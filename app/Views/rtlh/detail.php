@@ -1,0 +1,281 @@
+<?= $this->extend('layout') ?>
+
+<?= $this->section('content') ?>
+<?php
+    function getStatusBadge($status) {
+        $status = strtoupper($status ?? '');
+        if (str_contains($status, 'TIDAK LAYAK') || str_contains($status, 'KURANG LAYAK')) {
+            return 'bg-red-50 text-red-700 border-red-100';
+        } elseif (str_contains($status, 'AGAK') || str_contains($status, 'MENUJU')) {
+            return 'bg-amber-50 text-amber-700 border-amber-100';
+        } elseif (str_contains($status, 'LAYAK')) {
+            return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+        }
+        return 'bg-slate-50 text-slate-400 border-slate-100';
+    }
+?>
+
+<div class="max-w-6xl mx-auto space-y-8 pb-24 text-slate-900">
+    
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-[2rem] border shadow-sm">
+        <div class="flex items-center space-x-5">
+            <div class="p-4 bg-blue-900 rounded-2xl text-white shadow-lg shadow-blue-900/20">
+                <i data-lucide="clipboard-list" class="w-10 h-10"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-black text-blue-950 tracking-tight">Data Survei Lengkap RTLH</h1>
+                <div class="flex items-center space-x-3 mt-1">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">ID Registrasi</span>
+                    <span class="px-3 py-1 bg-blue-950 text-white rounded-lg font-mono text-sm font-bold shadow-lg">SRV-<?= str_pad($rumah['id_survei'] ?? '0', 5, '0', STR_PAD_LEFT) ?></span>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="window.print()" class="px-5 py-3 bg-white border-2 border-blue-900/10 text-blue-900 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center">
+                <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Cetak Laporan
+            </button>
+            <a href="<?= base_url('rtlh/edit/' . ($rumah['id_survei'] ?? '')) ?>" class="px-8 py-3 bg-blue-900 text-white rounded-2xl text-sm font-bold hover:bg-blue-950 shadow-xl shadow-blue-900/30 transition-all flex items-center">
+                <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> Perbarui Data
+            </a>
+        </div>
+    </div>
+
+    <!-- BAGIAN 1: IDENTITAS PENERIMA -->
+    <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-6 border-b bg-slate-50/50 flex items-center justify-between">
+            <h3 class="font-bold text-blue-950 uppercase tracking-[0.2em] text-xs flex items-center">
+                <i data-lucide="user" class="w-4 h-4 mr-2 text-blue-900"></i> I. Identitas Lengkap Pemilik
+            </h3>
+        </div>
+        <div class="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-8">
+            <div class="lg:col-span-2">
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Nama Lengkap Kepala Keluarga</p>
+                <p class="text-2xl font-black text-slate-900 leading-tight"><?= $penerima['nama_kepala_keluarga'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">NIK (16 Digit)</p>
+                <p class="text-sm font-mono font-bold text-blue-900 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100 w-fit"><?= $penerima['nik'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Nomor KK</p>
+                <p class="text-sm font-mono font-bold text-blue-900 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100 w-fit"><?= $penerima['no_kk'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Tempat, Tanggal Lahir</p>
+                <p class="text-sm font-bold text-slate-800"><?= $penerima['tempat_lahir'] ?? '-' ?>, <?= $penerima['tanggal_lahir'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Umur</p>
+                <p class="text-sm font-bold text-slate-800">
+                    <?php 
+                        if (!empty($penerima['tanggal_lahir'])) {
+                            $birthDate = new DateTime($penerima['tanggal_lahir']);
+                            echo $birthDate->diff(new DateTime('today'))->y . ' Tahun';
+                        } else echo '-';
+                    ?>
+                </p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jenis Kelamin</p>
+                <p class="text-sm font-bold text-slate-800"><?= ($penerima['jenis_kelamin'] ?? '') == 'L' ? 'Laki-laki' : 'Perempuan' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Pendidikan</p>
+                <p class="text-sm font-bold text-slate-800"><?= $penerima['pendidikan'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Pekerjaan Utama</p>
+                <p class="text-sm font-bold text-slate-800"><?= $penerima['pekerjaan'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Penghasilan / Bulan</p>
+                <p class="text-sm font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 w-fit"><?= $penerima['penghasilan_per_bulan'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jml Anggota Keluarga</p>
+                <p class="text-sm font-bold text-slate-800"><?= $penerima['jumlah_anggota_keluarga'] ?? '0' ?> Orang</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BAGIAN 2: PROFIL RUMAH & LINGKUNGAN -->
+    <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-6 border-b bg-slate-50/50 flex items-center justify-between">
+            <h3 class="font-bold text-blue-950 uppercase tracking-[0.2em] text-xs flex items-center">
+                <i data-lucide="home" class="w-4 h-4 mr-2 text-blue-900"></i> II. Lokasi, Lahan & Aset
+            </h3>
+        </div>
+        <div class="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-8">
+            <div class="lg:col-span-2">
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Alamat Lengkap Rumah</p>
+                <p class="text-sm font-medium text-slate-800 leading-relaxed"><?= $rumah['alamat_detail'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Desa / Kelurahan</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['desa'] ?? '-' ?> <span class="text-[10px] text-slate-400 font-normal ml-1">(ID: <?= $rumah['desa_id'] ?? '-' ?>)</span></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jenis Kawasan</p>
+                <p class="text-sm font-bold text-slate-800 uppercase tracking-tighter"><?= $rumah['jenis_kawasan'] ?? '-' ?></p>
+            </div>
+            <div class="bg-blue-900 text-white p-5 rounded-3xl shadow-lg shadow-blue-900/20">
+                <p class="text-[9px] font-black text-blue-200 uppercase mb-1 tracking-[0.2em]">Luas Rumah</p>
+                <p class="text-2xl font-black"><?= $rumah['luas_rumah_m2'] ?? '0' ?><span class="text-xs font-bold ml-1 opacity-60 italic">m²</span></p>
+            </div>
+            <div class="bg-blue-900 text-white p-5 rounded-3xl shadow-lg shadow-blue-900/20">
+                <p class="text-[9px] font-black text-blue-200 uppercase mb-1 tracking-[0.2em]">Luas Lahan</p>
+                <p class="text-2xl font-black"><?= $rumah['luas_lahan_m2'] ?? '0' ?><span class="text-xs font-bold ml-1 opacity-60 italic">m²</span></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jml Penghuni Rumah</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['jumlah_penghuni_jiwa'] ?? '0' ?> Jiwa</p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Fungsi Ruang</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['fungsi_ruang'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Kepemilikan Rumah</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['kepemilikan_rumah'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Kepemilikan Tanah</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['kepemilikan_tanah'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Aset Rumah Lain</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['aset_rumah_di_lokasi_lain'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Bantuan Perumahan</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['bantuan_perumahan'] ?? '-' ?></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BAGIAN 3: FASILITAS & SANITASI -->
+    <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-6 border-b bg-slate-50/50 flex items-center justify-between">
+            <h3 class="font-bold text-blue-950 uppercase tracking-[0.2em] text-xs flex items-center">
+                <i data-lucide="droplets" class="w-4 h-4 mr-2 text-blue-900"></i> III. Fasilitas & Utilitas Sanitasi
+            </h3>
+        </div>
+        <div class="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-8">
+            <div class="lg:col-span-2">
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Sumber Penerangan</p>
+                <p class="text-sm font-bold text-slate-800 italic"><?= $rumah['sumber_penerangan'] ?? '-' ?> <span class="text-blue-900 ml-2 font-black underline decoration-blue-900/20"><?= $rumah['sumber_penerangan_detail'] ?? '' ?></span></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Sumber Air Minum (SAM)</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['sumber_air_minum'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jarak SAM ke TPA Tinja</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['jarak_sam_ke_tpa_tinja'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Kamar Mandi & Jamban</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['kamar_mandi_dan_jamban'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jenis Jamban / Kloset</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['jenis_jamban_kloset'] ?? '-' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jenis TPA Tinja</p>
+                <p class="text-sm font-bold text-slate-800"><?= $rumah['jenis_tpa_tinja'] ?? '-' ?></p>
+            </div>
+            <div class="lg:col-span-2">
+                <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Lokasi Koordinat</p>
+                <p class="text-xs font-mono font-bold text-blue-900 bg-blue-50 p-2 rounded-lg border border-blue-100 italic w-fit"><?= $rumah['lokasi_koordinat'] ?? 'Point(0 0)' ?></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BAGIAN 4: PENILAIAN TEKNIS -->
+    <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-6 border-b bg-slate-50/50 flex items-center justify-between">
+            <h3 class="font-bold text-blue-950 uppercase tracking-[0.2em] text-xs flex items-center">
+                <i data-lucide="shield-check" class="w-4 h-4 mr-2 text-blue-900"></i> IV. Penilaian Teknis Fisik Bangunan
+            </h3>
+        </div>
+        <div class="p-10 space-y-12">
+            <!-- STRUKTUR UTAMA -->
+            <div>
+                <h4 class="text-[10px] font-black text-blue-950 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Komponen Struktur Utama</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <?php 
+                        $struk = ['Pondasi', 'Kolom', 'Balok', 'Sloof'];
+                        foreach($struk as $s):
+                            $val = $kondisi[strtolower($s)] ?? null;
+                    ?>
+                    <div class="p-5 border-2 border-blue-900/5 bg-slate-50/30 rounded-3xl">
+                        <p class="text-[9px] font-black text-blue-900 uppercase tracking-wider mb-4 opacity-70"><?= $s ?></p>
+                        <span class="px-4 py-1.5 rounded-xl text-[10px] font-black border uppercase shadow-sm <?= getStatusBadge($val) ?>">
+                            <?= $val ?? 'N/A' ?>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- MATERIAL & KONDISI PENUTUP -->
+            <div>
+                <h4 class="text-[10px] font-black text-blue-950 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Material & Kondisi Penutup</h4>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <?php 
+                        $mats = [
+                            ['label' => 'Penutup Atap', 'mat' => $kondisi['atap_mat'], 'st' => $kondisi['atap_st'], 'icon' => 'tent'],
+                            ['label' => 'Dinding Utama', 'mat' => $kondisi['dinding_mat'], 'st' => $kondisi['dinding_st'], 'icon' => 'layers'],
+                            ['label' => 'Lantai Utama', 'mat' => $kondisi['lantai_mat'], 'st' => $kondisi['lantai_st'], 'icon' => 'grid-3x3'],
+                        ];
+                        foreach($mats as $m):
+                    ?>
+                    <div class="p-6 border-2 border-blue-900/5 rounded-[2rem] space-y-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest"><?= $m['label'] ?></span>
+                            <i data-lucide="<?= $m['icon'] ?>" class="w-5 h-5 text-blue-900/20"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-blue-900 uppercase mb-1 opacity-60">Material</p>
+                            <p class="text-lg font-black text-slate-800 italic uppercase"><?= $m['mat'] ?: '-' ?></p>
+                        </div>
+                        <div>
+                            <span class="inline-block w-full text-center py-2 rounded-xl text-[10px] font-black border uppercase shadow-sm <?= getStatusBadge($m['st']) ?>">
+                                <?= $m['st'] ?? 'N/A' ?>
+                            </span>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- KOMPONEN PENDUKUNG -->
+            <div>
+                <h4 class="text-[10px] font-black text-blue-950 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Komponen Pendukung</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <?php 
+                        $supp = [
+                            ['lbl' => 'Rangka Atap', 'val' => $kondisi['rangka_atap']],
+                            ['lbl' => 'Plafon', 'val' => $kondisi['plafon']],
+                            ['lbl' => 'Daun Jendela', 'val' => $kondisi['jendela']],
+                            ['lbl' => 'Ventilasi', 'val' => $kondisi['ventilasi']],
+                        ];
+                        foreach($supp as $sp):
+                    ?>
+                    <div class="p-5 border-2 border-blue-900/5 bg-slate-50/30 rounded-3xl text-center">
+                        <p class="text-[9px] font-black text-blue-900 uppercase mb-3 tracking-wider opacity-70"><?= $sp['lbl'] ?></p>
+                        <span class="px-3 py-1 rounded-lg text-[9px] font-black border uppercase shadow-sm <?= getStatusBadge($sp['val']) ?>">
+                            <?= $sp['val'] ?? 'N/A' ?>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>lucide.createIcons();</script>
+<?= $this->endSection() ?>
