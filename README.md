@@ -1,68 +1,98 @@
-# CodeIgniter 4 Application Starter
+# 🏠 SIBARUKI (Sistem Informasi Bedah Rumah Kabupaten Sinjai)
 
-## What is CodeIgniter?
+![CI4](https://img.shields.io/badge/Framework-CodeIgniter%204.6-orange?style=for-the-badge&logo=codeigniter)
+![Tailwind](https://img.shields.io/badge/Styling-Tailwind%20CSS-blue?style=for-the-badge&logo=tailwindcss)
+![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?style=for-the-badge&logo=php)
+![MySQL](https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql)
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+**SIBARUKI** adalah platform pusat data terpadu untuk manajemen dan monitoring program bedah rumah (RTLH) serta pemantauan kawasan permukiman kumuh di Kabupaten Sinjai. Dirancang dengan standar UI/UX modern ("Mewah" Style) untuk memberikan efisiensi maksimal bagi Admin Pusat dan Petugas Lapangan.
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+---
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## ✨ Fitur Unggulan
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+### 🛡️ Autentikasi & Keamanan (RBAC)
+- **Role-Based Access Control:** Pembatasan akses antara **Admin Pusat** dan **Petugas Desa**.
+- **Multi-Village Assignment:** Satu petugas dapat ditugaskan untuk mengelola satu atau banyak desa sekaligus.
+- **Data Isolation:** Petugas hanya dapat melihat dan mengelola data di wilayah desa yang ditugaskan kepada mereka.
 
-## Installation & updates
+### 📊 Dashboard Monitoring Real-time
+- **Live Stats:** Visualisasi total unit RTLH dan lokasi Wilayah Kumuh secara instan.
+- **System Health Check:** Pemantauan status database, beban server, dan indikator sinyal internet secara real-time.
+- **Activity Log Detail:** Audit trail yang mencatat setiap perubahan data secara spesifik (siapa, kapan, dan apa yang diubah).
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+### ⚡ UI/UX "Mewah" Experience
+- **AJAX Live Search:** Pencarian data instan tanpa refresh halaman (Debounced).
+- **Elegant Page Loader:** Transisi antar halaman yang halus dengan efek *glassmorphism*.
+- **Persistent Sidebar:** Navigasi cerdas yang mengingat pilihan menu Anda melalui *localStorage*.
+- **Modern Form Input:** Menggunakan *Tom Select* untuk pemilihan desa yang searchable dan intuitif.
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+### 🗺️ GIS & Integrasi Data
+- **WKT Support:** Mendukung penyimpanan koordinat lokasi dalam format *Well-Known Text*.
+- **Unified RTLH Management:** Pengelolaan data penerima, profil rumah, dan kondisi fisik bangunan dalam satu pintu.
 
-## Setup
+---
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+## 🚀 Teknologi yang Digunakan
 
-## Important Change with index.php
+| Komponen | Teknologi |
+| --- | --- |
+| **Backend** | PHP 8.1+ / CodeIgniter 4 |
+| **Frontend** | Tailwind CSS (Compiled via PostCSS) |
+| **Database** | MySQL / MariaDB |
+| **Icons** | Lucide Icons |
+| **Libraries** | Tom Select (Dropdown), Leaflet.js (Maps) |
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+---
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+## 📦 Instalasi & Persiapan
 
-**Please** read the user guide for a better explanation of how CI4 works!
+1. **Clone Repositori**
+   ```bash
+   git clone https://github.com/username/sibaruki.git
+   cd sibaruki
+   ```
 
-## Repository Management
+2. **Instal Dependensi**
+   ```bash
+   composer install
+   npm install
+   ```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+3. **Konfigurasi Environment**
+   Salin file `env` menjadi `.env` dan sesuaikan pengaturan database Anda.
+   ```bash
+   cp env .env
+   ```
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+4. **Migrasi & Seeding**
+   Siapkan struktur database dan data awal (Admin & Roles).
+   ```bash
+   php spark migrate
+   php spark db:seed AuthSeeder
+   ```
 
-## Server Requirements
+5. **Build Aset CSS**
+   ```bash
+   npm run build
+   ```
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+6. **Jalankan Aplikasi**
+   ```bash
+   php spark serve
+   ```
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+---
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+## 🔑 Akun Akses Default (Development)
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+- **Admin:** `admin` / `password123`
+- **Petugas:** `petugas_a` / `password123`
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+---
+
+## 👨‍💻 Kontribusi
+Aplikasi ini dikembangkan untuk kebutuhan Dinas Perkim Kabupaten Sinjai. Kontribusi bersifat tertutup sesuai dengan protokol keamanan data instansi.
+
+---
+**© 2026 DINAS PERKIM KABUPATEN SINJAI**
