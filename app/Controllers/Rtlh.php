@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\Controller;
 use App\Models\RtlhPenerimaModel;
 use App\Models\RumahRtlhModel;
 use App\Models\KondisiRumahModel;
@@ -9,42 +10,41 @@ use App\Models\RefMasterModel;
 
 class Rtlh extends BaseController
 {
-    protected $penerimaModel;
-    protected $rumahModel;
-    protected $kondisiModel;
-    protected $refModel;
-
-    public function __construct()
-    {
-        $this->penerimaModel = new RtlhPenerimaModel();
-        $this->rumahModel = new RumahRtlhModel();
-        $this->kondisiModel = new KondisiRumahModel();
-        $this->refModel = new RefMasterModel();
+    // Fungsi pembantu untuk mengubah string kosong menjadi NULL
+    private function nullify($value) {
+        return ($value === '' || $value === null) ? null : $value;
     }
 
     public function index()
     {
+        $rumahModel = new RumahRtlhModel();
+        
         $data = [
             'title' => 'Data RTLH',
-            'rumah' => $this->rumahModel->select('rumah_rtlh.*, p.nama_kepala_keluarga as pemilik')
+            'rumah' => $rumahModel->select('rumah_rtlh.*, p.nama_kepala_keluarga as pemilik')
                 ->join('rtlh_penerima p', 'p.nik = rumah_rtlh.nik_pemilik', 'left')
+                ->orderBy('id_survei', 'ASC') // Kembali ke urutan dari terkecil
                 ->paginate(25, 'group1'),
-            'pager' => $this->rumahModel->pager
+            'pager' => $rumahModel->pager
         ];
         return view('rtlh/index', $data);
     }
 
     public function detail($id_survei)
     {
-        $rumah = $this->rumahModel->find($id_survei);
+        $db = \Config\Database::connect();
+        $rumah = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
-        $penerima = $this->penerimaModel->select('rtlh_penerima.*, pnd.nama_pilihan as pendidikan, pkj.nama_pilihan as pekerjaan')
+        $penerima = $db->table('rtlh_penerima')
+            ->select('rtlh_penerima.*, pnd.nama_pilihan as pendidikan, pkj.nama_pilihan as pekerjaan')
             ->join('ref_master pnd', 'pnd.id = rtlh_penerima.pendidikan_id', 'left')
             ->join('ref_master pkj', 'pkj.id = rtlh_penerima.pekerjaan_id', 'left')
-            ->find($rumah['nik_pemilik']);
-        
-        $kondisi = $this->kondisiModel->select('rtlh_kondisi_rumah.*')
+            ->where('nik', $rumah['nik_pemilik'])
+            ->get()->getRowArray();
+
+        $kondisi = $db->table('rtlh_kondisi_rumah')
+            ->select('rtlh_kondisi_rumah.*')
             ->select('ref_pondasi.nama_pilihan as pondasi, ref_kolom.nama_pilihan as kolom')
             ->select('ref_balok.nama_pilihan as balok, ref_sloof.nama_pilihan as sloof')
             ->select('ref_atap_st.nama_pilihan as atap_st, ref_atap_mat.nama_pilihan as atap_mat')
@@ -67,42 +67,82 @@ class Rtlh extends BaseController
             ->join('ref_master ref_jendela', 'ref_jendela.id = rtlh_kondisi_rumah.st_jendela', 'left')
             ->join('ref_master ref_ventilasi', 'ref_ventilasi.id = rtlh_kondisi_rumah.st_ventilasi', 'left')
             ->where('rtlh_kondisi_rumah.id_survei', $id_survei)
-            ->first();
+            ->get()->getRowArray();
 
-        $data = [
-            'title' => 'Detail Data RTLH',
-            'rumah' => $rumah,
-            'penerima' => $penerima ?: [],
-            'kondisi' => $kondisi ?: []
-        ];
+        $data = [ 'title' => 'Detail Data RTLH', 'rumah' => $rumah, 'penerima' => $penerima ?: [], 'kondisi' => $kondisi ?: [] ];
         return view('rtlh/detail', $data);
     }
 
     public function create()
     {
-        $allMaster = $this->refModel->findAll();
+        $refModel = new RefMasterModel();
+        $allMaster = $refModel->findAll();
         $master = [];
-        foreach ($allMaster as $m) {
-            $master[$m['kategori']][] = $m;
-        }
+        foreach ($allMaster as $m) { $master[$m['kategori']][] = $m; }
         return view('rtlh/create', ['title' => 'Input RTLH Terpadu', 'master' => $master]);
     }
 
     public function store()
     {
         $db = \Config\Database::connect();
+        $input = $this->request->getPost();
         $db->transStart();
         try {
-            $this->penerimaModel->insert($this->request->getPost());
+            $db->table('rtlh_penerima')->insert([
+                'nik' => $input['nik'],
+                'no_kk' => $this->nullify($input['no_kk']),
+                'nama_kepala_keluarga' => $input['nama_kepala_keluarga'],
+                'tempat_lahir' => $this->nullify($input['tempat_lahir']),
+                'tanggal_lahir' => $this->nullify($input['tanggal_lahir']),
+                'jenis_kelamin' => $this->nullify($input['jenis_kelamin']),
+                'pendidikan_id' => $this->nullify($input['pendidikan_id']),
+                'pekerjaan_id' => $this->nullify($input['pekerjaan_id']),
+                'penghasilan_per_bulan' => $this->nullify($input['penghasilan_per_bulan']),
+                'jumlah_anggota_keluarga' => $this->nullify($input['jumlah_anggota_keluarga']),
+            ]);
             
-            $dataRumah = $this->request->getPost();
-            $dataRumah['nik_pemilik'] = $this->request->getPost('nik');
-            $this->rumahModel->insert($dataRumah);
+            $db->table('rumah_rtlh')->insert([
+                'nik_pemilik' => $input['nik'],
+                'desa' => $input['desa'],
+                'desa_id' => $this->nullify($input['desa_id']),
+                'alamat_detail' => $this->nullify($input['alamat_detail']),
+                'kepemilikan_rumah' => $this->nullify($input['kepemilikan_rumah']),
+                'aset_rumah_di_lokasi_lain' => $this->nullify($input['aset_rumah_di_lokasi_lain']),
+                'kepemilikan_tanah' => $this->nullify($input['kepemilikan_tanah']),
+                'sumber_penerangan' => $this->nullify($input['sumber_penerangan']),
+                'sumber_penerangan_detail' => $this->nullify($input['sumber_penerangan_detail']),
+                'bantuan_perumahan' => $this->nullify($input['bantuan_perumahan']),
+                'jenis_kawasan' => $this->nullify($input['jenis_kawasan']),
+                'fungsi_ruang' => $this->nullify($input['fungsi_ruang']),
+                'luas_rumah_m2' => $this->nullify($input['luas_rumah_m2']),
+                'luas_lahan_m2' => $this->nullify($input['luas_lahan_m2']),
+                'jumlah_penghuni_jiwa' => $this->nullify($input['jumlah_penghuni_jiwa']),
+                'sumber_air_minum' => $this->nullify($input['sumber_air_minum']),
+                'jarak_sam_ke_tpa_tinja' => $this->nullify($input['jarak_sam_ke_tpa_tinja']),
+                'kamar_mandi_dan_jamban' => $this->nullify($input['kamar_mandi_dan_jamban']),
+                'jenis_jamban_kloset' => $this->nullify($input['jenis_jamban_kloset']),
+                'jenis_tpa_tinja' => $this->nullify($input['jenis_tpa_tinja']),
+                'lokasi_koordinat' => $this->nullify($input['lokasi_koordinat']),
+            ]);
             $id_survei = $db->insertID();
 
-            $dataKondisi = $this->request->getPost();
-            $dataKondisi['id_survei'] = $id_survei;
-            $this->kondisiModel->insert($dataKondisi);
+            $db->table('rtlh_kondisi_rumah')->insert([
+                'id_survei' => $id_survei,
+                'st_pondasi' => $this->nullify($input['st_pondasi']),
+                'st_kolom' => $this->nullify($input['st_kolom']),
+                'st_balok' => $this->nullify($input['st_balok']),
+                'st_sloof' => $this->nullify($input['st_sloof']),
+                'st_rangka_atap' => $this->nullify($input['st_rangka_atap']),
+                'st_plafon' => $this->nullify($input['st_plafon']),
+                'st_jendela' => $this->nullify($input['st_jendela']),
+                'st_ventilasi' => $this->nullify($input['st_ventilasi']),
+                'mat_lantai' => $this->nullify($input['mat_lantai']),
+                'st_lantai' => $this->nullify($input['st_lantai']),
+                'mat_dinding' => $this->nullify($input['mat_dinding']),
+                'st_dinding' => $this->nullify($input['st_dinding']),
+                'mat_atap' => $this->nullify($input['mat_atap']),
+                'st_atap' => $this->nullify($input['st_atap']),
+            ]);
 
             $db->transComplete();
             return redirect()->to('/rtlh')->with('message', 'Data berhasil disimpan.');
@@ -114,50 +154,98 @@ class Rtlh extends BaseController
 
     public function edit($id_survei)
     {
-        $rumah = $this->rumahModel->find($id_survei);
-        $data = [
-            'title' => 'Edit RTLH',
-            'rumah' => $rumah,
-            'penerima' => $this->penerimaModel->find($rumah['nik_pemilik']),
-            'kondisi' => $this->kondisiModel->find($id_survei),
-            'master' => []
-        ];
-        foreach ($this->refModel->findAll() as $m) { $data['master'][$m['kategori']][] = $m; }
-        return view('rtlh/edit', $data);
+        $db = \Config\Database::connect();
+        $refModel = new RefMasterModel();
+        $rumah = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
+        $penerima = $db->table('rtlh_penerima')->where('nik', $rumah['nik_pemilik'])->get()->getRowArray();
+        $kondisi = $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
+        $master = [];
+        foreach ($refModel->findAll() as $m) { $master[$m['kategori']][] = $m; }
+        return view('rtlh/edit', ['title' => 'Edit RTLH', 'rumah' => $rumah, 'penerima' => $penerima, 'kondisi' => $kondisi, 'master' => $master]);
     }
 
     public function update($id_survei)
     {
         $db = \Config\Database::connect();
-        try {
-            $rumahLama = $this->rumahModel->find($id_survei);
-            $db->transStart();
-            
-            // Update Penerima
-            $this->penerimaModel->update($rumahLama['nik_pemilik'], $this->request->getPost());
-            
-            // Update Rumah
-            $dataRumah = $this->request->getPost();
-            $dataRumah['nik_pemilik'] = $this->request->getPost('nik');
-            $this->rumahModel->update($id_survei, $dataRumah);
+        $input = $this->request->getPost();
+        
+        $rumahLama = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
+        if (!$rumahLama) return redirect()->back()->with('message', 'Data tidak ditemukan.');
+        
+        $nikLama = $rumahLama['nik_pemilik'];
+        $nikBaru = $input['nik'];
 
-            // Update Kondisi
-            $this->kondisiModel->update($id_survei, $this->request->getPost());
+        $db->transStart();
+        try {
+            $db->table('rtlh_penerima')->where('nik', $nikLama)->update([
+                'nik' => $nikBaru,
+                'no_kk' => $this->nullify($input['no_kk']),
+                'nama_kepala_keluarga' => $input['nama_kepala_keluarga'],
+                'tempat_lahir' => $this->nullify($input['tempat_lahir']),
+                'tanggal_lahir' => $this->nullify($input['tanggal_lahir']),
+                'jenis_kelamin' => $this->nullify($input['jenis_kelamin']),
+                'pendidikan_id' => $this->nullify($input['pendidikan_id']),
+                'pekerjaan_id' => $this->nullify($input['pekerjaan_id']),
+                'penghasilan_per_bulan' => $this->nullify($input['penghasilan_per_bulan']),
+                'jumlah_anggota_keluarga' => $this->nullify($input['jumlah_anggota_keluarga']),
+            ]);
+            
+            $db->table('rumah_rtlh')->where('id_survei', $id_survei)->update([
+                'nik_pemilik' => $nikBaru,
+                'desa' => $input['desa'],
+                'desa_id' => $this->nullify($input['desa_id']),
+                'alamat_detail' => $this->nullify($input['alamat_detail']),
+                'kepemilikan_rumah' => $this->nullify($input['kepemilikan_rumah']),
+                'aset_rumah_di_lokasi_lain' => $this->nullify($input['aset_rumah_di_lokasi_lain']),
+                'kepemilikan_tanah' => $this->nullify($input['kepemilikan_tanah']),
+                'sumber_penerangan' => $this->nullify($input['sumber_penerangan']),
+                'sumber_penerangan_detail' => $this->nullify($input['sumber_penerangan_detail']),
+                'bantuan_perumahan' => $this->nullify($input['bantuan_perumahan']),
+                'jenis_kawasan' => $this->nullify($input['jenis_kawasan']),
+                'fungsi_ruang' => $this->nullify($input['fungsi_ruang']),
+                'luas_rumah_m2' => $this->nullify($input['luas_rumah_m2']),
+                'luas_lahan_m2' => $this->nullify($input['luas_lahan_m2']),
+                'jumlah_penghuni_jiwa' => $this->nullify($input['jumlah_penghuni_jiwa']),
+                'sumber_air_minum' => $this->nullify($input['sumber_air_minum']),
+                'jarak_sam_ke_tpa_tinja' => $this->nullify($input['jarak_sam_ke_tpa_tinja']),
+                'kamar_mandi_dan_jamban' => $this->nullify($input['kamar_mandi_dan_jamban']),
+                'jenis_jamban_kloset' => $this->nullify($input['jenis_jamban_kloset']),
+                'jenis_tpa_tinja' => $this->nullify($input['jenis_tpa_tinja']),
+                'lokasi_koordinat' => $this->nullify($input['lokasi_koordinat']),
+            ]);
+
+            $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->update([
+                'st_pondasi' => $this->nullify($input['st_pondasi']),
+                'st_kolom' => $this->nullify($input['st_kolom']),
+                'st_balok' => $this->nullify($input['st_balok']),
+                'st_sloof' => $this->nullify($input['st_sloof']),
+                'st_rangka_atap' => $this->nullify($input['st_rangka_atap']),
+                'st_plafon' => $this->nullify($input['st_plafon']),
+                'st_jendela' => $this->nullify($input['st_jendela']),
+                'st_ventilasi' => $this->nullify($input['st_ventilasi']),
+                'mat_lantai' => $this->nullify($input['mat_lantai']),
+                'st_lantai' => $this->nullify($input['st_lantai']),
+                'mat_dinding' => $this->nullify($input['mat_dinding']),
+                'st_dinding' => $this->nullify($input['st_dinding']),
+                'mat_atap' => $this->nullify($input['mat_atap']),
+                'st_atap' => $this->nullify($input['st_atap']),
+            ]);
 
             $db->transComplete();
             return redirect()->to('/rtlh/detail/' . $id_survei)->with('message', 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
+            $db->transRollback();
             return redirect()->back()->withInput()->with('message', 'Kesalahan: ' . $e->getMessage());
         }
     }
 
     public function delete($id_survei)
     {
-        $rumah = $this->rumahModel->find($id_survei);
-        if ($rumah) {
-            $this->kondisiModel->delete($id_survei);
-            $this->rumahModel->delete($id_survei);
-        }
+        $db = \Config\Database::connect();
+        $db->transStart();
+        $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->delete();
+        $db->table('rumah_rtlh')->where('id_survei', $id_survei)->delete();
+        $db->transComplete();
         return redirect()->to('/rtlh')->with('message', 'Data berhasil dihapus');
     }
 }

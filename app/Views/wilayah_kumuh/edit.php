@@ -22,12 +22,7 @@
                     <h3 class="text-sm font-bold text-amber-600 uppercase tracking-widest mb-4 flex items-center">
                         <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> Identitas Wilayah
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">FID (Primary Key)</label>
-                            <input type="number" name="FID" value="<?= $kumuh['FID'] ?>" readonly class="w-full p-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 outline-none cursor-not-allowed">
-                            <p class="text-[10px] text-gray-400 mt-1">* FID tidak dapat diubah</p>
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Nama Kawasan</label>
                             <input type="text" name="Kawasan" value="<?= old('Kawasan', $kumuh['Kawasan']) ?>" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">

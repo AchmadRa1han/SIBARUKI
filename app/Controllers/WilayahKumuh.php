@@ -59,7 +59,7 @@ class WilayahKumuh extends BaseController
     public function update($id)
     {
         $this->kumuhModel->update($id, $this->request->getPost());
-        return redirect()->to('/wilayah-kumuh')->with('message', 'Data wilayah kumuh berhasil diperbarui');
+        return redirect()->to('/wilayah-kumuh/detail/' . $id)->with('message', 'Data wilayah kumuh berhasil diperbarui');
     }
 
     public function delete($id)

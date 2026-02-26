@@ -7,8 +7,8 @@ use CodeIgniter\Model;
 class WilayahKumuhModel extends Model
 {
     protected $table            = 'wilayah_kumuh';
-    protected $primaryKey       = 'FID'; // Mengasumsikan FID sebagai primary key
-    protected $useAutoIncrement = false;
+    protected $primaryKey       = 'FID';
+    protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $allowedFields    = [
         'FID', 'Provinsi', 'Kode_Prov', 'Kab_Kota', 'Kode_Kab', 

@@ -1,6 +1,9 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
+<!-- Library for PDF Download -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <?php
     function getStatusBadge($status) {
         $status = strtoupper($status ?? '');
@@ -15,12 +18,12 @@
     }
 ?>
 
-<div class="max-w-6xl mx-auto space-y-8 pb-24 text-slate-900">
+<div id="report-content" class="max-w-6xl mx-auto space-y-8 pb-24 text-slate-900">
     
-    <!-- HEADER -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-[2rem] border shadow-sm">
+    <!-- HEADER (no-export class untuk elemen yang tidak ingin di PDF-kan tapi ingin di cetak layar) -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-[2rem] border shadow-sm no-print">
         <div class="flex items-center space-x-5">
-            <div class="p-4 bg-blue-900 rounded-2xl text-white shadow-lg shadow-blue-900/20">
+            <div class="p-4 bg-blue-900 rounded-2xl text-white shadow-lg">
                 <i data-lucide="clipboard-list" class="w-10 h-10"></i>
             </div>
             <div>
@@ -32,12 +35,27 @@
             </div>
         </div>
         <div class="flex items-center space-x-3">
-            <button onclick="window.print()" class="px-5 py-3 bg-white border-2 border-blue-900/10 text-blue-900 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center">
-                <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Cetak Laporan
+            <button onclick="window.print()" class="px-5 py-3 bg-white border-2 border-blue-900/10 text-slate-600 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center shadow-sm">
+                <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Cetak
+            </button>
+            <button onclick="downloadPDF()" class="px-5 py-3 bg-white border-2 border-blue-900/10 text-blue-900 rounded-2xl text-sm font-bold hover:bg-blue-50 transition-all flex items-center shadow-sm">
+                <i data-lucide="download" class="w-4 h-4 mr-2"></i> Download PDF
             </button>
             <a href="<?= base_url('rtlh/edit/' . ($rumah['id_survei'] ?? '')) ?>" class="px-8 py-3 bg-blue-900 text-white rounded-2xl text-sm font-bold hover:bg-blue-950 shadow-xl shadow-blue-900/30 transition-all flex items-center">
                 <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> Perbarui Data
             </a>
+        </div>
+    </div>
+
+    <!-- Kotak Info Khusus PDF (Hanya muncul di PDF) -->
+    <div class="hidden print-block bg-blue-900 p-8 rounded-[2rem] text-white flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-black uppercase tracking-tight">Laporan Teknis RTLH</h1>
+            <p class="opacity-70 text-xs">Sistem Informasi Bantuan Rumah Tidak Layak Huni (SIBARUKI)</p>
+        </div>
+        <div class="text-right">
+            <p class="text-[10px] font-bold opacity-60 uppercase">Registrasi</p>
+            <p class="text-xl font-mono font-bold">SRV-<?= str_pad($rumah['id_survei'] ?? '0', 5, '0', STR_PAD_LEFT) ?></p>
         </div>
     </div>
 
@@ -90,7 +108,7 @@
             </div>
             <div>
                 <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Penghasilan / Bulan</p>
-                <p class="text-sm font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 w-fit"><?= $penerima['penghasilan_per_bulan'] ?? '-' ?></p>
+                <p class="text-sm font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md w-fit"><?= $penerima['penghasilan_per_bulan'] ?? '-' ?></p>
             </div>
             <div>
                 <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jml Anggota Keluarga</p>
@@ -99,7 +117,7 @@
         </div>
     </div>
 
-    <!-- BAGIAN 2: PROFIL RUMAH & LINGKUNGAN -->
+    <!-- BAGIAN 2: PROFIL RUMAH & LAHAN -->
     <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
         <div class="p-6 border-b bg-slate-50/50 flex items-center justify-between">
             <h3 class="font-bold text-blue-950 uppercase tracking-[0.2em] text-xs flex items-center">
@@ -119,11 +137,11 @@
                 <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80">Jenis Kawasan</p>
                 <p class="text-sm font-bold text-slate-800 uppercase tracking-tighter"><?= $rumah['jenis_kawasan'] ?? '-' ?></p>
             </div>
-            <div class="bg-blue-900 text-white p-5 rounded-3xl shadow-lg shadow-blue-900/20">
+            <div class="bg-blue-900 text-white p-5 rounded-3xl shadow-lg">
                 <p class="text-[9px] font-black text-blue-200 uppercase mb-1 tracking-[0.2em]">Luas Rumah</p>
                 <p class="text-2xl font-black"><?= $rumah['luas_rumah_m2'] ?? '0' ?><span class="text-xs font-bold ml-1 opacity-60 italic">m²</span></p>
             </div>
-            <div class="bg-blue-900 text-white p-5 rounded-3xl shadow-lg shadow-blue-900/20">
+            <div class="bg-blue-900 text-white p-5 rounded-3xl shadow-lg">
                 <p class="text-[9px] font-black text-blue-200 uppercase mb-1 tracking-[0.2em]">Luas Lahan</p>
                 <p class="text-2xl font-black"><?= $rumah['luas_lahan_m2'] ?? '0' ?><span class="text-xs font-bold ml-1 opacity-60 italic">m²</span></p>
             </div>
@@ -203,7 +221,7 @@
         <div class="p-10 space-y-12">
             <!-- STRUKTUR UTAMA -->
             <div>
-                <h4 class="text-[10px] font-black text-blue-950 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Komponen Struktur Utama</h4>
+                <h4 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Komponen Struktur Utama</h4>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <?php 
                         $struk = ['Pondasi', 'Kolom', 'Balok', 'Sloof'];
@@ -222,7 +240,7 @@
 
             <!-- MATERIAL & KONDISI PENUTUP -->
             <div>
-                <h4 class="text-[10px] font-black text-blue-950 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Material & Kondisi Penutup</h4>
+                <h4 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Material & Kondisi Penutup</h4>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <?php 
                         $mats = [
@@ -253,7 +271,7 @@
 
             <!-- KOMPONEN PENDUKUNG -->
             <div>
-                <h4 class="text-[10px] font-black text-blue-950 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Komponen Pendukung</h4>
+                <h4 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-6 flex items-center"><span class="w-8 h-1 bg-blue-900 mr-3"></span> Komponen Pendukung</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <?php 
                         $supp = [
@@ -277,5 +295,44 @@
     </div>
 </div>
 
-<script>lucide.createIcons();</script>
+<script>
+    lucide.createIcons();
+
+    function downloadPDF() {
+        const element = document.getElementById('report-content');
+        const opt = {
+            margin:       [10, 10],
+            filename:     'Laporan_RTLH_<?= $penerima["nama_kepala_keluarga"] ?? "Data" ?>.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        // Tambahkan class khusus untuk PDF sebelum generate
+        document.body.classList.add('is-exporting');
+        
+        html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+            document.body.classList.remove('is-exporting');
+        }).save();
+    }
+</script>
+
+<style>
+    @media print {
+        aside, header, nav, .no-print { display: none !important; }
+        main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        .shadow-sm, .shadow-lg, .shadow-xl { box-shadow: none !important; }
+        .bg-blue-900, .bg-blue-950, .bg-emerald-50, .bg-blue-50 { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .max-w-6xl { max-width: 100% !important; }
+    }
+
+    /* Sembunyikan elemen tertentu saat proses export PDF */
+    .is-exporting .no-print {
+        display: none !important;
+    }
+    
+    .print-block { display: none; }
+    .is-exporting .print-block { display: flex !important; }
+</style>
 <?= $this->endSection() ?>

@@ -4,69 +4,64 @@
 <div class="space-y-8">
     <!-- Header Section -->
     <div>
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Ringkasan Sistem</h1>
-        <p class="text-gray-500 mt-1">Selamat datang kembali, berikut adalah performa data Anda hari ini.</p>
+        <h1 class="text-3xl font-extrabold text-blue-950 tracking-tight">Ringkasan Sistem</h1>
+        <p class="text-slate-400 mt-1 font-medium italic">Data diperbarui secara real-time dari database SIBARUKI.</p>
     </div>
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all">
             <div class="flex items-center space-x-4">
-                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                <div class="p-3 bg-blue-50 text-blue-900 rounded-2xl shadow-inner">
                     <i data-lucide="layers" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-gray-500">Total Tabel</p>
-                    <p class="text-2xl font-bold text-gray-900">12</p>
+                    <p class="text-[10px] font-black text-blue-900 uppercase tracking-widest opacity-60">Total Tabel</p>
+                    <p class="text-2xl font-black text-slate-800"><?= $totalTables ?></p>
                 </div>
             </div>
-            <div class="mt-4 flex items-center text-xs text-green-600 font-bold bg-green-50 w-fit px-2 py-1 rounded-full">
-                <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i>
-                <span>+2 Baru</span>
-            </div>
+            <div class="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-tight">Tabel Utama Terkelola</div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all">
             <div class="flex items-center space-x-4">
-                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                <div class="p-3 bg-indigo-50 text-indigo-900 rounded-2xl shadow-inner">
                     <i data-lucide="database" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-gray-500">Total Data</p>
-                    <p class="text-2xl font-bold text-gray-900">2,543</p>
+                    <p class="text-[10px] font-black text-blue-900 uppercase tracking-widest opacity-60">Total Data</p>
+                    <p class="text-2xl font-black text-slate-800"><?= number_format($totalData) ?></p>
                 </div>
             </div>
-            <div class="mt-4 text-xs text-gray-400">Total seluruh entri database</div>
+            <div class="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-tight">Seluruh Entri Database</div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm opacity-50 cursor-not-allowed">
             <div class="flex items-center space-x-4">
-                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                <div class="p-3 bg-emerald-50 text-emerald-900 rounded-2xl shadow-inner">
                     <i data-lucide="users" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-gray-500">Pengguna Aktif</p>
-                    <p class="text-2xl font-bold text-gray-900">48</p>
+                    <p class="text-[10px] font-black text-blue-900 uppercase tracking-widest">Pengguna</p>
+                    <p class="text-2xl font-black text-slate-800">1</p>
                 </div>
             </div>
-            <div class="mt-4 flex items-center text-xs text-green-600 font-bold bg-green-50 w-fit px-2 py-1 rounded-full">
-                <span>8 Sesi Aktif</span>
-            </div>
+            <div class="mt-4 text-[10px] font-bold text-slate-400 uppercase">Sesi Administrator</div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
             <div class="flex items-center space-x-4">
-                <div class="p-3 bg-rose-50 text-rose-600 rounded-xl">
+                <div class="p-3 bg-rose-50 text-rose-900 rounded-2xl shadow-inner">
                     <i data-lucide="shield-check" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-gray-500">Status Sistem</p>
-                    <p class="text-2xl font-bold text-gray-900">Stabil</p>
+                    <p class="text-[10px] font-black text-blue-900 uppercase tracking-widest opacity-60">Status</p>
+                    <p class="text-2xl font-black text-slate-800 tracking-tighter uppercase">STABIL</p>
                 </div>
             </div>
-            <div class="mt-4 flex items-center text-xs text-emerald-600 font-bold">
+            <div class="mt-4 flex items-center text-[9px] font-black text-emerald-600 uppercase tracking-widest">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
-                Semua sistem berjalan normal
+                Sistem Online
             </div>
         </div>
     </div>
@@ -74,66 +69,57 @@
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Aktivitas Terakhir -->
-        <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-gray-50 flex justify-between items-center">
-                <h3 class="font-bold text-gray-800">Aktivitas Terakhir</h3>
-                <button class="text-sm text-blue-600 font-bold hover:underline">Lihat Semua</button>
+        <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+            <div class="p-8 border-b bg-slate-50/50 flex justify-between items-center">
+                <h3 class="font-black text-blue-950 uppercase tracking-widest text-xs">Aktivitas Terakhir</h3>
+                <i data-lucide="activity" class="w-4 h-4 text-slate-300"></i>
             </div>
-            <div class="divide-y divide-gray-50">
-                <div class="p-6 flex items-center space-x-4 hover:bg-gray-50 transition-colors">
-                    <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center shrink-0">
-                        <i data-lucide="edit-3" class="w-5 h-5"></i>
+            <div class="divide-y divide-slate-50">
+                <?php if(empty($logs)): ?>
+                    <div class="p-12 text-center text-slate-400 italic text-sm">
+                        <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-20 text-slate-900"></i>
+                        Belum ada aktivitas yang tercatat.
                     </div>
-                    <div class="flex-grow">
-                        <p class="text-sm font-bold text-gray-800">Pembaruan Data ref_master</p>
-                        <p class="text-xs text-gray-500">Admin mengubah kategori 'Hobi'</p>
+                <?php else: foreach($logs as $log): ?>
+                    <div class="p-6 flex items-center space-x-5 hover:bg-slate-50 transition-colors group">
+                        <div class="w-12 h-12 bg-white rounded-2xl border border-slate-100 flex items-center justify-center shrink-0 shadow-sm group-hover:shadow-md transition-all">
+                            <?php 
+                                $icon = 'edit-3'; $color = 'text-amber-500';
+                                if($log['action'] == 'Tambah') { $icon = 'plus-circle'; $color = 'text-blue-500'; }
+                                if($log['action'] == 'Hapus') { $icon = 'trash-2'; $color = 'text-rose-500'; }
+                            ?>
+                            <i data-lucide="<?= $icon ?>" class="w-5 h-5 <?= $color ?>"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="text-sm font-black text-slate-800 uppercase tracking-tight"><?= $log['action'] ?> Data di <span class="text-blue-900 underline decoration-blue-100"><?= $log['table_name'] ?></span></p>
+                            <p class="text-xs text-slate-400 font-medium mt-0.5 italic"><?= $log['description'] ?></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-slate-300 uppercase"><?= date('H:i', strtotime($log['created_at'])) ?></p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase"><?= date('d M', strtotime($log['created_at'])) ?></p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-xs font-medium text-gray-400">2 menit lalu</p>
-                    </div>
-                </div>
-                <div class="p-6 flex items-center space-x-4 hover:bg-gray-50 transition-colors">
-                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
-                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                    </div>
-                    <div class="flex-grow">
-                        <p class="text-sm font-bold text-gray-800">Data Baru Ditambahkan</p>
-                        <p class="text-xs text-gray-500">Menambahkan entri baru pada tabel pengguna</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs font-medium text-gray-400">1 jam lalu</p>
-                    </div>
-                </div>
-                <div class="p-6 flex items-center space-x-4 hover:bg-gray-50 transition-colors">
-                    <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center shrink-0">
-                        <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </div>
-                    <div class="flex-grow">
-                        <p class="text-sm font-bold text-gray-800">Penghapusan Log</p>
-                        <p class="text-xs text-gray-500">Sistem membersihkan log aktivitas lama</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs font-medium text-gray-400">5 jam lalu</p>
-                    </div>
-                </div>
+                <?php endforeach; endif; ?>
             </div>
         </div>
 
-        <!-- Quick Info / Panduan -->
-        <div class="bg-indigo-600 rounded-2xl p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden">
-            <i data-lucide="sparkles" class="w-32 h-32 absolute -right-8 -bottom-8 opacity-20 rotate-12"></i>
-            <h3 class="text-xl font-bold mb-4 relative z-10">Pusat Bantuan</h3>
-            <p class="text-indigo-100 text-sm leading-relaxed mb-6 relative z-10">
-                Butuh bantuan dalam mengelola database SIBARUKI? Tim pengembang siap membantu Anda kapan saja.
-            </p>
-            <button class="bg-white text-indigo-600 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-50 transition-colors relative z-10 shadow-lg">
-                Hubungi Support
-            </button>
+        <!-- Bantuan -->
+        <div class="bg-blue-950 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden flex flex-col justify-between">
+            <i data-lucide="help-circle" class="w-48 h-48 absolute -right-12 -bottom-12 opacity-5 rotate-12"></i>
+            <div>
+                <h3 class="text-2xl font-black mb-4 leading-tight tracking-tight">Butuh Bantuan Navigasi?</h3>
+                <p class="text-blue-200 text-sm leading-relaxed font-medium italic">
+                    Gunakan menu di samping kiri untuk mengelola Data Perumahan dan Kawasan Permukiman.
+                </p>
+            </div>
+            <div class="mt-10 pt-10 border-t border-white/10">
+                <button class="w-full bg-white text-blue-950 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-50 transition-all shadow-xl shadow-blue-950/50">
+                    Hubungi Developer
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-    lucide.createIcons();
-</script>
+<script>lucide.createIcons();</script>
 <?= $this->endSection() ?>

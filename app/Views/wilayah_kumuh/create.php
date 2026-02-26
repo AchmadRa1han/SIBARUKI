@@ -22,11 +22,7 @@
                     <h3 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-4 flex items-center">
                         <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> Identitas Wilayah
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">FID</label>
-                            <input type="number" name="FID" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Nama Kawasan</label>
                             <input type="text" name="Kawasan" placeholder="Contoh: Kawasan Pesisir A" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
