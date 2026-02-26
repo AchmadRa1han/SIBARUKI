@@ -1,4 +1,4 @@
-# 🏠 SIBARUKI (Sistem Informasi Bedah Rumah Kabupaten Sinjai)
+# 🏠 SIBARUKI (*Sama-Samaki Bangun Perumahan dan Permukiman*)
 
 ![CI4](https://img.shields.io/badge/Framework-CodeIgniter%204.6-orange?style=for-the-badge&logo=codeigniter)
 ![Tailwind](https://img.shields.io/badge/Styling-Tailwind%20CSS-blue?style=for-the-badge&logo=tailwindcss)
