@@ -34,6 +34,14 @@
                 <span class="font-medium">Dashboard</span>
             </a>
 
+            <!-- Manajemen User (Admin Only) -->
+            <?php if(session()->get('role_name') === 'admin'): ?>
+            <a href="<?= base_url('users') ?>" class="group flex items-center space-x-3 p-3 rounded-xl transition-all duration-300 <?= (url_is('users*')) ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' : 'hover:bg-slate-800/50 hover:text-white hover:translate-x-1' ?>">
+                <i data-lucide="users" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"></i>
+                <span class="font-medium">Manajemen User</span>
+            </a>
+            <?php endif; ?>
+
             <!-- Dropdown 1: Data Perumahan -->
             <div class="pt-2">
                 <button onclick="toggleDropdown('dropdown-perumahan', 'arrow-perumahan')" class="w-full flex justify-between items-center p-3 rounded-xl transition-all duration-300 hover:bg-slate-800/50 hover:text-white hover:translate-x-1 group">
@@ -194,8 +202,8 @@
         // Elegant Loader Logic
         const loader = document.getElementById('page-loader');
 
-        // 1. Sembunyikan saat halaman sudah siap
-        window.addEventListener('load', () => {
+        // 1. Sembunyikan saat halaman sudah siap (termasuk saat Back/Forward)
+        window.addEventListener('pageshow', (event) => {
             loader.classList.add('opacity-0');
             loader.classList.add('pointer-events-none');
         });

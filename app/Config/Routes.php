@@ -11,6 +11,15 @@ $routes->post('login/process', 'Auth::login');
 $routes->get('logout', 'Auth::logout');
 $routes->get('dashboard', 'Home::index');
 
+$routes->group('users', function($routes) {
+    $routes->get('/', 'Users::index');
+    $routes->get('create', 'Users::create');
+    $routes->post('store', 'Users::store');
+    $routes->get('edit/(:num)', 'Users::edit/$1');
+    $routes->post('update/(:num)', 'Users::update/$1');
+    $routes->post('delete/(:num)', 'Users::delete/$1');
+});
+
 $routes->group('ref-master', function($routes) {
     $routes->get('/', 'RefMaster::index');
     $routes->get('create', 'RefMaster::create');

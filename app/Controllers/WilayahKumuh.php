@@ -73,7 +73,12 @@ class WilayahKumuh extends BaseController
 
     public function store()
     {
-        $this->kumuhModel->insert($this->request->getPost());
+        $data = $this->request->getPost();
+        $this->kumuhModel->insert($data);
+
+        // Tambahkan Log
+        $this->logActivity('Tambah', 'Wilayah Kumuh', 'Menambah lokasi kumuh baru: ' . ($data['Kelurahan'] ?? 'Tanpa Nama'));
+
         return redirect()->to('/wilayah-kumuh')->with('message', 'Data wilayah kumuh berhasil disimpan');
     }
 
@@ -99,18 +104,37 @@ class WilayahKumuh extends BaseController
 
     public function update($id)
     {
-        $kumuh = $this->kumuhModel->find($id);
-        if (!$kumuh) return redirect()->back()->with('message', 'Data tidak ditemukan.');
+        $oldData = $this->kumuhModel->find($id);
+        if (!$oldData) return redirect()->back()->with('message', 'Data tidak ditemukan.');
 
         // Security Check
         if (session()->get('role_name') === 'petugas') {
             $desa_ids = session()->get('desa_ids');
-            if (!in_array($kumuh['desa_id'], $desa_ids)) {
+            if (!in_array($oldData['desa_id'], $desa_ids)) {
                 return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
             }
         }
 
-        $this->kumuhModel->update($id, $this->request->getPost());
+        $newData = $this->request->getPost();
+        
+        // Deteksi Perubahan
+        $changes = [];
+        if ($newData['Kecamatan'] !== $oldData['Kecamatan']) $changes[] = 'Kecamatan';
+        if ($newData['Kelurahan'] !== $oldData['Kelurahan']) $changes[] = 'Kelurahan';
+        if ($newData['Kode_RT_RW'] !== $oldData['Kode_RT_RW']) $changes[] = 'Kode RT/RW';
+        if ($newData['skor_kumuh'] != $oldData['skor_kumuh']) $changes[] = 'Skor Kumuh';
+        if ($newData['Luas_kumuh'] != $oldData['Luas_kumuh']) $changes[] = 'Luas';
+        
+        $detailLog = empty($changes) ? 'Memperbarui rincian wilayah' : 'Mengubah ' . implode(', ', $changes);
+
+        $this->kumuhModel->update($id, $newData);
+
+        // Format Pesan Baru: "Perubahan pada Balangnipa Kode RT RW 01/02: Mengubah Skor Kumuh"
+        $logMessage = "Perubahan pada " . $oldData['Kelurahan'] . " " . ($oldData['Kode_RT_RW'] ?? '') . ": " . $detailLog;
+
+        // Tambahkan Log
+        $this->logActivity('Ubah', 'Wilayah Kumuh', $logMessage);
+
         return redirect()->to('/wilayah-kumuh/detail/' . $id)->with('message', 'Data wilayah kumuh berhasil diperbarui');
     }
 
@@ -128,6 +152,10 @@ class WilayahKumuh extends BaseController
         }
 
         $this->kumuhModel->delete($id);
+
+        // Tambahkan Log
+        $this->logActivity('Hapus', 'Wilayah Kumuh', 'Menghapus data wilayah: ' . $kumuh['Kelurahan']);
+
         return redirect()->to('/wilayah-kumuh')->with('message', 'Data berhasil dihapus');
     }
 }
