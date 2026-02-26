@@ -18,12 +18,33 @@ class Rtlh extends BaseController
     public function index()
     {
         $rumahModel = new RumahRtlhModel();
+        $keyword = $this->request->getGet('keyword');
         
+        $builder = $rumahModel->select('rumah_rtlh.*, p.nama_kepala_keluarga as pemilik')
+                ->join('rtlh_penerima p', 'p.nik = rumah_rtlh.nik_pemilik', 'left');
+
+        // Filter Pencarian
+        if ($keyword) {
+            $builder->groupStart()
+                ->like('p.nama_kepala_keluarga', $keyword)
+                ->orLike('rumah_rtlh.nik_pemilik', $keyword)
+                ->orLike('rumah_rtlh.desa', $keyword)
+                ->groupEnd();
+        }
+
+        // Filter untuk Petugas
+        if (session()->get('role_name') === 'petugas') {
+            $desa_ids = session()->get('desa_ids');
+            if (!empty($desa_ids)) {
+                $builder->whereIn('rumah_rtlh.desa_id', $desa_ids);
+            } else {
+                $builder->where('rumah_rtlh.id_survei', 0); // Tampilkan kosong jika tidak ada tugas desa
+            }
+        }
+
         $data = [
             'title' => 'Data RTLH',
-            'rumah' => $rumahModel->select('rumah_rtlh.*, p.nama_kepala_keluarga as pemilik')
-                ->join('rtlh_penerima p', 'p.nik = rumah_rtlh.nik_pemilik', 'left')
-                ->orderBy('id_survei', 'ASC') // Kembali ke urutan dari terkecil
+            'rumah' => $builder->orderBy('id_survei', 'ASC')
                 ->paginate(25, 'group1'),
             'pager' => $rumahModel->pager
         ];
@@ -35,6 +56,14 @@ class Rtlh extends BaseController
         $db = \Config\Database::connect();
         $rumah = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+
+        // Security Check untuk Petugas
+        if (session()->get('role_name') === 'petugas') {
+            $desa_ids = session()->get('desa_ids');
+            if (!in_array($rumah['desa_id'], $desa_ids)) {
+                return redirect()->to('/rtlh')->with('message', 'Anda tidak memiliki akses ke data wilayah ini.');
+            }
+        }
 
         $penerima = $db->table('rtlh_penerima')
             ->select('rtlh_penerima.*, pnd.nama_pilihan as pendidikan, pkj.nama_pilihan as pekerjaan')
@@ -86,6 +115,10 @@ class Rtlh extends BaseController
     {
         $db = \Config\Database::connect();
         $input = $this->request->getPost();
+        
+        // Ambil penghasilan sebagai string
+        $penghasilan = $input['penghasilan_per_bulan'] ?? '';
+
         $db->transStart();
         try {
             $db->table('rtlh_penerima')->insert([
@@ -97,7 +130,7 @@ class Rtlh extends BaseController
                 'jenis_kelamin' => $this->nullify($input['jenis_kelamin']),
                 'pendidikan_id' => $this->nullify($input['pendidikan_id']),
                 'pekerjaan_id' => $this->nullify($input['pekerjaan_id']),
-                'penghasilan_per_bulan' => $this->nullify($input['penghasilan_per_bulan']),
+                'penghasilan_per_bulan' => $this->nullify($penghasilan),
                 'jumlah_anggota_keluarga' => $this->nullify($input['jumlah_anggota_keluarga']),
             ]);
             
@@ -145,6 +178,10 @@ class Rtlh extends BaseController
             ]);
 
             $db->transComplete();
+
+            // Tambahkan Log
+            $this->logActivity('Tambah', 'RTLH', 'Menambah data baru untuk NIK: ' . $input['nik']);
+
             return redirect()->to('/rtlh')->with('message', 'Data berhasil disimpan.');
         } catch (\Exception $e) {
             $db->transRollback();
@@ -157,6 +194,16 @@ class Rtlh extends BaseController
         $db = \Config\Database::connect();
         $refModel = new RefMasterModel();
         $rumah = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
+        if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+
+        // Security Check untuk Petugas
+        if (session()->get('role_name') === 'petugas') {
+            $desa_ids = session()->get('desa_ids');
+            if (!in_array($rumah['desa_id'], $desa_ids)) {
+                return redirect()->to('/rtlh')->with('message', 'Anda tidak memiliki akses untuk mengubah data ini.');
+            }
+        }
+
         $penerima = $db->table('rtlh_penerima')->where('nik', $rumah['nik_pemilik'])->get()->getRowArray();
         $kondisi = $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         $master = [];
@@ -172,11 +219,32 @@ class Rtlh extends BaseController
         $rumahLama = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumahLama) return redirect()->back()->with('message', 'Data tidak ditemukan.');
         
+        // Security Check untuk Petugas
+        if (session()->get('role_name') === 'petugas') {
+            $desa_ids = session()->get('desa_ids');
+            if (!in_array($rumahLama['desa_id'], $desa_ids)) {
+                return redirect()->to('/rtlh')->with('message', 'Anda tidak memiliki izin memperbarui data ini.');
+            }
+        }
+
         $nikLama = $rumahLama['nik_pemilik'];
         $nikBaru = $input['nik'];
+        $penghasilan = $input['penghasilan_per_bulan'] ?? '';
 
+        // Deteksi perubahan untuk log
+        $penerimaLama = $db->table('rtlh_penerima')->where('nik', $nikLama)->get()->getRowArray();
+        $changes = [];
+        if ($input['nama_kepala_keluarga'] !== $penerimaLama['nama_kepala_keluarga']) $changes[] = 'Nama';
+        if ($nikBaru !== $nikLama) $changes[] = 'NIK';
+        if ($penghasilan != $penerimaLama['penghasilan_per_bulan']) $changes[] = 'Penghasilan';
+        if ($input['alamat_detail'] !== $rumahLama['alamat_detail']) $changes[] = 'Alamat';
+        $detailLog = empty($changes) ? 'Memperbarui detail data' : 'Mengubah ' . implode(', ', $changes);
+
+        // MULAI TRANSAKSI
+        $db->query('SET FOREIGN_KEY_CHECKS=0'); // Matikan pengecekan sementara
         $db->transStart();
         try {
+            // 1. Update Tabel Penerima
             $db->table('rtlh_penerima')->where('nik', $nikLama)->update([
                 'nik' => $nikBaru,
                 'no_kk' => $this->nullify($input['no_kk']),
@@ -186,10 +254,11 @@ class Rtlh extends BaseController
                 'jenis_kelamin' => $this->nullify($input['jenis_kelamin']),
                 'pendidikan_id' => $this->nullify($input['pendidikan_id']),
                 'pekerjaan_id' => $this->nullify($input['pekerjaan_id']),
-                'penghasilan_per_bulan' => $this->nullify($input['penghasilan_per_bulan']),
+                'penghasilan_per_bulan' => $this->nullify($penghasilan),
                 'jumlah_anggota_keluarga' => $this->nullify($input['jumlah_anggota_keluarga']),
             ]);
             
+            // 2. Update Tabel Rumah
             $db->table('rumah_rtlh')->where('id_survei', $id_survei)->update([
                 'nik_pemilik' => $nikBaru,
                 'desa' => $input['desa'],
@@ -214,6 +283,7 @@ class Rtlh extends BaseController
                 'lokasi_koordinat' => $this->nullify($input['lokasi_koordinat']),
             ]);
 
+            // 3. Update Tabel Kondisi Rumah
             $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->update([
                 'st_pondasi' => $this->nullify($input['st_pondasi']),
                 'st_kolom' => $this->nullify($input['st_kolom']),
@@ -232,20 +302,40 @@ class Rtlh extends BaseController
             ]);
 
             $db->transComplete();
+            $db->query('SET FOREIGN_KEY_CHECKS=1'); // Hidupkan kembali
+
+            $this->logActivity('Ubah', 'RTLH', $detailLog . ' (NIK: ' . $nikBaru . ')');
             return redirect()->to('/rtlh/detail/' . $id_survei)->with('message', 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
             $db->transRollback();
-            return redirect()->back()->withInput()->with('message', 'Kesalahan: ' . $e->getMessage());
+            $db->query('SET FOREIGN_KEY_CHECKS=1');
+            return redirect()->back()->withInput()->with('message', 'Gagal: ' . $e->getMessage());
         }
     }
 
     public function delete($id_survei)
     {
         $db = \Config\Database::connect();
+        
+        $rumah = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
+        if (!$rumah) return redirect()->back()->with('message', 'Data tidak ditemukan.');
+
+        // Security Check untuk Petugas
+        if (session()->get('role_name') === 'petugas') {
+            $desa_ids = session()->get('desa_ids');
+            if (!in_array($rumah['desa_id'], $desa_ids)) {
+                return redirect()->to('/rtlh')->with('message', 'Anda tidak memiliki izin menghapus data ini.');
+            }
+        }
+
         $db->transStart();
         $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->delete();
         $db->table('rumah_rtlh')->where('id_survei', $id_survei)->delete();
         $db->transComplete();
+
+        // Tambahkan Log
+        $this->logActivity('Hapus', 'RTLH', 'Menghapus data ID Survei: ' . $id_survei);
+
         return redirect()->to('/rtlh')->with('message', 'Data berhasil dihapus');
     }
 }

@@ -42,4 +42,16 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
     }
+
+    protected function logActivity($action, $table, $description)
+    {
+        $db = \Config\Database::connect();
+        $db->table('sys_logs')->insert([
+            'user'        => session()->get('username') ?? 'System',
+            'action'      => $action,
+            'table_name'  => $table,
+            'description' => $description,
+            'created_at'  => date('Y-m-d H:i:s'),
+        ]);
+    }
 }

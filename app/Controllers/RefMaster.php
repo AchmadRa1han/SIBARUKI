@@ -12,13 +12,32 @@ class RefMaster extends BaseController
     public function __construct()
     {
         $this->refModel = new RefMasterModel();
+        
+        // Proteksi: Hanya admin yang boleh akses Referensi Master
+        if (session()->get('role_name') !== 'admin') {
+            // Kita gunakan header() dan exit untuk memastikan proses berhenti di constructor jika bukan admin
+            // Atau lebih elegan dengan melempar error di fungsi-fungsinya, 
+            // tapi cara tercepat di CI4 adalah mengecek di setiap method atau di constructor dengan redirect.
+        }
     }
 
     public function index()
     {
+        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard')->with('message', 'Akses ditolak: Hanya Admin yang dapat mengelola Referensi Master.');
+        
+        $keyword = $this->request->getGet('keyword');
+        $builder = $this->refModel;
+
+        if ($keyword) {
+            $builder->groupStart()
+                ->like('kategori', $keyword)
+                ->orLike('nama_pilihan', $keyword)
+                ->groupEnd();
+        }
+
         $data = [
             'title' => 'Referensi Master',
-            'ref_master' => $this->refModel->paginate(25, 'group1'),
+            'ref_master' => $builder->paginate(25, 'group1'),
             'pager' => $this->refModel->pager
         ];
 
@@ -27,6 +46,8 @@ class RefMaster extends BaseController
 
     public function create()
     {
+        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+
         $data = [
             'title' => 'Tambah Ref Master'
         ];
@@ -36,6 +57,8 @@ class RefMaster extends BaseController
 
     public function store()
     {
+        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+
         if (!$this->validate($this->refModel->getValidationRules())) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
@@ -50,6 +73,8 @@ class RefMaster extends BaseController
 
     public function edit($id)
     {
+        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+
         $data = [
             'title' => 'Edit Ref Master',
             'ref' => $this->refModel->find($id)
@@ -64,6 +89,8 @@ class RefMaster extends BaseController
 
     public function update($id)
     {
+        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+
         if (!$this->validate($this->refModel->getValidationRules())) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
@@ -78,6 +105,8 @@ class RefMaster extends BaseController
 
     public function delete($id)
     {
+        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+
         $this->refModel->delete($id);
         return redirect()->to('/ref-master')->with('message', 'Data berhasil dihapus');
     }

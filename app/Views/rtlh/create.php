@@ -73,7 +73,13 @@
 
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Penghasilan / Bulan</label>
-                        <input type="text" name="penghasilan_per_bulan" placeholder="Rp" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+                        <select name="penghasilan_per_bulan" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20">
+                            <option value="">Pilih Penghasilan</option>
+                            <option value="0 - 1,2 juta">0 - 1,2 juta</option>
+                            <option value="1,3 - 2,5 juta">1,3 - 2,5 juta</option>
+                            <option value="2,6 - 4,5 juta">2,6 - 4,5 juta</option>
+                            <option value="> 4,5 juta">> 4,5 juta</option>
+                        </select>
                     </div>
                 </div>
             </div>

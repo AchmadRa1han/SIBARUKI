@@ -73,7 +73,12 @@
                         </div>
                         <div class="md:col-span-3">
                             <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Penghasilan / Bulan</label>
-                            <input type="text" name="penghasilan_per_bulan" value="<?= old('penghasilan_per_bulan', $penerima['penghasilan_per_bulan']) ?>" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                            <select name="penghasilan_per_bulan" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20">
+                                <option value="0 - 1,2 juta" <?= $penerima['penghasilan_per_bulan'] == '0 - 1,2 juta' ? 'selected' : '' ?>>0 - 1,2 juta</option>
+                                <option value="1,3 - 2,5 juta" <?= $penerima['penghasilan_per_bulan'] == '1,3 - 2,5 juta' ? 'selected' : '' ?>>1,3 - 2,5 juta</option>
+                                <option value="2,6 - 4,5 juta" <?= $penerima['penghasilan_per_bulan'] == '2,6 - 4,5 juta' ? 'selected' : '' ?>>2,6 - 4,5 juta</option>
+                                <option value="> 4,5 juta" <?= $penerima['penghasilan_per_bulan'] == '> 4,5 juta' ? 'selected' : '' ?>>> 4,5 juta</option>
+                            </select>
                         </div>
                     </div>
                 </div>
