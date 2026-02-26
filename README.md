@@ -1,98 +1,58 @@
-# 🏠 SIBARUKI (Sistem Informasi Bedah Rumah Kabupaten Sinjai)
+# 🏠 SIBARUKI (Sama-Samaki Bangun Perumahan dan Permukiman)
 
-![CI4](https://img.shields.io/badge/Framework-CodeIgniter%204.6-orange?style=for-the-badge&logo=codeigniter)
+![CI4](https://img.shields.io/badge/Framework-CI4-orange?style=for-the-badge&logo=codeigniter)
 ![Tailwind](https://img.shields.io/badge/Styling-Tailwind%20CSS-blue?style=for-the-badge&logo=tailwindcss)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?style=for-the-badge&logo=php)
 ![MySQL](https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql)
+![Status](https://img.shields.io/badge/Status-Development-green?style=for-the-badge)
 
-**SIBARUKI** adalah platform pusat data terpadu untuk manajemen dan monitoring program bedah rumah (RTLH) serta pemantauan kawasan permukiman kumuh di Kabupaten Sinjai. Dirancang dengan standar UI/UX modern ("Mewah" Style) untuk memberikan efisiensi maksimal bagi Admin Pusat dan Petugas Lapangan.
+**SIBARUKI** adalah *Single Data Portal* yang dikembangkan oleh **Dinas Komunikasi, Informatika, dan Persandian** berkolaborasi dengan **Dinas Perumahan, Kawasan Permukiman, dan Pertanahan Kabupaten Sinjai**. Sistem ini dirancang untuk memudahkan akses informasi, monitoring, dan pengambilan keputusan berbasis data di bidang perumahan dan kawasan permukiman secara terpadu.
+
+---
+
+## 🎯 Tujuan Sistem
+- **Pusat Data Terpadu:** Menyediakan satu sumber data valid untuk informasi perumahan, kawasan permukiman, dan pertanahan di Kabupaten Sinjai.
+- **Monitoring & Evaluasi:** Memfasilitasi pelaporan dan pemantauan Rumah Tidak Layak Huni (RTLH), backlog perumahan, serta program strategis dinas lainnya.
+- **Akuntabilitas:** Meningkatkan transparansi melalui visualisasi data berbasis lokasi (GIS) dan audit trail aktivitas pengguna.
 
 ---
 
 ## ✨ Fitur Unggulan
 
-### 🛡️ Autentikasi & Keamanan (RBAC)
-- **Role-Based Access Control:** Pembatasan akses antara **Admin Pusat** dan **Petugas Desa**.
-- **Multi-Village Assignment:** Satu petugas dapat ditugaskan untuk mengelola satu atau banyak desa sekaligus.
-- **Data Isolation:** Petugas hanya dapat melihat dan mengelola data di wilayah desa yang ditugaskan kepada mereka.
+### 📊 Single Data Portal & Monitoring
+- **Dashboard Analisis:** Pemantauan statistik RTLH dan Wilayah Kumuh secara real-time dengan indikator kesehatan sistem (Database, Server Load, & Latensi Sinyal).
+- **Audit Trail (Log Aktivitas):** Pencatatan detail setiap perubahan data secara spesifik (siapa, kapan, dan detail kolom apa yang diubah).
 
-### 📊 Dashboard Monitoring Real-time
-- **Live Stats:** Visualisasi total unit RTLH dan lokasi Wilayah Kumuh secara instan.
-- **System Health Check:** Pemantauan status database, beban server, dan indikator sinyal internet secara real-time.
-- **Activity Log Detail:** Audit trail yang mencatat setiap perubahan data secara spesifik (siapa, kapan, dan apa yang diubah).
+### 🛡️ Manajemen Pengguna & Keamanan (RBAC)
+- **Role-Based Access Control:** Diferensiasi hak akses yang ketat antara Admin Pusat dan Petugas Lapangan.
+- **Smart Assignment:** Fitur penugasan wilayah kerja yang memungkinkan satu petugas mengelola satu atau banyak desa menggunakan pencarian *Tom Select* yang intuitif.
+- **Data Isolation:** Isolasi data otomatis yang memastikan petugas hanya dapat melihat dan mengelola data di wilayah desa penugasannya.
 
 ### ⚡ UI/UX "Mewah" Experience
-- **AJAX Live Search:** Pencarian data instan tanpa refresh halaman (Debounced).
-- **Elegant Page Loader:** Transisi antar halaman yang halus dengan efek *glassmorphism*.
-- **Persistent Sidebar:** Navigasi cerdas yang mengingat pilihan menu Anda melalui *localStorage*.
-- **Modern Form Input:** Menggunakan *Tom Select* untuk pemilihan desa yang searchable dan intuitif.
+- **AJAX Live Search:** Pencarian data dinamis tanpa *refresh* halaman menggunakan Fetch API untuk efisiensi kerja tinggi.
+- **Glassmorphism Loader:** Transisi halaman yang halus dengan efek blur modern dan dukungan *Back-Forward Cache*.
+- **Persistent Navigation:** Sidebar cerdas yang mengingat status menu terakhir pengguna melalui *LocalStorage*.
 
-### 🗺️ GIS & Integrasi Data
-- **WKT Support:** Mendukung penyimpanan koordinat lokasi dalam format *Well-Known Text*.
-- **Unified RTLH Management:** Pengelolaan data penerima, profil rumah, dan kondisi fisik bangunan dalam satu pintu.
+### 🗺️ GIS & Peta Digital
+- **Spatial Data Integration:** Mendukung penyimpanan koordinat format *Well-Known Text* (WKT) untuk pemetaan titik lokasi RTLH dan zonasi wilayah kumuh.
 
 ---
 
-## 🚀 Teknologi yang Digunakan
+## 🚀 Arsitektur Teknologi
 
-| Komponen | Teknologi |
+| Layer | Komponen |
 | --- | --- |
-| **Backend** | PHP 8.1+ / CodeIgniter 4 |
-| **Frontend** | Tailwind CSS (Compiled via PostCSS) |
-| **Database** | MySQL / MariaDB |
-| **Icons** | Lucide Icons |
-| **Libraries** | Tom Select (Dropdown), Leaflet.js (Maps) |
+| **Core Framework** | CodeIgniter 4 (Modern PHP Framework) |
+| **Styling Engine** | Tailwind CSS (Utility-First Framework) |
+| **Database** | MySQL (Relational Management) |
+| **Interactive JS** | Fetch API, Tom Select, Lucide Icons |
+| **Mapping Engine** | Leaflet.js (GIS Visualization) |
 
 ---
 
-## 📦 Instalasi & Persiapan
-
-1. **Clone Repositori**
-   ```bash
-   git clone https://github.com/username/sibaruki.git
-   cd sibaruki
-   ```
-
-2. **Instal Dependensi**
-   ```bash
-   composer install
-   npm install
-   ```
-
-3. **Konfigurasi Environment**
-   Salin file `env` menjadi `.env` dan sesuaikan pengaturan database Anda.
-   ```bash
-   cp env .env
-   ```
-
-4. **Migrasi & Seeding**
-   Siapkan struktur database dan data awal (Admin & Roles).
-   ```bash
-   php spark migrate
-   php spark db:seed AuthSeeder
-   ```
-
-5. **Build Aset CSS**
-   ```bash
-   npm run build
-   ```
-
-6. **Jalankan Aplikasi**
-   ```bash
-   php spark serve
-   ```
+## 🏛️ Instansi Terkait
+- **Dinas Perumahan, Kawasan Permukiman, dan Pertanahan Kab. Sinjai** (Sebagai Pemilik Program)
+- **Dinas Komunikasi, Informatika, dan Persandian Kab. Sinjai** (Sebagai Pengembang Sistem)
 
 ---
-
-## 🔑 Akun Akses Default (Development)
-
-- **Admin:** `admin` / `password123`
-- **Petugas:** `petugas_a` / `password123`
-
----
-
-## 👨‍💻 Kontribusi
-Aplikasi ini dikembangkan untuk kebutuhan Dinas Perkim Kabupaten Sinjai. Kontribusi bersifat tertutup sesuai dengan protokol keamanan data instansi.
-
----
-**© 2026 DINAS PERKIM KABUPATEN SINJAI**
+**© 2026 PEMERINTAH KABUPATEN SINJAI**
