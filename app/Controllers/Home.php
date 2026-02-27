@@ -9,9 +9,9 @@ class Home extends BaseController
         $db = \Config\Database::connect();
         
         // 1. Statistik Data
-        $totalRtlh = $db->table('rumah_rtlh')->countAllResults();
+        $totalRtlh = $db->table('rtlh_rumah')->countAllResults();
         $totalKumuh = $db->table('wilayah_kumuh')->countAllResults();
-        $totalDesa = $db->table('rumah_rtlh')->select('desa_id')->distinct()->countAllResults();
+        $totalDesa = $db->table('rtlh_rumah')->select('desa_id')->distinct()->countAllResults();
 
         // 2. Info Sistem
         $dbStatus = $db->connect() ? 'Stabil' : 'Error';

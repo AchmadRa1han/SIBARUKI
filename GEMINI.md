@@ -17,7 +17,7 @@
   - **TIDAK/KURANG LAYAK:** Rose (Merah) - `bg-rose-50 text-rose-700`.
 
 ## Konvensi Database & CRUD
-- **RTLH Terpadu:** Pengelolaan 3 tabel (`rtlh_penerima`, `rumah_rtlh`, `rtlh_kondisi_rumah`) disatukan dalam satu Controller (`Rtlh.php`) dan satu form input/edit.
+- **RTLH Terpadu:** Pengelolaan 3 tabel (`rtlh_penerima`, `rtlh_rumah`, `rtlh_kondisi_rumah`) disatukan dalam satu Controller (`Rtlh.php`) dan satu form input/edit.
 - **Transaksi:** Wajib menggunakan `$db->transStart()` dan `$db->transComplete()` saat menyimpan data yang melibatkan lebih dari satu tabel.
 - **Null Safety:** Gunakan operator null coalescing (`??`) pada setiap variabel di View untuk mencegah crash jika data database kosong.
 - **Pagination:** Gunakan template kustom `tailwind_full` (25 data per halaman).

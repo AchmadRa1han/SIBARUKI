@@ -26,7 +26,7 @@ class KondisiFisik extends BaseController
                 ->select('ref_atap_st.nama_pilihan as atap_st, ref_atap_mat.nama_pilihan as atap_mat')
                 ->select('ref_dinding_st.nama_pilihan as dinding_st, ref_dinding_mat.nama_pilihan as dinding_mat')
                 ->select('ref_lantai_st.nama_pilihan as lantai_st, ref_lantai_mat.nama_pilihan as lantai_mat')
-                ->join('rumah_rtlh r', 'r.id_survei = rtlh_kondisi_rumah.id_survei')
+                ->join('rtlh_rumah r', 'r.id_survei = rtlh_kondisi_rumah.id_survei')
                 ->join('rtlh_penerima p', 'p.nik = r.nik_pemilik')
                 ->join('ref_master ref_pondasi', 'ref_pondasi.id = rtlh_kondisi_rumah.st_pondasi', 'left')
                 ->join('ref_master ref_kolom', 'ref_kolom.id = rtlh_kondisi_rumah.st_kolom', 'left')

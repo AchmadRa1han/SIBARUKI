@@ -20,15 +20,15 @@ class Rtlh extends BaseController
         $rumahModel = new RumahRtlhModel();
         $keyword = $this->request->getGet('keyword');
         
-        $builder = $rumahModel->select('rumah_rtlh.*, p.nama_kepala_keluarga as pemilik')
-                ->join('rtlh_penerima p', 'p.nik = rumah_rtlh.nik_pemilik', 'left');
+        $builder = $rumahModel->select('rtlh_rumah.*, p.nama_kepala_keluarga as pemilik')
+                ->join('rtlh_penerima p', 'p.nik = rtlh_rumah.nik_pemilik', 'left');
 
         // Filter Pencarian
         if ($keyword) {
             $builder->groupStart()
                 ->like('p.nama_kepala_keluarga', $keyword)
-                ->orLike('rumah_rtlh.nik_pemilik', $keyword)
-                ->orLike('rumah_rtlh.desa', $keyword)
+                ->orLike('rtlh_rumah.nik_pemilik', $keyword)
+                ->orLike('rtlh_rumah.desa', $keyword)
                 ->groupEnd();
         }
 
@@ -36,9 +36,9 @@ class Rtlh extends BaseController
         if (session()->get('role_name') === 'petugas') {
             $desa_ids = session()->get('desa_ids');
             if (!empty($desa_ids)) {
-                $builder->whereIn('rumah_rtlh.desa_id', $desa_ids);
+                $builder->whereIn('rtlh_rumah.desa_id', $desa_ids);
             } else {
-                $builder->where('rumah_rtlh.id_survei', 0); // Tampilkan kosong jika tidak ada tugas desa
+                $builder->where('rtlh_rumah.id_survei', 0); // Tampilkan kosong jika tidak ada tugas desa
             }
         }
 
@@ -54,7 +54,7 @@ class Rtlh extends BaseController
     public function detail($id_survei)
     {
         $db = \Config\Database::connect();
-        $rumah = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
+        $rumah = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         // Security Check untuk Petugas
@@ -134,7 +134,7 @@ class Rtlh extends BaseController
                 'jumlah_anggota_keluarga' => $this->nullify($input['jumlah_anggota_keluarga']),
             ]);
             
-            $db->table('rumah_rtlh')->insert([
+            $db->table('rtlh_rumah')->insert([
                 'nik_pemilik' => $input['nik'],
                 'desa' => $input['desa'],
                 'desa_id' => $this->nullify($input['desa_id']),
@@ -193,7 +193,7 @@ class Rtlh extends BaseController
     {
         $db = \Config\Database::connect();
         $refModel = new RefMasterModel();
-        $rumah = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
+        $rumah = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         // Security Check untuk Petugas
@@ -216,7 +216,7 @@ class Rtlh extends BaseController
         $db = \Config\Database::connect();
         $input = $this->request->getPost();
         
-        $rumahLama = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
+        $rumahLama = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumahLama) return redirect()->back()->with('message', 'Data tidak ditemukan.');
         
         // Security Check untuk Petugas
@@ -259,7 +259,7 @@ class Rtlh extends BaseController
             ]);
             
             // 2. Update Tabel Rumah
-            $db->table('rumah_rtlh')->where('id_survei', $id_survei)->update([
+            $db->table('rtlh_rumah')->where('id_survei', $id_survei)->update([
                 'nik_pemilik' => $nikBaru,
                 'desa' => $input['desa'],
                 'desa_id' => $this->nullify($input['desa_id']),
@@ -317,7 +317,7 @@ class Rtlh extends BaseController
     {
         $db = \Config\Database::connect();
         
-        $rumah = $db->table('rumah_rtlh')->where('id_survei', $id_survei)->get()->getRowArray();
+        $rumah = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumah) return redirect()->back()->with('message', 'Data tidak ditemukan.');
 
         // Security Check untuk Petugas
@@ -330,7 +330,7 @@ class Rtlh extends BaseController
 
         $db->transStart();
         $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->delete();
-        $db->table('rumah_rtlh')->where('id_survei', $id_survei)->delete();
+        $db->table('rtlh_rumah')->where('id_survei', $id_survei)->delete();
         $db->transComplete();
 
         // Tambahkan Log

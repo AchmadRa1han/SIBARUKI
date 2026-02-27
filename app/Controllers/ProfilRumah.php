@@ -20,8 +20,8 @@ class ProfilRumah extends BaseController
     {
         $data = [
             'title' => 'Profil Rumah',
-            'rumah' => $this->rumahModel->select('rumah_rtlh.*, p.nama_kepala_keluarga as pemilik')
-                ->join('rtlh_penerima p', 'p.nik = rumah_rtlh.nik_pemilik', 'left')
+            'rumah' => $this->rumahModel->select('rtlh_rumah.*, p.nama_kepala_keluarga as pemilik')
+                ->join('rtlh_penerima p', 'p.nik = rtlh_rumah.nik_pemilik', 'left')
                 ->paginate(25, 'group1'),
             'pager' => $this->rumahModel->pager
         ];
