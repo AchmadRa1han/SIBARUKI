@@ -7,27 +7,27 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-fullscreen/dist/Leaflet.fullscreen.min.js"></script>
 
-<div class="max-w-6xl mx-auto space-y-8 pb-24 text-slate-900">
+<div class="max-w-6xl mx-auto space-y-8 pb-24 text-slate-900 dark:text-slate-200">
     
     <!-- HEADER -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-[2rem] border shadow-sm">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-8 rounded-[2rem] border dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div class="flex items-center space-x-5">
-            <div class="p-4 bg-blue-900 rounded-2xl text-white shadow-lg shadow-blue-900/20">
+            <div class="p-4 bg-blue-900 dark:bg-blue-700 rounded-2xl text-white shadow-lg shadow-blue-900/20">
                 <i data-lucide="map" class="w-10 h-10"></i>
             </div>
             <div>
-                <h1 class="text-3xl font-black text-blue-950 tracking-tight">Detail Kawasan Kumuh</h1>
+                <h1 class="text-3xl font-black text-blue-950 dark:text-white tracking-tight">Detail Kawasan Kumuh</h1>
                 <div class="flex items-center space-x-3 mt-1">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Feature ID</span>
-                    <span class="px-3 py-1 bg-blue-950 text-white rounded-lg font-mono text-sm font-bold shadow-lg shadow-blue-950/20">FID-<?= $kumuh['FID'] ?></span>
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Feature ID</span>
+                    <span class="px-3 py-1 bg-blue-950 dark:bg-blue-800 text-white rounded-lg font-mono text-sm font-bold shadow-lg shadow-blue-950/20">FID-<?= $kumuh['FID'] ?></span>
                 </div>
             </div>
         </div>
         <div class="flex items-center space-x-3">
-            <a href="<?= base_url('wilayah-kumuh') ?>" class="px-5 py-3 bg-white border-2 border-blue-900/10 text-blue-900 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center shadow-sm">
+            <a href="<?= base_url('wilayah-kumuh') ?>" class="px-5 py-3 bg-white dark:bg-slate-800 border-2 border-blue-900/10 dark:border-slate-700 text-blue-900 dark:text-blue-400 rounded-2xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center shadow-sm">
                 <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Kembali
             </a>
-            <a href="<?= base_url('wilayah-kumuh/edit/' . $kumuh['FID']) ?>" class="px-8 py-3 bg-blue-900 text-white rounded-2xl text-sm font-bold hover:bg-blue-950 shadow-xl shadow-blue-900/30 transition-all flex items-center">
+            <a href="<?= base_url('wilayah-kumuh/edit/' . $kumuh['FID']) ?>" class="px-8 py-3 bg-blue-900 dark:bg-blue-700 text-white rounded-2xl text-sm font-bold hover:bg-blue-950 dark:hover:bg-blue-600 shadow-xl shadow-blue-900/30 transition-all flex items-center">
                 <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> Edit Lokasi
             </a>
         </div>
@@ -36,22 +36,22 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- KOLOM KIRI: SKOR & LEGALITAS -->
         <div class="lg:col-span-1 space-y-8">
-            <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                <div class="p-6 border-b bg-slate-50/50 flex items-center space-x-3 text-blue-950">
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+                <div class="p-6 border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center space-x-3 text-blue-950 dark:text-blue-400">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
                     <h3 class="font-bold uppercase tracking-widest text-xs">Penilaian Kumuh</h3>
                 </div>
                 <div class="p-8">
-                    <div class="text-center p-8 bg-blue-50/30 rounded-[2.5rem] border-2 border-dashed border-blue-900/10">
-                        <p class="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em] mb-2 opacity-60">Total Skor Kumuh</p>
-                        <p class="text-6xl font-black text-blue-950"><?= number_format($kumuh['skor_kumuh'] ?? 0, 2) ?></p>
+                    <div class="text-center p-8 bg-blue-50/30 dark:bg-blue-950/30 rounded-[2.5rem] border-2 border-dashed border-blue-900/10 dark:border-blue-500/10 transition-colors duration-300">
+                        <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase tracking-[0.2em] mb-2 opacity-60">Total Skor Kumuh</p>
+                        <p class="text-6xl font-black text-blue-950 dark:text-white"><?= number_format($kumuh['skor_kumuh'] ?? 0, 2) ?></p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-blue-950 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden">
+            <div class="bg-blue-950 dark:bg-slate-900 rounded-[2.5rem] p-8 text-white border dark:border-slate-800 shadow-2xl relative overflow-hidden transition-colors duration-300">
                 <i data-lucide="database" class="w-32 h-32 absolute -right-8 -bottom-8 opacity-10 rotate-12"></i>
-                <h4 class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-6 relative z-10">Legalitas & Sumber</h4>
+                <h4 class="text-[10px] font-black text-blue-300 dark:text-blue-400 uppercase tracking-[0.2em] mb-6 relative z-10">Legalitas & Sumber</h4>
                 <div class="space-y-6 relative z-10">
                     <div>
                         <label class="text-[9px] font-bold text-blue-400 uppercase block mb-1 tracking-wider">Nomor SK Kumuh</label>
@@ -59,7 +59,7 @@
                     </div>
                     <div>
                         <label class="text-[9px] font-bold text-blue-400 uppercase block mb-1 tracking-wider">Sumber Data</label>
-                        <p class="text-sm font-medium text-blue-100 italic"><?= $kumuh['Sumber_data'] ?: '-' ?></p>
+                        <p class="text-sm font-medium text-blue-100 dark:text-blue-200 italic"><?= $kumuh['Sumber_data'] ?: '-' ?></p>
                     </div>
                 </div>
             </div>
@@ -67,8 +67,8 @@
 
         <!-- KOLOM KANAN: IDENTITAS WILAYAH & PETA -->
         <div class="lg:col-span-2 space-y-8">
-            <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                <div class="p-6 border-b bg-slate-50/50 flex items-center space-x-3 text-blue-950">
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+                <div class="p-6 border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center space-x-3 text-blue-950 dark:text-blue-400">
                     <i data-lucide="navigation" class="w-5 h-5"></i>
                     <h3 class="font-bold uppercase tracking-widest text-xs">Identitas Administratif & Wilayah</h3>
                 </div>
@@ -86,29 +86,29 @@
                         foreach($fields as $label => $val):
                     ?>
                     <div>
-                        <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-widest opacity-80"><?= $label ?></p>
-                        <p class="text-sm font-bold text-slate-800 italic"><?= $val ?? '-' ?></p>
+                        <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase mb-2 tracking-widest opacity-80"><?= $label ?></p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-slate-300 italic"><?= $val ?? '-' ?></p>
                     </div>
                     <?php endforeach; ?>
                 </div>
             </div>
 
             <!-- VISUALISASI PETA -->
-            <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                <div class="p-6 border-b bg-slate-50/50 flex items-center justify-between text-blue-950">
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+                <div class="p-6 border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center justify-between text-blue-950 dark:text-blue-400">
                     <h3 class="font-bold uppercase tracking-widest text-xs flex items-center">
                         <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> Visualisasi Peta GIS
                     </h3>
-                    <div id="map-status" class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[8px] font-black uppercase tracking-widest border border-blue-100">Ready</div>
+                    <div id="map-status" class="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 rounded text-[8px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-900 transition-colors duration-300">Ready</div>
                 </div>
                 <div class="p-2">
-                    <div id="map" class="w-full h-[550px] rounded-[2rem] z-0 border border-slate-100 bg-slate-50"></div>
+                    <div id="map" class="w-full h-[550px] rounded-[2rem] z-0 border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 transition-colors duration-300"></div>
                 </div>
-                <div class="p-6 bg-slate-50/50 flex justify-between items-center text-[10px]">
-                    <span class="text-slate-400 italic">Gunakan layer control di kanan atas untuk beralih ke tampilan Satelit.</span>
-                    <button onclick="toggleWKT()" class="text-blue-900 font-black hover:underline uppercase tracking-widest">Lihat Data Teks</button>
+                <div class="p-6 bg-slate-50/50 dark:bg-slate-950/50 flex justify-between items-center text-[10px]">
+                    <span class="text-slate-400 dark:text-slate-500 italic">Gunakan layer control di kanan atas untuk beralih ke tampilan Satelit.</span>
+                    <button onclick="toggleWKT()" class="text-blue-900 dark:text-blue-400 font-black hover:underline uppercase tracking-widest">Lihat Data Teks</button>
                 </div>
-                <div id="wkt-box" class="hidden p-6 bg-slate-100 border-t text-[9px] font-mono text-slate-500 break-all leading-relaxed">
+                <div id="wkt-box" class="hidden p-6 bg-slate-100 dark:bg-slate-950 border-t dark:border-slate-800 text-[9px] font-mono text-slate-500 dark:text-slate-600 break-all leading-relaxed">
                     <?= $kumuh['WKT'] ?>
                 </div>
             </div>
