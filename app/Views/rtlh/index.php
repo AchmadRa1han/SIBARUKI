@@ -15,7 +15,7 @@
         <?php endif; ?>
     </div>
 
-    <div class="p-8">
+    <div class="p-4 lg:p-8">
         <?php if (session()->getFlashdata('message')) : ?>
             <div class="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400 px-6 py-4 rounded-2xl mb-8 flex items-center space-x-3 text-sm font-bold shadow-sm">
                 <i data-lucide="check-circle" class="w-5 h-5"></i>
@@ -23,8 +23,90 @@
             </div>
         <?php endif; ?>
 
+        <!-- Toolbar Filter Lanjutan (Khusus Admin/Global) -->
+        <?php if (session()->get('role_scope') === 'global') : ?>
+        <div class="mb-8 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all">
+            <div class="flex items-center gap-4 mb-8 border-b dark:border-slate-800 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-900 dark:text-blue-400 shadow-inner">
+                    <i data-lucide="sliders-horizontal" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-blue-950 dark:text-white uppercase tracking-widest">Pusat Filter Data</h3>
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Analisis data RTLH berdasarkan berbagai parameter teknis</p>
+                </div>
+                <?php if(array_filter($filters)): ?>
+                <a href="<?= base_url('rtlh') ?>" class="ml-auto flex items-center gap-2 px-4 py-2 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-100 transition-all border border-rose-100 dark:border-rose-900">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Semua Filter
+                </a>
+                <?php endif; ?>
+            </div>
+            
+            <form action="<?= base_url('rtlh') ?>" method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <?php if ($keyword = request()->getGet('keyword')): ?>
+                    <input type="hidden" name="keyword" value="<?= $keyword ?>">
+                <?php endif; ?>
+                
+                <!-- Filter Desa -->
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-[0.2em] ml-1">Wilayah Desa</label>
+                    <div class="relative">
+                        <select name="desa_id" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none cursor-pointer transition-all">
+                            <option value="">Seluruh Desa</option>
+                            <?php foreach($all_desa as $d): ?>
+                                <option value="<?= $d['desa_id'] ?>" <?= ($filters['desa_id'] == $d['desa_id']) ? 'selected' : '' ?>><?= $d['desa_nama'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"></i>
+                    </div>
+                </div>
+
+                <!-- Filter Kepemilikan -->
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-[0.2em] ml-1">Status Milik</label>
+                    <div class="relative">
+                        <select name="milik" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none cursor-pointer transition-all">
+                            <option value="">Semua Status</option>
+                            <?php foreach($options['milik'] as $m): ?>
+                                <option value="<?= $m ?>" <?= ($filters['milik'] == $m) ? 'selected' : '' ?>><?= $m ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"></i>
+                    </div>
+                </div>
+
+                <!-- Filter Kawasan -->
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-[0.2em] ml-1">Jenis Kawasan</label>
+                    <div class="relative">
+                        <select name="kawasan" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none cursor-pointer transition-all">
+                            <option value="">Semua Kawasan</option>
+                            <?php foreach($options['kawasan'] as $k): ?>
+                                <option value="<?= $k ?>" <?= ($filters['kawasan'] == $k) ? 'selected' : '' ?>><?= $k ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"></i>
+                    </div>
+                </div>
+
+                <!-- Filter Air Minum -->
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-[0.2em] ml-1">Sumber Air</label>
+                    <div class="relative">
+                        <select name="air" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none cursor-pointer transition-all">
+                            <option value="">Semua Sumber</option>
+                            <?php foreach($options['air'] as $a): ?>
+                                <option value="<?= $a ?>" <?= ($filters['air'] == $a) ? 'selected' : '' ?>><?= $a ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"></i>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <?php endif; ?>
+
         <div class="overflow-x-auto rounded-[1.5rem] border border-slate-100 dark:border-slate-800 mb-8 shadow-inner bg-slate-50/30 dark:bg-slate-950/50">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                     <tr class="bg-white dark:bg-slate-900 text-blue-950 dark:text-blue-400 uppercase text-[10px] font-black tracking-[0.15em] transition-colors duration-300">
                         <th class="p-5 border-b border-slate-100 dark:border-slate-800 text-center">ID</th>

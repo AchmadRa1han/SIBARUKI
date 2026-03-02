@@ -27,9 +27,16 @@
             <a href="<?= base_url('wilayah-kumuh') ?>" class="px-5 py-3 bg-white dark:bg-slate-800 border-2 border-blue-900/10 dark:border-slate-700 text-blue-900 dark:text-blue-400 rounded-2xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center shadow-sm">
                 <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Kembali
             </a>
+            <?php if (has_permission('export_data')) : ?>
+            <button onclick="window.print()" class="px-5 py-3 bg-white dark:bg-slate-800 border-2 border-blue-900/10 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center shadow-sm">
+                <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Cetak
+            </button>
+            <?php endif; ?>
+            <?php if (has_permission('edit_kumuh')) : ?>
             <a href="<?= base_url('wilayah-kumuh/edit/' . $kumuh['FID']) ?>" class="px-8 py-3 bg-blue-900 dark:bg-blue-700 text-white rounded-2xl text-sm font-bold hover:bg-blue-950 dark:hover:bg-blue-600 shadow-xl shadow-blue-900/30 transition-all flex items-center">
                 <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> Edit Lokasi
             </a>
+            <?php endif; ?>
         </div>
     </div>
 

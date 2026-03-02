@@ -7,29 +7,29 @@
     <link rel="shortcut icon" type="image/png" href="<?= base_url('sinjai.png') ?>">
     <link rel="stylesheet" href="<?= base_url('css/app.css') ?>">
     <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body class="bg-gray-50 dark:bg-slate-950 font-sans flex h-screen overflow-hidden transition-colors duration-300">
     <script>
-        // Immediate Theme Check to prevent flash
+        // Immediate Theme Check to prevent flash and maintain state
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
     </script>
+</head>
+<body class="bg-gray-50 dark:bg-slate-950 font-sans flex h-screen overflow-hidden transition-colors duration-300">
+    <!-- Overlay for Mobile Sidebar -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] hidden lg:hidden transition-opacity duration-300"></div>
 
     <!-- Elegant Page Loader -->
     <div id="page-loader" class="fixed inset-0 z-[10000] bg-white/60 dark:bg-slate-950/60 backdrop-blur-md flex items-center justify-center transition-opacity duration-500 pointer-events-none opacity-0">
         <div class="flex flex-col items-center">
-            <!-- Spinner -->
             <div class="w-12 h-12 border-2 border-blue-900/10 border-t-blue-900 dark:border-blue-400/10 dark:border-t-blue-400 rounded-full animate-spin"></div>
-            <!-- Logo/Text -->
             <p class="mt-4 text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-[0.4em] animate-pulse">Memuat Data</p>
         </div>
     </div>
 
-    <!-- Sidebar Modern -->
-    <aside class="w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col shrink-0 shadow-xl border-r border-slate-800">
+    <!-- Sidebar Modern (Responsive) -->
+    <aside id="main-sidebar" class="fixed inset-y-0 left-0 w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col shrink-0 shadow-xl border-r border-slate-800 z-[70] transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static">
         <?php
             // Simple Helper for View
             $has_permission = function($name) {
@@ -37,9 +37,15 @@
                 return in_array($name, $perms);
             };
         ?>
-        <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
-            <img src="<?= base_url('sinjai.png') ?>" alt="Logo Sinjai" class="w-10 h-10 object-contain">
-            <span class="text-xl font-bold text-white tracking-tight">SIBARUKI</span>
+        <div class="p-6 flex items-center justify-between border-b border-slate-800">
+            <div class="flex items-center space-x-3">
+                <img src="<?= base_url('sinjai.png') ?>" alt="Logo Sinjai" class="w-10 h-10 object-contain">
+                <span class="text-xl font-bold text-white tracking-tight">SIBARUKI</span>
+            </div>
+            <!-- Close Button Mobile -->
+            <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 hover:bg-slate-800 rounded-lg">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
         </div>
         
         <nav class="flex-grow p-4 space-y-1 overflow-y-auto">
@@ -139,18 +145,30 @@
     </aside>
 
     <!-- Konten Utama -->
-    <div class="flex-grow flex flex-col min-w-0 overflow-hidden">
+    <div class="flex-grow flex flex-col min-w-0 overflow-hidden relative">
         <!-- Header -->
-        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-20 flex items-center justify-between px-8 shrink-0 shadow-sm z-10 transition-colors duration-300">
-            <div class="flex items-center flex-grow max-w-md">
+        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-20 flex items-center justify-between px-4 lg:px-8 shrink-0 shadow-sm z-50 transition-colors duration-300">
+            <div class="flex items-center flex-grow max-w-md gap-4">
+                <!-- Mobile Sidebar Toggle -->
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all active:scale-95">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                
                 <?php if (!url_is('/') && !url_is('/dashboard')): ?>
-                <form action="" method="get" class="relative w-full">
+                <form action="" method="get" class="relative w-full hidden sm:block">
                     <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input type="text" name="keyword" value="<?= request()->getGet('keyword') ?>" placeholder="Cari data..." class="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-slate-800 border-transparent rounded-xl text-sm focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:text-slate-200 transition-all outline-none">
                 </form>
                 <?php endif; ?>
             </div>            
-            <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2 lg:space-x-6">
+                <!-- Search Button Mobile Only -->
+                <?php if (!url_is('/') && !url_is('/dashboard')): ?>
+                <button class="sm:hidden p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </button>
+                <?php endif; ?>
+
                 <!-- Theme Toggle -->
                 <button onclick="toggleTheme()" class="p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all group relative overflow-hidden">
                     <div id="sun-icon" class="transition-transform duration-500">
@@ -161,17 +179,20 @@
                     </div>
                 </button>
 
-                <div class="relative group">
+                <div class="relative group hidden sm:block">
                     <button class="p-2 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors relative">
                         <i data-lucide="bell" class="w-5 h-5"></i>
                         <span class="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
                     </button>
                 </div>
-                <div class="h-8 w-px bg-gray-200 dark:bg-slate-800"></div>
+                <div class="h-8 w-px bg-gray-200 dark:bg-slate-800 hidden sm:block"></div>
                 <div class="flex items-center space-x-3 cursor-pointer group">
                     <div class="text-right hidden sm:block">
                         <p class="text-sm font-bold text-gray-800 dark:text-slate-200 group-hover:text-blue-600 transition-colors capitalize"><?= session()->get('username') ?></p>
                         <p class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider"><?= session()->get('role_name') ?></p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-900 dark:bg-blue-600 flex items-center justify-center text-white font-bold sm:hidden">
+                        <?= substr(session()->get('username') ?? 'A', 0, 1) ?>
                     </div>
                 </div>
             </div>
@@ -199,6 +220,32 @@
 
     <script>
         lucide.createIcons();
+
+        // Responsive Sidebar Toggle
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent scroll
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close sidebar when clicking links on mobile
+        document.querySelectorAll('#main-sidebar a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    toggleMobileSidebar();
+                }
+            });
+        });
 
         // --- LIVE SEARCH LOGIC ---
         const searchInput = document.querySelector('input[name="keyword"]');
@@ -261,12 +308,14 @@
         function updateThemeIcons(isDark) {
             const sun = document.getElementById('sun-icon');
             const moon = document.getElementById('moon-icon');
-            if (isDark) {
-                sun.style.transform = 'translateY(-150%)';
-                moon.style.transform = 'translateY(0)';
-            } else {
-                sun.style.transform = 'translateY(0)';
-                moon.style.transform = 'translateY(100%)';
+            if (sun && moon) {
+                if (isDark) {
+                    sun.style.transform = 'translateY(-150%)';
+                    moon.style.transform = 'translateY(0)';
+                } else {
+                    sun.style.transform = 'translateY(0)';
+                    moon.style.transform = 'translateY(100%)';
+                }
             }
         }
 
@@ -278,8 +327,10 @@
 
         // 1. Sembunyikan saat halaman sudah siap (termasuk saat Back/Forward)
         window.addEventListener('pageshow', (event) => {
-            loader.classList.add('opacity-0');
-            loader.classList.add('pointer-events-none');
+            if (loader) {
+                loader.classList.add('opacity-0');
+                loader.classList.add('pointer-events-none');
+            }
         });
 
         // 2. Tampilkan saat berpindah halaman melalui link
@@ -287,13 +338,13 @@
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
                 if (
+                    loader &&
                     href && 
                     !href.startsWith('#') && 
                     !href.startsWith('javascript:') && 
-                    !e.metaKey && !e.ctrlKey && // Biarkan jika user buka di tab baru (ctrl+click)
+                    !e.metaKey && !e.ctrlKey && 
                     this.getAttribute('target') !== '_blank'
                 ) {
-                    // Tampilkan loader
                     loader.classList.remove('opacity-0');
                     loader.classList.remove('pointer-events-none');
                 }

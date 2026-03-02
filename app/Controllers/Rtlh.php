@@ -18,12 +18,18 @@ class Rtlh extends BaseController
     public function index()
     {
         $rumahModel = new RumahRtlhModel();
+        $db = \Config\Database::connect();
+        
         $keyword = $this->request->getGet('keyword');
+        $filterDesa = $this->request->getGet('desa_id');
+        $filterMilik = $this->request->getGet('milik');
+        $filterKawasan = $this->request->getGet('kawasan');
+        $filterAir = $this->request->getGet('air');
         
         $builder = $rumahModel->select('rtlh_rumah.*, p.nama_kepala_keluarga as pemilik')
                 ->join('rtlh_penerima p', 'p.nik = rtlh_rumah.nik_pemilik', 'left');
 
-        // Filter Pencarian
+        // 1. Filter Pencarian Keyword
         if ($keyword) {
             $builder->groupStart()
                 ->like('p.nama_kepala_keluarga', $keyword)
@@ -32,7 +38,15 @@ class Rtlh extends BaseController
                 ->groupEnd();
         }
 
-        // Filter Wilayah (Berdasarkan Scope)
+        // 2. Filter Lanjutan (Khusus Admin/Global)
+        if (session()->get('role_scope') === 'global') {
+            if ($filterDesa) $builder->where('rtlh_rumah.desa_id', $filterDesa);
+            if ($filterMilik) $builder->where('rtlh_rumah.kepemilikan_rumah', $filterMilik);
+            if ($filterKawasan) $builder->where('rtlh_rumah.jenis_kawasan', $filterKawasan);
+            if ($filterAir) $builder->where('rtlh_rumah.sumber_air_minum', $filterAir);
+        }
+
+        // 3. Filter Wilayah (Berdasarkan Scope Petugas/Local)
         if (session()->get('role_scope') === 'local') {
             $desa_ids = session()->get('desa_ids_rtlh');
             if (!empty($desa_ids)) {
@@ -42,11 +56,27 @@ class Rtlh extends BaseController
             }
         }
 
+        // Ambil pilihan unik untuk filter dropdown
+        $optMilik = $db->table('rtlh_rumah')->select('kepemilikan_rumah')->distinct()->get()->getResultArray();
+        $optKawasan = $db->table('rtlh_rumah')->select('jenis_kawasan')->distinct()->get()->getResultArray();
+        $optAir = $db->table('rtlh_rumah')->select('sumber_air_minum')->distinct()->get()->getResultArray();
+
         $data = [
             'title' => 'Data RTLH',
-            'rumah' => $builder->orderBy('id_survei', 'ASC')
-                ->paginate(25, 'group1'),
-            'pager' => $rumahModel->pager
+            'rumah' => $builder->orderBy('id_survei', 'ASC')->paginate(25, 'group1'),
+            'pager' => $rumahModel->pager,
+            'all_desa' => $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray(),
+            'options' => [
+                'milik' => array_filter(array_column($optMilik, 'kepemilikan_rumah')),
+                'kawasan' => array_filter(array_column($optKawasan, 'jenis_kawasan')),
+                'air' => array_filter(array_column($optAir, 'sumber_air_minum')),
+            ],
+            'filters' => [
+                'desa_id' => $filterDesa,
+                'milik' => $filterMilik,
+                'kawasan' => $filterKawasan,
+                'air' => $filterAir
+            ]
         ];
         return view('rtlh/index', $data);
     }

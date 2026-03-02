@@ -33,58 +33,58 @@
     </div>
 
     <!-- Data Stats Grid (2 Kolom) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         <!-- RTLH -->
-        <div class="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden group">
+        <div class="bg-white dark:bg-slate-900 p-6 lg:p-10 rounded-[2.5rem] lg:rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden group">
             <div class="relative z-10">
-                <div class="p-5 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-500 rounded-2xl w-fit mb-8 shadow-inner group-hover:scale-110 transition-transform duration-500">
-                    <i data-lucide="home" class="w-10 h-10"></i>
+                <div class="p-4 lg:p-5 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-500 rounded-2xl w-fit mb-6 lg:mb-8 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                    <i data-lucide="home" class="w-8 h-8 lg:w-10 lg:h-10"></i>
                 </div>
-                <p class="text-[12px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.3em] mb-2">Total RTLH Terdata</p>
+                <p class="text-[10px] lg:text-[12px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.3em] mb-2">Total RTLH Terdata</p>
                 <div class="flex items-baseline gap-3">
-                    <h2 class="text-5xl font-black text-slate-800 dark:text-white"><?= number_format($totalRtlh) ?></h2>
-                    <span class="text-sm font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Unit Rumah</span>
+                    <h2 class="text-4xl lg:text-5xl font-black text-slate-800 dark:text-white"><?= number_format($totalRtlh) ?></h2>
+                    <span class="text-xs lg:text-sm font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Unit Rumah</span>
                 </div>
             </div>
-            <i data-lucide="home" class="w-48 h-48 absolute -right-10 -bottom-10 opacity-[0.03] dark:opacity-[0.05] text-slate-900 dark:text-white rotate-12 group-hover:rotate-0 transition-all duration-700"></i>
+            <i data-lucide="home" class="w-32 lg:w-48 h-32 lg:h-48 absolute -right-6 lg:-right-10 -bottom-6 lg:-bottom-10 opacity-[0.03] dark:opacity-[0.05] text-slate-900 dark:text-white rotate-12 group-hover:rotate-0 transition-all duration-700"></i>
         </div>
 
         <!-- Wilayah Kumuh -->
-        <div class="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden group">
+        <div class="bg-white dark:bg-slate-900 p-6 lg:p-10 rounded-[2.5rem] lg:rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden group">
             <div class="relative z-10">
-                <div class="p-5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-500 rounded-2xl w-fit mb-8 shadow-inner group-hover:scale-110 transition-transform duration-500">
-                    <i data-lucide="map-pin" class="w-10 h-10"></i>
+                <div class="p-4 lg:p-5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-500 rounded-2xl w-fit mb-6 lg:mb-8 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                    <i data-lucide="map-pin" class="w-8 h-8 lg:w-10 lg:h-10"></i>
                 </div>
-                <p class="text-[12px] font-black text-rose-600 dark:text-rose-500 uppercase tracking-[0.3em] mb-2">Lokasi Wilayah Kumuh</p>
+                <p class="text-[10px] lg:text-[12px] font-black text-rose-600 dark:text-rose-500 uppercase tracking-[0.3em] mb-2">Lokasi Wilayah Kumuh</p>
                 <div class="flex items-baseline gap-3">
-                    <h2 class="text-5xl font-black text-slate-800 dark:text-white"><?= number_format($totalKumuh) ?></h2>
-                    <span class="text-sm font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Titik Kawasan</span>
+                    <h2 class="text-4xl lg:text-5xl font-black text-slate-800 dark:text-white"><?= number_format($totalKumuh) ?></h2>
+                    <span class="text-xs lg:text-sm font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Titik Kawasan</span>
                 </div>
             </div>
-            <i data-lucide="map-pin" class="w-48 h-48 absolute -right-10 -bottom-10 opacity-[0.03] dark:opacity-[0.05] text-slate-900 dark:text-white -rotate-12 group-hover:rotate-0 transition-all duration-700"></i>
+            <i data-lucide="map-pin" class="w-32 lg:w-48 h-32 lg:h-48 absolute -right-6 lg:-right-10 -bottom-6 lg:-bottom-10 opacity-[0.03] dark:opacity-[0.05] text-slate-900 dark:text-white -rotate-12 group-hover:rotate-0 transition-all duration-700"></i>
         </div>
     </div>
 
     <!-- Health Check & System Info -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors duration-300">
-            <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Database</span>
+            <span class="text-[8px] lg:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Database</span>
             <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300"><?= $dbStatus ?></span>
-                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span class="text-[9px] lg:text-[10px] font-bold text-slate-700 dark:text-slate-300"><?= $dbStatus ?></span>
+                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
             </div>
         </div>
         <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors duration-300">
-            <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Beban Server</span>
-            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300"><?= $serverLoad ?></span>
+            <span class="text-[8px] lg:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Server</span>
+            <span class="text-[9px] lg:text-[10px] font-bold text-slate-700 dark:text-slate-300"><?= $serverLoad ?></span>
         </div>
         <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors duration-300">
-            <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">PHP Env</span>
-            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300">v<?= $phpVersion ?></span>
+            <span class="text-[8px] lg:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">PHP</span>
+            <span class="text-[9px] lg:text-[10px] font-bold text-slate-700 dark:text-slate-300">v<?= $phpVersion ?></span>
         </div>
         <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors duration-300">
-            <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sistem OS</span>
-            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300"><?= PHP_OS ?></span>
+            <span class="text-[8px] lg:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">OS</span>
+            <span class="text-[9px] lg:text-[10px] font-bold text-slate-700 dark:text-slate-300"><?= PHP_OS ?></span>
         </div>
     </div>
 

@@ -22,27 +22,27 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php foreach ($roles as $role) : ?>
-            <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all group relative overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all group relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i data-lucide="shield-check" class="w-24 h-24 text-blue-900"></i>
+                    <i data-lucide="shield-check" class="w-24 h-24 text-blue-900 dark:text-blue-400"></i>
                 </div>
                 
                 <div class="relative z-10">
                     <div class="flex justify-between items-start mb-6">
                         <div>
-                            <span class="text-[10px] font-black text-blue-900 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100 mb-2 inline-block">Role Name</span>
-                            <h3 class="text-2xl font-bold text-slate-800"><?= strtoupper($role['role_name']) ?></h3>
+                            <span class="text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/30 px-3 py-1 rounded-full border border-blue-100 dark:border-blue-900 mb-2 inline-block transition-colors">Role Name</span>
+                            <h3 class="text-2xl font-bold text-slate-800 dark:text-white"><?= strtoupper($role['role_name']) ?></h3>
                         </div>
                     </div>
 
                     <div class="space-y-4 mb-8">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-600">
+                            <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-600 dark:text-slate-400 border border-transparent dark:border-slate-800">
                                 <i data-lucide="map-pin" class="w-5 h-5"></i>
                             </div>
                             <div>
-                                <p class="text-[10px] font-black text-blue-900 uppercase tracking-widest">Scope</p>
-                                <p class="text-sm font-semibold <?= $role['scope'] == 'global' ? 'text-emerald-600' : 'text-amber-600' ?>">
+                                <p class="text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest transition-colors">Scope</p>
+                                <p class="text-sm font-semibold <?= $role['scope'] == 'global' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' ?>">
                                     <?= strtoupper($role['scope']) ?>
                                 </p>
                             </div>
@@ -50,12 +50,12 @@
                     </div>
 
                     <div class="flex gap-3 mt-auto">
-                        <a href="<?= base_url('roles/edit/' . $role['id']) ?>" class="flex-1 bg-slate-50 hover:bg-blue-900 hover:text-white text-slate-600 px-4 py-3 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 text-sm border border-slate-100">
+                        <a href="<?= base_url('roles/edit/' . $role['id']) ?>" class="flex-1 bg-slate-50 dark:bg-slate-800 hover:bg-blue-900 dark:hover:bg-blue-700 hover:text-white text-slate-600 dark:text-slate-300 px-4 py-3 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 text-sm border border-slate-100 dark:border-slate-700">
                             <i data-lucide="edit-3" class="w-4 h-4"></i>
                             EDIT
                         </a>
                         <?php if ($role['id'] != 1) : ?>
-                            <a href="<?= base_url('roles/delete/' . $role['id']) ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus role ini?')" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 p-3 rounded-2xl transition-all border border-rose-100 active:scale-95">
+                            <a href="<?= base_url('roles/delete/' . $role['id']) ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus role ini?')" class="bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 p-3 rounded-2xl transition-all border border-rose-100 dark:border-rose-900 active:scale-95">
                                 <i data-lucide="trash-2" class="w-5 h-5"></i>
                             </a>
                         <?php endif; ?>

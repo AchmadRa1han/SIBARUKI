@@ -15,9 +15,15 @@ class WilayahKumuh extends BaseController
 
     public function index()
     {
+        $db = \Config\Database::connect();
         $builder = $this->kumuhModel;
+        
         $keyword = $this->request->getGet('keyword');
+        $filterKec = $this->request->getGet('kecamatan');
+        $filterDesa = $this->request->getGet('desa_id');
+        $filterSkor = $this->request->getGet('skor');
 
+        // 1. Filter Keyword
         if ($keyword) {
             $builder->groupStart()
                 ->like('Kecamatan', $keyword)
@@ -27,7 +33,19 @@ class WilayahKumuh extends BaseController
                 ->groupEnd();
         }
 
-        // Filter Wilayah
+        // 2. Filter Lanjutan (Khusus Global)
+        if (session()->get('role_scope') === 'global') {
+            if ($filterKec) $builder->where('Kecamatan', $filterKec);
+            if ($filterDesa) $builder->where('desa_id', $filterDesa);
+            
+            if ($filterSkor) {
+                if ($filterSkor === 'high') $builder->where('skor_kumuh >=', 60);
+                if ($filterSkor === 'mid') $builder->where('skor_kumuh >=', 40)->where('skor_kumuh <', 60);
+                if ($filterSkor === 'low') $builder->where('skor_kumuh <', 40);
+            }
+        }
+
+        // 3. Filter Wilayah (Petugas)
         if (session()->get('role_scope') === 'local') {
             $desa_ids = session()->get('desa_ids_kumuh');
             if (!empty($desa_ids)) {
@@ -37,10 +55,23 @@ class WilayahKumuh extends BaseController
             }
         }
 
+        // Options for Filter
+        $optKec = $db->table('wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
+        $optDesa = $db->table('wilayah_kumuh')->select('Kelurahan, desa_id')->distinct()->get()->getResultArray();
+
         $data = [
             'title' => 'Wilayah Kumuh',
             'kumuh' => $builder->paginate(25, 'group1'),
-            'pager' => $this->kumuhModel->pager
+            'pager' => $this->kumuhModel->pager,
+            'options' => [
+                'kecamatan' => array_filter(array_column($optKec, 'Kecamatan')),
+                'desa' => $optDesa
+            ],
+            'filters' => [
+                'kecamatan' => $filterKec,
+                'desa_id' => $filterDesa,
+                'skor' => $filterSkor
+            ]
         ];
 
         return view('wilayah_kumuh/index', $data);

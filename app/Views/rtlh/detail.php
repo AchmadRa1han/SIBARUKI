@@ -35,15 +35,19 @@
             </div>
         </div>
         <div class="flex items-center space-x-3">
+            <?php if (has_permission('export_data')) : ?>
             <button onclick="window.print()" class="px-5 py-3 bg-white dark:bg-slate-800 border-2 border-blue-900/10 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center shadow-sm">
                 <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Cetak
             </button>
             <button onclick="downloadPDF()" class="px-5 py-3 bg-white dark:bg-slate-800 border-2 border-blue-900/10 dark:border-slate-700 text-blue-900 dark:text-blue-400 rounded-2xl text-sm font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-all flex items-center shadow-sm">
                 <i data-lucide="download" class="w-4 h-4 mr-2"></i> Download PDF
             </button>
+            <?php endif; ?>
+            <?php if (has_permission('edit_rtlh')) : ?>
             <a href="<?= base_url('rtlh/edit/' . ($rumah['id_survei'] ?? '')) ?>" class="px-8 py-3 bg-blue-900 dark:bg-blue-700 text-white rounded-2xl text-sm font-bold hover:bg-blue-950 dark:hover:bg-blue-600 shadow-xl shadow-blue-900/30 transition-all flex items-center">
                 <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> Perbarui Data
             </a>
+            <?php endif; ?>
         </div>
     </div>
 
