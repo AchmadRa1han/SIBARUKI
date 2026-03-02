@@ -55,9 +55,9 @@
                             EDIT
                         </a>
                         <?php if ($role['id'] != 1) : ?>
-                            <a href="<?= base_url('roles/delete/' . $role['id']) ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus role ini?')" class="bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 p-3 rounded-2xl transition-all border border-rose-100 dark:border-rose-900 active:scale-95">
+                            <button type="button" onclick="confirmDeleteRole('<?= base_url('roles/delete/' . $role['id']) ?>')" class="bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 p-3 rounded-2xl transition-all border border-rose-100 dark:border-rose-900 active:scale-95">
                                 <i data-lucide="trash-2" class="w-5 h-5"></i>
-                            </a>
+                            </button>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -65,4 +65,11 @@
         <?php endforeach; ?>
     </div>
 </div>
+
+<script>
+    async function confirmDeleteRole(url) {
+        const ok = await customConfirm('Hapus Role?', 'Pastikan tidak ada user yang sedang menggunakan role ini.', 'danger');
+        if (ok) window.location.href = url;
+    }
+</script>
 <?= $this->endSection() ?>

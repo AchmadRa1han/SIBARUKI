@@ -149,12 +149,9 @@
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                     </a>
                                     <?php if (has_permission('delete_rtlh')): ?>
-                                    <form action="<?= base_url('rtlh/delete/' . $row['id_survei']) ?>" method="post" onsubmit="return confirm('Hapus seluruh rangkaian data RTLH ini?')">
-                                        <?= csrf_field() ?>
-                                        <button type="submit" class="p-2 text-rose-300 dark:text-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors" title="Hapus Permanen">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" onclick="confirmDeleteRtlh(this)" data-url="<?= base_url('rtlh/delete/' . $row['id_survei']) ?>" class="p-2 text-rose-300 dark:text-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors" title="Hapus Permanen">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
                                     <?php endif; ?>
                                 </div>
                             </td>
@@ -164,11 +161,51 @@
             </table>
         </div>
 
-        <div class="mt-4 flex justify-center">
-            <?= $pager->links('group1', 'tailwind_full') ?>
+        <div class="p-6 bg-slate-50/50 dark:bg-slate-950/50 border-t dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-4 min-w-[200px]">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tampilkan:</span>
+                <select onchange="changePerPage(this.value)" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer">
+                    <?php foreach([10, 25, 50, 100] as $count): ?>
+                        <option value="<?= $count ?>" <?= $perPage == $count ? 'selected' : '' ?>><?= $count ?> Data</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="flex-grow flex justify-center">
+                <?= $pager->links('group1', 'tailwind_full') ?>
+            </div>
+
+            <!-- Spacer to maintain center alignment if needed -->
+            <div class="hidden md:block min-w-[200px]"></div>
         </div>
     </div>
 </div>
 
-<script>lucide.createIcons();</script>
+<script>
+    lucide.createIcons();
+
+    async function confirmDeleteRtlh(btn) {
+        const url = btn.getAttribute('data-url');
+        const ok = await customConfirm('Hapus Data RTLH?', 'Data akan dipindahkan ke Recycle Bin dan bisa dipulihkan nanti.', 'danger');
+        if (ok) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '<?= csrf_token() ?>';
+            csrf.value = '<?= csrf_hash() ?>';
+            form.appendChild(csrf);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    function changePerPage(count) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('per_page', count);
+        url.searchParams.set('page_group1', 1); // Reset ke hal 1
+        window.location.href = url.href;
+    }
+</script>
 <?= $this->endSection() ?>

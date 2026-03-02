@@ -68,12 +68,22 @@
                 <div id="dropdown-akses" class="hidden pl-11 mt-1 space-y-1 text-slate-400">
                     <?php if($has_permission('manage_roles')): ?>
                     <a href="<?= base_url('roles') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('roles*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Master Role
+                        Manajemen Role
                     </a>
                     <?php endif; ?>
                     <?php if($has_permission('manage_users') || $has_permission('view_users')): ?>
                     <a href="<?= base_url('users') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('users*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
                         Manajemen User
+                    </a>
+                    <?php endif; ?>
+                    <?php if($has_permission('manage_roles')): ?>
+                    <a href="<?= base_url('logs') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('logs*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        Monitoring Aktivitas
+                    </a>
+                    <?php endif; ?>
+                    <?php if($has_permission('manage_roles')): ?>
+                    <a href="<?= base_url('trash') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('trash*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        Recycle Bin
                     </a>
                     <?php endif; ?>
                 </div>
@@ -218,8 +228,128 @@
         </button>
     </div>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-8 right-8 z-[10000] space-y-4 pointer-events-none"></div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-[10001] flex items-center justify-center p-4 hidden">
+        <div id="confirm-backdrop" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+        <div id="confirm-card" class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 max-w-sm w-full relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 scale-90 opacity-0 transition-all duration-300">
+            <div class="flex flex-col items-center text-center">
+                <div id="confirm-icon-box" class="w-20 h-20 rounded-3xl mb-6 flex items-center justify-center shadow-inner transition-colors">
+                    <i id="confirm-icon" data-lucide="alert-triangle" class="w-10 h-10"></i>
+                </div>
+                <h3 id="confirm-title" class="text-xl font-black text-blue-950 dark:text-white uppercase tracking-tight mb-2">Konfirmasi</h3>
+                <p id="confirm-message" class="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-8">Apakah Anda yakin ingin melanjutkan aksi ini?</p>
+                
+                <div class="flex gap-3 w-full">
+                    <button id="confirm-cancel" class="flex-1 px-6 py-4 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">Batal</button>
+                    <button id="confirm-ok" class="flex-1 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-lg active:scale-95">Ya, Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
+
+        // --- CUSTOM CONFIRM SYSTEM ---
+        function customConfirm(title, message, type = 'danger') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirm-modal');
+                const card = document.getElementById('confirm-card');
+                const backdrop = document.getElementById('confirm-backdrop');
+                const iconBox = document.getElementById('confirm-icon-box');
+                const icon = document.getElementById('confirm-icon');
+                const btnOk = document.getElementById('confirm-ok');
+                const btnCancel = document.getElementById('confirm-cancel');
+
+                document.getElementById('confirm-title').innerText = title;
+                document.getElementById('confirm-message').innerText = message;
+
+                // Style based on type
+                if (type === 'danger') {
+                    iconBox.className = 'w-20 h-20 rounded-3xl mb-6 flex items-center justify-center shadow-inner bg-rose-50 dark:bg-rose-950/30 text-rose-600';
+                    btnOk.className = 'flex-1 px-6 py-4 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-rose-600/20 active:scale-95';
+                    icon.setAttribute('data-lucide', 'trash-2');
+                } else {
+                    iconBox.className = 'w-20 h-20 rounded-3xl mb-6 flex items-center justify-center shadow-inner bg-blue-50 dark:bg-blue-950/30 text-blue-600';
+                    btnOk.className = 'flex-1 px-6 py-4 bg-blue-900 hover:bg-blue-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20 active:scale-95';
+                    icon.setAttribute('data-lucide', 'help-circle');
+                }
+                lucide.createIcons();
+
+                // Show Modal
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    backdrop.classList.add('opacity-100');
+                    card.classList.remove('scale-90', 'opacity-0');
+                    card.classList.add('scale-100', 'opacity-100');
+                }, 10);
+
+                const close = (result) => {
+                    backdrop.classList.remove('opacity-100');
+                    card.classList.add('scale-90', 'opacity-0');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        resolve(result);
+                    }, 300);
+                };
+
+                btnOk.onclick = () => close(true);
+                btnCancel.onclick = () => close(false);
+            });
+        }
+
+        // --- TOAST SYSTEM ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-white dark:bg-slate-900 border-emerald-500' : 'bg-white dark:bg-slate-900 border-rose-500';
+            const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+            const iconColor = type === 'success' ? 'text-emerald-500' : 'text-rose-500';
+
+            toast.className = `pointer-events-auto flex items-center gap-4 p-5 rounded-2xl border-l-4 shadow-2xl transition-all duration-500 translate-x-full opacity-0 ${bgColor}`;
+            toast.innerHTML = `
+                <div class="${iconColor}"><i data-lucide="${icon}" class="w-6 h-6"></i></div>
+                <div class="flex-grow">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">${type === 'success' ? 'Berhasil' : 'Peringatan'}</p>
+                    <p class="text-sm font-bold text-slate-700 dark:text-slate-200">${message}</p>
+                </div>
+                <button class="text-slate-300 hover:text-slate-500 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            // Animate In
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            }, 10);
+
+            // Auto Remove
+            const remove = () => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            };
+
+            const autoTimeout = setTimeout(remove, 5000);
+            toast.querySelector('button').onclick = () => {
+                clearTimeout(autoTimeout);
+                remove();
+            };
+        }
+
+        // Check for Flashdata on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            <?php if (session()->getFlashdata('success') || session()->getFlashdata('message')): ?>
+                showToast("<?= session()->getFlashdata('success') ?: session()->getFlashdata('message') ?>", 'success');
+            <?php endif; ?>
+            <?php if (session()->getFlashdata('error') || session()->getFlashdata('errors')): ?>
+                showToast("<?= session()->getFlashdata('error') ?: 'Terjadi kesalahan input.' ?>", 'error');
+            <?php endif; ?>
+        });
 
         // Responsive Sidebar Toggle
         function toggleMobileSidebar() {
@@ -371,7 +501,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const path = window.location.pathname;
             const dropdowns = [
-                { id: 'dropdown-akses', arrow: 'arrow-akses', paths: ['roles', 'users'] },
+                { id: 'dropdown-akses', arrow: 'arrow-akses', paths: ['roles', 'users', 'logs', 'trash'] },
                 { id: 'dropdown-perumahan', arrow: 'arrow-perumahan', paths: ['ref-master', 'rtlh'] },
                 { id: 'dropdown-permukiman', arrow: 'arrow-permukiman', paths: ['wilayah-kumuh'] }
             ];

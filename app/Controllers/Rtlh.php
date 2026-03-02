@@ -61,10 +61,14 @@ class Rtlh extends BaseController
         $optKawasan = $db->table('rtlh_rumah')->select('jenis_kawasan')->distinct()->get()->getResultArray();
         $optAir = $db->table('rtlh_rumah')->select('sumber_air_minum')->distinct()->get()->getResultArray();
 
+        // Pilihan Jumlah Data per Halaman
+        $perPage = $this->request->getGet('per_page') ?? 25;
+
         $data = [
             'title' => 'Data RTLH',
-            'rumah' => $builder->orderBy('id_survei', 'ASC')->paginate(25, 'group1'),
+            'rumah' => $builder->orderBy('id_survei', 'ASC')->paginate($perPage, 'group1'),
             'pager' => $rumahModel->pager,
+            'perPage' => $perPage,
             'all_desa' => $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray(),
             'options' => [
                 'milik' => array_filter(array_column($optMilik, 'kepemilikan_rumah')),
@@ -269,17 +273,20 @@ class Rtlh extends BaseController
         $nikBaru = $input['nik'];
         $penghasilan = $input['penghasilan_per_bulan'] ?? '';
 
-        // Deteksi perubahan untuk log
+        // Ambil data LAMA sebelum diupdate untuk DIFF
         $penerimaLama = $db->table('rtlh_penerima')->where('nik', $nikLama)->get()->getRowArray();
+        $kondisiLama = $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
+
+        // Deteksi perubahan ringkas untuk description
         $changes = [];
-        if ($input['nama_kepala_keluarga'] !== $penerimaLama['nama_kepala_keluarga']) $changes[] = 'Nama';
+        if ($input['nama_kepala_keluarga'] !== ($penerimaLama['nama_kepala_keluarga'] ?? '')) $changes[] = 'Nama';
         if ($nikBaru !== $nikLama) $changes[] = 'NIK';
-        if ($penghasilan != $penerimaLama['penghasilan_per_bulan']) $changes[] = 'Penghasilan';
-        if ($input['alamat_detail'] !== $rumahLama['alamat_detail']) $changes[] = 'Alamat';
-        $detailLog = empty($changes) ? 'Memperbarui detail data' : 'Mengubah ' . implode(', ', $changes);
+        if ($penghasilan != ($penerimaLama['penghasilan_per_bulan'] ?? '')) $changes[] = 'Penghasilan';
+        if ($input['alamat_detail'] !== ($rumahLama['alamat_detail'] ?? '')) $changes[] = 'Alamat';
+        $detailLog = empty($changes) ? 'Memperbarui rincian data' : 'Mengubah ' . implode(', ', $changes);
 
         // MULAI TRANSAKSI
-        $db->query('SET FOREIGN_KEY_CHECKS=0'); // Matikan pengecekan sementara
+        $db->query('SET FOREIGN_KEY_CHECKS=0');
         $db->transStart();
         try {
             // 1. Update Tabel Penerima
@@ -339,10 +346,26 @@ class Rtlh extends BaseController
                 'st_atap' => $this->nullify($input['st_atap']),
             ]);
 
-            $db->transComplete();
-            $db->query('SET FOREIGN_KEY_CHECKS=1'); // Hidupkan kembali
+            // Ambil data BARU setelah update untuk dibandingkan
+            $penerimaBaru = $db->table('rtlh_penerima')->where('nik', $nikBaru)->get()->getRowArray();
+            $rumahBaru = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
+            $kondisiBaru = $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
 
-            $this->logActivity('Ubah', 'RTLH', $detailLog . ' (NIK: ' . $nikBaru . ')');
+            $diffPenerima = $this->generateDiff($penerimaLama, $penerimaBaru);
+            $diffRumah = $this->generateDiff($rumahLama, $rumahBaru);
+            $diffKondisi = $this->generateDiff($kondisiLama, $kondisiBaru);
+
+            $allDiff = "";
+            if($diffPenerima != "Tidak ada perubahan data teknis.") $allDiff .= "[IDENTITAS]: {$diffPenerima} | ";
+            if($diffRumah != "Tidak ada perubahan data teknis.") $allDiff .= "[PROFIL]: {$diffRumah} | ";
+            if($diffKondisi != "Tidak ada perubahan data teknis.") $allDiff .= "[TEKNIS]: {$diffKondisi}";
+
+            if(empty($allDiff)) $allDiff = "Tidak ada perubahan data teknis.";
+
+            $db->transComplete();
+            $db->query('SET FOREIGN_KEY_CHECKS=1');
+
+            $this->logActivity('Ubah', 'RTLH', $detailLog . ' (NIK: ' . $nikBaru . ')', trim($allDiff, ' | '));
             return redirect()->to('/rtlh/detail/' . $id_survei)->with('message', 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
             $db->transRollback();
@@ -368,14 +391,54 @@ class Rtlh extends BaseController
             }
         }
 
+        // --- RECYCLE BIN LOGIC ---
+        // Ambil data lengkap dari 3 tabel sebelum dihapus
+        $penerima = $db->table('rtlh_penerima')->where('nik', $rumah['nik_pemilik'])->get()->getRowArray();
+        $kondisi = $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
+
+        $allData = [
+            'penerima' => $penerima,
+            'rumah'    => $rumah,
+            'kondisi'  => $kondisi
+        ];
+
         $db->transStart();
+        
+        // 1. Simpan ke Trash
+        $db->table('trash_data')->insert([
+            'entity_type' => 'RTLH',
+            'entity_id'   => $id_survei,
+            'data_json'   => json_encode($allData),
+            'deleted_by'  => session()->get('username'),
+            'created_at'  => date('Y-m-d H:i:s')
+        ]);
+
+        // 2. Hapus dari Tabel Utama
         $db->table('rtlh_kondisi_rumah')->where('id_survei', $id_survei)->delete();
         $db->table('rtlh_rumah')->where('id_survei', $id_survei)->delete();
+        // NIK di penerima tidak dihapus otomatis (bisa saja ada rumah lain), 
+        // tapi dalam konteks ini kita hapus jika tidak ada rumah lain
+        $checkLain = $db->table('rtlh_rumah')->where('nik_pemilik', $rumah['nik_pemilik'])->countAllResults();
+        if($checkLain == 0) {
+            $db->table('rtlh_penerima')->where('nik', $rumah['nik_pemilik'])->delete();
+        }
+
         $db->transComplete();
 
-        // Tambahkan Log
-        $this->logActivity('Hapus', 'RTLH', 'Menghapus data ID Survei: ' . $id_survei);
+        // Tambahkan Log DETAIL
+        $detailLog = $this->formatLogData($rumah) . " | [Penerima]: " . ($penerima['nama_kepala_keluarga'] ?? '-');
+        $this->logActivity('Hapus', 'RTLH', 'Memindahkan data ke Recycle Bin (ID Survei: ' . $id_survei . ')', $detailLog);
 
-        return redirect()->to('/rtlh')->with('message', 'Data berhasil dihapus');
+        return redirect()->to('/rtlh')->with('message', 'Data telah dipindahkan ke Recycle Bin.');
+    }
+
+    public function logExport($id_survei)
+    {
+        $db = \Config\Database::connect();
+        $rumah = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
+        
+        $this->logActivity('Ekspor PDF', 'RTLH', 'Mendownload laporan lengkap RTLH untuk NIK: ' . ($rumah['nik_pemilik'] ?? 'Unknown'));
+        
+        return $this->response->setJSON(['status' => 'success']);
     }
 }

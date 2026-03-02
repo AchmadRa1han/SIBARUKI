@@ -304,6 +304,9 @@
         // Tambahkan class khusus untuk PDF sebelum generate
         document.body.classList.add('is-exporting');
         
+        // Log ke server
+        fetch('<?= base_url("rtlh/log-export/" . ($rumah["id_survei"] ?? 0)) ?>', { method: 'POST' });
+
         html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
             document.body.classList.remove('is-exporting');
         }).save();

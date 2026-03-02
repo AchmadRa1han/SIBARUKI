@@ -59,10 +59,14 @@ class WilayahKumuh extends BaseController
         $optKec = $db->table('wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
         $optDesa = $db->table('wilayah_kumuh')->select('Kelurahan, desa_id')->distinct()->get()->getResultArray();
 
+        // Pilihan Jumlah Data per Halaman
+        $perPage = $this->request->getGet('per_page') ?? 25;
+
         $data = [
             'title' => 'Wilayah Kumuh',
-            'kumuh' => $builder->paginate(25, 'group1'),
+            'kumuh' => $builder->paginate($perPage, 'group1'),
             'pager' => $this->kumuhModel->pager,
+            'perPage' => $perPage,
             'options' => [
                 'kecamatan' => array_filter(array_column($optKec, 'Kecamatan')),
                 'desa' => $optDesa
@@ -108,11 +112,12 @@ class WilayahKumuh extends BaseController
     {
         if (!has_permission('create_kumuh')) return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
 
-        $data = $this->request->getPost();
-        $this->kumuhModel->insert($data);
+        $id = $this->kumuhModel->insert($data);
+        $saved = $this->kumuhModel->find($id);
+        $detailLog = $this->formatLogData($saved);
 
-        // Tambahkan Log
-        $this->logActivity('Tambah', 'Wilayah Kumuh', 'Menambah lokasi kumuh baru: ' . ($data['Kelurahan'] ?? 'Tanpa Nama'));
+        // Tambahkan Log DETAIL
+        $this->logActivity('Tambah', 'Wilayah Kumuh', 'Menambah lokasi kumuh baru: ' . ($data['Kelurahan'] ?? 'Tanpa Nama'), $detailLog);
 
         return redirect()->to('/wilayah-kumuh')->with('message', 'Data wilayah kumuh berhasil disimpan');
     }
@@ -167,12 +172,14 @@ class WilayahKumuh extends BaseController
         $detailLog = empty($changes) ? 'Memperbarui rincian wilayah' : 'Mengubah ' . implode(', ', $changes);
 
         $this->kumuhModel->update($id, $newData);
+        $newDataRecord = $this->kumuhModel->find($id);
+        $diff = $this->generateDiff($oldData, $newDataRecord);
 
         // Format Pesan Baru: "Perubahan pada Balangnipa Kode RT RW 01/02: Mengubah Skor Kumuh"
         $logMessage = "Perubahan pada " . $oldData['Kelurahan'] . " " . ($oldData['Kode_RT_RW'] ?? '') . ": " . $detailLog;
 
-        // Tambahkan Log
-        $this->logActivity('Ubah', 'Wilayah Kumuh', $logMessage);
+        // Tambahkan Log dengan DETAIL
+        $this->logActivity('Ubah', 'Wilayah Kumuh', $logMessage, $diff);
 
         return redirect()->to('/wilayah-kumuh/detail/' . $id)->with('message', 'Data wilayah kumuh berhasil diperbarui');
     }
@@ -192,11 +199,26 @@ class WilayahKumuh extends BaseController
             }
         }
 
+        $db = \Config\Database::connect();
+        
+        $db->transStart();
+        // 1. Simpan ke Trash
+        $db->table('trash_data')->insert([
+            'entity_type' => 'KUMUH',
+            'entity_id'   => $id,
+            'data_json'   => json_encode($kumuh),
+            'deleted_by'  => session()->get('username'),
+            'created_at'  => date('Y-m-d H:i:s')
+        ]);
+
+        // 2. Hapus data asli
         $this->kumuhModel->delete($id);
+        $db->transComplete();
 
-        // Tambahkan Log
-        $this->logActivity('Hapus', 'Wilayah Kumuh', 'Menghapus data wilayah: ' . $kumuh['Kelurahan']);
+        // Tambahkan Log DETAIL
+        $detailLog = $this->formatLogData($kumuh);
+        $this->logActivity('Hapus', 'Wilayah Kumuh', 'Memindahkan data wilayah ke Recycle Bin: ' . $kumuh['Kelurahan'], $detailLog);
 
-        return redirect()->to('/wilayah-kumuh')->with('message', 'Data berhasil dihapus');
+        return redirect()->to('/wilayah-kumuh')->with('message', 'Data telah dipindahkan ke Recycle Bin.');
     }
 }

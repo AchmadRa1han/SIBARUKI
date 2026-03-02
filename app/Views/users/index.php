@@ -58,11 +58,9 @@
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                             </a>
                             <?php if($user['username'] !== 'admin'): ?>
-                            <form action="<?= base_url('users/delete/'.$user['id']) ?>" method="post" onsubmit="return confirm('Hapus user ini?')">
-                                <button type="submit" class="p-2 text-slate-400 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 transition-colors">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </form>
+                            <button type="button" onclick="confirmDeleteUser(this)" data-url="<?= base_url('users/delete/'.$user['id']) ?>" class="p-2 text-slate-400 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
                             <?php endif; ?>
                             <?php else: ?>
                                 <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest italic">Read Only</span>
@@ -75,4 +73,23 @@
         </table>
     </div>
 </div>
+
+<script>
+    async function confirmDeleteUser(btn) {
+        const url = btn.getAttribute('data-url');
+        const ok = await customConfirm('Hapus User?', 'Akun ini akan dipindahkan ke Recycle Bin.', 'danger');
+        if (ok) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '<?= csrf_token() ?>';
+            csrf.value = '<?= csrf_hash() ?>';
+            form.appendChild(csrf);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
 <?= $this->endSection() ?>

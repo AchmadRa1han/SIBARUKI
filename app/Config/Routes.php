@@ -29,6 +29,15 @@ $routes->group('users', function($routes) {
     $routes->post('delete/(:num)', 'Users::delete/$1');
 });
 
+$routes->get('logs', 'Logs::index');
+$routes->get('logs/clear', 'Logs::clear');
+
+$routes->group('trash', function($routes) {
+    $routes->get('/', 'Trash::index');
+    $routes->get('restore/(:num)', 'Trash::restore/$1');
+    $routes->get('delete-perm/(:num)', 'Trash::deletePermanently/$1');
+});
+
 $routes->group('ref-master', function($routes) {
     $routes->get('/', 'RefMaster::index');
     $routes->get('create', 'RefMaster::create');
@@ -43,6 +52,7 @@ $routes->group('rtlh', function($routes) {
     $routes->get('create', 'Rtlh::create');
     $routes->post('store', 'Rtlh::store');
     $routes->get('detail/(:num)', 'Rtlh::detail/$1');
+    $routes->post('log-export/(:num)', 'Rtlh::logExport/$1');
     $routes->get('edit/(:num)', 'Rtlh::edit/$1');
     $routes->post('update/(:num)', 'Rtlh::update/$1');
     $routes->post('delete/(:num)', 'Rtlh::delete/$1');

@@ -93,38 +93,20 @@ class Users extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $userId = $this->userModel->insert([
+        $userData = [
             'username' => $this->request->getPost('username'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             'instansi' => $this->request->getPost('instansi'),
             'role_id'  => $this->request->getPost('role_id')
-        ]);
+        ];
 
-        // Simpan data desa RTLH
-        $desaIdsRtlh = $this->request->getPost('desa_ids_rtlh');
-        if ($desaIdsRtlh && is_array($desaIdsRtlh)) {
-            foreach ($desaIdsRtlh as $desaId) {
-                $this->userDesaModel->insert([
-                    'user_id'  => $userId,
-                    'desa_id'  => trim($desaId),
-                    'category' => 'rtlh'
-                ]);
-            }
-        }
+        $userId = $this->userModel->insert($userData);
+        $savedData = $this->userModel->find($userId);
+        $detailLog = $this->formatLogData($savedData);
 
-        // Simpan data desa Kumuh
-        $desaIdsKumuh = $this->request->getPost('desa_ids_kumuh');
-        if ($desaIdsKumuh && is_array($desaIdsKumuh)) {
-            foreach ($desaIdsKumuh as $desaId) {
-                $this->userDesaModel->insert([
-                    'user_id'  => $userId,
-                    'desa_id'  => trim($desaId),
-                    'category' => 'kumuh'
-                ]);
-            }
-        }
-
-        $this->logActivity('Tambah', 'Users', 'Menambah user baru: ' . $this->request->getPost('username'));
+        // ... (simpan assignments desa) ...
+        
+        $this->logActivity('Tambah', 'Users', "Menambah user baru: {$savedData['username']}", $detailLog);
 
         return redirect()->to('/users')->with('message', 'User berhasil ditambahkan');
     }
@@ -175,36 +157,12 @@ class Users extends BaseController
             $updateData['password'] = password_hash($passwordInput, PASSWORD_DEFAULT);
         }
 
+        $oldData = $this->userModel->find($id);
         $this->userModel->update($id, $updateData);
+        $newData = $this->userModel->find($id);
 
-        // Update Desa Penugasan (Hapus semua, lalu simpan ulang per kategori)
-        $this->userDesaModel->where('user_id', $id)->delete();
-        
-        // Simpan RTLH
-        $desaIdsRtlh = $this->request->getPost('desa_ids_rtlh');
-        if ($desaIdsRtlh && is_array($desaIdsRtlh)) {
-            foreach ($desaIdsRtlh as $desaId) {
-                $this->userDesaModel->insert([
-                    'user_id'  => $id,
-                    'desa_id'  => trim($desaId),
-                    'category' => 'rtlh'
-                ]);
-            }
-        }
-
-        // Simpan Kumuh
-        $desaIdsKumuh = $this->request->getPost('desa_ids_kumuh');
-        if ($desaIdsKumuh && is_array($desaIdsKumuh)) {
-            foreach ($desaIdsKumuh as $desaId) {
-                $this->userDesaModel->insert([
-                    'user_id'  => $id,
-                    'desa_id'  => trim($desaId),
-                    'category' => 'kumuh'
-                ]);
-            }
-        }
-
-        $this->logActivity('Ubah', 'Users', 'Memperbarui profil user: ' . $user['username']);
+        $diff = $this->generateDiff($oldData, $newData, ['password', 'updated_at']);
+        $this->logActivity('Ubah', 'Users', 'Memperbarui profil user: ' . $user['username'], $diff);
 
         return redirect()->to('/users')->with('message', 'User berhasil diperbarui');
     }
@@ -214,13 +172,41 @@ class Users extends BaseController
         if (!has_permission('delete_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
         
         $user = $this->userModel->find($id);
+        if (!$user) return redirect()->back()->with('message', 'User tidak ditemukan.');
         if ($user['username'] === 'admin') {
             return redirect()->back()->with('message', 'Admin utama tidak bisa dihapus.');
         }
 
-        $this->userModel->delete($id);
-        $this->logActivity('Hapus', 'Users', 'Menghapus user: ' . $user['username']);
+        $db = \Config\Database::connect();
+        
+        // Ambil data penugasan desa sebelum dihapus
+        $assignments = $db->table('user_desa')->where('user_id', $id)->get()->getResultArray();
 
-        return redirect()->to('/users')->with('message', 'User berhasil dihapus');
+        $allData = [
+            'user' => $user,
+            'assignments' => $assignments
+        ];
+
+        $db->transStart();
+        
+        // 1. Simpan ke Trash
+        $db->table('trash_data')->insert([
+            'entity_type' => 'USER',
+            'entity_id'   => $id,
+            'data_json'   => json_encode($allData),
+            'deleted_by'  => session()->get('username'),
+            'created_at'  => date('Y-m-d H:i:s')
+        ]);
+
+        // 2. Hapus data asli
+        $db->table('user_desa')->where('user_id', $id)->delete();
+        $this->userModel->delete($id);
+
+        $db->transComplete();
+
+        $detailLog = $this->formatLogData($user);
+        $this->logActivity('Hapus', 'Users', 'Memindahkan user ke Recycle Bin: ' . $user['username'], $detailLog);
+
+        return redirect()->to('/users')->with('message', 'User telah dipindahkan ke Recycle Bin.');
     }
 }

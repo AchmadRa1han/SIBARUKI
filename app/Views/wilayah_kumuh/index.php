@@ -25,7 +25,7 @@
 
         <!-- Toolbar Filter Lanjutan (Khusus Admin/Global) -->
         <?php if (session()->get('role_scope') === 'global') : ?>
-        <div class="mb-8 bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all">
+        <div class="mb-8 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all">
             <div class="flex items-center gap-4 mb-8 border-b dark:border-slate-800 pb-6">
                 <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-700 dark:text-amber-400 shadow-inner">
                     <i data-lucide="map" class="w-6 h-6"></i>
@@ -50,7 +50,7 @@
                 <div class="space-y-2">
                     <label class="text-[9px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-[0.2em] ml-1">Kecamatan</label>
                     <div class="relative">
-                        <select name="kecamatan" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-amber-500/10 appearance-none cursor-pointer transition-all">
+                        <select name="kecamatan" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none cursor-pointer transition-all">
                             <option value="">Semua Kecamatan</option>
                             <?php foreach($options['kecamatan'] as $k): ?>
                                 <option value="<?= $k ?>" <?= ($filters['kecamatan'] == $k) ? 'selected' : '' ?>><?= $k ?></option>
@@ -64,7 +64,7 @@
                 <div class="space-y-2">
                     <label class="text-[9px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-[0.2em] ml-1">Kelurahan / Desa</label>
                     <div class="relative">
-                        <select name="desa_id" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-amber-500/10 appearance-none cursor-pointer transition-all">
+                        <select name="desa_id" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none cursor-pointer transition-all">
                             <option value="">Semua Kelurahan</option>
                             <?php foreach($options['desa'] as $d): ?>
                                 <option value="<?= $d['desa_id'] ?>" <?= ($filters['desa_id'] == $d['desa_id']) ? 'selected' : '' ?>><?= $d['Kelurahan'] ?></option>
@@ -78,7 +78,7 @@
                 <div class="space-y-2">
                     <label class="text-[9px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-[0.2em] ml-1">Tingkat Kumuh</label>
                     <div class="relative">
-                        <select name="skor" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-amber-500/10 appearance-none cursor-pointer transition-all">
+                        <select name="skor" onchange="this.form.submit()" class="w-full pl-5 pr-10 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none cursor-pointer transition-all">
                             <option value="">Semua Tingkat</option>
                             <option value="high" <?= ($filters['skor'] == 'high') ? 'selected' : '' ?>>Kumuh Berat (Skor >= 60)</option>
                             <option value="mid" <?= ($filters['skor'] == 'mid') ? 'selected' : '' ?>>Kumuh Sedang (Skor 40-59)</option>
@@ -90,6 +90,8 @@
             </form>
         </div>
         <?php endif; ?>
+
+        <div class="overflow-x-auto rounded-[1.5rem] border border-slate-100 dark:border-slate-800 mb-8 shadow-inner bg-slate-50/30 dark:bg-slate-950/50">
             <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                     <tr class="bg-white dark:bg-slate-900 text-blue-950 dark:text-blue-400 uppercase text-[10px] font-black tracking-[0.15em] transition-colors duration-300">
@@ -130,12 +132,9 @@
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                     </a>
                                     <?php if (has_permission('delete_kumuh')): ?>
-                                    <form action="<?= base_url('wilayah-kumuh/delete/' . $row['FID']) ?>" method="post" onsubmit="return confirm('Hapus data wilayah ini?')">
-                                        <?= csrf_field() ?>
-                                        <button type="submit" class="p-2 text-rose-300 dark:text-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" onclick="confirmDeleteKumuh(this)" data-url="<?= base_url('wilayah-kumuh/delete/' . $row['FID']) ?>" class="p-2 text-rose-300 dark:text-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
                                     <?php endif; ?>
                                 </div>
                             </td>
@@ -145,12 +144,51 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="mt-4 flex justify-center">
-            <?= $pager->links('group1', 'tailwind_full') ?>
+        <!-- PAGINATION & PER PAGE CONTROL -->
+        <div class="p-6 bg-slate-50/50 dark:bg-slate-950/50 border-t dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-4 min-w-[200px]">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tampilkan:</span>
+                <select onchange="changePerPage(this.value)" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer">
+                    <?php foreach([10, 25, 50, 100] as $count): ?>
+                        <option value="<?= $count ?>" <?= $perPage == $count ? 'selected' : '' ?>><?= $count ?> Data</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="flex-grow flex justify-center">
+                <?= $pager->links('group1', 'tailwind_full') ?>
+            </div>
+
+            <div class="hidden md:block min-w-[200px]"></div>
         </div>
     </div>
 </div>
 
-<script>lucide.createIcons();</script>
+<script>
+    lucide.createIcons();
+
+    async function confirmDeleteKumuh(btn) {
+        const url = btn.getAttribute('data-url');
+        const ok = await customConfirm('Hapus Wilayah Kumuh?', 'Data akan dipindahkan ke Recycle Bin.', 'danger');
+        if (ok) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '<?= csrf_token() ?>';
+            csrf.value = '<?= csrf_hash() ?>';
+            form.appendChild(csrf);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    function changePerPage(count) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('per_page', count);
+        url.searchParams.set('page_group1', 1);
+        window.location.href = url.href;
+    }
+</script>
 <?= $this->endSection() ?>
