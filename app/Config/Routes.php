@@ -11,6 +11,15 @@ $routes->post('login/process', 'Auth::login');
 $routes->get('logout', 'Auth::logout');
 $routes->get('dashboard', 'Home::index');
 
+$routes->group('roles', function($routes) {
+    $routes->get('/', 'Roles::index');
+    $routes->get('create', 'Roles::create');
+    $routes->post('store', 'Roles::store');
+    $routes->get('edit/(:num)', 'Roles::edit/$1');
+    $routes->post('update/(:num)', 'Roles::update/$1');
+    $routes->get('delete/(:num)', 'Roles::delete/$1');
+});
+
 $routes->group('users', function($routes) {
     $routes->get('/', 'Users::index');
     $routes->get('create', 'Users::create');

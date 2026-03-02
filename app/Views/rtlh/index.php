@@ -7,10 +7,12 @@
             <h1 class="text-2xl font-black text-blue-950 dark:text-white tracking-tight">Manajemen Data RTLH</h1>
             <p class="text-sm text-slate-400 dark:text-slate-500 font-medium">Integrasi data penerima, profil rumah, dan teknis bangunan</p>
         </div>
+        <?php if (has_permission('create_rtlh')): ?>
         <a href="<?= base_url('rtlh/create') ?>" class="bg-blue-900 dark:bg-blue-700 hover:bg-blue-950 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-2xl transition-all flex items-center space-x-2 text-sm font-bold shadow-xl shadow-blue-900/20">
             <i data-lucide="plus-circle" class="w-5 h-5"></i>
             <span>Tambah Data Terpadu</span>
         </a>
+        <?php endif; ?>
     </div>
 
     <div class="p-8">
@@ -64,12 +66,14 @@
                                        title="Lihat Detail Lengkap">
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                     </a>
+                                    <?php if (has_permission('delete_rtlh')): ?>
                                     <form action="<?= base_url('rtlh/delete/' . $row['id_survei']) ?>" method="post" onsubmit="return confirm('Hapus seluruh rangkaian data RTLH ini?')">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="p-2 text-rose-300 dark:text-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors" title="Hapus Permanen">
                                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
                                     </form>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

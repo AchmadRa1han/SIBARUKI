@@ -12,7 +12,7 @@ class RoleModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['role_name'];
+    protected $allowedFields    = ['role_name', 'scope'];
 
     // Dates
     protected $useTimestamps = true;

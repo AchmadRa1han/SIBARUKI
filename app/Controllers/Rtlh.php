@@ -32,13 +32,13 @@ class Rtlh extends BaseController
                 ->groupEnd();
         }
 
-        // Filter untuk Petugas
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        // Filter Wilayah (Berdasarkan Scope)
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_rtlh');
             if (!empty($desa_ids)) {
                 $builder->whereIn('rtlh_rumah.desa_id', $desa_ids);
             } else {
-                $builder->where('rtlh_rumah.id_survei', 0); // Tampilkan kosong jika tidak ada tugas desa
+                $builder->where('rtlh_rumah.id_survei', 0);
             }
         }
 
@@ -57,9 +57,9 @@ class Rtlh extends BaseController
         $rumah = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
-        // Security Check untuk Petugas
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        // Security Check Wilayah
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_rtlh') ?? [];
             if (!in_array($rumah['desa_id'], $desa_ids)) {
                 return redirect()->to('/rtlh')->with('message', 'Anda tidak memiliki akses ke data wilayah ini.');
             }
@@ -104,6 +104,8 @@ class Rtlh extends BaseController
 
     public function create()
     {
+        if (!has_permission('create_rtlh')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
+
         $refModel = new RefMasterModel();
         $allMaster = $refModel->findAll();
         $master = [];
@@ -113,6 +115,8 @@ class Rtlh extends BaseController
 
     public function store()
     {
+        if (!has_permission('create_rtlh')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
+
         $db = \Config\Database::connect();
         $input = $this->request->getPost();
         
@@ -191,14 +195,16 @@ class Rtlh extends BaseController
 
     public function edit($id_survei)
     {
+        if (!has_permission('edit_rtlh')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
+
         $db = \Config\Database::connect();
         $refModel = new RefMasterModel();
         $rumah = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
-        // Security Check untuk Petugas
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        // Security Check Wilayah
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_rtlh') ?? [];
             if (!in_array($rumah['desa_id'], $desa_ids)) {
                 return redirect()->to('/rtlh')->with('message', 'Anda tidak memiliki akses untuk mengubah data ini.');
             }
@@ -213,15 +219,17 @@ class Rtlh extends BaseController
 
     public function update($id_survei)
     {
+        if (!has_permission('edit_rtlh')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
+
         $db = \Config\Database::connect();
         $input = $this->request->getPost();
         
         $rumahLama = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumahLama) return redirect()->back()->with('message', 'Data tidak ditemukan.');
         
-        // Security Check untuk Petugas
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        // Security Check Wilayah
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_rtlh') ?? [];
             if (!in_array($rumahLama['desa_id'], $desa_ids)) {
                 return redirect()->to('/rtlh')->with('message', 'Anda tidak memiliki izin memperbarui data ini.');
             }
@@ -315,14 +323,16 @@ class Rtlh extends BaseController
 
     public function delete($id_survei)
     {
+        if (!has_permission('delete_rtlh')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
+
         $db = \Config\Database::connect();
         
         $rumah = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
         if (!$rumah) return redirect()->back()->with('message', 'Data tidak ditemukan.');
 
-        // Security Check untuk Petugas
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        // Security Check Wilayah
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_rtlh') ?? [];
             if (!in_array($rumah['desa_id'], $desa_ids)) {
                 return redirect()->to('/rtlh')->with('message', 'Anda tidak memiliki izin menghapus data ini.');
             }

@@ -1,0 +1,68 @@
+<?= $this->extend('layout') ?>
+
+<?= $this->section('content') ?>
+<div class="p-6">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-blue-950 uppercase tracking-tight">Manajemen Role</h1>
+            <p class="text-slate-500 text-sm mt-1">Kelola hak akses dan cakupan data pengguna sistem.</p>
+        </div>
+        <a href="<?= base_url('roles/create') ?>" class="bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-900/20 active:scale-95">
+            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+            TAMBAH ROLE
+        </a>
+    </div>
+
+    <?php if (session()->getFlashdata('success')) : ?>
+        <div class="mb-6 bg-emerald-50 text-emerald-700 px-6 py-4 rounded-3xl border border-emerald-100 flex items-center gap-3 animate-fade-in">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span class="font-medium"><?= session()->getFlashdata('success') ?></span>
+        </div>
+    <?php endif; ?>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <?php foreach ($roles as $role) : ?>
+            <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all group relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i data-lucide="shield-check" class="w-24 h-24 text-blue-900"></i>
+                </div>
+                
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <span class="text-[10px] font-black text-blue-900 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100 mb-2 inline-block">Role Name</span>
+                            <h3 class="text-2xl font-bold text-slate-800"><?= strtoupper($role['role_name']) ?></h3>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-600">
+                                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-blue-900 uppercase tracking-widest">Scope</p>
+                                <p class="text-sm font-semibold <?= $role['scope'] == 'global' ? 'text-emerald-600' : 'text-amber-600' ?>">
+                                    <?= strtoupper($role['scope']) ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 mt-auto">
+                        <a href="<?= base_url('roles/edit/' . $role['id']) ?>" class="flex-1 bg-slate-50 hover:bg-blue-900 hover:text-white text-slate-600 px-4 py-3 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 text-sm border border-slate-100">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            EDIT
+                        </a>
+                        <?php if ($role['id'] != 1) : ?>
+                            <a href="<?= base_url('roles/delete/' . $role['id']) ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus role ini?')" class="bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 p-3 rounded-2xl transition-all border border-rose-100 active:scale-95">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?= $this->endSection() ?>

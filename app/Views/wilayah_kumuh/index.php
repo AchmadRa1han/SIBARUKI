@@ -7,10 +7,12 @@
             <h1 class="text-2xl font-black text-blue-950 dark:text-white tracking-tight">Daftar Wilayah Kumuh</h1>
             <p class="text-sm text-slate-400 dark:text-slate-500 font-medium">Pemantauan lokasi, statistik luas, dan skor kumuh wilayah</p>
         </div>
+        <?php if (has_permission('create_kumuh')): ?>
         <a href="<?= base_url('wilayah-kumuh/create') ?>" class="bg-blue-900 dark:bg-blue-700 hover:bg-blue-950 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-2xl transition-all flex items-center space-x-2 text-sm font-bold shadow-xl shadow-blue-900/20">
             <i data-lucide="plus-circle" class="w-5 h-5"></i>
             <span>Tambah Lokasi Baru</span>
         </a>
+        <?php endif; ?>
     </div>
 
     <div class="p-8">
@@ -61,12 +63,14 @@
                                        title="Lihat Laporan Lengkap">
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                     </a>
+                                    <?php if (has_permission('delete_kumuh')): ?>
                                     <form action="<?= base_url('wilayah-kumuh/delete/' . $row['FID']) ?>" method="post" onsubmit="return confirm('Hapus data wilayah ini?')">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="p-2 text-rose-300 dark:text-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors">
                                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
                                     </form>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

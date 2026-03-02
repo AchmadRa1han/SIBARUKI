@@ -7,10 +7,12 @@
             <h1 class="text-2xl font-black text-blue-950 dark:text-white uppercase tracking-wider">Manajemen Pengguna</h1>
             <p class="text-slate-400 dark:text-slate-500 text-sm font-medium italic">Kelola hak akses dan penugasan wilayah petugas.</p>
         </div>
+        <?php if (has_permission('manage_users')): ?>
         <a href="<?= base_url('users/create') ?>" class="bg-blue-900 dark:bg-blue-700 hover:bg-blue-800 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2 group">
             <i data-lucide="user-plus" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
             <span>Tambah User</span>
         </a>
+        <?php endif; ?>
     </div>
 
     <?php if(session()->getFlashdata('message')): ?>
@@ -51,6 +53,7 @@
                     <td class="p-6 text-xs text-slate-400 dark:text-slate-600 font-bold uppercase"><?= date('d M Y', strtotime($user['created_at'])) ?></td>
                     <td class="p-6">
                         <div class="flex justify-center gap-2">
+                            <?php if(has_permission('manage_users')): ?>
                             <a href="<?= base_url('users/edit/'.$user['id']) ?>" class="p-2 text-slate-400 dark:text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                             </a>
@@ -60,6 +63,9 @@
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </form>
+                            <?php endif; ?>
+                            <?php else: ?>
+                                <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest italic">Read Only</span>
                             <?php endif; ?>
                         </div>
                     </td>

@@ -21,13 +21,45 @@ class Users extends BaseController
 
     public function index()
     {
-        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+        if (!has_permission('manage_users') && !has_permission('view_users')) {
+            return redirect()->to('/dashboard');
+        }
+
+        $builder = $this->userModel->select('users.*, roles.role_name, roles.scope as role_scope')
+                        ->join('roles', 'roles.id = users.role_id');
+
+        // Filter Wilayah (Untuk Kepala Desa / Local Scope)
+        if (session()->get('role_scope') === 'local') {
+            $db = \Config\Database::connect();
+            // 1. Dapatkan daftar desa milik user yang sedang login (Kades)
+            $my_desa_ids = array_merge(
+                session()->get('desa_ids_rtlh') ?? [],
+                session()->get('desa_ids_kumuh') ?? []
+            );
+
+            if (!empty($my_desa_ids)) {
+                // 2. Cari semua USER_ID yang ditugaskan di desa yang sama
+                $related_users = $db->table('user_desa')
+                                    ->select('user_id')
+                                    ->whereIn('desa_id', $my_desa_ids)
+                                    ->get()
+                                    ->getResultArray();
+                
+                $user_ids = array_column($related_users, 'user_id');
+                
+                if (!empty($user_ids)) {
+                    $builder->whereIn('users.id', $user_ids);
+                } else {
+                    $builder->where('users.id', 0); // Kosongkan jika tidak ada
+                }
+            } else {
+                $builder->where('users.id', 0);
+            }
+        }
 
         $data = [
-            'title' => 'Manajemen Pengguna',
-            'users' => $this->userModel->select('users.*, roles.role_name')
-                        ->join('roles', 'roles.id = users.role_id')
-                        ->findAll()
+            'title' => 'Daftar Pengguna / Petugas',
+            'users' => $builder->findAll()
         ];
 
         return view('users/index', $data);
@@ -35,7 +67,7 @@ class Users extends BaseController
 
     public function create()
     {
-        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+        if (!has_permission('create_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
 
         $db = \Config\Database::connect();
         $data = [
@@ -49,7 +81,7 @@ class Users extends BaseController
 
     public function store()
     {
-        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+        if (!has_permission('create_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
 
         $rules = [
             'username' => 'required|is_unique[users.username]',
@@ -68,13 +100,26 @@ class Users extends BaseController
             'role_id'  => $this->request->getPost('role_id')
         ]);
 
-        // Simpan data desa jika ada (sekarang dikirim sebagai array dari dropdown)
-        $desaIds = $this->request->getPost('desa_ids');
-        if ($desaIds && is_array($desaIds)) {
-            foreach ($desaIds as $desaId) {
+        // Simpan data desa RTLH
+        $desaIdsRtlh = $this->request->getPost('desa_ids_rtlh');
+        if ($desaIdsRtlh && is_array($desaIdsRtlh)) {
+            foreach ($desaIdsRtlh as $desaId) {
                 $this->userDesaModel->insert([
-                    'user_id' => $userId,
-                    'desa_id' => trim($desaId)
+                    'user_id'  => $userId,
+                    'desa_id'  => trim($desaId),
+                    'category' => 'rtlh'
+                ]);
+            }
+        }
+
+        // Simpan data desa Kumuh
+        $desaIdsKumuh = $this->request->getPost('desa_ids_kumuh');
+        if ($desaIdsKumuh && is_array($desaIdsKumuh)) {
+            foreach ($desaIdsKumuh as $desaId) {
+                $this->userDesaModel->insert([
+                    'user_id'  => $userId,
+                    'desa_id'  => trim($desaId),
+                    'category' => 'kumuh'
                 ]);
             }
         }
@@ -86,22 +131,27 @@ class Users extends BaseController
 
     public function edit($id)
     {
-        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+        if (!has_permission('edit_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
 
         $user = $this->userModel->find($id);
         if (!$user) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         $db = \Config\Database::connect();
         
-        // Ambil desa yang ditugaskan
-        $userDesa = $this->userDesaModel->where('user_id', $id)->findAll();
-        $assignedDesaIds = array_column($userDesa, 'desa_id');
+        // Ambil desa penugasan RTLH
+        $rtlhDesa = $this->userDesaModel->where(['user_id' => $id, 'category' => 'rtlh'])->findAll();
+        $assignedRtlh = array_column($rtlhDesa, 'desa_id');
+
+        // Ambil desa penugasan Kumuh
+        $kumuhDesa = $this->userDesaModel->where(['user_id' => $id, 'category' => 'kumuh'])->findAll();
+        $assignedKumuh = array_column($kumuhDesa, 'desa_id');
 
         $data = [
             'title'             => 'Edit Pengguna',
             'user'              => $user,
             'roles'             => $this->roleModel->findAll(),
-            'assigned_desa_ids' => $assignedDesaIds,
+            'assigned_rtlh'     => $assignedRtlh,
+            'assigned_kumuh'    => $assignedKumuh,
             'all_desa'          => $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray()
         ];
 
@@ -110,7 +160,7 @@ class Users extends BaseController
 
     public function update($id)
     {
-        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+        if (!has_permission('edit_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
 
         $user = $this->userModel->find($id);
         $passwordInput = $this->request->getPost('password');
@@ -127,17 +177,30 @@ class Users extends BaseController
 
         $this->userModel->update($id, $updateData);
 
-        // Update Desa Penugasan (sekarang sebagai array)
+        // Update Desa Penugasan (Hapus semua, lalu simpan ulang per kategori)
         $this->userDesaModel->where('user_id', $id)->delete();
-        $desaIds = $this->request->getPost('desa_ids');
-        if ($desaIds && is_array($desaIds)) {
-            foreach ($desaIds as $desaId) {
-                if (trim($desaId)) {
-                    $this->userDesaModel->insert([
-                        'user_id' => $id,
-                        'desa_id' => trim($desaId)
-                    ]);
-                }
+        
+        // Simpan RTLH
+        $desaIdsRtlh = $this->request->getPost('desa_ids_rtlh');
+        if ($desaIdsRtlh && is_array($desaIdsRtlh)) {
+            foreach ($desaIdsRtlh as $desaId) {
+                $this->userDesaModel->insert([
+                    'user_id'  => $id,
+                    'desa_id'  => trim($desaId),
+                    'category' => 'rtlh'
+                ]);
+            }
+        }
+
+        // Simpan Kumuh
+        $desaIdsKumuh = $this->request->getPost('desa_ids_kumuh');
+        if ($desaIdsKumuh && is_array($desaIdsKumuh)) {
+            foreach ($desaIdsKumuh as $desaId) {
+                $this->userDesaModel->insert([
+                    'user_id'  => $id,
+                    'desa_id'  => trim($desaId),
+                    'category' => 'kumuh'
+                ]);
             }
         }
 
@@ -148,7 +211,7 @@ class Users extends BaseController
 
     public function delete($id)
     {
-        if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
+        if (!has_permission('delete_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
         
         $user = $this->userModel->find($id);
         if ($user['username'] === 'admin') {

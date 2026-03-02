@@ -30,6 +30,13 @@
 
     <!-- Sidebar Modern -->
     <aside class="w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col shrink-0 shadow-xl border-r border-slate-800">
+        <?php
+            // Simple Helper for View
+            $has_permission = function($name) {
+                $perms = session()->get('permissions') ?? [];
+                return in_array($name, $perms);
+            };
+        ?>
         <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
             <img src="<?= base_url('sinjai.png') ?>" alt="Logo Sinjai" class="w-10 h-10 object-contain">
             <span class="text-xl font-bold text-white tracking-tight">SIBARUKI</span>
@@ -42,12 +49,29 @@
                 <span class="font-medium">Dashboard</span>
             </a>
 
-            <!-- Manajemen User (Admin Only) -->
-            <?php if(session()->get('role_name') === 'admin'): ?>
-            <a href="<?= base_url('users') ?>" class="group flex items-center space-x-3 p-3 rounded-xl transition-all duration-300 <?= (url_is('users*')) ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1' ?>">
-                <i data-lucide="users" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"></i>
-                <span class="font-medium">Manajemen User</span>
-            </a>
+            <!-- Hak Akses & User (Admin/Manager Only) -->
+            <?php if($has_permission('manage_users') || $has_permission('view_users') || $has_permission('manage_roles')): ?>
+            <div class="pt-2">
+                <button onclick="toggleDropdown('dropdown-akses', 'arrow-akses')" class="w-full flex justify-between items-center p-3 rounded-xl transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 group">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="shield-check" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"></i>
+                        <span class="font-medium">Hak Akses</span>
+                    </div>
+                    <i id="arrow-akses" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300"></i>
+                </button>
+                <div id="dropdown-akses" class="hidden pl-11 mt-1 space-y-1 text-slate-400">
+                    <?php if($has_permission('manage_roles')): ?>
+                    <a href="<?= base_url('roles') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('roles*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        Master Role
+                    </a>
+                    <?php endif; ?>
+                    <?php if($has_permission('manage_users') || $has_permission('view_users')): ?>
+                    <a href="<?= base_url('users') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('users*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        Manajemen User
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </div>
             <?php endif; ?>
 
             <!-- Dropdown 1: Data Perumahan -->
@@ -65,13 +89,16 @@
                         Referensi Master
                     </a>
                     <?php endif; ?>
+                    <?php if($has_permission('view_rtlh')): ?>
                     <a href="<?= base_url('rtlh') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('rtlh*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
                         Data RTLH
                     </a>
+                    <?php endif; ?>
                 </div>
             </div>
 
             <!-- Dropdown 2: Data Kawasan Permukiman -->
+            <?php if($has_permission('view_kumuh')): ?>
             <div class="pt-2">
                 <button onclick="toggleDropdown('dropdown-permukiman', 'arrow-permukiman')" class="w-full flex justify-between items-center p-3 rounded-xl transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 group">
                     <div class="flex items-center space-x-3">
@@ -86,6 +113,7 @@
                     </a>
                 </div>
             </div>
+            <?php endif; ?>
 
             <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Sistem</div>
             <a href="#" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 transition-all duration-300 hover:translate-x-1">
@@ -156,14 +184,16 @@
     </div>
 
     <!-- Floating Support Button -->
-    <div class="fixed bottom-8 right-8 z-[50] flex items-center group">
-        <!-- Tooltip / Label yang muncul saat hover -->
-        <div class="bg-blue-950 text-white text-[10px] font-black uppercase tracking-widest px-4 py-3 rounded-xl mr-3 shadow-2xl opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300 pointer-events-none whitespace-nowrap">
-            Hubungi Bantuan
-        </div>
-        <!-- Tombol Utama -->
-        <button class="w-14 h-14 bg-blue-950 text-white rounded-2xl shadow-2xl flex items-center justify-center hover:bg-blue-900 hover:rotate-12 transition-all duration-300 active:scale-95">
-            <i data-lucide="message-square" class="w-6 h-6"></i>
+    <div class="fixed bottom-8 right-8 z-[50]">
+        <button class="w-14 h-14 bg-blue-950 text-white rounded-2xl shadow-2xl flex items-center justify-center hover:bg-blue-900 transition-all duration-300 active:scale-95 group relative">
+            <!-- Tooltip / Label Pop-up Bouncy (Tetap Tegak) -->
+            <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-blue-950 text-white text-[10px] font-black uppercase tracking-widest px-4 py-3 rounded-xl shadow-2xl opacity-0 scale-50 translate-y-4 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 pointer-events-none whitespace-nowrap origin-bottom transition-all duration-500 ease-[custom-bezier] z-10" style="transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);">
+                Hubungi Bantuan
+                <!-- Small Triangle / Arrow -->
+                <div class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-blue-950"></div>
+            </div>
+            <!-- Hanya Ikon yang Miring -->
+            <i data-lucide="message-square" class="w-6 h-6 group-hover:rotate-12 transition-transform duration-300"></i>
         </button>
     </div>
 
@@ -290,6 +320,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const path = window.location.pathname;
             const dropdowns = [
+                { id: 'dropdown-akses', arrow: 'arrow-akses', paths: ['roles', 'users'] },
                 { id: 'dropdown-perumahan', arrow: 'arrow-perumahan', paths: ['ref-master', 'rtlh'] },
                 { id: 'dropdown-permukiman', arrow: 'arrow-permukiman', paths: ['wilayah-kumuh'] }
             ];

@@ -27,8 +27,9 @@ class WilayahKumuh extends BaseController
                 ->groupEnd();
         }
 
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        // Filter Wilayah
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_kumuh');
             if (!empty($desa_ids)) {
                 $builder->whereIn('desa_id', $desa_ids);
             } else {
@@ -51,8 +52,8 @@ class WilayahKumuh extends BaseController
         if (!$kumuh) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         // Security Check
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_kumuh') ?? [];
             if (!in_array($kumuh['desa_id'], $desa_ids)) {
                 return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
             }
@@ -68,11 +69,14 @@ class WilayahKumuh extends BaseController
 
     public function create()
     {
+        if (!has_permission('create_kumuh')) return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
         return view('wilayah_kumuh/create', ['title' => 'Tambah Wilayah Kumuh']);
     }
 
     public function store()
     {
+        if (!has_permission('create_kumuh')) return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
+
         $data = $this->request->getPost();
         $this->kumuhModel->insert($data);
 
@@ -84,12 +88,14 @@ class WilayahKumuh extends BaseController
 
     public function edit($id)
     {
+        if (!has_permission('edit_kumuh')) return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
+
         $kumuh = $this->kumuhModel->find($id);
         if (!$kumuh) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         // Security Check
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_kumuh') ?? [];
             if (!in_array($kumuh['desa_id'], $desa_ids)) {
                 return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
             }
@@ -104,12 +110,14 @@ class WilayahKumuh extends BaseController
 
     public function update($id)
     {
+        if (!has_permission('edit_kumuh')) return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
+
         $oldData = $this->kumuhModel->find($id);
         if (!$oldData) return redirect()->back()->with('message', 'Data tidak ditemukan.');
 
         // Security Check
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_kumuh') ?? [];
             if (!in_array($oldData['desa_id'], $desa_ids)) {
                 return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
             }
@@ -140,12 +148,14 @@ class WilayahKumuh extends BaseController
 
     public function delete($id)
     {
+        if (!has_permission('delete_kumuh')) return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
+
         $kumuh = $this->kumuhModel->find($id);
         if (!$kumuh) return redirect()->back()->with('message', 'Data tidak ditemukan.');
 
         // Security Check
-        if (session()->get('role_name') === 'petugas') {
-            $desa_ids = session()->get('desa_ids');
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_kumuh') ?? [];
             if (!in_array($kumuh['desa_id'], $desa_ids)) {
                 return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak.');
             }

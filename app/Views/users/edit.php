@@ -8,96 +8,150 @@
         border: none !important;
         padding: 1rem !important;
         background: #f8fafc !important; /* slate-50 */
-        border-radius: 1rem !important;
+        border-radius: 1.25rem !important;
         transition: all 0.3s ease;
+        border: 1px solid #f1f5f9 !important;
     }
     .dark .ts-control {
         background: #020617 !important; /* slate-950 */
-        color: #e2e8f0 !important;
-    }
-    .dark .ts-dropdown {
-        background: #0f172a !important; /* slate-900 */
-        border: 1px solid #1e293b !important;
-        color: #e2e8f0 !important;
-    }
-    .dark .ts-dropdown .active {
-        background: #1e3a8a !important;
+        color: #e2e8f0 !important; /* slate-200 */
+        border-color: #1e293b !important;
     }
     .ts-wrapper.multi .ts-control > div {
+        border-radius: 0.75rem !important;
+        padding: 4px 12px !important;
+        font-weight: 700 !important;
+        font-size: 10px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+    }
+    /* RTLH Specific Tag Color */
+    .rtlh-select .ts-wrapper.multi .ts-control > div {
         background: #1e3a8a !important; /* blue-900 */
         color: white !important;
-        border-radius: 0.5rem !important;
-        padding: 2px 8px !important;
+    }
+    /* Kumuh Specific Tag Color */
+    .kumuh-select .ts-wrapper.multi .ts-control > div {
+        background: #b45309 !important; /* amber-700 */
+        color: white !important;
     }
 </style>
 
-<div class="max-w-3xl mx-auto">
-    <div class="mb-8">
-        <h1 class="text-2xl font-black text-blue-950 dark:text-white uppercase tracking-wider text-center">Edit Pengguna</h1>
-        <p class="text-slate-400 dark:text-slate-500 text-sm font-medium italic text-center">Modifikasi profil atau ubah penugasan wilayah.</p>
+<div class="max-w-4xl mx-auto p-6">
+    <div class="mb-10 flex items-center justify-between border-b dark:border-slate-800 pb-8 transition-colors duration-300">
+        <div>
+            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Edit Pengguna</h1>
+            <p class="text-slate-400 dark:text-slate-500 text-sm font-medium italic mt-1">Sesuaikan profil dan hak akses pengguna: <span class="text-blue-600 dark:text-blue-400 font-bold"><?= $user['username'] ?></span></p>
+        </div>
+        <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-3xl flex items-center justify-center text-blue-900 dark:text-blue-400">
+            <i data-lucide="user-cog" class="w-8 h-8"></i>
+        </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
-        <form action="<?= base_url('users/update/'.$user['id']) ?>" method="post" class="p-10 space-y-8">
-            <?= csrf_field() ?>
+    <form action="<?= base_url('users/update/' . $user['id']) ?>" method="post" class="space-y-8">
+        <?= csrf_field() ?>
 
+        <!-- Baris 1: Informasi Login -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+            <h3 class="text-blue-900 dark:text-blue-400 font-black uppercase text-[10px] tracking-[0.2em] mb-8 border-b dark:border-slate-800 pb-4 flex items-center gap-2">
+                <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                Update Kredensial
+            </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                    <label class="block text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest mb-2 ml-1">Username</label>
+                    <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1">Username</label>
                     <input type="text" name="username" value="<?= $user['username'] ?>" required
-                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all">
+                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-900 dark:focus:border-blue-700 dark:text-slate-200 outline-none transition-all font-bold">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest mb-2 ml-1">Password Baru (Opsional)</label>
-                    <input type="password" name="password" placeholder="••••••••"
-                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all">
+                    <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1">Ganti Password</label>
+                    <input type="password" name="password" placeholder="Kosongkan jika tidak ingin ganti..."
+                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-900 dark:focus:border-blue-700 dark:text-slate-200 outline-none transition-all font-bold">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest mb-2 ml-1">Instansi / Desa</label>
-                    <input type="text" name="instansi" value="<?= $user['instansi'] ?>"
-                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all">
+                    <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1">Instansi / Unit Kerja</label>
+                    <input type="text" name="instansi" value="<?= $user['instansi'] ?>" placeholder="Contoh: Dinas Perkim / Desa Saukang"
+                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-900 dark:focus:border-blue-700 dark:text-slate-200 outline-none transition-all font-bold">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest mb-2 ml-1">Role Akses</label>
-                    <select name="role_id" required class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl outline-none dark:text-slate-200 appearance-none font-bold">
-                        <?php foreach($roles as $role): ?>
-                            <option value="<?= $role['id'] ?>" <?= $user['role_id'] == $role['id'] ? 'selected' : '' ?>><?= strtoupper($role['role_name']) ?></option>
+                    <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1">Role / Hak Akses</label>
+                    <div class="relative">
+                        <select name="role_id" required class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl outline-none dark:text-slate-200 appearance-none font-black text-blue-900 dark:text-blue-400 cursor-pointer focus:ring-4 focus:ring-blue-500/10">
+                            <?php foreach($roles as $role): ?>
+                                <option value="<?= $role['id'] ?>" <?= $user['role_id'] == $role['id'] ? 'selected' : '' ?>><?= strtoupper($role['role_name']) ?> - <?= strtoupper($role['scope']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Baris 2: Penugasan Wilayah -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+            <h3 class="text-blue-900 dark:text-blue-400 font-black uppercase text-[10px] tracking-[0.2em] mb-8 border-b dark:border-slate-800 pb-4 flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                Penugasan Wilayah Kerja
+            </h3>
+            
+            <div class="space-y-8">
+                <!-- RTLH Selection -->
+                <div class="rtlh-select">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-900 dark:text-blue-400">
+                            <i data-lucide="home" class="w-4 h-4"></i>
+                        </div>
+                        <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Wilayah Tugas Data RTLH</label>
+                    </div>
+                    <select name="desa_ids_rtlh[]" id="desa_rtlh" multiple placeholder="Pilih desa untuk tugas RTLH..." class="w-full">
+                        <?php foreach($all_desa as $desa): ?>
+                            <option value="<?= $desa['desa_id'] ?>" <?= in_array($desa['desa_id'], $assigned_rtlh) ? 'selected' : '' ?>><?= $desa['desa_nama'] ?> (<?= $desa['desa_id'] ?>)</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Kumuh Selection -->
+                <div class="kumuh-select">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-500">
+                            <i data-lucide="map" class="w-4 h-4"></i>
+                        </div>
+                        <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Wilayah Tugas Wilayah Kumuh</label>
+                    </div>
+                    <select name="desa_ids_kumuh[]" id="desa_kumuh" multiple placeholder="Pilih desa untuk tugas Kumuh..." class="w-full">
+                        <?php foreach($all_desa as $desa): ?>
+                            <option value="<?= $desa['desa_id'] ?>" <?= in_array($desa['desa_id'], $assigned_kumuh) ? 'selected' : '' ?>><?= $desa['desa_nama'] ?> (<?= $desa['desa_id'] ?>)</option>
                         <?php endforeach; ?>
                     </select>
                 </div>
             </div>
-
-            <div>
-                <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-2 ml-1">Wilayah Penugasan (Petugas)</label>
-                <select name="desa_ids[]" id="desa_ids" multiple placeholder="Pilih satu atau lebih desa..." class="w-full">
-                    <?php foreach($all_desa as $desa): ?>
-                        <option value="<?= $desa['desa_id'] ?>" <?= in_array($desa['desa_id'], $assigned_desa_ids) ? 'selected' : '' ?>>
-                            <?= $desa['desa_nama'] ?> (<?= $desa['desa_id'] ?>)
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+            
+            <div class="mt-8 p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl flex items-start gap-3">
+                <i data-lucide="info" class="w-4 h-4 text-blue-600 shrink-0 mt-0.5"></i>
+                <p class="text-[10px] text-slate-500 dark:text-slate-500 font-medium leading-relaxed italic">Catatan: Jika user memiliki role dengan Scope "Global", wilayah penugasan di atas dapat dikosongkan karena user akan otomatis memiliki akses ke seluruh kabupaten.</p>
             </div>
+        </div>
 
-            <div class="pt-8 flex justify-end gap-6 border-t border-slate-50 dark:border-slate-800">
-                <a href="<?= base_url('users') ?>" class="px-6 py-4 text-xs font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Batal</a>
-                <button type="submit" class="bg-blue-950 dark:bg-blue-700 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-950/20 dark:shadow-none hover:bg-blue-900 dark:hover:bg-blue-600 transition-all">
-                    Update Akun
-                </button>
-            </div>
-        </form>
-    </div>
+        <!-- Tombol Aksi -->
+        <div class="flex items-center justify-end gap-6 pt-4">
+            <a href="<?= base_url('users') ?>" class="text-xs font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Batal</a>
+            <button type="submit" class="bg-blue-900 dark:bg-blue-700 text-white px-12 py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-blue-900/30 dark:shadow-none hover:bg-blue-800 dark:hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-3">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                Perbarui Profil
+            </button>
+        </div>
+    </form>
 </div>
 
 <!-- Tom Select JS -->
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
-    new TomSelect("#desa_ids", {
+    const config = {
         plugins: ['remove_button'],
         create: false,
-        sortField: {
-            field: "text",
-            direction: "asc"
-        }
-    });
+        sortField: { field: "text", direction: "asc" }
+    };
+    new TomSelect("#desa_rtlh", config);
+    new TomSelect("#desa_kumuh", config);
 </script>
 <?= $this->endSection() ?>
