@@ -25,30 +25,34 @@ class Home extends BaseController
         $totalDesa = $rtlhBuilder->select('desa_id')->distinct()->countAllResults();
 
         // --- 2. DATA UNTUK GRAFIK (CHARTS) ---
-        // A. Top 5 Desa dengan RTLH Terbanyak
-        $chartDesa = $db->table('rtlh_rumah')
-            ->select('desa, COUNT(id_survei) as total')
-            ->groupBy('desa')
-            ->orderBy('total', 'DESC')
-            ->limit(5)
-            ->get()->getResultArray();
+        $chartDesaBuilder = $db->table('rtlh_rumah')->select('desa, COUNT(id_survei) as total');
+        if ($roleScope === 'local') {
+            $chartDesaBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        }
+        $chartDesa = $chartDesaBuilder->groupBy('desa')->orderBy('total', 'DESC')->limit(5)->get()->getResultArray();
 
-        // B. Status Kelayakan (Simulasi/Berdasarkan Atap/Lantai/Dinding)
-        // Kita hitung sederhana: Jika Atap & Lantai Rusak = Tidak Layak
-        $statusLayak = $db->query("
+        // Status Kelayakan (Filtered)
+        $layakQuery = "
             SELECT 
                 SUM(CASE WHEN st_atap = 'RUSAK' AND st_lantai = 'RUSAK' THEN 1 ELSE 0 END) as tidak_layak,
                 SUM(CASE WHEN st_atap = 'BAIK' AND st_lantai = 'BAIK' THEN 1 ELSE 0 END) as layak,
                 COUNT(*) - SUM(CASE WHEN st_atap = 'RUSAK' AND st_lantai = 'RUSAK' THEN 1 ELSE 0 END) 
                          - SUM(CASE WHEN st_atap = 'BAIK' AND st_lantai = 'BAIK' THEN 1 ELSE 0 END) as menuju_layak
-            FROM rtlh_kondisi_rumah
-        ")->getRowArray();
+            FROM rtlh_kondisi_rumah kr
+            JOIN rtlh_rumah r ON r.id_survei = kr.id_survei
+        ";
+        if ($roleScope === 'local') {
+            $desaList = "'" . implode("','", (!empty($desaRtlh) ? $desaRtlh : ['0'])) . "'";
+            $layakQuery .= " WHERE r.desa_id IN ($desaList)";
+        }
+        $statusLayak = $db->query($layakQuery)->getRowArray();
 
         // --- 3. WILAYAH KRITIS (TOP 5 KUMUH) ---
-        $topKumuh = $db->table('wilayah_kumuh')
-            ->orderBy('skor_kumuh', 'DESC')
-            ->limit(5)
-            ->get()->getResultArray();
+        $topKumuhBuilder = $db->table('wilayah_kumuh');
+        if ($roleScope === 'local') {
+            $topKumuhBuilder->whereIn('desa_id', !empty($desaKumuh) ? $desaKumuh : ['0']);
+        }
+        $topKumuh = $topKumuhBuilder->orderBy('skor_kumuh', 'DESC')->limit(5)->get()->getResultArray();
 
         // --- 4. KESEHATAN DATA (HEALTH CHECK) ---
         $missingCoords = $db->table('rtlh_rumah')
@@ -66,12 +70,27 @@ class Home extends BaseController
             ->limit(20)
             ->get()->getResultArray();
 
-        // --- 6. LOG & SISTEM ---
-        $dbStatus = $db->connect() ? 'Stabil' : 'Error';
-        $serverLoad = function_exists('sys_getloadavg') ? sys_getloadavg()[0] . '%' : rand(5, 12) . '%';
+        // --- 6. LOG AKTIVITAS (Filter by User if not Admin) ---
         $logs = [];
         if ($db->tableExists('sys_logs')) {
-            $logs = $db->table('sys_logs')->orderBy('created_at', 'DESC')->limit(6)->get()->getResultArray();
+            $logBuilder = $db->table('sys_logs')->orderBy('created_at', 'DESC');
+            if ($roleScope === 'local') {
+                $logBuilder->where('user', session()->get('username'));
+            }
+            $logs = $logBuilder->limit(6)->get()->getResultArray();
+        }
+
+        // --- 7. DAFTAR WILAYAH TUGAS (Untuk Widget Coverage) ---
+        $assignedDesaNames = [];
+        if ($roleScope === 'local') {
+            $allMyDesa = array_unique(array_merge($desaRtlh, $desaKumuh));
+            if (!empty($allMyDesa)) {
+                $desaData = $db->table('kode_desa')
+                    ->select('desa_nama')
+                    ->whereIn('desa_id', $allMyDesa)
+                    ->get()->getResultArray();
+                $assignedDesaNames = array_column($desaData, 'desa_nama');
+            }
         }
 
         $data = [
@@ -84,9 +103,7 @@ class Home extends BaseController
             'topKumuh'      => $topKumuh,
             'health'        => ['coords' => $missingCoords, 'kk' => $missingKK],
             'mapMarkers'    => $mapMarkers,
-            'dbStatus'      => $dbStatus,
-            'serverLoad'    => $serverLoad,
-            'phpVersion'    => PHP_VERSION,
+            'assignedDesa'  => $assignedDesaNames,
             'logs'          => $logs
         ];
 

@@ -1,32 +1,38 @@
 # SIBARUKI - Project Guidelines
 
-## Arsitektur Teknologi
+## Arsitektur Teknologi & Keamanan
 - **Framework:** CodeIgniter 4 (PHP).
 - **Styling:** Tailwind CSS (dikompilasi via PostCSS ke `public/css/app.css`).
 - **Icons:** Lucide Icons (CDN).
-- **GIS/Peta:** Leaflet.js dengan dukungan data format WKT (Well-Known Text).
+- **Sistem Hak Akses (RBAC):** Dinamis berbasis tabel `roles`, `permissions`, dan `role_permissions`. 
+- **Cakupan Data (Scope):** 
+  - `Global`: Akses data se-Kabupaten (Admin/Pimpinan).
+  - `Local`: Akses data terbatas pada wilayah tugas (Petugas/Kepala Desa).
+- **Data Integrity:** Dilengkapi fitur **Recycle Bin** (tabel `trash_data`) untuk menyimpan data yang dihapus dalam format JSON agar bisa dipulihkan.
 
 ## Standar UI/UX ("Mewah" Style)
-- **Tema Warna Utama:** Biru Sangat Gelap (`blue-900` / `blue-950`).
-- **Layout Utama:** Dashboard dengan sidebar navigasi di kiri (dengan sistem dropdown untuk daftar tabel) dan header statis.
-- **Kartu Informasi:** Menggunakan sudut sangat bulat (`rounded-[2rem]` atau `rounded-3xl`), border abu-abu sangat tipis, dan bayangan lembut (`shadow-sm`).
-- **Label Kolom:** Wajib menggunakan warna Biru Gelap (`text-blue-900` atau `text-blue-950`), font tebal (`font-black`), huruf kapital (`uppercase`), dan ukuran kecil (`text-[10px]`).
-- **Traffic Light System:**
-  - **LAYAK:** Emerald (Hijau) - `bg-emerald-50 text-emerald-700`.
-  - **AGAK/MENUJU LAYAK:** Amber (Kuning/Oranye) - `bg-amber-50 text-amber-700`.
-  - **TIDAK/KURANG LAYAK:** Rose (Merah) - `bg-rose-50 text-rose-700`.
+- **Tema Warna:** Biru Sangat Gelap (`blue-950`).
+- **Layout Utama:** Dashboard responsive dengan sidebar (Auto-open logic berbasis URL) dan Header statis.
+- **Kartu Informasi:** Sudut sangat bulat (`rounded-[2rem]` / `rounded-[3rem]`), border tipis, dan bayangan lembut (`shadow-sm`).
+- **Sistem Notifikasi:** Menggunakan **Toast Notification** melayang (pojok kanan atas) untuk feedback aksi, menggantikan alert statis.
+- **Konfirmasi Aksi:** Wajib menggunakan **Custom Confirmation Modal** (`customConfirm`) untuk aksi krusial (Hapus, Restore, Clear Log).
+- **Dark Mode:** Wajib didukung penuh (`dark:`) dengan persistensi tema menggunakan `localStorage`.
 
-## Konvensi Database & CRUD
-- **RTLH Terpadu:** Pengelolaan 3 tabel (`rtlh_penerima`, `rtlh_rumah`, `rtlh_kondisi_rumah`) disatukan dalam satu Controller (`Rtlh.php`) dan satu form input/edit.
-- **Transaksi:** Wajib menggunakan `$db->transStart()` dan `$db->transComplete()` saat menyimpan data yang melibatkan lebih dari satu tabel.
-- **Null Safety:** Gunakan operator null coalescing (`??`) pada setiap variabel di View untuk mencegah crash jika data database kosong.
-- **Pagination:** Gunakan template kustom `tailwind_full` (25 data per halaman).
+## Monitoring & Audit
+- **Monitoring Aktivitas:** Pusat kendali terpusat yang mencakup:
+  - **Audit Trail:** Log detail "Data Diff" (membandingkan nilai lama vs baru).
+  - **User Analytics:** Pelacakan login sukses, login gagal (Security Alarm), dan status Online (5 menit terakhir).
+  - **System Health:** Monitor beban CPU, status Database, dan penggunaan Disk Server secara real-time.
+- **Automasi:** Fitur *Live Auto-Refresh* (30 detik) dan *Housekeeping* (pembersihan log > 6 bulan).
 
-## Fitur Khusus
-- **Peta GIS:** Menampilkan visualisasi dari kolom `WKT`. Dilengkapi fitur *Auto-Repair* untuk menangani data koordinat yang terpotong dan opsi tampilan Satelit.
-- **Detail Laporan:** Halaman detail harus menampilkan **seluruh** kolom yang tersedia di database tanpa kecuali, disusun dalam kategori yang logis.
+## Konvensi Pengembangan
+- **CRUD Terpadu:** Pengelolaan data lintas tabel wajib menggunakan Transaksi Database (`$db->transStart()`).
+- **Security Check:** Setiap aksi di Controller wajib divalidasi menggunakan helper `has_permission('nama_izin')`.
+- **Filtering:** Admin wajib dibekali *Advanced Filter* (Dropdown Desa, Kriteria Teknis, dll) di setiap daftar tabel utama.
+- **Pagination:** Menggunakan template kustom `tailwind_full` dengan navigasi di posisi **Tengah (Center)** dan fitur *Dynamic Per-Page*.
 
 ## Perintah Pengembangan
 - run localhost: `php spark serve`
 - Build CSS: `npm run build`
 - Watch CSS: `npm run watch`
+- Update Permissions: `php spark db:seed RbacSeeder`

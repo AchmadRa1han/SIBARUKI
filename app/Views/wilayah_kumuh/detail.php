@@ -3,25 +3,14 @@
 <?= $this->section('content') ?>
 <!-- Library Peta -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet-fullscreen/dist/leaflet.fullscreen.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-fullscreen/dist/Leaflet.fullscreen.min.js"></script>
 
-<div class="max-w-6xl mx-auto space-y-8 pb-24 text-slate-900 dark:text-slate-200">
-    
-    <!-- HEADER -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-8 rounded-[2rem] border dark:border-slate-800 shadow-sm transition-colors duration-300">
-        <div class="flex items-center space-x-5">
-            <div class="p-4 bg-blue-900 dark:bg-blue-700 rounded-2xl text-white shadow-lg shadow-blue-900/20">
-                <i data-lucide="map" class="w-10 h-10"></i>
-            </div>
-            <div>
-                <h1 class="text-3xl font-black text-blue-950 dark:text-white tracking-tight">Detail Kawasan Kumuh</h1>
-                <div class="flex items-center space-x-3 mt-1">
-                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Feature ID</span>
-                    <span class="px-3 py-1 bg-blue-950 dark:bg-blue-800 text-white rounded-lg font-mono text-sm font-bold shadow-lg shadow-blue-950/20">FID-<?= $kumuh['FID'] ?></span>
-                </div>
-            </div>
+<div class="space-y-10 pb-12">
+    <!-- Tombol Navigasi & Judul -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Detail Wilayah Kumuh</h1>
+            <p class="text-slate-400 dark:text-slate-500 text-sm font-medium italic mt-1">Laporan teknis kondisi kekumuhan tingkat kelurahan/desa.</p>
         </div>
         <div class="flex items-center space-x-3">
             <a href="<?= base_url('wilayah-kumuh') ?>" class="px-5 py-3 bg-white dark:bg-slate-800 border-2 border-blue-900/10 dark:border-slate-700 text-blue-900 dark:text-blue-400 rounded-2xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center shadow-sm">
@@ -40,64 +29,57 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- KOLOM KIRI: SKOR & LEGALITAS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <!-- Panel Informasi Utama -->
         <div class="lg:col-span-1 space-y-8">
-            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
-                <div class="p-6 border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center space-x-3 text-blue-950 dark:text-blue-400">
-                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                    <h3 class="font-bold uppercase tracking-widest text-xs">Penilaian Kumuh</h3>
-                </div>
-                <div class="p-8">
-                    <div class="text-center p-8 bg-blue-50/30 dark:bg-blue-950/30 rounded-[2.5rem] border-2 border-dashed border-blue-900/10 dark:border-blue-500/10 transition-colors duration-300">
-                        <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase tracking-[0.2em] mb-2 opacity-60">Total Skor Kumuh</p>
-                        <p class="text-6xl font-black text-blue-950 dark:text-white"><?= number_format($kumuh['skor_kumuh'] ?? 0, 2) ?></p>
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+                <h3 class="text-blue-900 dark:text-blue-400 font-black uppercase text-[10px] tracking-widest mb-8 border-b dark:border-slate-800 pb-4">Identitas Wilayah</h3>
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Kelurahan / Desa</p>
+                        <p class="text-lg font-black text-slate-800 dark:text-white"><?= $kumuh['Kelurahan'] ?></p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Kecamatan</p>
+                        <p class="text-md font-bold text-slate-700 dark:text-slate-300"><?= $kumuh['Kecamatan'] ?></p>
+                    </div>
+                    <div class="pt-4 grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <p class="text-[8px] font-black text-slate-400 uppercase mb-1">RT / RW</p>
+                            <p class="text-sm font-black text-blue-900 dark:text-blue-400"><?= $kumuh['Kode_RT_RW'] ?></p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Luas (Ha)</p>
+                            <p class="text-sm font-black text-blue-900 dark:text-blue-400"><?= number_format($kumuh['Luas_kumuh'], 2) ?></p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-blue-950 dark:bg-slate-900 rounded-[2.5rem] p-8 text-white border dark:border-slate-800 shadow-2xl relative overflow-hidden transition-colors duration-300">
-                <i data-lucide="database" class="w-32 h-32 absolute -right-8 -bottom-8 opacity-10 rotate-12"></i>
-                <h4 class="text-[10px] font-black text-blue-300 dark:text-blue-400 uppercase tracking-[0.2em] mb-6 relative z-10">Legalitas & Sumber</h4>
-                <div class="space-y-6 relative z-10">
-                    <div>
-                        <label class="text-[9px] font-bold text-blue-400 uppercase block mb-1 tracking-wider">Nomor SK Kumuh</label>
-                        <p class="text-sm font-bold leading-tight"><?= $kumuh['Sk_Kumuh'] ?: 'Tidak Tersedia' ?></p>
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-bold text-blue-400 uppercase block mb-1 tracking-wider">Sumber Data</label>
-                        <p class="text-sm font-medium text-blue-100 dark:text-blue-200 italic"><?= $kumuh['Sumber_data'] ?: '-' ?></p>
-                    </div>
+            <!-- Panel Statistik Skor -->
+            <div class="bg-rose-50 dark:bg-rose-950/20 p-8 rounded-[2.5rem] border border-rose-100 dark:border-rose-900 shadow-sm transition-colors duration-300">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-rose-700 dark:text-rose-400 font-black uppercase text-[10px] tracking-widest">Skor Kekumuhan</h3>
+                    <i data-lucide="trending-up" class="w-5 h-5 text-rose-400"></i>
                 </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-6xl font-black text-rose-600"><?= $kumuh['skor_kumuh'] ?></span>
+                    <span class="text-xs font-bold text-rose-400 uppercase">Poin</span>
+                </div>
+                <p class="mt-4 text-[10px] text-rose-700/60 dark:text-rose-400/60 font-medium leading-relaxed italic">Semakin tinggi skor, semakin mendesak penanganan kawasan.</p>
             </div>
         </div>
 
-        <!-- KOLOM KANAN: IDENTITAS WILAYAH & PETA -->
+        <!-- Panel Visual Peta -->
         <div class="lg:col-span-2 space-y-8">
-            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
-                <div class="p-6 border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center space-x-3 text-blue-950 dark:text-blue-400">
-                    <i data-lucide="navigation" class="w-5 h-5"></i>
-                    <h3 class="font-bold uppercase tracking-widest text-xs">Identitas Administratif & Wilayah</h3>
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300 relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-blue-900 dark:text-blue-400 font-black uppercase text-[10px] tracking-widest flex items-center">
+                        <i data-lucide="map" class="w-4 h-4 mr-2"></i> Nama Kawasan
+                    </h3>
+                    <span class="px-3 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 rounded-full text-[9px] font-black uppercase tracking-tighter border border-blue-100 dark:border-blue-900"><?= $kumuh['Kawasan'] ?></span>
                 </div>
-                <div class="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-8">
-                    <?php 
-                        $fields = [
-                            'Provinsi' => $kumuh['Provinsi'],
-                            'Kabupaten / Kota' => $kumuh['Kab_Kota'],
-                            'Kecamatan' => $kumuh['Kecamatan'],
-                            'Kelurahan / Desa' => $kumuh['Kelurahan'],
-                            'RT / RW' => $kumuh['Kode_RT_RW'],
-                            'Nama Kawasan' => $kumuh['Kawasan'],
-                            'Luas Kawasan' => ($kumuh['Luas_kumuh'] ?? '0') . ' Ha'
-                        ];
-                        foreach($fields as $label => $val):
-                    ?>
-                    <div>
-                        <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase mb-2 tracking-widest opacity-80"><?= $label ?></p>
-                        <p class="text-sm font-bold text-slate-800 dark:text-slate-300 italic"><?= $val ?? '-' ?></p>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed italic">"Kawasan ini teridentifikasi sebagai titik pantau kekumuhan berdasarkan survei infrastruktur dan sanitasi lingkungan."</p>
             </div>
 
             <!-- VISUALISASI PETA -->
@@ -148,26 +130,45 @@
 
         try {
             const coords = extractCoordinates(rawWkt);
-            const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' });
-            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri'
-            });
+            
+            if (coords.length > 0) {
+                // Gunakan Peta Terang secara permanen
+                const map = L.map('map', { attributionControl: false }).setView(coords[0], 17);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-            const map = L.map('map', { center: [0, 0], zoom: 13, layers: [osm], fullscreenControl: true });
-            L.control.layers({ "Peta Jalan": osm, "Satelit": satellite }).addTo(map);
+                // Opsi Satelit tetap tersedia
+                const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={z}&y={y}&z={z}', {
+                    maxZoom: 20
+                });
 
-            if (coords.length > 2) {
-                const polygon = L.polygon(coords, { color: '#1e3a8a', weight: 4, fillColor: '#3b82f6', fillOpacity: 0.3 }).addTo(map);
-                map.fitBounds(polygon.getBounds());
-                statusEl.innerText = "WILAYAH TERVERIFIKASI";
-            } else if (coords.length > 0) {
-                L.marker(coords[0]).addTo(map);
-                map.setView(coords[0], 17);
-                statusEl.innerText = "HANYA TITIK";
+                const baseMaps = {
+                    "Peta Standar": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+                    "Satelit": googleSat
+                };
+                L.control.layers(baseMaps).addTo(map);
+
+                if (coords.length > 1) {
+                    const polygon = L.polygon(coords, { color: '#1e3a8a', weight: 3, fillOpacity: 0.2 }).addTo(map);
+                    map.fitBounds(polygon.getBounds());
+                    statusEl.innerText = "POLYGON";
+                } else {
+                    L.marker(coords[0]).addTo(map);
+                    map.setView(coords[0], 17);
+                    statusEl.innerText = "HANYA TITIK";
+                }
             }
         } catch (e) {
             statusEl.innerText = "ERROR GEOMETRI";
         }
     });
 </script>
+
+<style>
+    @media print {
+        header, aside, .no-print, .shadow-sm, .shadow-xl { display: none !important; }
+        .lg\:col-span-2, .lg\:col-span-1 { width: 100% !important; display: block !important; }
+        body { background: white !important; }
+        #map { height: 400px !important; border: 1px solid #ddd !important; }
+    }
+</style>
 <?= $this->endSection() ?>
