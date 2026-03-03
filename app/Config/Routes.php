@@ -60,6 +60,7 @@ $routes->group('rtlh', function($routes) {
 
 $routes->group('wilayah-kumuh', function($routes) {
     $routes->get('/', 'WilayahKumuh::index');
+    $routes->get('peta', 'WilayahKumuh::peta');
     $routes->get('create', 'WilayahKumuh::create');
     $routes->post('store', 'WilayahKumuh::store');
     $routes->get('detail/(:num)', 'WilayahKumuh::detail/$1');

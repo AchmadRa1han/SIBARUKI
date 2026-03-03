@@ -38,28 +38,31 @@ class Logs extends BaseController
             ->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))
             ->countAllResults();
 
-        // 4. TREN AKTIVITAS (24 JAM TERAKHIR)
-        $trendQuery = $db->query("
-            SELECT HOUR(created_at) as jam, COUNT(*) as total 
-            FROM sys_logs 
-            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
-            GROUP BY HOUR(created_at)
-            ORDER BY jam ASC
-        ")->getResultArray();
-        
-        $trendData = [];
-        $trendLabels = [];
-        for ($i = 0; $i < 24; $i++) {
-            $trendLabels[] = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
+        // 4. TREN AKTIVITAS (Multi-Range)
+        $trendHourlyQuery = $db->query("SELECT HOUR(created_at) as jam, COUNT(*) as total FROM sys_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR) GROUP BY HOUR(created_at) ORDER BY jam ASC")->getResultArray();
+        $trendHourlyData = array_fill(0, 24, 0);
+        foreach($trendHourlyQuery as $t) { $trendHourlyData[$t['jam']] = (int)$t['total']; }
+        $trendHourlyLabels = [];
+        for($i=0;$i<24;$i++) { $trendHourlyLabels[] = str_pad($i, 2, '0', STR_PAD_LEFT).':00'; }
+
+        $trendDailyQuery = $db->query("SELECT DATE(created_at) as tgl, COUNT(*) as total FROM sys_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY DATE(created_at) ORDER BY tgl ASC")->getResultArray();
+        $trendDailyData = []; $trendDailyLabels = [];
+        for($i=6; $i>=0; $i--) {
+            $d = date('Y-m-d', strtotime("-$i days"));
+            $trendDailyLabels[] = date('d M', strtotime($d));
             $found = false;
-            foreach($trendQuery as $t) {
-                if ($t['jam'] == $i) {
-                    $trendData[] = (int)$t['total'];
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) $trendData[] = 0;
+            foreach($trendDailyQuery as $t) { if($t['tgl'] == $d) { $trendDailyData[] = (int)$t['total']; $found = true; break; } }
+            if(!$found) $trendDailyData[] = 0;
+        }
+
+        $trendMonthlyQuery = $db->query("SELECT DATE_FORMAT(created_at, '%Y-%m') as bulan, COUNT(*) as total FROM sys_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY bulan ORDER BY bulan ASC")->getResultArray();
+        $trendMonthlyData = []; $trendMonthlyLabels = [];
+        for($i=5; $i>=0; $i--) {
+            $m = date('Y-m', strtotime("-$i months"));
+            $trendMonthlyLabels[] = date('M Y', strtotime($m));
+            $found = false;
+            foreach($trendMonthlyQuery as $t) { if($t['bulan'] == $m) { $trendMonthlyData[] = (int)$t['total']; $found = true; break; } }
+            if(!$found) $trendMonthlyData[] = 0;
         }
 
         // 5. USER ANALYTICS
@@ -71,115 +74,51 @@ class Logs extends BaseController
             ->limit(3)
             ->get()->getResultArray();
 
-        // 6. ACTION DISTRIBUTION (Untuk Donut Chart)
-        $actionDistRaw = $db->table('sys_logs')
-            ->select('action, COUNT(*) as total')
-            ->groupBy('action')
-            ->get()->getResultArray();
-        
+        // 6. ACTION DISTRIBUTION
+        $actionDistRaw = $db->table('sys_logs')->select('action, COUNT(*) as total')->groupBy('action')->get()->getResultArray();
         $actionDist = [];
-        foreach($actionDistRaw as $row) {
-            if(!empty($row['action'])) {
-                $actionDist[] = [
-                    'label' => $row['action'],
-                    'total' => (int)$row['total']
-                ];
-            }
-        }
+        foreach($actionDistRaw as $row) { if(!empty($row['action'])) { $actionDist[] = ['label' => $row['action'], 'total' => (int)$row['total']]; } }
 
-        // 7. ONLINE USERS (Aktif dalam 5 menit terakhir)
-        $onlineUsers = $db->table('users')
-            ->select('username, last_active, instansi')
-            ->where('last_active >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
-            ->get()->getResultArray();
+        // 7. ONLINE USERS
+        $onlineUsers = $db->table('users')->select('username, last_active, instansi')->where('last_active >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))->get()->getResultArray();
 
-        // 8. ANOMALY DETECTION (Deteksi Aktivitas Mencurigakan)
+        // 8. ANOMALY DETECTION
         $anomalies = [];
-        
-        // A. Deteksi Aktivitas Jam Malam (22:00 - 05:00)
-        $nightActions = $db->query("
-            SELECT user, action, table_name, created_at 
-            FROM sys_logs 
-            WHERE HOUR(created_at) >= 22 OR HOUR(created_at) < 5
-            AND created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
-            LIMIT 5
-        ")->getResultArray();
-        
-        if (!empty($nightActions)) {
-            foreach($nightActions as $na) {
-                $anomalies[] = [
-                    'type' => 'Jam Tidak Wajar',
-                    'user' => $na['user'],
-                    'desc' => "Aksi {$na['action']} pada pukul " . date('H:i', strtotime($na['created_at']))
-                ];
-            }
-        }
+        $nightActions = $db->query("SELECT user, action, table_name, created_at FROM sys_logs WHERE (HOUR(created_at) >= 22 OR HOUR(created_at) < 5) AND created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR) LIMIT 5")->getResultArray();
+        foreach($nightActions as $na) { $anomalies[] = ['type' => 'Jam Tidak Wajar', 'user' => $na['user'], 'desc' => "Aksi {$na['action']} pada " . date('H:i', strtotime($na['created_at']))]; }
+        $massActions = $db->query("SELECT user, COUNT(*) as total FROM sys_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR) GROUP BY user, MINUTE(created_at) HAVING total > 10")->getResultArray();
+        foreach($massActions as $ma) { $anomalies[] = ['type' => 'Aktivitas Masal', 'user' => $ma['user'], 'desc' => "Melakukan {$ma['total']} aksi dalam 1 menit"]; }
 
-        // B. Deteksi Aktivitas Masal (Lebih dari 10 aksi dalam 1 menit oleh user yang sama)
-        $massActions = $db->query("
-            SELECT user, COUNT(*) as total, MIN(created_at) as start_time 
-            FROM sys_logs 
-            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
-            GROUP BY user, MINUTE(created_at)
-            HAVING total > 10
-        ")->getResultArray();
+        // 9. LOGS QUERY WITH USER INFO
+        $logModel->select('sys_logs.*, users.instansi, roles.role_name')
+                 ->join('users', 'users.username = sys_logs.user', 'left')
+                 ->join('roles', 'roles.id = users.role_id', 'left');
 
-        foreach($massActions as $ma) {
-            $anomalies[] = [
-                'type' => 'Aktivitas Masal',
-                'user' => $ma['user'],
-                'desc' => "Melakukan {$ma['total']} aksi dalam 1 menit"
-            ];
-        }
+        if ($filterUser) $logModel->where('sys_logs.user', $filterUser);
+        if ($filterAction) $logModel->where('sys_logs.action', $filterAction);
+        if ($filterTable) $logModel->where('sys_logs.table_name', $filterTable);
+        if ($filterDate) $logModel->like('sys_logs.created_at', $filterDate);
 
-        // 9. APPLY FILTERS TO MODEL FOR PAGINATION
-        if ($filterUser) $logModel->where('user', $filterUser);
-        if ($filterAction) $logModel->where('action', $filterAction);
-        if ($filterTable) $logModel->where('table_name', $filterTable);
-        if ($filterDate) $logModel->like('created_at', $filterDate);
-
-        // Ambil data untuk filter dropdown (Unik)
+        // Filter Dropdown Options
         $optUsers = $db->table('sys_logs')->select('user')->distinct()->get()->getResultArray();
         $optTables = $db->table('sys_logs')->select('table_name')->distinct()->get()->getResultArray();
 
         $data = [
             'title'   => 'Monitoring Aktivitas Sistem',
-            'logs'    => $logModel->orderBy('created_at', 'DESC')->paginate($perPage, 'group1'),
+            'logs'    => $logModel->orderBy('sys_logs.created_at', 'DESC')->paginate($perPage, 'group1'),
             'pager'   => $logModel->pager,
             'perPage' => $perPage,
             'total'   => $db->table('sys_logs')->countAllResults(),
             'system'  => [
-                'dbStatus' => $dbStatus,
-                'serverLoad' => $serverLoad,
-                'phpVersion' => $phpVersion,
-                'os' => PHP_OS,
-                'responseTime' => $responseTime,
-                'disk' => [
-                    'total' => $totalDisk, 
-                    'used' => $usedDisk, 
-                    'percent' => $diskPercent,
-                    'path' => FCPATH
-                ]
+                'dbStatus' => $dbStatus, 'serverLoad' => $serverLoad, 'phpVersion' => $phpVersion, 'os' => PHP_OS, 
+                'responseTime' => $responseTime, 'disk' => ['total' => $totalDisk, 'used' => $usedDisk, 'percent' => $diskPercent, 'path' => FCPATH]
             ],
             'analytics' => [
-                'topLogins' => $topLogins,
-                'failedLogins' => $failedLogins,
-                'trend' => $trendData,
-                'trendLabels' => $trendLabels,
-                'actionDist' => $actionDist,
-                'onlineUsers' => $onlineUsers,
-                'anomalies' => $anomalies
+                'topLogins' => $topLogins, 'failedLogins' => $failedLogins, 'onlineUsers' => $onlineUsers, 'anomalies' => $anomalies, 'actionDist' => $actionDist,
+                'trend' => ['hourly' => ['data' => $trendHourlyData, 'labels' => $trendHourlyLabels], 'daily' => ['data' => $trendDailyData, 'labels' => $trendDailyLabels], 'monthly' => ['data' => $trendMonthlyData, 'labels' => $trendMonthlyLabels]]
             ],
-            'options' => [
-                'users'  => array_column($optUsers, 'user'),
-                'tables' => array_column($optTables, 'table_name')
-            ],
-            'filters' => [
-                'user'   => $filterUser,
-                'action' => $filterAction,
-                'table'  => $filterTable,
-                'date'   => $filterDate
-            ]
+            'options' => ['users' => array_column($optUsers, 'user'), 'tables' => array_column($optTables, 'table_name')],
+            'filters' => ['user' => $filterUser, 'action' => $filterAction, 'table' => $filterTable, 'date' => $filterDate]
         ];
 
         return view('logs/index', $data);
@@ -188,12 +127,8 @@ class Logs extends BaseController
     public function clear()
     {
         if (!has_permission('manage_roles')) return redirect()->to('/dashboard');
-
         $db = \Config\Database::connect();
-        $db->table('sys_logs')
-           ->where('created_at <', date('Y-m-d H:i:s', strtotime('-6 months')))
-           ->delete();
-
+        $db->table('sys_logs')->where('created_at <', date('Y-m-d H:i:s', strtotime('-6 months')))->delete();
         $this->logActivity('Housekeeping', 'System', 'Membersihkan log aktivitas lama (> 6 bulan)');
         return redirect()->to('/logs')->with('message', 'Log lama berhasil dibersihkan.');
     }

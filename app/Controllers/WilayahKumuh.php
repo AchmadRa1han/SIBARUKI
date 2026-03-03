@@ -81,6 +81,32 @@ class WilayahKumuh extends BaseController
         return view('wilayah_kumuh/index', $data);
     }
 
+    public function peta()
+    {
+        if (!has_permission('view_kumuh')) {
+            return redirect()->to('/dashboard')->with('message', 'Akses ditolak.');
+        }
+
+        $builder = $this->kumuhModel->where('WKT !=', null)->where('WKT !=', '');
+
+        // Filter Wilayah (Petugas)
+        if (session()->get('role_scope') === 'local') {
+            $desa_ids = session()->get('desa_ids_kumuh');
+            if (!empty($desa_ids)) {
+                $builder->whereIn('desa_id', $desa_ids);
+            } else {
+                return redirect()->to('/dashboard')->with('message', 'Akses ditolak.');
+            }
+        }
+
+        $data = [
+            'title' => 'Peta Sebaran Wilayah Kumuh',
+            'kumuh' => $builder->findAll()
+        ];
+
+        return view('wilayah_kumuh/peta', $data);
+    }
+
     public function detail($id)
     {
         $kumuh = $this->kumuhModel->find($id);

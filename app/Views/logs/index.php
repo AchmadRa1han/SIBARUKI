@@ -29,11 +29,20 @@
 
     <!-- 1. TOP ANALYTICS GRID -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Trend Aktivitas (Line) -->
+        
+        <!-- Trend Aktivitas (Multi-Range Chart) -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all overflow-hidden">
-            <h3 class="text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                <i data-lucide="trending-up" class="w-4 h-4"></i> Beban Aktivitas (24 Jam)
-            </h3>
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i> Tren Aktivitas Sistem
+                </h3>
+                <!-- Range Switcher -->
+                <div class="flex p-1 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <button onclick="updateTrend('hourly')" id="tab-hourly" class="px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tighter transition-all bg-white dark:bg-blue-900 text-blue-900 dark:text-white shadow-sm">24 Jam</button>
+                    <button onclick="updateTrend('daily')" id="tab-daily" class="px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tighter transition-all text-slate-400 hover:text-slate-600">7 Hari</button>
+                    <button onclick="updateTrend('monthly')" id="tab-monthly" class="px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tighter transition-all text-slate-400 hover:text-slate-600">6 Bulan</button>
+                </div>
+            </div>
             <div id="trendChart" class="w-full"></div>
         </div>
 
@@ -166,6 +175,7 @@
                         <th class="p-6 text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest">Waktu</th>
                         <th class="p-6 text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest">Pengguna & Perangkat</th>
                         <th class="p-6 text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest text-center">Aksi</th>
+                        <th class="p-6 text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest">Modul</th>
                         <th class="p-6 text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest text-center">Rincian</th>
                     </tr>
                 </thead>
@@ -181,14 +191,19 @@
                                 <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-[10px] font-black uppercase shrink-0"><?= substr($log['user'] ?? 'U', 0, 1) ?></div>
                                 <div class="min-w-0">
                                     <p class="text-xs font-black text-slate-700 dark:text-slate-300"><?= $log['user'] ?></p>
-                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                    <p class="text-[8px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter">
+                                        <?= $log['role_name'] ?? 'System' ?> 
+                                        <span class="text-slate-300 dark:text-slate-700 mx-1">|</span> 
+                                        <?= $log['instansi'] ?? '-' ?>
+                                    </p>
+                                    <div class="flex items-center gap-1.5 mt-1 border-t dark:border-slate-800 pt-1">
                                         <?php 
                                             $ua = strtolower($log['user_agent'] ?? '');
                                             $deviceIcon = 'monitor';
                                             if(str_contains($ua, 'android') || str_contains($ua, 'iphone')) $deviceIcon = 'smartphone';
                                         ?>
-                                        <i data-lucide="<?= $deviceIcon ?>" class="w-3 h-3 text-slate-400"></i>
-                                        <p class="text-[8px] font-bold text-slate-400 uppercase truncate"><?= $log['user_agent'] ?? 'Unknown Device' ?></p>
+                                        <i data-lucide="<?= $deviceIcon ?>" class="w-2.5 h-3 text-slate-400"></i>
+                                        <p class="text-[7px] font-bold text-slate-400 uppercase truncate max-w-[120px]"><?= $log['user_agent'] ?? 'Unknown' ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -207,6 +222,7 @@
                                 <?= $log['action'] ?>
                             </span>
                         </td>
+                        <td class="p-6"><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><?= $log['table_name'] ?></span></td>
                         <td class="p-6 text-center">
                             <?php if(!empty($log['details'])): ?>
                                 <button onclick="toggleLogDetail('detail-<?= $log['id'] ?>')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-blue-900 hover:text-white transition-all whitespace-nowrap">Rincian</button>
@@ -216,7 +232,7 @@
                         </td>
                     </tr>
                     <tr id="detail-<?= $log['id'] ?>" class="hidden bg-blue-50/20 dark:bg-blue-950/10">
-                        <td colspan="4" class="p-8">
+                        <td colspan="5" class="p-8">
                             <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-blue-100 dark:border-blue-900/50 shadow-inner">
                                 <p class="text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-[0.2em] mb-4">
                                     <?= in_array($log['action'], ['Tambah', 'Hapus']) ? 'Snapshot Data Record:' : 'Daftar Field yang Diperbarui:' ?>
@@ -244,7 +260,7 @@
 
         <!-- PAGINATION -->
         <div class="p-6 bg-slate-50/50 dark:bg-slate-950/50 border-t dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex flex-col md:flex-row items-center gap-4 min-w-[300px]">
+            <div class="flex items-center gap-4 min-w-[300px]">
                 <div class="flex items-center gap-3">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tampilkan:</span>
                     <select onchange="changePerPage(this.value)" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer">
@@ -266,22 +282,40 @@
 <script>
     lucide.createIcons();
 
-    // --- 1. TREND CHART (LINE) ---
-    const trendOptions = {
-        series: [{ name: 'Aktivitas', data: <?= json_encode($analytics['trend']) ?> }],
+    // --- 1. TREND CHART (MULTI-RANGE) ---
+    const trends = <?= json_encode($analytics['trend']) ?>;
+    let currentRange = 'hourly';
+
+    const trendChart = new ApexCharts(document.querySelector("#trendChart"), {
+        series: [{ name: 'Aktivitas', data: trends.hourly.data }],
         chart: { type: 'area', height: 250, toolbar: { show: false }, fontFamily: 'Plus Jakarta Sans, sans-serif' },
         colors: ['#1e3a8a'],
         stroke: { curve: 'smooth', width: 3 },
         fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05 } },
         xaxis: {
-            categories: <?= json_encode($analytics['trendLabels']) ?>,
+            categories: trends.hourly.labels,
             labels: { style: { colors: '#94a3b8', fontSize: '10px', fontWeight: 700 } }
         },
         yaxis: { labels: { show: false } },
         grid: { show: false },
         dataLabels: { enabled: false }
-    };
-    new ApexCharts(document.querySelector("#trendChart"), trendOptions).render();
+    });
+    trendChart.render();
+
+    function updateTrend(range) {
+        // Update Buttons UI
+        ['hourly', 'daily', 'monthly'].forEach(r => {
+            const btn = document.getElementById(`tab-${r}`);
+            btn.className = "px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tighter transition-all " + 
+                            (r === range ? "bg-white dark:bg-blue-900 text-blue-900 dark:text-white shadow-sm" : "text-slate-400 hover:text-slate-600");
+        });
+
+        // Update Data
+        trendChart.updateOptions({
+            series: [{ data: trends[range].data }],
+            xaxis: { categories: trends[range].labels }
+        });
+    }
 
     // --- 2. ACTION DONUT CHART ---
     const actionData = <?= json_encode($analytics['actionDist']) ?>;

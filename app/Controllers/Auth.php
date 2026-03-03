@@ -74,37 +74,20 @@ class Auth extends BaseController
                 
                 $session->set($ses_data);
 
-                // Catat Log Login
-                $db->table('sys_logs')->insert([
-                    'user'        => $user['username'],
-                    'action'      => 'Login',
-                    'table_name'  => 'Users',
-                    'description' => 'User berhasil masuk ke dalam sistem',
-                    'created_at'  => date('Y-m-d H:i:s'),
-                ]);
+                // Catat Log Login (Menggunakan fungsi global)
+                $this->logActivity('Login', 'Users', 'User berhasil masuk ke dalam sistem');
 
                 return redirect()->to(base_url('dashboard'));
             } else {
                 // Catat Log Login Gagal (Password Salah)
-                $db->table('sys_logs')->insert([
-                    'user'        => $username,
-                    'action'      => 'Login Gagal',
-                    'table_name'  => 'Security',
-                    'description' => 'Percobaan masuk dengan password yang salah',
-                    'created_at'  => date('Y-m-d H:i:s'),
-                ]);
+                $this->logActivity('Login Gagal', 'Security', 'Percobaan masuk dengan password yang salah');
                 $session->setFlashdata('msg', 'Password salah.');
                 return redirect()->to(base_url('login'));
             }
         } else {
             // Catat Log Login Gagal (Username Tidak Ditemukan)
-            $db->table('sys_logs')->insert([
-                'user'        => $username ?? 'Unknown',
-                'action'      => 'Login Gagal',
-                'table_name'  => 'Security',
-                'description' => 'Percobaan masuk dengan username tidak terdaftar',
-                'created_at'  => date('Y-m-d H:i:s'),
-            ]);
+            // Karena user tidak ada, kita catat manual dengan System/Unknown
+            $this->logActivity('Login Gagal', 'Security', 'Percobaan masuk dengan username tidak terdaftar: ' . ($username ?? 'Unknown'));
             $session->setFlashdata('msg', 'Username tidak ditemukan.');
             return redirect()->to(base_url('login'));
         }
