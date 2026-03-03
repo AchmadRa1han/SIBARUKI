@@ -48,47 +48,12 @@
             </button>
         </div>
         
-        <nav class="flex-grow p-4 space-y-1 overflow-y-auto">
+        <nav id="sidebar-nav" class="flex-grow p-4 space-y-1 overflow-y-auto">
             <!-- Dashboard -->
             <a href="<?= base_url('dashboard') ?>" class="group flex items-center space-x-3 p-3 rounded-xl transition-all duration-300 <?= (url_is('/') || url_is('dashboard*')) ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1' ?>">
                 <i data-lucide="layout-dashboard" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"></i>
                 <span class="font-medium">Dashboard</span>
             </a>
-
-            <!-- Hak Akses & User (Admin/Manager Only) -->
-            <?php if($has_permission('manage_users') || $has_permission('view_users') || $has_permission('manage_roles')): ?>
-            <div class="pt-2">
-                <button onclick="toggleDropdown('dropdown-akses', 'arrow-akses')" class="w-full flex justify-between items-center p-3 rounded-xl transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 group">
-                    <div class="flex items-center space-x-3">
-                        <i data-lucide="shield-check" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"></i>
-                        <span class="font-medium">Hak Akses</span>
-                    </div>
-                    <i id="arrow-akses" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300"></i>
-                </button>
-                <div id="dropdown-akses" class="hidden pl-11 mt-1 space-y-1 text-slate-400">
-                    <?php if($has_permission('manage_roles')): ?>
-                    <a href="<?= base_url('roles') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('roles*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Manajemen Role
-                    </a>
-                    <?php endif; ?>
-                    <?php if($has_permission('manage_users') || $has_permission('view_users')): ?>
-                    <a href="<?= base_url('users') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('users*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Manajemen User
-                    </a>
-                    <?php endif; ?>
-                    <?php if($has_permission('manage_roles')): ?>
-                    <a href="<?= base_url('logs') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('logs*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Monitoring Aktivitas
-                    </a>
-                    <?php endif; ?>
-                    <?php if($has_permission('manage_roles')): ?>
-                    <a href="<?= base_url('trash') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('trash*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Recycle Bin
-                    </a>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php endif; ?>
 
             <!-- Dropdown 1: Data Perumahan -->
             <div class="pt-2">
@@ -100,42 +65,65 @@
                     <i id="arrow-perumahan" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300"></i>
                 </button>
                 <div id="dropdown-perumahan" class="hidden pl-11 mt-1 space-y-1 text-slate-400">
-                    <?php if(session()->get('role_name') === 'admin'): ?>
-                    <a href="<?= base_url('ref-master') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('ref-master*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Referensi Master
-                    </a>
-                    <?php endif; ?>
-                    <?php if($has_permission('view_rtlh')): ?>
                     <a href="<?= base_url('rtlh') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('rtlh*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Data RTLH
+                        RTLH
                     </a>
-                    <?php endif; ?>
+                    <a href="<?= base_url('psu') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('psu*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        PSU Terbangun
+                    </a>
+                    <a href="<?= base_url('perumahan-formal') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('perumahan-formal*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        Perumahan Formal
+                    </a>
+                    <a href="<?= base_url('bansos-rtlh') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('bansos-rtlh*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        Bansos Perbaikan RTLH
+                    </a>
                 </div>
             </div>
 
             <!-- Dropdown 2: Data Kawasan Permukiman -->
-            <?php if($has_permission('view_kumuh')): ?>
             <div class="pt-2">
                 <button onclick="toggleDropdown('dropdown-permukiman', 'arrow-permukiman')" class="w-full flex justify-between items-center p-3 rounded-xl transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 group">
                     <div class="flex items-center space-x-3">
                         <i data-lucide="map" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"></i>
-                        <span class="font-medium">Data Permukiman</span>
+                        <span class="font-medium">Kawasan Permukiman</span>
                     </div>
                     <i id="arrow-permukiman" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300"></i>
                 </button>
                 <div id="dropdown-permukiman" class="hidden pl-11 mt-1 space-y-1 text-slate-400">
                     <a href="<?= base_url('wilayah-kumuh') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('wilayah-kumuh')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Wilayah Kumuh
+                        Kawasan Kumuh
                     </a>
                     <a href="<?= base_url('wilayah-kumuh/peta') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('wilayah-kumuh/peta')) ? 'bg-blue-600 text-white px-3' : '' ?>">
                         Peta Wilayah Kumuh
                     </a>
+                    <a href="<?= base_url('pisew') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('pisew*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        PISEW
+                    </a>
+                    <a href="<?= base_url('arsinum') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('arsinum*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        Arsinum
+                    </a>
                 </div>
             </div>
-            <?php endif; ?>
+
+            <!-- Dropdown 3: Data Pertanahan -->
+            <div class="pt-2">
+                <button onclick="toggleDropdown('dropdown-pertanahan', 'arrow-pertanahan')" class="w-full flex justify-between items-center p-3 rounded-xl transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 group">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="layers" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"></i>
+                        <span class="font-medium">Data Pertanahan</span>
+                    </div>
+                    <i id="arrow-pertanahan" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300"></i>
+                </button>
+                <div id="dropdown-pertanahan" class="hidden pl-11 mt-1 space-y-1 text-slate-400">
+                    <a href="<?= base_url('aset-tanah') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('aset-tanah*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
+                        Aset Tanah Pemda
+                    </a>
+                </div>
+            </div>
 
             <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Sistem</div>
-            <a href="#" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 transition-all duration-300 hover:translate-x-1">
+            
+            <a href="<?= base_url('settings') ?>" class="group flex items-center space-x-3 p-3 rounded-xl transition-all duration-300 <?= (url_is('settings*')) ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1' ?>">
                 <i data-lucide="settings" class="w-5 h-5 transition-transform duration-300 group-hover:rotate-45"></i>
                 <span class="font-medium">Pengaturan</span>
             </a>
@@ -167,7 +155,7 @@
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
                 
-                <?php if (!url_is('/') && !url_is('/dashboard')): ?>
+                <?php if (!url_is('/') && !url_is('dashboard*') && !url_is('settings*')): ?>
                 <form action="" method="get" class="relative w-full hidden sm:block">
                     <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input type="text" name="keyword" value="<?= request()->getGet('keyword') ?>" placeholder="Cari data..." class="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-slate-800 border-transparent rounded-xl text-sm focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:text-slate-200 transition-all outline-none">
@@ -176,7 +164,7 @@
             </div>            
             <div class="flex items-center space-x-2 lg:space-x-6">
                 <!-- Search Button Mobile Only -->
-                <?php if (!url_is('/') && !url_is('/dashboard')): ?>
+                <?php if (!url_is('/') && !url_is('dashboard*') && !url_is('settings*')): ?>
                 <button class="sm:hidden p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">
                     <i data-lucide="search" class="w-5 h-5"></i>
                 </button>
@@ -503,10 +491,13 @@
         // Auto-open logic with Memory
         document.addEventListener('DOMContentLoaded', () => {
             const path = window.location.pathname;
+            const sidebarNav = document.getElementById('sidebar-nav');
+            
             const dropdowns = [
                 { id: 'dropdown-akses', arrow: 'arrow-akses', paths: ['roles', 'users', 'logs', 'trash'] },
-                { id: 'dropdown-perumahan', arrow: 'arrow-perumahan', paths: ['ref-master', 'rtlh'] },
-                { id: 'dropdown-permukiman', arrow: 'arrow-permukiman', paths: ['wilayah-kumuh'] }
+                { id: 'dropdown-perumahan', arrow: 'arrow-perumahan', paths: ['rtlh', 'psu', 'perumahan-formal', 'bansos-rtlh'] },
+                { id: 'dropdown-permukiman', arrow: 'arrow-permukiman', paths: ['wilayah-kumuh', 'pisew', 'arsinum'] },
+                { id: 'dropdown-pertanahan', arrow: 'arrow-pertanahan', paths: ['aset-tanah'] }
             ];
 
             dropdowns.forEach(item => {
@@ -519,13 +510,25 @@
 
                 // Buka jika: Ada di memory 'open' ATAU URL-nya sedang aktif
                 if (savedState === 'open' || isPathActive) {
-                    dropdown.classList.remove('hidden');
+                    if (dropdown) dropdown.classList.remove('hidden');
                     if (arrow) arrow.style.transform = 'rotate(180deg)';
-                    
-                    // Jika tadinya tertutup di memory tapi URL aktif, simpan sebagai open
                     if (isPathActive) localStorage.setItem(item.id, 'open');
                 }
             });
+
+            // --- SIDEBAR SCROLL MEMORY (Restored AFTER dropdowns open) ---
+            setTimeout(() => {
+                const savedScroll = localStorage.getItem('sidebarScrollPos');
+                if (savedScroll && sidebarNav) {
+                    sidebarNav.scrollTop = savedScroll;
+                }
+            }, 50);
+
+            if (sidebarNav) {
+                sidebarNav.addEventListener('scroll', () => {
+                    localStorage.setItem('sidebarScrollPos', sidebarNav.scrollTop);
+                });
+            }
         });
     </script>
 </body>

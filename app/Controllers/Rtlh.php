@@ -85,10 +85,14 @@ class Rtlh extends BaseController
         return view('rtlh/index', $data);
     }
 
-    public function detail($id_survei)
+    public function detail($id)
     {
+        if (!has_permission('view_rtlh_detail')) {
+            return redirect()->to('/rtlh')->with('message', 'Akses ke detail data ditolak. Anda tidak memiliki izin untuk melihat informasi sensitif.');
+        }
+
         $db = \Config\Database::connect();
-        $rumah = $db->table('rtlh_rumah')->where('id_survei', $id_survei)->get()->getRowArray();
+        $rumah = $db->table('rtlh_rumah')->where('id_survei', $id)->get()->getRowArray();
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         // Security Check Wilayah
@@ -129,7 +133,7 @@ class Rtlh extends BaseController
             ->join('ref_master ref_plafon', 'ref_plafon.id = rtlh_kondisi_rumah.st_plafon', 'left')
             ->join('ref_master ref_jendela', 'ref_jendela.id = rtlh_kondisi_rumah.st_jendela', 'left')
             ->join('ref_master ref_ventilasi', 'ref_ventilasi.id = rtlh_kondisi_rumah.st_ventilasi', 'left')
-            ->where('rtlh_kondisi_rumah.id_survei', $id_survei)
+            ->where('rtlh_kondisi_rumah.id_survei', $id)
             ->get()->getRowArray();
 
         $data = [ 'title' => 'Detail Data RTLH', 'rumah' => $rumah, 'penerima' => $penerima ?: [], 'kondisi' => $kondisi ?: [] ];
@@ -140,11 +144,18 @@ class Rtlh extends BaseController
     {
         if (!has_permission('create_rtlh')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
 
+        $db = \Config\Database::connect();
         $refModel = new RefMasterModel();
         $allMaster = $refModel->findAll();
         $master = [];
         foreach ($allMaster as $m) { $master[$m['kategori']][] = $m; }
-        return view('rtlh/create', ['title' => 'Input RTLH Terpadu', 'master' => $master]);
+
+        $data = [
+            'title' => 'Input RTLH Terpadu',
+            'master' => $master,
+            'all_desa' => $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray()
+        ];
+        return view('rtlh/create', $data);
     }
 
     public function store()

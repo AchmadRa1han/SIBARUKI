@@ -10,6 +10,15 @@ $routes->get('login', 'Auth::index');
 $routes->post('login/process', 'Auth::login');
 $routes->get('logout', 'Auth::logout');
 $routes->get('dashboard', 'Home::index');
+$routes->get('settings', 'Settings::index');
+
+// Placeholders
+$routes->get('psu', 'Placeholder::psu');
+$routes->get('perumahan-formal', 'Placeholder::formal');
+$routes->get('bansos-rtlh', 'Placeholder::bansos');
+$routes->get('pisew', 'Placeholder::pisew');
+$routes->get('arsinum', 'Placeholder::arsinum');
+$routes->get('aset-tanah', 'Placeholder::aset_tanah');
 
 $routes->group('roles', function($routes) {
     $routes->get('/', 'Roles::index');

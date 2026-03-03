@@ -109,6 +109,10 @@ class WilayahKumuh extends BaseController
 
     public function detail($id)
     {
+        if (!has_permission('view_kumuh_detail')) {
+            return redirect()->to('/wilayah-kumuh')->with('message', 'Akses ditolak. Anda tidak memiliki izin untuk melihat rincian detail wilayah.');
+        }
+
         $kumuh = $this->kumuhModel->find($id);
         if (!$kumuh) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 

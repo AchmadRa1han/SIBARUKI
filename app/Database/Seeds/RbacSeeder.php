@@ -16,12 +16,14 @@ class RbacSeeder extends Seeder
         $permissions = [
             // RTLH
             ['permission_name' => 'view_rtlh', 'description' => 'Melihat Daftar RTLH'],
+            ['permission_name' => 'view_rtlh_detail', 'description' => 'Melihat Rincian Detail RTLH (Sensitif)'],
             ['permission_name' => 'create_rtlh', 'description' => 'Menambah Data RTLH'],
             ['permission_name' => 'edit_rtlh', 'description' => 'Mengubah Data RTLH'],
             ['permission_name' => 'delete_rtlh', 'description' => 'Menghapus Data RTLH'],
             
             // Wilayah Kumuh
             ['permission_name' => 'view_kumuh', 'description' => 'Melihat Daftar Wilayah Kumuh'],
+            ['permission_name' => 'view_kumuh_detail', 'description' => 'Melihat Rincian Detail Wilayah Kumuh'],
             ['permission_name' => 'create_kumuh', 'description' => 'Menambah Data Wilayah Kumuh'],
             ['permission_name' => 'edit_kumuh', 'description' => 'Mengubah Data Wilayah Kumuh'],
             ['permission_name' => 'delete_kumuh', 'description' => 'Menghapus Data Wilayah Kumuh'],
