@@ -10,13 +10,19 @@
 
 ## Standar UI/UX ("Mewah" Style)
 - **Tema Warna:** Biru Sangat Gelap (`blue-950`).
+- **Layout Utama (Data Spasial):** 
+  - **Integrated Map & Table:** Peta Interaktif berada di bagian atas, diikuti oleh Tabel Data di bagian bawah dalam satu halaman.
+  - **Scroll Preservation:** Wajib menggunakan `localStorage` untuk menyimpan posisi scroll elemen `#main-content` saat auto-refresh atau pindah halaman pagination.
+  - **Dynamic Sorting:** Header tabel harus mendukung pengurutan Ascending/Descending via klik judul kolom tanpa menghilangkan state filter lain.
+- **Peta & Geospasial:** 
+  - **Marker Clustering:** Wajib menggunakan `Leaflet.markercluster` untuk data titik yang banyak.
+  - **Satellite Toggle:** Peta harus memiliki kontrol untuk berpindah antara layer standard (CartoDB) dan Satellite (Esri).
+  - **Focus Map:** Tombol aksi pada tabel wajib memiliki fungsi `focusMap` yang melakukan auto-zoom ke objek dan auto-scroll ke kontainer peta.
 - **Sidebar & Navigasi:** 
   - **Scroll Memory:** Posisi scroll sidebar tersimpan via `localStorage`.
   - **Auto-Open:** Dropdown otomatis terbuka berdasarkan rute URL aktif.
-  - **Hub Pengaturan:** Menu manajemen (User, Role, Log, Trash) dipusatkan dalam satu halaman khusus (`/settings`), bukan dropdown sidebar.
+  - **Hub Pengaturan:** Menu manajemen dipusatkan dalam halaman `/settings`.
 - **Kartu Informasi:** Sudut sangat bulat (`rounded-[2.5rem]`), border tipis, dan bayangan lembut (`shadow-sm`).
-- **Notifikasi:** **Toast Notification** melayang (pojok kanan atas) untuk feedback aksi.
-- **Konfirmasi:** Wajib menggunakan **Custom Confirmation Modal** (`customConfirm`) untuk aksi krusial.
 - **Dark Mode:** Didukung penuh (`dark:`) dengan persistensi tema.
 
 ## Peta & Geospasial
