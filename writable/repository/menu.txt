@@ -1,0 +1,220 @@
+Menu
+Data perumahan
+1. RTLH (Rumah tidak layak huni) -> peta titik(MINUS, Kurang data titik koordinatnya)
+2. Sebaran PSU (Prasarana/Sarana Utilitas Umum) Terbangun  -> peta titik
+3. Sebaran Perumahan formal  -> peta poligon
+4. Sebaran bantuan sosial perbaikan RTLH  -> peta titik
+Data kawasan permukiman
+1. Kawasan kumuh -> peta polygon (DONE)
+2. Sebaran PISEW (Pengembangan Infrastruktur Sosial Ekonomi Wilayah)  -> peta titik
+Data pertanahan
+1. Sebaran Aset Tanah Pemda -> peta poligon
+
+
+tambahkan authentication (Done)
+tambahkan monitoring aktivitas 
+tambahkan fitur crud untuk user Ketika kita login sebagai admin (Done)
+tambahkan fitur kalau misal sudah tuntas menerima bantuan, dia akan langsung pindah ke tampilan telah menerima bantuan
+
+
+
+konsep database untuk user 1
+
+  Tabel `users` (Revisi Final):
+   * id (PK)
+   * username
+   * password
+   * instansi (Nama Kantor/Desa)
+   * `desa_id` (Kolom ini bisa NULL untuk Admin Pusat, dan berisi Kode Desa untuk Petugas Desa)
+   * role_id (FK ke roles)
+
+
+Tabel `roles` (Master Role)
+  Tabel ini menyimpan jenis akses yang ada di sistem.
+   - id (Primary Key, Auto Increment)
+   - role_name (Contoh: 'admin', 'operator')
+
+
+konsep database untuk user 2
+
+ 1. Tabel `users` (Data Login Utama)
+   * id (PK)
+   * username
+   * password
+   * instansi
+   * role_id (FK ke roles)
+
+
+  2. Tabel `roles` (Master Role)
+   * id (PK)
+   * role_name (Admin Pusat, Petugas Lapangan)
+
+
+  3. Tabel `user_desa` (Tabel Penghubung)
+  Tabel ini yang akan mencatat petugas ini pegang desa mana saja.
+   * id (PK)
+   * user_id (FK ke users)
+   * `desa_id` (Kode Desa)
+
+
+Admin: admin / password123
+Petugas: petugas_a / password123
+
+
+apakah anda bisa menambahkan ini? (jangan di tambah dulu, dan coba kasih saran kalua ada yang kurang)
+
+Menu Pengaturan biasanya menjadi tempat bagi Admin untuk mengelola hal-hal yang sifatnya konfigurasi sistem
+tanpa harus menyentuh kode program. Untuk SIBARUKI, berikut adalah ide isi yang sangat pas:
+
+
+  1. Profil Instansi (General Settings)
+  Mengelola data yang akan tampil di header laporan PDF atau Berita Acara.
+   * Nama Dinas/Instansi.
+   * Alamat Kantor.
+   * Logo Dinas (bisa upload logo baru untuk mengganti logo Sinjai saat ini).
+   * Nama Pimpinan & NIP (untuk tanda tangan otomatis di laporan).
+
+
+  2. Pengaturan Tampilan (UI Preferences)
+   * Mode Default: Light atau Dark.
+   * Warna Aksen: Memilih warna utama (Blue, Indigo, Emerald, dll).
+   * Bahasa: (Jika ingin mendukung multi-bahasa nantinya).
+
+
+  3. Pemeliharaan Sistem (System Tools)
+   * Tombol "Backup Database": Admin bisa mendownload file SQL cadangan sewaktu-waktu.
+   * Tombol "Cek Update": Mengetahui jika ada fitur baru (simulasi).
+   * Log Error: Melihat rekaman error sistem secara teknis (hanya untuk pengembang/admin IT).
+
+
+  4. Pengaturan Notifikasi (Notifications)
+   * Email Gateway: Konfigurasi akun email jika sistem ingin mengirim notifikasi otomatis ke user.
+   * Alert Threshold: Mengatur batas skor kumuh (misal: skor di atas 70 dianggap "Sangat Bahaya").
+
+  ---
+
+
+
+  1. Teknologi & Fitur Utama yang Digunakan
+   * PhpSpreadsheet: Library PHP standar industri untuk membaca dan menulis file Excel (.xlsx, .xls) dan CSV    
+     secara presisi.
+   * Database Transactions: Menjamin jika proses impor 1 baris ke 3 tabel gagal di tengah jalan, seluruh data   
+     baris tersebut akan ditarik kembali (Rollback) agar tidak ada data sampah.
+   * Smart ID Lookup: Algoritma pencarian otomatis untuk mengubah teks Excel (Nama Desa, Kondisi Bangunan)      
+     menjadi ID database yang sesuai secara real-time.
+   * Header Mapping Engine: Antarmuka yang memungkinkan Admin mencocokkan kolom Excel dengan kolom Database     
+     secara manual jika nama kolomnya berbeda.
+   * Validation Layer: Pengecekan duplikasi NIK, format koordinat yang salah, atau kolom wajib yang kosong      
+     sebelum data benar-benar disimpan.
+
+  ---
+
+
+  2. Alur Kerja Impor (Workflow)
+
+  Tahap 1: Persiapan (Template)
+   * Sistem menyediakan tombol "Unduh Template Impor".
+   * Template ini sudah berisi judul kolom yang paling dikenali oleh sistem (untuk meminimalisir mapping        
+     manual).
+
+
+  Tahap 2: Unggah & Parsing
+   1. Admin mengunggah file Excel/CSV.
+   2. Sistem membaca file tersebut dan menyimpannya sementara di memori.
+   3. Mapping Preview: Admin diperlihatkan tabel berisi data dari Excel. Di atas setiap kolom, ada dropdown     
+      untuk memilih target kolom di database.
+       * Contoh: Kolom Excel "Luas" dipetakan ke "luas_rumah_m2" di DB.
+
+
+  Tahap 3: Pemrosesan Data (The "Magic" Logic)
+  Sistem akan memproses setiap baris dengan logika berikut:
+   1. Resolusi Desa: Mencari desa_id di tabel kode_desa berdasarkan teks "Desa" yang ada di Excel.
+   2. Resolusi Ref Master: Mencari ID di tabel ref_master untuk kolom seperti st_pondasi, st_atap, dll.
+      berdasarkan teks (misal: "RUSAK" menjadi ID 12).
+   3. Split Data: Membagi satu baris Excel menjadi 3 bagian:
+       * Bagian A -> Masuk ke rtlh_penerima.
+       * Bagian B -> Masuk ke rtlh_rumah (menggunakan nik dari Bagian A).
+       * Bagian C -> Masuk ke rtlh_kondisi_rumah (menggunakan id_survei dari Bagian B).
+
+
+  Tahap 4: Eksekusi & Feedback
+   * Sistem menampilkan laporan hasil impor:
+       * "Berhasil: 145 data."
+       * "Gagal: 2 data (Baris 10: NIK Duplikat, Baris 25: Nama Desa tidak ditemukan)."
+
+  ---
+
+
+  3. Struktur Modul & Menu
+
+  A. Halaman Impor RTLH (Advanced)
+   * Mendukung pemecahan 1 baris Excel ke 3 tabel database.
+   * Pendeteksian otomatis hubungan NIK antara tabel penerima dan rumah.
+
+
+  B. Halaman Impor Wilayah Kumuh (Simple)
+   * Mendukung file CSV/Excel.
+   * Fokus pada pemetaan kolom identitas kawasan dan skor kumuh.
+
+
+  C. Halaman Ekspor (Reporting)
+   * Ekspor RTLH: Menghasilkan satu file Excel besar yang sudah digabungkan (Join) dari 3 tabel, sehingga siap  
+     dicetak atau dilaporkan ke pimpinan.
+   * Ekspor Wilayah Kumuh: Menghasilkan file data kawasan yang rapi.
+
+  ---
+
+
+  4. Keuntungan Teknis bagi Anda
+   1. Keamanan Truncate: Jika Anda mengosongkan database transaksi, Anda bisa mengimpor ulang kapan saja hanya  
+      dengan bermodalkan file Excel. Sistem akan membangun kembali relasi ID-nya secara otomatis.
+   2. Pembersihan Data: Selama proses impor, sistem bisa otomatis memperbaiki penulisan (misal: merapikan huruf 
+      kapital pada nama).
+   3. Audit: Setiap kali proses impor dilakukan, sistem akan mencatat di Monitoring Aktivitas: "Admin mengimpor 
+      150 data RTLH dari file Data_2024.xlsx".
+
+  ---
+
+
+  5. Komponen UI (User Interface)
+  Tampilan akan mengikuti standar SIBARUKI Luxury Style:
+   * Area Upload dengan animasi Drag & Drop.
+   * Tabel Preview dengan baris yang berwarna (Merah untuk data yang salah, Hijau untuk data yang siap impor).  
+   * Progress Bar saat proses impor sedang berjalan (untuk ribuan data).
+
+
+  Bagaimana menurut Anda rincian ini? Apakah ada poin tambahan yang ingin Anda masukkan ke dalam rencana ini? 
+
+
+Berikut adalah analisis dan beberapa saran teknis tambahan dari saya untuk memperkuat sistem tersebut:        
+
+
+  1. Analisis Menu Pengaturan (Settings)
+  Ide Anda untuk membagi pengaturan menjadi Profil Instansi, Tampilan, dan Pemeliharaan sudah sangat tepat.     
+  Untuk membuatnya lebih profesional ("Luxury"), saya menyarankan tambahan berikut:
+   * Mode Pemeliharaan (Maintenance Mode): Tombol untuk menonaktifkan akses bagi pengguna non-admin saat Anda   
+     sedang melakukan update data besar atau perbaikan sistem.
+   * Informasi Sistem (System Health): Menampilkan versi PHP, versi Database, dan sisa kapasitas penyimpanan    
+     server (ini sejalan dengan mandat monitoring di GEMINI.md).
+   * Log Error Teknis: Tab khusus untuk Admin IT melihat rekaman error sistem tanpa harus membuka file log di   
+     server.
+
+
+  2. Logika "Magic" Impor RTLH (Bagian Krusial)
+  Karena Anda akan memecah 1 baris Excel ke dalam 3 tabel (penerima, rumah, dan kondisi_fisik), ada beberapa    
+  tantangan teknis yang perlu diantisipasi:
+   * Fuzzy Matching (Pencarian Cerdas): Terkadang user menulis "Rusak Berat", "rusak berat", atau hanya "RB" di 
+     Excel. Sistem harus cukup pintar untuk mencocokkan teks tersebut dengan ID yang benar di tabel ref_master  
+     (tidak boleh case-sensitive).
+   * Proses Bertahap (Chunk Processing): Jika Admin mengunggah 5.000 data sekaligus, server bisa mengalami      
+     timeout atau kehabisan memori. Sebaiknya data diproses per 100 baris menggunakan AJAX agar Progress Bar    
+     berjalan mulus secara real-time.
+   * Tabel Transit (Staging Area): Sebelum data benar-benar masuk ke database utama, tampilkan dulu di tabel    
+     sementara (preview). Di sini Admin bisa langsung memperbaiki data yang "Merah" (salah) sebelum menekan     
+     tombol "Finalize Import".
+
+
+  3. Struktur Kode & Arsitektur (CI4)
+  Agar kode tetap rapi dan mudah dirawat (maintainable), saya menyarankan:
+   * Controller: Buat Settings.php untuk pengaturan dan DataExchange.php untuk Impor/Ekspor.
+   * Library Khusus: B yang sudah ada).vice.php di folder app/Libraries untuk menangani semua logika

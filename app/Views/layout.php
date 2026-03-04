@@ -85,16 +85,13 @@
                 <button onclick="toggleDropdown('dropdown-permukiman', 'arrow-permukiman')" class="w-full flex justify-between items-center p-3 rounded-xl transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 group">
                     <div class="flex items-center space-x-3">
                         <i data-lucide="map" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"></i>
-                        <span class="font-medium">Kawasan Permukiman</span>
+                        <span class="font-medium">Data Permukiman</span>
                     </div>
                     <i id="arrow-permukiman" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300"></i>
                 </button>
                 <div id="dropdown-permukiman" class="hidden pl-11 mt-1 space-y-1 text-slate-400">
                     <a href="<?= base_url('wilayah-kumuh') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('wilayah-kumuh')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Kawasan Kumuh
-                    </a>
-                    <a href="<?= base_url('wilayah-kumuh/peta') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('wilayah-kumuh/peta')) ? 'bg-blue-600 text-white px-3' : '' ?>">
-                        Peta Wilayah Kumuh
+                        Wilayah Kumuh
                     </a>
                     <a href="<?= base_url('pisew') ?>" class="block p-2 text-sm rounded-md transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:hover:bg-slate-800/30 hover:translate-x-1 <?= (url_is('pisew*')) ? 'bg-blue-600 text-white px-3' : '' ?>">
                         PISEW

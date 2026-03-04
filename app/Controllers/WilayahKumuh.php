@@ -55,16 +55,18 @@ class WilayahKumuh extends BaseController
             }
         }
 
-        // Options for Filter
         $optKec = $db->table('wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
         $optDesa = $db->table('wilayah_kumuh')->select('Kelurahan, desa_id')->distinct()->get()->getResultArray();
 
-        // Pilihan Jumlah Data per Halaman
-        $perPage = $this->request->getGet('per_page') ?? 25;
+        $perPage = $this->request->getGet('per_page') ?? 10;
+
+        // Ambil semua data untuk peta (tanpa pagination)
+        $kumuh_all = (clone $builder)->findAll();
 
         $data = [
             'title' => 'Wilayah Kumuh',
             'kumuh' => $builder->paginate($perPage, 'group1'),
+            'kumuh_all' => $kumuh_all,
             'pager' => $this->kumuhModel->pager,
             'perPage' => $perPage,
             'options' => [

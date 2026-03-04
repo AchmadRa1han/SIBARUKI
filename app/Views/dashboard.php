@@ -61,7 +61,7 @@
                             <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Nomor KK Kosong</span>
                         </div>
                         <span class="text-lg font-black text-amber-600"><?= $health['kk'] ?></span>
-                    </div>
+                    </div>apa
                 </div>
             </div>
             <div class="mt-8 pt-6 border-t dark:border-slate-800">

@@ -132,20 +132,26 @@
             const coords = extractCoordinates(rawWkt);
             
             if (coords.length > 0) {
-                // Gunakan Peta Terang secara permanen
-                const map = L.map('map', { attributionControl: false }).setView(coords[0], 17);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-                // Opsi Satelit tetap tersedia
-                const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={z}&y={y}&z={z}', {
-                    maxZoom: 20
+                // Define Layers
+                const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap'
                 });
 
+                const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EBP, and the GIS User Community'
+                });
+
+                const map = L.map('map', { 
+                    attributionControl: false,
+                    layers: [osm] // Default
+                }).setView(coords[0], 17);
+
                 const baseMaps = {
-                    "Peta Standar": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-                    "Satelit": googleSat
+                    "Peta Standar": osm,
+                    "Satelit": satellite
                 };
-                L.control.layers(baseMaps).addTo(map);
+                
+                L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
                 if (coords.length > 1) {
                     const polygon = L.polygon(coords, { color: '#1e3a8a', weight: 3, fillOpacity: 0.2 }).addTo(map);

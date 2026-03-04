@@ -18,7 +18,15 @@ $routes->get('perumahan-formal', 'Placeholder::formal');
 $routes->get('bansos-rtlh', 'Placeholder::bansos');
 $routes->get('pisew', 'Placeholder::pisew');
 $routes->get('arsinum', 'Placeholder::arsinum');
-$routes->get('aset-tanah', 'Placeholder::aset_tanah');
+$routes->group('aset-tanah', function($routes) {
+    $routes->get('/', 'AsetTanah::index');
+    $routes->get('create', 'AsetTanah::create');
+    $routes->post('store', 'AsetTanah::store');
+    $routes->get('detail/(:num)', 'AsetTanah::detail/$1');
+    $routes->get('edit/(:num)', 'AsetTanah::edit/$1');
+    $routes->post('update/(:num)', 'AsetTanah::update/$1');
+    $routes->post('delete/(:num)', 'AsetTanah::delete/$1');
+});
 
 $routes->group('roles', function($routes) {
     $routes->get('/', 'Roles::index');
