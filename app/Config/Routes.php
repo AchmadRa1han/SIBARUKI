@@ -16,8 +16,24 @@ $routes->get('settings', 'Settings::index');
 $routes->get('psu', 'Placeholder::psu');
 $routes->get('perumahan-formal', 'Placeholder::formal');
 $routes->get('bansos-rtlh', 'Placeholder::bansos');
-$routes->get('pisew', 'Placeholder::pisew');
-$routes->get('arsinum', 'Placeholder::arsinum');
+$routes->group('pisew', function($routes) {
+    $routes->get('/', 'Pisew::index');
+    $routes->get('create', 'Pisew::create');
+    $routes->post('store', 'Pisew::store');
+    $routes->get('detail/(:num)', 'Pisew::detail/$1');
+    $routes->get('edit/(:num)', 'Pisew::edit/$1');
+    $routes->post('update/(:num)', 'Pisew::update/$1');
+    $routes->post('delete/(:num)', 'Pisew::delete/$1');
+});
+$routes->group('arsinum', function($routes) {
+    $routes->get('/', 'Arsinum::index');
+    $routes->get('create', 'Arsinum::create');
+    $routes->post('store', 'Arsinum::store');
+    $routes->get('detail/(:num)', 'Arsinum::detail/$1');
+    $routes->get('edit/(:num)', 'Arsinum::edit/$1');
+    $routes->post('update/(:num)', 'Arsinum::update/$1');
+    $routes->post('delete/(:num)', 'Arsinum::delete/$1');
+});
 $routes->group('aset-tanah', function($routes) {
     $routes->get('/', 'AsetTanah::index');
     $routes->get('create', 'AsetTanah::create');

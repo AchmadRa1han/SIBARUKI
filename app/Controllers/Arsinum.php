@@ -37,12 +37,9 @@ class Arsinum extends BaseController
 
         $query = $query->orderBy($sortBy, $sortOrder);
 
-        $arsinum = $query->paginate($perPage, 'group1');
-        $arsinum_all = (clone $query)->findAll();
-
         $data = [
-            'arsinum' => $arsinum,
-            'arsinum_all' => $arsinum_all,
+            'arsinum' => $query->paginate($perPage, 'group1'),
+            'arsinum_all' => (clone $query)->findAll(),
             'pager' => $this->arsinumModel->pager,
             'perPage' => $perPage,
             'sortBy' => $sortBy,
@@ -57,11 +54,35 @@ class Arsinum extends BaseController
         return view('arsinum/index', $data);
     }
 
+    public function create()
+    {
+        return view('arsinum/create');
+    }
+
+    public function store()
+    {
+        $this->arsinumModel->save($this->request->getPost());
+        return redirect()->to('/arsinum')->with('success', 'Data ARSINUM berhasil ditambahkan.');
+    }
+
     public function detail($id)
     {
         $data['item'] = $this->arsinumModel->find($id);
-        if (!$data['item']) return redirect()->back();
+        if (!$data['item']) return redirect()->to('/arsinum');
         return view('arsinum/detail', $data);
+    }
+
+    public function edit($id)
+    {
+        $data['item'] = $this->arsinumModel->find($id);
+        if (!$data['item']) return redirect()->to('/arsinum');
+        return view('arsinum/edit', $data);
+    }
+
+    public function update($id)
+    {
+        $this->arsinumModel->update($id, $this->request->getPost());
+        return redirect()->to('/arsinum')->with('success', 'Data ARSINUM berhasil diperbarui.');
     }
 
     public function delete($id)

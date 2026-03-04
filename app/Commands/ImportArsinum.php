@@ -16,7 +16,6 @@ class ImportArsinum extends BaseCommand
         $db = \Config\Database::connect();
         $forge = \Config\Database::forge();
 
-        CLI::write('Mengecek tabel arsinum...', 'yellow');
         $fields = [
             'id' => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
             'jenis_pekerjaan' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
@@ -36,23 +35,16 @@ class ImportArsinum extends BaseCommand
         $forge->addKey('id', true);
         $forge->createTable('arsinum', true);
         $db->table('arsinum')->truncate();
-        CLI::write('Tabel arsinum siap.', 'green');
 
         $filePath = WRITEPATH . 'repository/ARSINUM KAB. SINJAI 2022-2025.csv';
-        if (!file_exists($filePath)) {
-            CLI::error('File CSV tidak ditemukan!');
-            return;
-        }
-
         $file = fopen($filePath, 'r');
-        fgetcsv($file, 0, ';'); // Skip Title
-        fgetcsv($file, 0, ';'); // Skip Header
 
         $count = 0;
         $batch = [];
 
         while (($row = fgetcsv($file, 0, ';')) !== FALSE) {
-            if (count($row) < 10 || empty($row[1])) continue;
+            // Lewati jika bukan baris data (baris data ARSINUM dimulai dengan angka di kolom pertama)
+            if (!isset($row[0]) || !is_numeric($row[0])) continue;
 
             $anggaran = str_replace(['.', ','], ['', '.'], $row[7]);
 

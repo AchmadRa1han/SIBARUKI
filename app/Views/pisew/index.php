@@ -12,24 +12,24 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">ARSINUM</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Pemetaan Teknologi Air Siap Minum Kabupaten Sinjai.</p>
+            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">PISEW</h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Program Pengembangan Infrastruktur Sosial Ekonomi Wilayah Kab. Sinjai.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <div class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-blue-100">
-                <?= number_format($total_unit, 0, ',', '.') ?> Unit Terdata
+                <?= number_format($total_kegiatan, 0, ',', '.') ?> Kegiatan
             </div>
-            <a href="<?= base_url('arsinum/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
+            <a href="<?= base_url('pisew/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
                 <i data-lucide="plus" class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform"></i> Tambah Data
             </a>
         </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Quick Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4 group hover:border-blue-500 transition-all duration-500">
             <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-500">
-                <i data-lucide="droplets" class="w-6 h-6"></i>
+                <i data-lucide="building-2" class="w-6 h-6"></i>
             </div>
             <div>
                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Anggaran</p>
@@ -40,15 +40,23 @@
 
     <!-- Map Section -->
     <div class="relative group">
-        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-[2.5rem] blur opacity-10 transition duration-1000"></div>
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur opacity-10 transition duration-1000"></div>
         <div class="relative bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800">
             <div id="map" class="w-full h-[60vh] z-10" style="min-height: 450px; background: #ececec;"></div>
             <div class="absolute top-6 left-6 z-[1000] hidden md:block">
                 <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-2xl border border-white/10 flex items-center gap-3">
                     <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></div>
-                    Database ARSINUM Terintegrasi
+                    Database Spasial PISEW
                 </div>
             </div>
+            <?php if (empty(array_filter(array_column($pisew_all, 'koordinat')))): ?>
+            <div class="absolute inset-0 z-[1001] bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center pointer-events-none">
+                <div class="bg-white/90 dark:bg-slate-900/90 p-6 rounded-[2rem] shadow-2xl border border-white/20 text-center max-w-xs">
+                    <i data-lucide="map-off" class="w-10 h-10 text-slate-400 mx-auto mb-3"></i>
+                    <p class="text-[10px] font-black text-blue-950 dark:text-white uppercase tracking-widest">Koordinat Belum Tersedia</p>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -60,12 +68,12 @@
                     <i data-lucide="database" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h3 class="text-xs font-black text-blue-950 dark:text-white uppercase tracking-tight">Daftar Pekerjaan</h3>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Informasi Proyek Terkini</p>
+                    <h3 class="text-xs font-black text-blue-950 dark:text-white uppercase tracking-tight">Daftar Kegiatan PISEW</h3>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Infrastruktur Sosial Ekonomi Wilayah</p>
                 </div>
             </div>
 
-            <form action="<?= base_url('arsinum') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
+            <form action="<?= base_url('pisew') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
                 <input type="hidden" name="sort_by" value="<?= $sortBy ?>">
                 <input type="hidden" name="sort_order" value="<?= $sortOrder ?>">
                 <select name="per_page" onchange="submitWithScroll(this)" class="w-full md:w-24 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 focus:ring-2 focus:ring-blue-500 cursor-pointer">
@@ -80,7 +88,7 @@
                     <?php endforeach; ?>
                 </select>
                 <div class="relative w-full md:w-56">
-                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari pekerjaan..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500">
+                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari desa/pekerjaan..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500 transition-all">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
                 </div>
             </form>
@@ -91,25 +99,27 @@
                 <thead>
                     <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-black text-slate-400 uppercase tracking-widest">
                         <th class="px-4 py-4 w-64 cursor-pointer hover:text-blue-600" onclick="applySort('jenis_pekerjaan')">Jenis Pekerjaan</th>
-                        <th class="px-4 py-4 w-24 text-center">Volume</th>
-                        <th class="px-4 py-4 w-48">Wilayah (Desa/Kec)</th>
+                        <th class="px-4 py-4 w-48">Lokasi (Desa)</th>
+                        <th class="px-4 py-4 w-32">Kecamatan</th>
+                        <th class="px-4 py-4 w-32 cursor-pointer hover:text-blue-600" onclick="applySort('anggaran')">Anggaran</th>
+                        <th class="px-4 py-4 w-20 text-center cursor-pointer hover:text-blue-600" onclick="applySort('tahun')">Tahun</th>
                         <th class="px-4 py-4 text-center w-36">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]">
-                    <?php foreach($arsinum as $item): ?>
+                    <?php foreach($pisew as $item): ?>
                     <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-200">
-                        <td class="px-4 py-3 font-black text-blue-950 dark:text-white uppercase truncate" title="<?= $item['jenis_pekerjaan'] ?>"><?= $item['jenis_pekerjaan'] ?></td>
-                        <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-md font-bold"><?= $item['volume'] ?></span></td>
-                        <td class="px-4 py-3">
-                            <div class="flex flex-col"><span class="font-bold text-slate-700 dark:text-slate-200 uppercase truncate"><?= $item['desa'] ?></span><span class="text-[8px] text-slate-400 font-bold uppercase"><?= $item['kecamatan'] ?></span></div>
-                        </td>
+                        <td class="px-4 py-3 font-black text-blue-950 dark:text-white uppercase truncate block" title="<?= $item['jenis_pekerjaan'] ?>"><?= $item['jenis_pekerjaan'] ?></td>
+                        <td class="px-4 py-3 font-bold text-slate-700 dark:text-slate-200 uppercase truncate" title="<?= $item['lokasi_desa'] ?>"><?= $item['lokasi_desa'] ?></td>
+                        <td class="px-4 py-3 font-black text-blue-600 uppercase"><?= $item['kecamatan'] ?></td>
+                        <td class="px-4 py-3 font-black text-slate-700 dark:text-slate-300">Rp <?= number_format($item['anggaran'], 0, ',', '.') ?></td>
+                        <td class="px-4 py-3 text-center"><span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-black rounded-lg"><?= $item['tahun'] ?></span></td>
                         <td class="px-4 py-3 text-center">
                             <div class="flex items-center justify-center gap-1.5">
                                 <?php if($item['koordinat']): ?>
                                 <button onclick="focusMap(<?= $item['koordinat'] ?>)" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
-                                <a href="<?= base_url('arsinum/detail/'.$item['id']) ?>" class="p-2 bg-blue-950 text-white rounded-lg hover:bg-black transition-all active:scale-95" title="Detail"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
+                                <a href="<?= base_url('pisew/detail/'.$item['id']) ?>" class="p-2 bg-blue-950 text-white rounded-lg shadow-md hover:bg-black transition-all active:scale-95" title="Detail"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
                                 <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                             </div>
                         </td>
@@ -118,7 +128,7 @@
                 </tbody>
             </table>
         </div>
-        <?php if (isset($pager)): ?><div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800"><?= $pager->links('group1', 'tailwind_full') ?></div><?php endif; ?>
+        <?php if (isset($pager)): ?><div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center"><?= $pager->links('group1', 'tailwind_full') ?></div><?php endif; ?>
     </div>
 </div>
 
@@ -126,12 +136,8 @@
 
 <script>
     let map;
-    let clusterGroup;
-    let currentRotation = 0;
-
     function initMap() {
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
-        
         try {
             const isDark = document.documentElement.classList.contains('dark');
             const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
@@ -140,19 +146,16 @@
             map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 11);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            // --- Custom Layer Toggle (Robust Inline SVG) ---
             const LayerToggle = L.Control.extend({
                 onAdd: function(map) {
                     const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 p-3 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 text-blue-600 hover:bg-blue-50 transition-all duration-500 active:scale-90 mt-2 flex items-center justify-center');
-                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>`;
                     
                     L.DomEvent.disableClickPropagation(btn);
                     L.DomEvent.on(btn, 'click', function(e) {
-                        currentRotation += 360;
                         const svg = btn.querySelector('svg');
-                        svg.style.transition = 'transform 0.8s cubic-bezier(0.65, 0, 0.35, 1)';
-                        svg.style.transform = `rotate(${currentRotation}deg)`;
-                        
+                        svg.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                        svg.style.transform = 'rotate(360deg)';
                         setTimeout(() => {
                             if (map.hasLayer(standard)) {
                                 map.removeLayer(standard); map.addLayer(satellite);
@@ -161,29 +164,15 @@
                                 map.removeLayer(satellite); map.addLayer(standard);
                                 btn.classList.remove('bg-blue-600', 'text-white'); btn.classList.add('text-blue-600');
                             }
-                        }, 250);
+                            svg.style.transition = 'none'; svg.style.transform = 'rotate(0deg)';
+                        }, 600);
                     });
                     return btn;
                 }
             });
             map.addControl(new LayerToggle({ position: 'topright' }));
-
-            clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
-            const data = <?= json_encode($arsinum_all ?? []) ?>;
-            data.forEach(item => {
-                if (item.koordinat) {
-                    const coords = item.koordinat.split(',').map(c => parseFloat(c.trim()));
-                    const marker = L.circleMarker(coords, { radius: 8, fillColor: "#2563eb", color: "#fff", weight: 2, fillOpacity: 0.8 });
-                    marker.bindPopup(`
-                        <div class="bg-blue-950 text-white p-4 rounded-t-xl"><p class="text-[8px] font-black uppercase tracking-widest text-blue-400 mb-1">ARSINUM</p><h5 class="text-xs font-black uppercase leading-tight">${item.jenis_pekerjaan}</h5></div>
-                        <div class="p-4 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[10px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('arsinum/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all">Detail</a></div>
-                    `);
-                    clusterGroup.addLayer(marker);
-                }
-            });
-            map.addLayer(clusterGroup);
             if (typeof lucide !== 'undefined') lucide.createIcons();
-        } catch(err) { console.error(err); }
+        } catch(err) {}
     }
 
     function focusMap(lat, lng) {
@@ -193,14 +182,14 @@
     }
 
     function confirmDelete(id) {
-        customConfirm('Hapus Data?', 'Hapus data ARSINUM ini?', 'danger').then(conf => {
-            if (conf) { document.getElementById('delete-form').action = `<?= base_url('arsinum/delete') ?>/${id}`; document.getElementById('delete-form').submit(); }
+        customConfirm('Hapus PISEW?', 'Apakah Anda yakin ingin menghapus data kegiatan ini?', 'danger').then(conf => {
+            if (conf) { document.getElementById('delete-form').action = `<?= base_url('pisew/delete') ?>/${id}`; document.getElementById('delete-form').submit(); }
         });
     }
 
     function submitWithScroll(el) {
         const mc = document.getElementById('main-content');
-        if (mc) localStorage.setItem('arsinumScrollPos', mc.scrollTop);
+        if (mc) localStorage.setItem('pisewScrollPos', mc.scrollTop);
         const form = el.tagName === 'FORM' ? el : el.form;
         if (form) form.submit();
     }
@@ -217,9 +206,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         const mc = document.getElementById('main-content');
         if (mc) {
-            const sp = localStorage.getItem('arsinumScrollPos');
-            if (sp) { setTimeout(() => { mc.scrollTop = sp; localStorage.removeItem('arsinumScrollPos'); }, 100); }
-            document.querySelectorAll('nav a').forEach(link => link.addEventListener('click', () => localStorage.setItem('arsinumScrollPos', mc.scrollTop)));
+            const sp = localStorage.getItem('pisewScrollPos');
+            if (sp) { setTimeout(() => { mc.scrollTop = sp; localStorage.removeItem('pisewScrollPos'); }, 100); }
+            document.querySelectorAll('nav a').forEach(link => link.addEventListener('click', () => localStorage.setItem('pisewScrollPos', mc.scrollTop)));
         }
     });
 
@@ -230,7 +219,6 @@
     .leaflet-popup-content-wrapper { border-radius: 1.5rem; padding: 0; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); border: none; }
     .leaflet-popup-content { margin: 0; width: 240px !important; }
     .leaflet-container { font-family: inherit; }
-    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; }
-    #map svg { transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1); }
+    #map i { transition: transform 0.3s ease; }
 </style>
 <?= $this->endSection() ?>
