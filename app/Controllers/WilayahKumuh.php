@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\WilayahKumuhModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class WilayahKumuh extends BaseController
 {
@@ -252,5 +254,76 @@ class WilayahKumuh extends BaseController
         $this->logActivity('Hapus', 'Wilayah Kumuh', 'Memindahkan data wilayah ke Recycle Bin: ' . $kumuh['Kelurahan'], $detailLog);
 
         return redirect()->to('/wilayah-kumuh')->with('message', 'Data telah dipindahkan ke Recycle Bin.');
+    }
+
+    public function exportExcel()
+    {
+        $data = $this->kumuhModel->findAll();
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $headers = ['FID', 'Kecamatan', 'Kelurahan', 'Kawasan', 'Luas Kumuh', 'Skor Kumuh', 'WKT'];
+        foreach ($headers as $key => $header) {
+            $sheet->setCellValueByColumnAndRow($key + 1, 1, $header);
+        }
+
+        // Data
+        $rowNum = 2;
+        foreach ($data as $row) {
+            $sheet->setCellValueByColumnAndRow(1, $rowNum, $row['FID']);
+            $sheet->setCellValueByColumnAndRow(2, $rowNum, $row['Kecamatan']);
+            $sheet->setCellValueByColumnAndRow(3, $rowNum, $row['Kelurahan']);
+            $sheet->setCellValueByColumnAndRow(4, $rowNum, $row['Kawasan']);
+            $sheet->setCellValueByColumnAndRow(5, $rowNum, $row['Luas_kumuh']);
+            $sheet->setCellValueByColumnAndRow(6, $rowNum, $row['skor_kumuh']);
+            $sheet->setCellValueByColumnAndRow(7, $rowNum, $row['WKT']);
+            $rowNum++;
+        }
+
+        // Style header
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'Export_Wilayah_Kumuh_' . date('YmdHis') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function importCsv()
+    {
+        if (!has_permission('create_kumuh')) return redirect()->back()->with('message', 'Izin ditolak.');
+
+        $file = $this->request->getFile('csv_file');
+        if (!$file->isValid()) return redirect()->back()->with('message', 'File tidak valid.');
+
+        $handle = fopen($file->getTempName(), 'r');
+        fgetcsv($handle); // Skip header
+
+        $count = 0;
+        while (($row = fgetcsv($handle)) !== FALSE) {
+            if (empty($row[1])) continue;
+            $this->kumuhModel->insert([
+                'Kecamatan'   => $row[1] ?? null,
+                'Kelurahan'   => $row[2] ?? null,
+                'Kawasan'     => $row[3] ?? null,
+                'Luas_kumuh'  => $row[4] ?? 0,
+                'skor_kumuh'  => $row[5] ?? 0,
+                'WKT'         => $row[6] ?? null,
+            ]);
+            $count++;
+        }
+        fclose($handle);
+
+        $this->logActivity('Import', 'Wilayah Kumuh', "Mengimpor $count data wilayah kumuh via CSV");
+        return redirect()->to('/wilayah-kumuh')->with('message', "$count data berhasil diimpor.");
     }
 }

@@ -17,14 +17,18 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <div class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-blue-100">
-                <?= number_format($total_aset, 0, ',', '.') ?> Bidang
+                <?= number_format($total_aset ?? 0) ?> Bidang Tanah
             </div>
-            <a href="<?= base_url('aset-tanah/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
-                <i data-lucide="plus" class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform"></i> Tambah Aset
+            <a href="<?= base_url('aset-tanah/export-excel') ?>" class="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Excel
             </a>
+            <?php if (has_permission('create_rtlh')): ?>
+            <a href="<?= base_url('aset-tanah/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
+                <i data-lucide="plus" class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform"></i> Tambah Data
+            </a>
+            <?php endif; ?>
         </div>
     </div>
-
     <!-- Quick Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4 group hover:border-blue-500 transition-all duration-500">

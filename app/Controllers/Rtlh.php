@@ -6,6 +6,8 @@ use App\Models\RtlhPenerimaModel;
 use App\Models\RumahRtlhModel;
 use App\Models\KondisiRumahModel;
 use App\Models\RefMasterModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Rtlh extends BaseController
 {
@@ -311,5 +313,103 @@ class Rtlh extends BaseController
         $rumah = $db->table('rtlh_rumah')->where('id_survei', $id)->get()->getRowArray();
         $this->logActivity('Ekspor PDF', 'RTLH', 'Mendownload laporan RTLH untuk NIK: ' . ($rumah['nik_pemilik'] ?? 'Unknown'));
         return $this->response->setJSON(['status' => 'success']);
+    }
+
+    public function exportExcel()
+    {
+        $db = \Config\Database::connect();
+        $data = $db->table('rtlh_rumah')
+            ->select('rtlh_rumah.*, p.*')
+            ->join('rtlh_penerima p', 'p.nik = rtlh_rumah.nik_pemilik', 'left')
+            ->get()->getResultArray();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $headers = ['NIK', 'Nama', 'Desa', 'Alamat', 'Luas Rumah', 'Penghuni', 'Koordinat'];
+        foreach ($headers as $key => $header) {
+            $sheet->setCellValueByColumnAndRow($key + 1, 1, $header);
+        }
+
+        // Data
+        $rowNum = 2;
+        foreach ($data as $row) {
+            $sheet->setCellValueByColumnAndRow(1, $rowNum, $row['nik_pemilik']);
+            $sheet->setCellValueByColumnAndRow(2, $rowNum, $row['nama_kepala_keluarga']);
+            $sheet->setCellValueByColumnAndRow(3, $rowNum, $row['desa']);
+            $sheet->setCellValueByColumnAndRow(4, $rowNum, $row['alamat_detail']);
+            $sheet->setCellValueByColumnAndRow(5, $rowNum, $row['luas_rumah_m2']);
+            $sheet->setCellValueByColumnAndRow(6, $rowNum, $row['jumlah_penghuni_jiwa']);
+            $sheet->setCellValueByColumnAndRow(7, $rowNum, $row['lokasi_koordinat']);
+            $rowNum++;
+        }
+
+        // Style header
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'Export_RTLH_' . date('YmdHis') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function importCsv()
+    {
+        if (!has_permission('create_rtlh')) return redirect()->back()->with('message', 'Izin ditolak.');
+
+        $file = $this->request->getFile('csv_file');
+        if (!$file->isValid()) return redirect()->back()->with('message', 'File tidak valid.');
+
+        $db = \Config\Database::connect();
+        $handle = fopen($file->getTempName(), 'r');
+        fgetcsv($handle); // Skip header
+
+        $count = 0;
+        $db->transStart();
+        while (($row = fgetcsv($handle)) !== FALSE) {
+            if (empty($row[0])) continue;
+            
+            $nik = $row[0];
+            $nama = $row[1] ?? 'TANPA NAMA';
+            $desa = $row[2] ?? '-';
+            $alamat = $row[3] ?? null;
+            $luas = $row[4] ?? 0;
+            $penghuni = $row[5] ?? 0;
+            $koordinat = $row[6] ?? null;
+
+            // Simple insert into 2 main tables
+            $db->table('rtlh_penerima')->ignore(true)->insert([
+                'nik' => $nik,
+                'nama_kepala_keluarga' => $nama,
+            ]);
+
+            $db->table('rtlh_rumah')->insert([
+                'nik_pemilik' => $nik,
+                'desa' => $desa,
+                'alamat_detail' => $alamat,
+                'luas_rumah_m2' => $luas,
+                'jumlah_penghuni_jiwa' => $penghuni,
+                'lokasi_koordinat' => $koordinat,
+            ]);
+
+            $id_survei = $db->insertID();
+            $db->table('rtlh_kondisi_rumah')->insert(['id_survei' => $id_survei]);
+            
+            $count++;
+        }
+        $db->transComplete();
+        fclose($handle);
+
+        $this->logActivity('Import', 'RTLH', "Mengimpor $count data RTLH via CSV");
+        return redirect()->to('/rtlh')->with('message', "$count data berhasil diimpor.");
     }
 }

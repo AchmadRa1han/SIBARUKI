@@ -13,6 +13,26 @@
             </a>
         </div>
 
+        <!-- Import Card -->
+        <div class="px-8 py-6 bg-emerald-50 dark:bg-emerald-950/20 border-b border-emerald-100 dark:border-emerald-900/30">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                        <i data-lucide="file-up" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-emerald-900 dark:text-emerald-400 uppercase tracking-tight">Import via CSV</h3>
+                        <p class="text-[10px] text-emerald-600/70 font-bold uppercase tracking-widest">Unggah file untuk impor massal</p>
+                    </div>
+                </div>
+                <form action="<?= base_url('wilayah-kumuh/import-csv') ?>" method="post" enctype="multipart/form-data" class="flex items-center gap-2">
+                    <?= csrf_field() ?>
+                    <input type="file" name="csv_file" accept=".csv" required class="block w-full text-[10px] text-emerald-900 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
+                    <button type="submit" class="bg-emerald-900 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-black transition-all">Upload</button>
+                </form>
+            </div>
+        </div>
+
         <form action="<?= base_url('wilayah-kumuh/store') ?>" method="post" class="p-10">
             <?= csrf_field() ?>
             

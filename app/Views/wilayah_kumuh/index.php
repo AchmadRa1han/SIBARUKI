@@ -20,6 +20,9 @@
             <div id="debug-status" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-blue-100 transition-all">
                 Memuat Peta...
             </div>
+            <a href="<?= base_url('wilayah-kumuh/export-excel') ?>" class="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Excel
+            </a>
             <?php if (has_permission('create_kumuh')): ?>
             <a href="<?= base_url('wilayah-kumuh/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
                 <i data-lucide="plus" class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform"></i> Tambah Kawasan

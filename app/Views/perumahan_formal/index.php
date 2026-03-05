@@ -12,18 +12,18 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Data RTLH</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Monitoring Rumah Tidak Layak Huni Kabupaten Sinjai.</p>
+            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Perumahan Formal</h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Pemetaan dan Monitoring Sebaran Perumahan Formal Kabupaten Sinjai.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <div class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-blue-100">
-                <?= count($rumah_all ?? []) ?> Unit Terverifikasi
+                <?= number_format($total_perumahan ?? 0) ?> Perumahan Terdaftar
             </div>
-            <a href="<?= base_url('rtlh/export-excel') ?>" class="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2">
+            <a href="<?= base_url('perumahan-formal/export-excel') ?>" class="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Excel
             </a>
             <?php if (has_permission('create_rtlh')): ?>
-            <a href="<?= base_url('rtlh/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
+            <a href="<?= base_url('perumahan-formal/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
                 <i data-lucide="plus" class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform"></i> Tambah Data
             </a>
             <?php endif; ?>
@@ -38,7 +38,7 @@
             <div class="absolute top-6 left-6 z-[1000] hidden md:block">
                 <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-2xl border border-white/10 flex items-center gap-3">
                     <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></div>
-                    Database Geospasial RTLH
+                    Database Geospasial Perumahan
                 </div>
             </div>
         </div>
@@ -49,22 +49,22 @@
         <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col lg:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 bg-blue-950 rounded-2xl flex items-center justify-center text-white shadow-xl">
-                    <i data-lucide="database" class="w-5 h-5"></i>
+                    <i data-lucide="building-2" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h3 class="text-xs font-black text-blue-950 dark:text-white uppercase tracking-tight">Daftar Penerima RTLH</h3>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Informasi Terpadu Kepemilikan & Kondisi</p>
+                    <h3 class="text-xs font-black text-blue-950 dark:text-white uppercase tracking-tight">Daftar Perumahan</h3>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Informasi Pengembang & Kawasan</p>
                 </div>
             </div>
 
-            <form action="<?= base_url('rtlh') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
+            <form action="<?= base_url('perumahan-formal') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
                 <select name="per_page" onchange="submitWithScroll(this)" class="w-full md:w-24 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 focus:ring-2 focus:ring-blue-500 cursor-pointer">
                     <?php foreach([5, 10, 25, 50, 100] as $p): ?>
                         <option value="<?= $p ?>" <?= ($perPage ?? 10) == $p ? 'selected' : '' ?>><?= $p ?> Baris</option>
                     <?php endforeach; ?>
                 </select>
                 <div class="relative w-full md:w-64">
-                    <input type="text" name="keyword" value="<?= $keyword ?? '' ?>" placeholder="Cari Nama / Desa..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500 transition-all uppercase">
+                    <input type="text" name="keyword" value="<?= $keyword ?? '' ?>" placeholder="Cari Perumahan / Pengembang..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500 transition-all uppercase">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
                 </div>
             </form>
@@ -74,26 +74,28 @@
             <table class="w-full text-left border-collapse table-fixed">
                 <thead>
                     <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                        <th class="px-4 py-4 w-64">Kepala Keluarga</th>
-                        <th class="px-4 py-4 w-40">Wilayah</th>
-                        <th class="px-4 py-4 w-32 text-center">Kawasan</th>
+                        <th class="px-4 py-4 w-64">Nama Perumahan</th>
+                        <th class="px-4 py-4 w-48">Pengembang</th>
+                        <th class="px-4 py-4 w-24 text-center">Tahun</th>
+                        <th class="px-4 py-4 w-24 text-center">Luas (Ha)</th>
                         <th class="px-4 py-4 text-center w-36">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]">
-                    <?php if (!empty($rumah)): foreach($rumah as $item): ?>
+                    <?php if (!empty($perumahan)): foreach($perumahan as $item): ?>
                     <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-200">
-                        <td class="px-4 py-3"><span class="font-black text-blue-950 dark:text-white uppercase truncate block"><?= $item['pemilik'] ?? '-' ?></span></td>
-                        <td class="px-4 py-3"><span class="font-black text-blue-600 uppercase"><?= $item['desa'] ?></span></td>
-                        <td class="px-4 py-3 text-center"><span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg font-black uppercase text-[8px] truncate block"><?= $item['jenis_kawasan'] ?? '-' ?></span></td>
+                        <td class="px-4 py-3"><span class="font-black text-blue-950 dark:text-white uppercase truncate block"><?= $item['nama_perumahan'] ?></span></td>
+                        <td class="px-4 py-3"><span class="font-bold text-slate-500 dark:text-slate-400 uppercase truncate block"><?= $item['pengembang'] ?></span></td>
+                        <td class="px-4 py-3 text-center"><span class="font-black text-blue-600"><?= $item['tahun_pembangunan'] ?></span></td>
+                        <td class="px-4 py-3 text-center"><span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg font-black uppercase text-[8px] truncate block"><?= number_format($item['luas_kawasan_ha'], 2) ?></span></td>
                         <td class="px-4 py-3 text-center">
                             <div class="flex items-center justify-center gap-1.5">
-                                <?php if(!empty($item['lokasi_koordinat'])): ?>
-                                <button onclick="focusMap(<?= $item['lokasi_koordinat'] ?>)" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
+                                <?php if(!empty($item['latitude'])): ?>
+                                <button onclick="focusMap(<?= $item['latitude'] ?>, <?= $item['longitude'] ?>)" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
-                                <a href="<?= base_url('rtlh/detail/'.$item['id_survei']) ?>" class="p-2 bg-blue-950 text-white rounded-lg shadow-md hover:bg-black transition-all active:scale-95"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
+                                <a href="<?= base_url('perumahan-formal/detail/'.$item['id']) ?>" class="p-2 bg-blue-950 text-white rounded-lg shadow-md hover:bg-black transition-all active:scale-95"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
                                 <?php if (has_permission('delete_rtlh')): ?>
-                                <button onclick="confirmDelete(<?= $item['id_survei'] ?>, '<?= addslashes($item['pemilik'] ?? '') ?>')" class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="confirmDelete(<?= $item['id'] ?>, '<?= addslashes($item['nama_perumahan']) ?>')" class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
                             </div>
                         </td>
@@ -106,7 +108,7 @@
         </div>
         <?php if (!empty($pager)): ?>
         <div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800">
-            <?= $pager ?>
+            <?= $pager->links('default', 'tailwind_full') ?>
         </div>
         <?php endif; ?>
     </div>
@@ -158,23 +160,43 @@
             map.addControl(new LayerToggle({ position: 'topright' }));
 
             const clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
-            const rtlhData = <?= json_encode($rumah_all ?? []) ?>;
-            rtlhData.forEach(item => {
-                if (item.lokasi_koordinat) {
-                    const coords = item.lokasi_koordinat.split(',').map(c => parseFloat(c.trim()));
-                    if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-                        const marker = L.circleMarker(coords, { radius: 8, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
-                        marker.bindPopup(`
-                            <div class="bg-blue-950 text-white p-4 rounded-t-xl"><p class="text-[8px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Data RTLH</p><h5 class="text-xs font-black uppercase leading-tight">${item.pemilik || '-'}</h5></div>
-                            <div class="p-4 bg-white dark:bg-slate-900 space-y-3 rounded-b-xl"><p class="text-[10px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('rtlh/detail/') ?>/${item.id_survei}" class="block w-full py-2 bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all">Detail</a></div>
-                        `);
-                        clusterGroup.addLayer(marker);
-                    }
+            const perumahanData = <?= json_encode($perumahan_all ?? []) ?>;
+            
+            perumahanData.forEach(item => {
+                if (item.latitude && item.longitude) {
+                    const coords = [parseFloat(item.latitude), parseFloat(item.longitude)];
+                    const marker = L.circleMarker(coords, { 
+                        radius: 10, 
+                        fillColor: "#1e1b4b", 
+                        color: "#fff", 
+                        weight: 2, 
+                        fillOpacity: 0.8 
+                    });
+                    
+                    marker.bindPopup(`
+                        <div class="bg-blue-950 text-white p-4 rounded-t-xl">
+                            <p class="text-[8px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Perumahan Formal</p>
+                            <h5 class="text-xs font-black uppercase leading-tight">${item.nama_perumahan}</h5>
+                        </div>
+                        <div class="p-4 bg-white dark:bg-slate-900 space-y-3 rounded-b-xl">
+                            <p class="text-[10px] font-bold text-slate-700 dark:text-slate-300">🏢 ${item.pengembang}</p>
+                            <p class="text-[10px] font-bold text-slate-700 dark:text-slate-300">📏 ${parseFloat(item.luas_kawasan_ha).toFixed(2)} Ha</p>
+                            <a href="<?= base_url('perumahan-formal/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all hover:bg-black">Detail</a>
+                        </div>
+                    `);
+                    clusterGroup.addLayer(marker);
                 }
             });
             map.addLayer(clusterGroup);
+            
+            if (perumahanData.length > 0) {
+                const group = new L.featureGroup(clusterGroup.getLayers());
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+
             if (typeof lucide !== 'undefined') lucide.createIcons();
-        } catch(err) {}
+            setTimeout(() => { map.invalidateSize(); }, 500);
+        } catch(err) { console.error(err); }
     }
 
     function focusMap(lat, lng) {
@@ -184,14 +206,18 @@
     }
 
     function confirmDelete(id, name) {
-        customConfirm('Hapus RTLH?', `Hapus data milik ${name}?`, 'danger').then(conf => {
-            if (conf) { const f = document.getElementById('delete-form'); f.action = `<?= base_url('rtlh/delete') ?>/${id}`; f.submit(); }
+        customConfirm('Hapus Perumahan?', `Hapus data perumahan ${name}?`, 'danger').then(conf => {
+            if (conf) { 
+                const f = document.getElementById('delete-form'); 
+                f.action = `<?= base_url('perumahan-formal/delete') ?>/${id}`; 
+                f.submit(); 
+            }
         });
     }
 
     function submitWithScroll(el) {
         const mc = document.getElementById('main-content');
-        if (mc) localStorage.setItem('rtlhScrollPos', mc.scrollTop);
+        if (mc) localStorage.setItem('perumahanScrollPos', mc.scrollTop);
         const form = el.tagName === 'FORM' ? el : el.form;
         if (form) form.submit();
     }
@@ -199,9 +225,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         const mc = document.getElementById('main-content');
         if (mc) {
-            const sp = localStorage.getItem('rtlhScrollPos');
-            if (sp) { setTimeout(() => { mc.scrollTop = sp; localStorage.removeItem('rtlhScrollPos'); }, 150); }
-            document.querySelectorAll('nav a').forEach(link => link.addEventListener('click', () => localStorage.setItem('rtlhScrollPos', mc.scrollTop)));
+            const sp = localStorage.getItem('perumahanScrollPos');
+            if (sp) { setTimeout(() => { mc.scrollTop = sp; localStorage.removeItem('perumahanScrollPos'); }, 150); }
+            document.querySelectorAll('nav a').forEach(link => link.addEventListener('click', () => localStorage.setItem('perumahanScrollPos', mc.scrollTop)));
         }
     });
 

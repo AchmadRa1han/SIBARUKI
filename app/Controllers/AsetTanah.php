@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\AsetTanahModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class AsetTanah extends BaseController
 {
@@ -80,6 +82,74 @@ class AsetTanah extends BaseController
 
         $this->asetModel->save($this->request->getPost());
         return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil ditambahkan.');
+    }
+
+    public function exportExcel()
+    {
+        $data = $this->asetModel->findAll();
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $headers = ['ID', 'Nama Objek', 'Kecamatan', 'Desa', 'Luas', 'Status', 'Koordinat', 'WKT'];
+        foreach ($headers as $key => $header) {
+            $sheet->setCellValueByColumnAndRow($key + 1, 1, $header);
+        }
+
+        // Data
+        $rowNum = 2;
+        foreach ($data as $row) {
+            $sheet->setCellValueByColumnAndRow(1, $rowNum, $row['id']);
+            $sheet->setCellValueByColumnAndRow(2, $rowNum, $row['nama_objek']);
+            $sheet->setCellValueByColumnAndRow(3, $rowNum, $row['kecamatan']);
+            $sheet->setCellValueByColumnAndRow(4, $rowNum, $row['desa']);
+            $sheet->setCellValueByColumnAndRow(5, $rowNum, $row['luas']);
+            $sheet->setCellValueByColumnAndRow(6, $rowNum, $row['status_sertifikat']);
+            $sheet->setCellValueByColumnAndRow(7, $rowNum, $row['lokasi_koordinat']);
+            $sheet->setCellValueByColumnAndRow(8, $rowNum, $row['wkt']);
+            $rowNum++;
+        }
+
+        // Style header
+        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'Export_Aset_Tanah_' . date('YmdHis') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function importCsv()
+    {
+        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        $file = $this->request->getFile('csv_file');
+        if (!$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
+        $handle = fopen($file->getTempName(), 'r');
+        fgetcsv($handle); 
+        $count = 0;
+        while (($row = fgetcsv($handle)) !== FALSE) {
+            if (empty($row[0])) continue;
+            $this->asetModel->insert([
+                'nama_objek' => $row[0],
+                'kecamatan' => $row[1],
+                'desa' => $row[2],
+                'luas' => $row[3],
+                'status_sertifikat' => $row[4],
+                'lokasi_koordinat' => $row[5],
+                'wkt' => $row[6] ?? null,
+            ]);
+            $count++;
+        }
+        fclose($handle);
+        return redirect()->to('/aset-tanah')->with('success', "$count data berhasil diimpor.");
     }
 
     public function detail($id)
