@@ -58,7 +58,6 @@ class Rtlh extends BaseController
 
     public function exportExcel()
     {
-        // Gabungkan data dari 3 tabel untuk ekspor lengkap
         $db = \Config\Database::connect();
         $builder = $db->table('rtlh_rumah');
         $builder->select('rtlh_rumah.*, rtlh_penerima.nama_kepala_keluarga as pemilik, rtlh_penerima.no_kk, rtlh_kondisi_rumah.st_atap, rtlh_kondisi_rumah.st_lantai, rtlh_kondisi_rumah.st_dinding');
@@ -81,7 +80,7 @@ class Rtlh extends BaseController
             $sheet->setCellValue('C' . $rowNum, $row['nik_pemilik']);
             $sheet->setCellValue('D' . $rowNum, $row['alamat_detail']);
             $sheet->setCellValue('E' . $rowNum, $row['desa']);
-            $sheet->setCellValue('F' . $rowNum, $row['desa_id']); // Assuming kecamatan is not directly in rtlh_rumah
+            $sheet->setCellValue('F' . $rowNum, $row['desa_id']); 
             $sheet->setCellValue('G' . $rowNum, $row['st_atap'] ?? '-');
             $sheet->setCellValue('H' . $rowNum, $row['st_lantai'] ?? '-');
             $sheet->setCellValue('I' . $rowNum, $row['st_dinding'] ?? '-');
@@ -107,66 +106,89 @@ class Rtlh extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
+        // 1. Map Nama Field ke Alias Header CSV
         $aliasMap = [
-            'nik'                  => ['nik', '*nik'],
-            'nama_kepala_keluarga' => ['nama kepala rumah tangga', '*nama kepala rumah tangga'],
-            'no_kk'                => ['no.kk', 'no kk'],
-            'desa'                 => ['desa', '*desa'],
-            'alamat_detail'        => ['alamat', '*alamat'],
-            'jenis_kawasan'        => ['jenis kawasan'],
+            'nik'                  => ['*nik', 'nik'],
+            'nama_kepala_keluarga' => ['*nama kepala rumah tangga', 'nama kepala rumah tangga', 'nama'],
+            'no_kk'                => ['no.kk', 'no kk', 'nomor kk'],
+            'desa'                 => ['*desa', 'desa'],
+            'alamat_detail'        => ['*alamat', 'alamat'],
+            'jenis_kawasan'        => ['jenis kawasan', 'kawasan'],
             'fungsi_ruang'         => ['fungsi ruang'],
-            'luas_rumah_m2'        => ['luas rumah (m2)', '*luas rumah (m2)'],
+            'luas_rumah_m2'        => ['*luas rumah (m2)', 'luas rumah (m2)'],
             'luas_lahan_m2'        => ['luah lahan (m2)', 'luas lahan (m2)'],
-            'jumlah_penghuni_jiwa' => ['jumlah penghuni (jiwa)', '*jumlah penghuni (jiwa)'],
-            'pendidikan_id'        => ['pendidikan', '*pendidikan'],
-            'pekerjaan_id'         => ['pekerjaan', '*pekerjaan'],
-            'penghasilan_per_bulan'=> ['penghasilan perbulan', '*penghasilan perbulan'],
-            'jenis_kelamin'        => ['jenis kelamin', '*jenis kelamin'],
-            'tempat_tanggal_lahir' => ['tempat tanggal lahir'],
-            'kepemilikan_rumah'    => ['kepemilikan rumah', '*kepemilikan rumah'],
-            'kepemilikan_tanah'    => ['kepemilikan tanah', '*kepemilikan tanah'],
-            'bantuan_perumahan'    => ['bantuan perumahan', '*bantuan perumahan'],
-            'st_pondasi'           => ['pondasi', '*pondasi'],
-            'st_kolom'             => ['kondisi kolom', '*kondisi kolom'],
+            'jumlah_penghuni_jiwa' => ['*jumlah penghuni (jiwa)', 'jumlah penghuni (jiwa)'],
+            'pendidikan_id'        => ['*pendidikan', 'pendidikan'],
+            'pekerjaan_id'         => ['*pekerjaan', 'pekerjaan'],
+            'penghasilan_per_bulan'=> ['*penghasilan perbulan', 'penghasilan perbulan'],
+            'jenis_kelamin'        => ['*jenis kelamin', 'jenis kelamin'],
+            'tempat_tanggal_lahir' => ['tempat tanggal lahir', 'ttl'],
+            'kepemilikan_rumah'    => ['*kepemilikan rumah', 'kepemilikan rumah'],
+            'aset_rumah_di_lokasi_lain' => ['*aset rumah di lokasi lain', 'aset rumah di lokasi lain', 'aset lain'],
+            'kepemilikan_tanah'    => ['*kepemilikan tanah', 'kepemilikan tanah'],
+            'bantuan_perumahan'    => ['*bantuan perumahan', 'bantuan perumahan'],
+            'jumlah_anggota_keluarga' => ['*jumlah keluarga (kk)', 'jumlah keluarga (kk)', 'jumlah anggota keluarga'],
+            'sumber_penerangan'    => ['*sumber penerangan', 'sumber penerangan'],
+            'st_pondasi'           => ['*pondasi', 'pondasi'],
+            'st_kolom'             => ['*kondisi kolom', 'kondisi kolom'],
             'st_balok'             => ['kondisi balok', 'balok'],
             'st_sloof'             => ['kondisi sloof', 'sloof'],
-            'st_rangka_atap'       => ['kondisi rangka atap', '*kondisi rangka atap'],
+            'st_rangka_atap'       => ['*kondisi rangka atap', 'kondisi rangka atap'],
             'st_plafon'            => ['kondisi plafon', 'plafon'],
-            'st_jendela'           => ['jendela', '*jendela'],
-            'st_ventilasi'         => ['ventilasi', '*ventilasi'],
-            'mat_lantai'           => ['material lantai terluas', '*material lantai terluas'],
-            'st_lantai'            => ['kondisi lantai', '*kondisi lantai'],
-            'mat_dinding'          => ['material dinding terluas', '*material dinding terluas'],
-            'st_dinding'           => ['kondisi dinding', '*kondisi dinding'],
-            'mat_atap'             => ['material atap terluas', '*material atap terluas'],
-            'st_atap'              => ['kondisi atap', '*kondisi atap'],
-            'sumber_air_minum'     => ['sumber air minum', '*sumber air minum'],
-            'jarak_sam_ke_tpa_tinja'=> ['jarak sam ke tpa tinja', '*jarak sam ke tpa tinja'],
-            'kamar_mandi_dan_jamban'=> ['kamar mandi dan jamban', '*kamar mandi dan jamban'],
-            'jenis_jamban_kloset'  => ['jenis jamban/ kloset'],
+            'st_jendela'           => ['*jendela', 'jendela'],
+            'st_ventilasi'         => ['*ventilasi', 'ventilasi'],
+            'mat_lantai'           => ['*material lantai terluas', 'material lantai terluas'],
+            'st_lantai'            => ['*kondisi lantai', 'kondisi lantai'],
+            'mat_dinding'          => ['*material dinding terluas', 'material dinding terluas'],
+            'st_dinding'           => ['*kondisi dinding', 'kondisi dinding'],
+            'mat_atap'             => ['*material atap terluas', 'material atap terluas'],
+            'st_atap'              => ['*kondisi atap', 'kondisi atap'],
+            'sumber_air_minum'     => ['*sumber air minum', 'sumber air minum'],
+            'jarak_sam_ke_tpa_tinja'=> ['*jarak sam ke tpa tinja', 'jarak sam ke tpa tinja'],
+            'kamar_mandi_dan_jamban'=> ['*kamar mandi dan jamban', 'kamar mandi dan jamban', '*kamarmandi dan jamban'],
+            'jenis_jamban_kloset'  => ['jenis jamban/ kloset', 'jenis jamban'],
             'jenis_tpa_tinja'      => ['jenis tpa tinja'],
         ];
 
         $db = \Config\Database::connect();
-        $refMap = $this->refModel->findAll(); 
+        $allRefs = $this->refModel->findAll();
+        $refMap = [];
+        foreach ($allRefs as $r) {
+            $refMap[$r['kategori']][strtoupper(trim($r['nama_pilihan']))] = $r['id'];
+        }
+
+        $allDesa = $db->table('kode_desa')->select('desa_id, desa_nama')->get()->getResultArray();
+        $desaLookup = [];
+        foreach ($allDesa as $d) {
+            $desaLookup[strtoupper(trim($d['desa_nama']))] = $d['desa_id'];
+        }
 
         $handle = fopen($file->getTempName(), 'r');
         $headerPos = [];
         $foundHeader = false;
 
-        // Skip metadata dan cari header sesungguhnya
+        // 2. Deteksi Header & Posisi Kolom
         while (($line = fgetcsv($handle, 2000, ";")) !== FALSE) {
-            $lineStr = implode(' ', $line);
-            if (stripos($lineStr, 'NIK') !== false) {
-                foreach ($line as $index => $colName) {
-                    $cleanCol = strtolower(trim($colName));
+            $lineClean = array_map(function($v) { return strtolower(trim($v)); }, $line);
+            if (in_array('*nik', $lineClean) || in_array('nik', $lineClean)) {
+                $countPenerangan = 0;
+                foreach ($lineClean as $index => $colName) {
+                    $matched = false;
                     foreach ($aliasMap as $field => $aliases) {
-                        if ($cleanCol == $field || in_array($cleanCol, $aliases)) {
-                            if ($cleanCol == '*sumber penerangan' && isset($headerPos['sumber_penerangan'])) {
-                                $headerPos['sumber_penerangan_detail'] = $index;
+                        if ($colName == $field || in_array($colName, $aliases)) {
+                            // Khusus untuk dua kolom "*sumber penerangan"
+                            if ($colName == '*sumber penerangan') {
+                                if ($countPenerangan == 0) {
+                                    $headerPos['sumber_penerangan'] = $index;
+                                    $countPenerangan++;
+                                } else {
+                                    $headerPos['sumber_penerangan_detail'] = $index;
+                                }
                             } else {
                                 $headerPos[$field] = $index;
                             }
+                            $matched = true;
+                            break;
                         }
                     }
                 }
@@ -176,101 +198,128 @@ class Rtlh extends BaseController
         }
 
         if (!$foundHeader || !isset($headerPos['nik'])) {
-            return redirect()->back()->with('error', 'Header CSV tidak valid atau kolom NIK tidak ditemukan.');
+            return redirect()->back()->with('error', 'Format Header CSV tidak dikenali.');
         }
 
         $db->transStart();
         $count = 0;
 
+        // 3. Iterasi Data Baris demi Baris
         while (($row = fgetcsv($handle, 2000, ";")) !== FALSE) {
-            if (empty($row[$headerPos['nik']])) continue;
+            $nik = trim($row[$headerPos['nik']] ?? '');
+            if (empty($nik)) continue;
 
             $getVal = function($field) use ($row, $headerPos) {
-                $v = isset($headerPos[$field]) ? trim($row[$headerPos[$field]]) : null;
-                if ($v && in_array($field, ['luas_rumah_m2', 'luas_lahan_m2'])) {
-                    $v = preg_replace('/[^0-9.]/', '', $v);
-                }
-                return $v;
+                return isset($headerPos[$field]) ? trim($row[$headerPos[$field]] ?? '') : null;
             };
 
-            $findRefId = function($text) use ($refMap) {
+            $findId = function($cat, $text) use ($refMap) {
                 if (empty($text)) return null;
                 $text = strtoupper(trim($text));
-                foreach ($refMap as $r) {
-                    $opt = strtoupper($r['nama_pilihan']);
-                    if ($opt == $text || stripos($opt, $text) !== false || stripos($text, $opt) !== false) {
-                        return $r['id'];
+                if (isset($refMap[$cat][$text])) return $refMap[$cat][$text];
+                if (isset($refMap[$cat])) {
+                    foreach ($refMap[$cat] as $nama => $id) {
+                        if (stripos($nama, $text) !== false || stripos($text, $nama) !== false) return $id;
                     }
                 }
                 return null;
             };
 
-            $nik = $getVal('nik');
-            
             $ttl = $getVal('tempat_tanggal_lahir');
             $tempat = null; $tanggal = null;
             if ($ttl && strpos($ttl, ',') !== false) {
                 $parts = explode(',', $ttl);
                 $tempat = trim($parts[0]);
-                $tglStr = trim($parts[1] ?? '');
-                if ($tglStr) $tanggal = date('Y-m-d', strtotime($tglStr));
+                $tglRaw = trim($parts[1] ?? '');
+                if ($tglRaw) {
+                    $timestamp = strtotime($tglRaw);
+                    if ($timestamp) $tanggal = date('Y-m-d', $timestamp);
+                }
             }
 
+            // A. rtlh_penerima
             $dataPenerima = [
                 'nik' => $nik,
                 'nama_kepala_keluarga' => $getVal('nama_kepala_keluarga'),
                 'no_kk' => $getVal('no_kk'),
                 'tempat_lahir' => $tempat,
                 'tanggal_lahir' => $tanggal,
-                'jenis_kelamin' => (stripos($getVal('jenis_kelamin'), 'PEREMPUAN') !== false) ? 'P' : 'L',
-                'pendidikan_id' => $findRefId($getVal('pendidikan_id')),
-                'pekerjaan_id' => $findRefId($getVal('pekerjaan_id')),
+                'jenis_kelamin' => (stripos($getVal('jenis_kelamin') ?? '', 'PEREMPUAN') !== false) ? 'P' : 'L',
+                'pendidikan_id' => $findId('PENDIDIKAN', $getVal('pendidikan_id')),
+                'pekerjaan_id' => $findId('PEKERJAAN', $getVal('pekerjaan_id')),
                 'penghasilan_per_bulan' => $getVal('penghasilan_per_bulan'),
+                'jumlah_anggota_keluarga' => (int) preg_replace('/[^0-9]/', '', $getVal('jumlah_anggota_keluarga') ?? '0'),
+                'updated_at' => date('Y-m-d H:i:s')
             ];
-            
-            if ($this->penerimaModel->find($nik)) $this->penerimaModel->update($nik, $dataPenerima);
-            else $this->penerimaModel->insert($dataPenerima);
+            if ($this->penerimaModel->find($nik)) {
+                $this->penerimaModel->update($nik, $dataPenerima);
+            } else {
+                $dataPenerima['created_at'] = date('Y-m-d H:i:s');
+                $this->penerimaModel->insert($dataPenerima);
+            }
 
+            // B. rtlh_rumah
+            $desaName = strtoupper(trim($getVal('desa') ?? ''));
             $this->rumahModel->set([
-                'nik_pemilik' => $nik,
-                'desa' => $getVal('desa'),
+                'nik_pemilik'   => $nik,
+                'desa'          => $getVal('desa'),
+                'desa_id'       => $desaLookup[$desaName] ?? null,
                 'alamat_detail' => $getVal('alamat_detail'),
                 'jenis_kawasan' => $getVal('jenis_kawasan'),
-                'fungsi_ruang' => $getVal('fungsi_ruang'),
+                'fungsi_ruang'  => $getVal('fungsi_ruang'),
                 'kepemilikan_rumah' => $getVal('kepemilikan_rumah'),
+                'aset_rumah_di_lokasi_lain' => $getVal('aset_rumah_di_lokasi_lain'),
                 'kepemilikan_tanah' => $getVal('kepemilikan_tanah'),
                 'bantuan_perumahan' => $getVal('bantuan_perumahan'),
-                'luas_rumah_m2' => $getVal('luas_rumah_m2') ?: 0,
-                'luas_lahan_m2' => $getVal('luas_lahan_m2') ?: 0,
-                'jumlah_penghuni_jiwa' => $getVal('jumlah_penghuni_jiwa') ?: 0,
-                'sumber_penerangan' => isset($headerPos['sumber_penerangan']) ? ($row[$headerPos['sumber_penerangan']] ?? null) : null,
-                'sumber_penerangan_detail' => isset($headerPos['sumber_penerangan_detail']) ? ($row[$headerPos['sumber_penerangan_detail']] ?? null) : null,
+                'luas_rumah_m2' => preg_replace('/[^0-9.]/', '', $getVal('luas_rumah_m2') ?? '0'),
+                'luas_lahan_m2' => preg_replace('/[^0-9.]/', '', $getVal('luas_lahan_m2') ?? '0'),
+                'jumlah_penghuni_jiwa' => (int) preg_replace('/[^0-9]/', '', $getVal('jumlah_penghuni_jiwa') ?? '0'),
+                'sumber_penerangan' => $getVal('sumber_penerangan'),
+                'sumber_penerangan_detail' => $getVal('sumber_penerangan_detail'),
                 'sumber_air_minum' => $getVal('sumber_air_minum'),
                 'jarak_sam_ke_tpa_tinja' => $getVal('jarak_sam_ke_tpa_tinja'),
                 'kamar_mandi_dan_jamban' => $getVal('kamar_mandi_dan_jamban'),
                 'jenis_jamban_kloset' => $getVal('jenis_jamban_kloset'),
                 'jenis_tpa_tinja' => $getVal('jenis_tpa_tinja'),
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
-            $this->rumahModel->insert();
-            $surveiId = $this->rumahModel->getInsertID();
+            
+            $existingRumah = $this->rumahModel->where('nik_pemilik', $nik)->first();
+            if ($existingRumah) {
+                $this->rumahModel->update($existingRumah['id_survei']);
+                $surveiId = $existingRumah['id_survei'];
+            } else {
+                $this->rumahModel->set('created_at', date('Y-m-d H:i:s'));
+                $this->rumahModel->insert();
+                $surveiId = $this->rumahModel->getInsertID();
+            }
 
-            $this->kondisiModel->insert([
+            // C. rtlh_kondisi_rumah
+            $dataKondisi = [
                 'id_survei'  => $surveiId,
-                'st_pondasi' => $findRefId($getVal('st_pondasi')),
-                'st_kolom'   => $findRefId($getVal('st_kolom')),
-                'st_balok'   => $findRefId($getVal('st_balok')),
-                'st_sloof'   => $findRefId($getVal('st_sloof')),
-                'st_rangka_atap' => $findRefId($getVal('st_rangka_atap')),
-                'st_plafon'  => $findRefId($getVal('st_plafon')),
-                'st_jendela' => $findRefId($getVal('st_jendela')),
-                'st_ventilasi' => $findRefId($getVal('st_ventilasi')),
-                'mat_lantai' => $findRefId($getVal('mat_lantai')),
-                'st_lantai'  => $findRefId($getVal('st_lantai')),
-                'mat_dinding' => $findRefId($getVal('mat_dinding')),
-                'st_dinding' => $findRefId($getVal('st_dinding')),
-                'mat_atap'   => $findRefId($getVal('mat_atap')),
-                'st_atap'    => $findRefId($getVal('st_atap')),
-            ]);
+                'st_pondasi' => $findId('KONDISI', $getVal('st_pondasi')),
+                'st_kolom'   => $findId('KONDISI', $getVal('st_kolom')),
+                'st_balok'   => $findId('KONDISI', $getVal('st_balok')),
+                'st_sloof'   => $findId('KONDISI', $getVal('st_sloof')),
+                'st_rangka_atap' => $findId('KONDISI', $getVal('st_rangka_atap')),
+                'st_plafon'  => $findId('KONDISI', $getVal('st_plafon')),
+                'st_jendela' => $findId('KONDISI', $getVal('st_jendela')),
+                'st_ventilasi' => $findId('KONDISI', $getVal('st_ventilasi')),
+                'mat_lantai' => $findId('MATERIAL_LANTAI', $getVal('mat_lantai')),
+                'st_lantai'  => $findId('KONDISI', $getVal('st_lantai')),
+                'mat_dinding' => $findId('MATERIAL_DINDING', $getVal('mat_dinding')),
+                'st_dinding' => $findId('KONDISI', $getVal('st_dinding')),
+                'mat_atap'   => $findId('MATERIAL_ATAP', $getVal('mat_atap')),
+                'st_atap'    => $findId('KONDISI', $getVal('st_atap')),
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+            
+            if ($this->kondisiModel->find($surveiId)) {
+                $this->kondisiModel->update($surveiId, $dataKondisi);
+            } else {
+                $dataKondisi['created_at'] = date('Y-m-d H:i:s');
+                $this->kondisiModel->insert($dataKondisi);
+            }
 
             $count++;
         }
@@ -278,7 +327,7 @@ class Rtlh extends BaseController
         fclose($handle);
         $db->transComplete();
 
-        return redirect()->to('/rtlh')->with('success', "Import Berhasil: $count data RTLH telah diproses.");
+        return redirect()->to('/rtlh')->with('success', "Import Selesai: $count data RTLH berhasil diproses.");
     }
 
     public function detail($id)
@@ -357,7 +406,7 @@ class Rtlh extends BaseController
             'kepemilikan_tanah' => $post['kepemilikan_tanah'] ?? null,
             'fungsi_ruang' => $post['fungsi_ruang'] ?? null,
             'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? null,
-            'bantuan_per_perumahan' => $post['bantuan_perumahan'] ?? null,
+            'bantuan_perumahan' => $post['bantuan_perumahan'] ?? null,
             'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? null,
             'luas_rumah_m2' => $post['luas_rumah_m2'] ?: null,
             'luas_lahan_m2' => $post['luas_lahan_m2'] ?: null,
