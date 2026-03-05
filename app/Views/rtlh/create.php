@@ -1,53 +1,50 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto space-y-8">
+    
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border dark:border-slate-800 shadow-sm transition-all duration-300">
+        <div>
+            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Input RTLH Terpadu</h1>
+            <p class="text-sm text-slate-400 dark:text-slate-500 font-medium mt-1">Lengkapi seluruh instrumen survei teknis atau impor data massal.</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="<?= base_url('rtlh') ?>" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest">Batal</a>
+        </div>
+    </div>
+
+    <!-- 1. FORM IMPORT (TERPISAH) -->
+    <div class="bg-emerald-50 dark:bg-emerald-950/20 rounded-[2.5rem] p-8 border border-emerald-100 dark:border-emerald-900/30">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                    <i data-lucide="file-up" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-emerald-900 dark:text-emerald-400 uppercase tracking-tight">Import via CSV</h3>
+                    <p class="text-[10px] text-emerald-600/70 font-bold uppercase tracking-widest">Unggah file untuk impor massal</p>
+                </div>
+            </div>
+            <form action="<?= base_url('rtlh/import-csv') ?>" method="post" enctype="multipart/form-data" class="flex items-center gap-2">
+                <?= csrf_field() ?>
+                <input type="file" name="csv_file" accept=".csv" required class="block w-full text-[10px] text-emerald-900 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
+                <button type="submit" class="bg-emerald-900 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-black transition-all">Upload</button>
+            </form>
+        </div>
+    </div>
+
+    <?php if (session()->getFlashdata('error')) : ?>
+        <div class="bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900 text-rose-700 dark:text-rose-400 px-6 py-4 rounded-2xl text-sm font-bold shadow-sm transition-colors duration-300">
+            <i data-lucide="alert-circle" class="w-4 h-4 inline mr-2"></i>
+            <?= session()->getFlashdata('error') ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- 2. FORM MANUAL -->
     <form action="<?= base_url('rtlh/store') ?>" method="post">
         <?= csrf_field() ?>
-
         <div class="space-y-8">
-            <!-- HEADER -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border dark:border-slate-800 shadow-sm transition-all duration-300">
-                <div>
-                    <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Input RTLH Terpadu</h1>
-                    <p class="text-sm text-slate-400 dark:text-slate-500 font-medium mt-1">Lengkapi seluruh instrumen survei teknis dan profil penghuni.</p>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <a href="<?= base_url('rtlh') ?>" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest">Batal</a>
-                    <button type="submit" class="bg-blue-900 dark:bg-blue-700 hover:bg-blue-950 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-blue-900/20 transition-all flex items-center space-x-3 active:scale-95">
-                        <i data-lucide="save" class="w-5 h-5"></i>
-                        <span class="uppercase tracking-widest text-xs">Simpan Data</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Import Card -->
-            <div class="bg-emerald-50 dark:bg-emerald-950/20 rounded-[2.5rem] p-8 border border-emerald-100 dark:border-emerald-900/30">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                            <i data-lucide="file-up" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-black text-emerald-900 dark:text-emerald-400 uppercase tracking-tight">Import via CSV</h3>
-                            <p class="text-[10px] text-emerald-600/70 font-bold uppercase tracking-widest">Unggah file untuk impor massal</p>
-                        </div>
-                    </div>
-                    <form action="<?= base_url('rtlh/import-csv') ?>" method="post" enctype="multipart/form-data" class="flex items-center gap-2">
-                        <?= csrf_field() ?>
-                        <input type="file" name="csv_file" accept=".csv" required class="block w-full text-[10px] text-emerald-900 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
-                        <button type="submit" class="bg-emerald-900 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-black transition-all">Upload</button>
-                    </form>
-                </div>
-            </div>
-
-            <?php if (session()->getFlashdata('message')) : ?>
-                <div class="bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900 text-rose-700 dark:text-rose-400 px-6 py-4 rounded-2xl text-sm font-bold shadow-sm transition-colors duration-300">
-                    <i data-lucide="alert-circle" class="w-4 h-4 inline mr-2"></i>
-                    <?= session()->getFlashdata('message') ?>
-                </div>
-            <?php endif; ?>
-
             <!-- SECTION 1: IDENTITAS PENERIMA -->
             <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
                 <div class="p-6 border-b dark:border-slate-800 bg-blue-50/30 dark:bg-blue-950/30">

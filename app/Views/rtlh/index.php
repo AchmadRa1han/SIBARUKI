@@ -106,7 +106,7 @@
         </div>
         <?php if (!empty($pager)): ?>
         <div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800">
-            <?= $pager ?>
+            <?= $pager->links('default', 'tailwind_full') ?>
         </div>
         <?php endif; ?>
     </div>

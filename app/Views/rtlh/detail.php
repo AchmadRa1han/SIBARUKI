@@ -7,11 +7,11 @@
 <?php
     function getStatusBadge($status) {
         $status = strtoupper($status ?? '');
-        if (str_contains($status, 'TIDAK LAYAK') || str_contains($status, 'RUSAK BERAT') || str_contains($status, 'RUSAK SEDANG')) {
+        if (str_contains($status, 'TIDAK LAYAK') || str_contains($status, 'KURANG LAYAK') || str_contains($status, 'RUSAK BERAT') || str_contains($status, 'RUSAK SEDANG')) {
             return 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-100 dark:border-red-900';
-        } elseif (str_contains($status, 'RUSAK RINGAN') || str_contains($status, 'MENUJU')) {
+        } elseif (str_contains($status, 'RUSAK RINGAN') || str_contains($status, 'MENUJU') || str_contains($status, 'AGAK')) {
             return 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900';
-        } elseif (str_contains($status, 'LAYAK') || str_contains($status, 'BAIK')) {
+        } elseif (str_contains($status, 'LAYAK') || str_contains($status, 'BAIK') || str_contains($status, 'SANGAT')) {
             return 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900';
         }
         return 'bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-700';
@@ -282,6 +282,22 @@
                         </span>
                     </div>
                     <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="bg-blue-950 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                    <i data-lucide="info" class="w-32 h-32"></i>
+                </div>
+                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-400 mb-4">Informasi Sistem</h4>
+                <div class="space-y-4 relative z-10">
+                    <div class="flex justify-between items-center text-[10px]">
+                        <span class="font-bold text-blue-300/60 uppercase">Dibuat Pada</span>
+                        <span class="font-black"><?= !empty($rumah['created_at']) ? date('d/m/Y H:i', strtotime($rumah['created_at'])) : '-' ?></span>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px]">
+                        <span class="font-bold text-blue-300/60 uppercase">Pembaruan Terakhir</span>
+                        <span class="font-black"><?= !empty($rumah['updated_at']) ? date('d/m/Y H:i', strtotime($rumah['updated_at'])) : '-' ?></span>
+                    </div>
                 </div>
             </div>
         </div>

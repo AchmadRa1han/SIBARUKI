@@ -10,6 +10,11 @@ class RumahRtlhModel extends Model
     protected $primaryKey       = 'id_survei';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
+    protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $dateFormat    = 'datetime';
+
     protected $allowedFields    = [
         'nik_pemilik', 'desa', 'desa_id', 'alamat_detail', 'kepemilikan_rumah', 
         'aset_rumah_di_lokasi_lain', 'kepemilikan_tanah', 'sumber_penerangan', 
