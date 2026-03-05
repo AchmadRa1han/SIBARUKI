@@ -455,13 +455,16 @@
         document.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
+                const isExport = href && (href.includes('export') || href.includes('download'));
+                
                 if (
                     loader &&
                     href && 
                     !href.startsWith('#') && 
                     !href.startsWith('javascript:') && 
                     !e.metaKey && !e.ctrlKey && 
-                    this.getAttribute('target') !== '_blank'
+                    this.getAttribute('target') !== '_blank' &&
+                    !isExport
                 ) {
                     loader.classList.remove('opacity-0');
                     loader.classList.remove('pointer-events-none');

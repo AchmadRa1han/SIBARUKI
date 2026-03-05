@@ -20,4 +20,14 @@ class RefMasterModel extends Model
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
+
+    public function getAllMapped()
+    {
+        $all = $this->findAll();
+        $mapped = [];
+        foreach ($all as $item) {
+            $mapped[$item['id']] = $item['nama_pilihan'];
+        }
+        return $mapped;
+    }
 }

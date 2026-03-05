@@ -15,16 +15,16 @@
             <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Perumahan Formal</h1>
             <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Pemetaan dan Monitoring Sebaran Perumahan Formal Kabupaten Sinjai.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-            <div class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-blue-100">
-                <?= number_format($total_perumahan ?? 0) ?> Perumahan Terdaftar
+        <div class="flex flex-wrap md:flex-nowrap items-center justify-end gap-2 flex-shrink-0">
+            <div class="bg-blue-50 text-blue-600 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-blue-100 whitespace-nowrap">
+                <?= number_format($total_perumahan ?? 0) ?> Perumahan
             </div>
-            <a href="<?= base_url('perumahan-formal/export-excel') ?>" class="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2">
-                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Excel
+            <a href="<?= base_url('perumahan-formal/export-excel') ?>" class="bg-emerald-50 text-emerald-600 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="download" class="w-3 h-3"></i> Export Excel
             </a>
             <?php if (has_permission('create_rtlh')): ?>
-            <a href="<?= base_url('perumahan-formal/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
-                <i data-lucide="plus" class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform"></i> Tambah Data
+            <a href="<?= base_url('perumahan-formal/create') ?>" class="bg-blue-950 hover:bg-black text-white px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap">
+                <i data-lucide="plus" class="w-3 h-3 group-hover:rotate-90 transition-transform"></i> Tambah Data
             </a>
             <?php endif; ?>
         </div>

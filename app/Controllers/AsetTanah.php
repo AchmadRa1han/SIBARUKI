@@ -17,8 +17,9 @@ class AsetTanah extends BaseController
 
     public function index()
     {
-        $search = $this->request->getGet('search');
-        $kecamatan = $this->request->getGet('kecamatan');
+        $search = $this->request->getGet('search') ?? '';
+        $perPage = $this->request->getGet('per_page') ?? 10;
+        $selected_kecamatan = $this->request->getGet('kecamatan') ?? '';
         $sortBy = $this->request->getGet('sort_by') ?? 'id';
         $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
 
@@ -26,62 +27,32 @@ class AsetTanah extends BaseController
 
         if ($search) {
             $query = $query->groupStart()
-                ->like('no_sertifikat', $search)
-                ->orLike('nama_pemilik', $search)
-                ->orLike('lokasi', $search)
+                ->like('nama_pemilik', $search)
+                ->orLike('no_sertifikat', $search)
                 ->groupEnd();
         }
 
-        if ($kecamatan) {
-            $query = $query->where('kecamatan', $kecamatan);
+        if ($selected_kecamatan) {
+            $query = $query->where('kecamatan', $selected_kecamatan);
         }
 
-        // Apply Sorting
-        $query = $query->orderBy($sortBy, $sortOrder);
-
-        $perPage = $this->request->getGet('per_page') ?? 10;
-        $aset = $query->paginate($perPage, 'group1');
-        
-        // Ambil semua data untuk peta (tanpa pagination)
-        $aset_all = (clone $query)->findAll();
-
         $data = [
-            'aset' => $aset,
-            'aset_all' => $aset_all,
+            'title' => 'Data Aset Tanah',
+            'aset' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
+            'aset_all' => $this->asetModel->findAll(),
             'pager' => $this->asetModel->pager,
             'perPage' => $perPage,
+            'search' => $search,
+            'kecamatans' => $this->asetModel->select('kecamatan')->distinct()->findAll(),
+            'selected_kecamatan' => $selected_kecamatan,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
             'total_aset' => $this->asetModel->countAllResults(false),
-            'total_luas' => $this->asetModel->selectSum('luas_m2')->get()->getRow()->luas_m2,
-            'total_nilai' => $this->asetModel->selectSum('nilai_aset')->get()->getRow()->nilai_aset,
-            'kecamatans' => $this->asetModel->select('kecamatan')->distinct()->findAll(),
-            'search' => $search,
-            'selected_kecamatan' => $kecamatan
+            'total_luas' => $this->asetModel->selectSum('luas_m2')->get()->getRow()->luas_m2 ?? 0,
+            'total_nilai' => $this->asetModel->selectSum('nilai_aset')->get()->getRow()->nilai_aset ?? 0,
         ];
 
         return view('aset_tanah/index', $data);
-    }
-
-    public function create()
-    {
-        return view('aset_tanah/create');
-    }
-
-    public function store()
-    {
-        $rules = [
-            'no_sertifikat' => 'required',
-            'nama_pemilik'  => 'required',
-            'luas_m2'       => 'required|numeric',
-        ];
-
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        $this->asetModel->save($this->request->getPost());
-        return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil ditambahkan.');
     }
 
     public function exportExcel()
@@ -90,38 +61,32 @@ class AsetTanah extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header
-        $headers = ['ID', 'Nama Objek', 'Kecamatan', 'Desa', 'Luas', 'Status', 'Koordinat', 'WKT'];
-        foreach ($headers as $key => $header) {
-            $sheet->setCellValueByColumnAndRow($key + 1, 1, $header);
-        }
+        $sheet->setCellValue('A1', 'ID');
+        $sheet->setCellValue('B1', 'No Sertifikat');
+        $sheet->setCellValue('C1', 'Nama Pemilik');
+        $sheet->setCellValue('D1', 'Luas (m2)');
+        $sheet->setCellValue('E1', 'Kecamatan');
+        $sheet->setCellValue('F1', 'Desa');
+        $sheet->setCellValue('G1', 'Koordinat');
 
-        // Data
         $rowNum = 2;
         foreach ($data as $row) {
-            $sheet->setCellValueByColumnAndRow(1, $rowNum, $row['id']);
-            $sheet->setCellValueByColumnAndRow(2, $rowNum, $row['nama_objek']);
-            $sheet->setCellValueByColumnAndRow(3, $rowNum, $row['kecamatan']);
-            $sheet->setCellValueByColumnAndRow(4, $rowNum, $row['desa']);
-            $sheet->setCellValueByColumnAndRow(5, $rowNum, $row['luas']);
-            $sheet->setCellValueByColumnAndRow(6, $rowNum, $row['status_sertifikat']);
-            $sheet->setCellValueByColumnAndRow(7, $rowNum, $row['lokasi_koordinat']);
-            $sheet->setCellValueByColumnAndRow(8, $rowNum, $row['wkt']);
+            $sheet->setCellValue('A' . $rowNum, $row['id']);
+            $sheet->setCellValue('B' . $rowNum, $row['no_sertifikat']);
+            $sheet->setCellValue('C' . $rowNum, $row['nama_pemilik']);
+            $sheet->setCellValue('D' . $rowNum, $row['luas_m2']);
+            $sheet->setCellValue('E' . $rowNum, $row['kecamatan']);
+            $sheet->setCellValue('F' . $rowNum, $row['desa_kelurahan']);
+            $sheet->setCellValue('G' . $rowNum, $row['koordinat']);
             $rowNum++;
         }
 
-        // Style header
-        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
-        foreach (range('A', 'H') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+        foreach (range('A', 'G') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
 
         $filename = 'Export_Aset_Tanah_' . date('YmdHis') . '.xlsx';
-
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
@@ -138,13 +103,12 @@ class AsetTanah extends BaseController
         while (($row = fgetcsv($handle)) !== FALSE) {
             if (empty($row[0])) continue;
             $this->asetModel->insert([
-                'nama_objek' => $row[0],
-                'kecamatan' => $row[1],
-                'desa' => $row[2],
-                'luas' => $row[3],
-                'status_sertifikat' => $row[4],
-                'lokasi_koordinat' => $row[5],
-                'wkt' => $row[6] ?? null,
+                'no_sertifikat' => $row[0],
+                'nama_pemilik' => $row[1],
+                'luas_m2' => $row[2],
+                'kecamatan' => $row[3],
+                'desa_kelurahan' => $row[4],
+                'koordinat' => $row[5] ?? null,
             ]);
             $count++;
         }
@@ -154,36 +118,32 @@ class AsetTanah extends BaseController
 
     public function detail($id)
     {
-        $aset = $this->asetModel->find($id);
-        if (!$aset) {
-            return redirect()->to('/aset-tanah')->with('error', 'Data tidak ditemukan.');
-        }
+        $data['aset'] = $this->asetModel->find($id);
+        if (!$data['aset']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        $data['title'] = 'Detail Aset Tanah';
+        return view('aset_tanah/detail', $data);
+    }
 
-        return view('aset_tanah/detail', ['aset' => $aset]);
+    public function create()
+    {
+        return view('aset_tanah/create', ['title' => 'Tambah Aset']);
+    }
+
+    public function store()
+    {
+        $this->asetModel->insert($this->request->getPost());
+        return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
-        $aset = $this->asetModel->find($id);
-        if (!$aset) {
-            return redirect()->to('/aset-tanah')->with('error', 'Data tidak ditemukan.');
-        }
-
-        return view('aset_tanah/edit', ['aset' => $aset]);
+        $data['aset'] = $this->asetModel->find($id);
+        $data['title'] = 'Edit Aset Tanah';
+        return view('aset_tanah/edit', $data);
     }
 
     public function update($id)
     {
-        $rules = [
-            'no_sertifikat' => 'required',
-            'nama_pemilik'  => 'required',
-            'luas_m2'       => 'required|numeric',
-        ];
-
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
         $this->asetModel->update($id, $this->request->getPost());
         return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil diperbarui.');
     }

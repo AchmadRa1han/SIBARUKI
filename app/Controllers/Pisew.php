@@ -17,11 +17,11 @@ class Pisew extends BaseController
 
     public function index()
     {
-        $search = $this->request->getGet('search');
-        $kecamatan = $this->request->getGet('kecamatan');
-        $sortBy = $this->request->getGet('sort_by') ?? 'tahun';
-        $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
+        $search = $this->request->getGet('search') ?? '';
         $perPage = $this->request->getGet('per_page') ?? 10;
+        $selected_kecamatan = $this->request->getGet('kecamatan') ?? '';
+        $sortBy = $this->request->getGet('sort_by') ?? 'id';
+        $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
 
         $query = $this->pisewModel;
 
@@ -32,38 +32,26 @@ class Pisew extends BaseController
                 ->groupEnd();
         }
 
-        if ($kecamatan) {
-            $query = $query->where('kecamatan', $kecamatan);
+        if ($selected_kecamatan) {
+            $query = $query->where('kecamatan', $selected_kecamatan);
         }
 
-        $query = $query->orderBy($sortBy, $sortOrder);
-
         $data = [
-            'pisew' => $query->paginate($perPage, 'group1'),
-            'pisew_all' => (clone $query)->findAll(),
+            'title' => 'Data PISEW',
+            'pisew' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
+            'pisew_all' => $this->pisewModel->findAll(),
             'pager' => $this->pisewModel->pager,
             'perPage' => $perPage,
+            'search' => $search,
+            'kecamatans' => $this->pisewModel->select('kecamatan')->distinct()->findAll(),
+            'selected_kecamatan' => $selected_kecamatan,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
-            'search' => $search,
-            'selected_kecamatan' => $kecamatan,
-            'kecamatans' => $this->pisewModel->select('kecamatan')->distinct()->findAll(),
-            'total_anggaran' => $this->pisewModel->selectSum('anggaran')->get()->getRow()->anggaran,
-            'total_kegiatan' => $this->pisewModel->countAllResults(false)
+            'total_kegiatan' => $this->pisewModel->countAllResults(false),
+            'total_anggaran' => $this->pisewModel->selectSum('anggaran')->get()->getRow()->anggaran ?? 0,
         ];
 
         return view('pisew/index', $data);
-    }
-
-    public function create()
-    {
-        return view('pisew/create');
-    }
-
-    public function store()
-    {
-        $this->pisewModel->save($this->request->getPost());
-        return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil ditambahkan.');
     }
 
     public function exportExcel()
@@ -72,39 +60,34 @@ class Pisew extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header
-        $headers = ['ID', 'Kecamatan', 'Desa', 'Jenis Kegiatan', 'Tahun', 'Pagu', 'Output', 'Koordinat', 'WKT'];
-        foreach ($headers as $key => $header) {
-            $sheet->setCellValueByColumnAndRow($key + 1, 1, $header);
-        }
+        $sheet->setCellValue('A1', 'ID');
+        $sheet->setCellValue('B1', 'Jenis Pekerjaan');
+        $sheet->setCellValue('C1', 'Lokasi Desa');
+        $sheet->setCellValue('D1', 'Kecamatan');
+        $sheet->setCellValue('E1', 'Anggaran');
+        $sheet->setCellValue('F1', 'Tahun');
+        $sheet->setCellValue('G1', 'Pelaksana');
+        $sheet->setCellValue('H1', 'Koordinat');
 
-        // Data
         $rowNum = 2;
         foreach ($data as $row) {
-            $sheet->setCellValueByColumnAndRow(1, $rowNum, $row['id']);
-            $sheet->setCellValueByColumnAndRow(2, $rowNum, $row['kecamatan']);
-            $sheet->setCellValueByColumnAndRow(3, $rowNum, $row['desa']);
-            $sheet->setCellValueByColumnAndRow(4, $rowNum, $row['jenis_kegiatan']);
-            $sheet->setCellValueByColumnAndRow(5, $rowNum, $row['tahun']);
-            $sheet->setCellValueByColumnAndRow(6, $rowNum, $row['pagu']);
-            $sheet->setCellValueByColumnAndRow(7, $rowNum, $row['output']);
-            $sheet->setCellValueByColumnAndRow(8, $rowNum, $row['lokasi_koordinat']);
-            $sheet->setCellValueByColumnAndRow(9, $rowNum, $row['wkt']);
+            $sheet->setCellValue('A' . $rowNum, $row['id']);
+            $sheet->setCellValue('B' . $rowNum, $row['jenis_pekerjaan']);
+            $sheet->setCellValue('C' . $rowNum, $row['lokasi_desa']);
+            $sheet->setCellValue('D' . $rowNum, $row['kecamatan']);
+            $sheet->setCellValue('E' . $rowNum, $row['anggaran']);
+            $sheet->setCellValue('F' . $rowNum, $row['tahun']);
+            $sheet->setCellValue('G' . $rowNum, $row['pelaksana']);
+            $sheet->setCellValue('H' . $rowNum, $row['koordinat']);
             $rowNum++;
         }
 
-        // Style header
-        $sheet->getStyle('A1:I1')->getFont()->setBold(true);
-        foreach (range('A', 'I') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
+        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
+        foreach (range('A', 'H') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
 
         $filename = 'Export_PISEW_' . date('YmdHis') . '.xlsx';
-
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
@@ -121,14 +104,13 @@ class Pisew extends BaseController
         while (($row = fgetcsv($handle)) !== FALSE) {
             if (empty($row[0])) continue;
             $this->pisewModel->insert([
-                'kecamatan' => $row[0],
-                'desa' => $row[1],
-                'jenis_kegiatan' => $row[2],
-                'tahun' => $row[3],
-                'pagu' => $row[4],
-                'output' => $row[5],
-                'lokasi_koordinat' => $row[6],
-                'wkt' => $row[7] ?? null,
+                'jenis_pekerjaan' => $row[0],
+                'lokasi_desa' => $row[1],
+                'kecamatan' => $row[2],
+                'pelaksana' => $row[3],
+                'anggaran' => $row[4],
+                'tahun' => $row[5],
+                'koordinat' => $row[6] ?? null,
             ]);
             $count++;
         }
@@ -139,14 +121,26 @@ class Pisew extends BaseController
     public function detail($id)
     {
         $data['item'] = $this->pisewModel->find($id);
-        if (!$data['item']) return redirect()->to('/pisew');
+        if (!$data['item']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        $data['title'] = 'Detail PISEW';
         return view('pisew/detail', $data);
+    }
+
+    public function create()
+    {
+        return view('pisew/create', ['title' => 'Tambah PISEW']);
+    }
+
+    public function store()
+    {
+        $this->pisewModel->insert($this->request->getPost());
+        return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $data['item'] = $this->pisewModel->find($id);
-        if (!$data['item']) return redirect()->to('/pisew');
+        $data['title'] = 'Edit PISEW';
         return view('pisew/edit', $data);
     }
 

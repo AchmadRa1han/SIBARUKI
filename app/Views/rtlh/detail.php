@@ -7,11 +7,11 @@
 <?php
     function getStatusBadge($status) {
         $status = strtoupper($status ?? '');
-        if (str_contains($status, 'TIDAK LAYAK') || str_contains($status, 'KURANG LAYAK')) {
+        if (str_contains($status, 'TIDAK LAYAK') || str_contains($status, 'RUSAK BERAT') || str_contains($status, 'RUSAK SEDANG')) {
             return 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-100 dark:border-red-900';
-        } elseif (str_contains($status, 'AGAK') || str_contains($status, 'MENUJU')) {
+        } elseif (str_contains($status, 'RUSAK RINGAN') || str_contains($status, 'MENUJU')) {
             return 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900';
-        } elseif (str_contains($status, 'LAYAK')) {
+        } elseif (str_contains($status, 'LAYAK') || str_contains($status, 'BAIK')) {
             return 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900';
         }
         return 'bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-700';
@@ -92,11 +92,11 @@
             </div>
             <div>
                 <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase mb-2 tracking-widest opacity-80">Pendidikan</p>
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-300"><?= $penerima['pendidikan'] ?? '-' ?></p>
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-300"><?= $ref[$penerima['pendidikan_id'] ?? ''] ?? '-' ?></p>
             </div>
             <div>
                 <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase mb-2 tracking-widest opacity-80">Pekerjaan Utama</p>
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-300"><?= $penerima['pekerjaan'] ?? '-' ?></p>
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-300"><?= $ref[$penerima['pekerjaan_id'] ?? ''] ?? '-' ?></p>
             </div>
             <div>
                 <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase mb-2 tracking-widest opacity-80">Penghasilan / Bulan</p>
@@ -218,12 +218,13 @@
                     <?php 
                         $struk = ['Pondasi', 'Kolom', 'Balok', 'Sloof'];
                         foreach($struk as $s):
-                            $val = $kondisi[strtolower($s)] ?? null;
+                            $field = 'st_' . strtolower($s);
+                            $val = $ref[$kondisi[$field] ?? ''] ?? 'N/A';
                     ?>
                     <div class="p-5 border-2 border-blue-900/5 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 rounded-3xl transition-colors duration-300">
                         <p class="text-[9px] font-black text-blue-900 dark:text-blue-500 uppercase tracking-wider mb-4 opacity-70"><?= $s ?></p>
                         <span class="px-4 py-1.5 rounded-xl text-[10px] font-black border uppercase shadow-sm <?= getStatusBadge($val) ?>">
-                            <?= $val ?? 'N/A' ?>
+                            <?= $val ?>
                         </span>
                     </div>
                     <?php endforeach; ?>
@@ -236,9 +237,9 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <?php 
                         $mats = [
-                            ['label' => 'Penutup Atap', 'mat' => $kondisi['atap_mat'], 'st' => $kondisi['atap_st'], 'icon' => 'tent'],
-                            ['label' => 'Dinding Utama', 'mat' => $kondisi['dinding_mat'], 'st' => $kondisi['dinding_st'], 'icon' => 'layers'],
-                            ['label' => 'Lantai Utama', 'mat' => $kondisi['lantai_mat'], 'st' => $kondisi['lantai_st'], 'icon' => 'grid-3x3'],
+                            ['label' => 'Penutup Atap', 'mat' => $ref[$kondisi['mat_atap'] ?? ''] ?? '-', 'st' => $ref[$kondisi['st_atap'] ?? ''] ?? '-', 'icon' => 'tent'],
+                            ['label' => 'Dinding Utama', 'mat' => $ref[$kondisi['mat_dinding'] ?? ''] ?? '-', 'st' => $ref[$kondisi['st_dinding'] ?? ''] ?? '-', 'icon' => 'layers'],
+                            ['label' => 'Lantai Utama', 'mat' => $ref[$kondisi['mat_lantai'] ?? ''] ?? '-', 'st' => $ref[$kondisi['st_lantai'] ?? ''] ?? '-', 'icon' => 'grid-3x3'],
                         ];
                         foreach($mats as $m):
                     ?>
@@ -249,11 +250,11 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-blue-900 dark:text-blue-500 uppercase mb-1 opacity-60">Material</p>
-                            <p class="text-lg font-black text-slate-800 dark:text-slate-200 italic uppercase"><?= $m['mat'] ?: '-' ?></p>
+                            <p class="text-lg font-black text-slate-800 dark:text-slate-200 italic uppercase"><?= $m['mat'] ?></p>
                         </div>
                         <div>
                             <span class="inline-block w-full text-center py-2 rounded-xl text-[10px] font-black border uppercase shadow-sm <?= getStatusBadge($m['st']) ?>">
-                                <?= $m['st'] ?? 'N/A' ?>
+                                <?= $m['st'] ?>
                             </span>
                         </div>
                     </div>
@@ -267,17 +268,17 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <?php 
                         $supp = [
-                            ['lbl' => 'Rangka Atap', 'val' => $kondisi['rangka_atap']],
-                            ['lbl' => 'Plafon', 'val' => $kondisi['plafon']],
-                            ['lbl' => 'Daun Jendela', 'val' => $kondisi['jendela']],
-                            ['lbl' => 'Ventilasi', 'val' => $kondisi['ventilasi']],
+                            ['lbl' => 'Rangka Atap', 'val' => $ref[$kondisi['st_rangka_atap'] ?? ''] ?? 'N/A'],
+                            ['lbl' => 'Plafon', 'val' => $ref[$kondisi['st_plafon'] ?? ''] ?? 'N/A'],
+                            ['lbl' => 'Daun Jendela', 'val' => $ref[$kondisi['st_jendela'] ?? ''] ?? 'N/A'],
+                            ['lbl' => 'Ventilasi', 'val' => $ref[$kondisi['st_ventilasi'] ?? ''] ?? 'N/A'],
                         ];
                         foreach($supp as $sp):
                     ?>
                     <div class="p-5 border-2 border-blue-900/5 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/30 rounded-3xl text-center transition-colors duration-300">
                         <p class="text-[9px] font-black text-blue-900 dark:text-blue-500 uppercase mb-3 tracking-wider opacity-70"><?= $sp['lbl'] ?></p>
                         <span class="px-3 py-1 rounded-lg text-[9px] font-black border uppercase shadow-sm <?= getStatusBadge($sp['val']) ?>">
-                            <?= $sp['val'] ?? 'N/A' ?>
+                            <?= $sp['val'] ?>
                         </span>
                     </div>
                     <?php endforeach; ?>

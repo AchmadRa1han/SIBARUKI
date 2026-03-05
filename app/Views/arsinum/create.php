@@ -8,7 +8,7 @@
         </a>
         <div>
             <h1 class="text-2xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Tambah ARSINUM</h1>
-            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Input Data Proyek Air Siap Minum</p>
+            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none">Input Proyek Air Siap Minum Baru</p>
         </div>
     </div>
 
@@ -34,7 +34,41 @@
 
     <form action="<?= base_url('arsinum/store') ?>" method="post" class="space-y-6">
         <?= csrf_field() ?>
-        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-sm border border-slate-100 dark:border-slate-800">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-800 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="md:col-span-2 space-y-2">
-...
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jenis Pekerjaan / Nama Objek</label>
+                    <input type="text" name="jenis_pekerjaan" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm font-bold text-blue-950 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all uppercase" placeholder="CONTOH: PEMBANGUNAN ARSINUM DESA X">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Volume / Kapasitas</label>
+                    <input type="text" name="volume" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm font-bold text-blue-950 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all" placeholder="CONTOH: 1 UNIT">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Anggaran (Rp)</label>
+                    <input type="number" name="anggaran" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm font-bold text-blue-950 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all" placeholder="0">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Desa / Lokasi</label>
+                    <input type="text" name="desa" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm font-bold text-blue-950 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all uppercase" placeholder="CONTOH: DESA LAPPA">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kecamatan</label>
+                    <input type="text" name="kecamatan" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm font-bold text-blue-950 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all uppercase" placeholder="CONTOH: SINJAI UTARA">
+                </div>
+                <div class="md:col-span-2 space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Koordinat (Lat, Long)</label>
+                    <input type="text" name="koordinat" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm font-bold text-blue-950 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all" placeholder="-5.12345, 120.12345">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3">
+            <button type="submit" class="bg-blue-950 text-white px-10 py-5 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-black transition-all active:scale-95 flex items-center gap-3 group">
+                Simpan Data <i data-lucide="save" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+    </form>
+</div>
+<?= $this->endSection() ?>

@@ -16,40 +16,18 @@
             <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Wilayah Kumuh</h1>
             <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Monitoring dan pemetaan kawasan permukiman kumuh Kabupaten Sinjai.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-            <div id="debug-status" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-blue-100 transition-all">
+        <div class="flex flex-wrap md:flex-nowrap items-center justify-end gap-2 flex-shrink-0">
+            <div id="debug-status" class="bg-blue-50 text-blue-600 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-blue-100 transition-all whitespace-nowrap">
                 Memuat Peta...
             </div>
-            <a href="<?= base_url('wilayah-kumuh/export-excel') ?>" class="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2">
-                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Excel
+            <a href="<?= base_url('wilayah-kumuh/export-excel') ?>" class="bg-emerald-50 text-emerald-600 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="download" class="w-3 h-3"></i> Export Excel
             </a>
             <?php if (has_permission('create_kumuh')): ?>
-            <a href="<?= base_url('wilayah-kumuh/create') ?>" class="bg-blue-950 hover:bg-black text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all flex items-center gap-2 group">
-                <i data-lucide="plus" class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform"></i> Tambah Kawasan
+            <a href="<?= base_url('wilayah-kumuh/create') ?>" class="bg-blue-950 hover:bg-black text-white px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap">
+                <i data-lucide="plus" class="w-3 h-3 group-hover:rotate-90 transition-transform"></i> Tambah Kawasan
             </a>
             <?php endif; ?>
-        </div>
-    </div>
-
-    <!-- Quick Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4 group hover:border-rose-500 transition-all duration-500">
-            <div class="w-12 h-12 bg-rose-50 dark:bg-rose-900/20 rounded-2xl flex items-center justify-center text-rose-600 group-hover:scale-110 transition-transform duration-500">
-                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-            </div>
-            <div>
-                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Kawasan</p>
-                <p class="text-lg font-black text-blue-950 dark:text-white"><?= is_array($kumuh_all) ? count($kumuh_all) : 0 ?> <span class="text-[10px] text-slate-400">Titik</span></p>
-            </div>
-        </div>
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4 group hover:border-blue-500 transition-all duration-500">
-            <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-500">
-                <i data-lucide="map" class="w-6 h-6"></i>
-            </div>
-            <div>
-                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Kecamatan</p>
-                <p class="text-lg font-black text-blue-950 dark:text-white"><?= is_array($kumuh_all) ? count(array_unique(array_column($kumuh_all, 'Kecamatan'))) : 0 ?> <span class="text-[10px] text-slate-400">Wilayah</span></p>
-            </div>
         </div>
     </div>
 

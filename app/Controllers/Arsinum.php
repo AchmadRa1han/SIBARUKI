@@ -17,11 +17,11 @@ class Arsinum extends BaseController
 
     public function index()
     {
-        $search = $this->request->getGet('search');
-        $kecamatan = $this->request->getGet('kecamatan');
-        $sortBy = $this->request->getGet('sort_by') ?? 'tahun';
-        $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
+        $search = $this->request->getGet('search') ?? '';
         $perPage = $this->request->getGet('per_page') ?? 10;
+        $selected_kecamatan = $this->request->getGet('kecamatan') ?? '';
+        $sortBy = $this->request->getGet('sort_by') ?? 'id';
+        $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
 
         $query = $this->arsinumModel;
 
@@ -29,42 +29,29 @@ class Arsinum extends BaseController
             $query = $query->groupStart()
                 ->like('jenis_pekerjaan', $search)
                 ->orLike('desa', $search)
-                ->orLike('pelaksana', $search)
                 ->groupEnd();
         }
 
-        if ($kecamatan) {
-            $query = $query->where('kecamatan', $kecamatan);
+        if ($selected_kecamatan) {
+            $query = $query->where('kecamatan', $selected_kecamatan);
         }
 
-        $query = $query->orderBy($sortBy, $sortOrder);
-
         $data = [
-            'arsinum' => $query->paginate($perPage, 'group1'),
-            'arsinum_all' => (clone $query)->findAll(),
+            'title' => 'Data ARSINUM',
+            'arsinum' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
+            'arsinum_all' => $this->arsinumModel->findAll(),
             'pager' => $this->arsinumModel->pager,
             'perPage' => $perPage,
+            'search' => $search,
+            'kecamatans' => $this->arsinumModel->select('kecamatan')->distinct()->findAll(),
+            'selected_kecamatan' => $selected_kecamatan,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
-            'search' => $search,
-            'selected_kecamatan' => $kecamatan,
-            'kecamatans' => $this->arsinumModel->select('kecamatan')->distinct()->findAll(),
-            'total_anggaran' => $this->arsinumModel->selectSum('anggaran')->get()->getRow()->anggaran,
-            'total_unit' => $this->arsinumModel->countAllResults(false)
+            'total_unit' => $this->arsinumModel->countAllResults(false),
+            'total_anggaran' => $this->arsinumModel->selectSum('anggaran')->get()->getRow()->anggaran ?? 0,
         ];
 
         return view('arsinum/index', $data);
-    }
-
-    public function create()
-    {
-        return view('arsinum/create');
-    }
-
-    public function store()
-    {
-        $this->arsinumModel->save($this->request->getPost());
-        return redirect()->to('/arsinum')->with('success', 'Data ARSINUM berhasil ditambahkan.');
     }
 
     public function exportExcel()
@@ -73,38 +60,38 @@ class Arsinum extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header
-        $headers = ['ID', 'Nama Objek', 'Kecamatan', 'Desa', 'Tahun', 'Status', 'Koordinat', 'WKT'];
-        foreach ($headers as $key => $header) {
-            $sheet->setCellValueByColumnAndRow($key + 1, 1, $header);
-        }
+        $sheet->setCellValue('A1', 'ID');
+        $sheet->setCellValue('B1', 'Jenis Pekerjaan');
+        $sheet->setCellValue('C1', 'Volume');
+        $sheet->setCellValue('D1', 'Desa');
+        $sheet->setCellValue('E1', 'Kecamatan');
+        $sheet->setCellValue('F1', 'Anggaran');
+        $sheet->setCellValue('G1', 'Pelaksana');
+        $sheet->setCellValue('H1', 'Sumber Dana');
+        $sheet->setCellValue('I1', 'Tahun');
+        $sheet->setCellValue('J1', 'Koordinat');
 
-        // Data
         $rowNum = 2;
         foreach ($data as $row) {
-            $sheet->setCellValueByColumnAndRow(1, $rowNum, $row['id']);
-            $sheet->setCellValueByColumnAndRow(2, $rowNum, $row['nama_objek']);
-            $sheet->setCellValueByColumnAndRow(3, $rowNum, $row['kecamatan']);
-            $sheet->setCellValueByColumnAndRow(4, $rowNum, $row['desa']);
-            $sheet->setCellValueByColumnAndRow(5, $rowNum, $row['tahun']);
-            $sheet->setCellValueByColumnAndRow(6, $rowNum, $row['status']);
-            $sheet->setCellValueByColumnAndRow(7, $rowNum, $row['lokasi_koordinat']);
-            $sheet->setCellValueByColumnAndRow(8, $rowNum, $row['wkt']);
+            $sheet->setCellValue('A' . $rowNum, $row['id']);
+            $sheet->setCellValue('B' . $rowNum, $row['jenis_pekerjaan']);
+            $sheet->setCellValue('C' . $rowNum, $row['volume']);
+            $sheet->setCellValue('D' . $rowNum, $row['desa']);
+            $sheet->setCellValue('E' . $rowNum, $row['kecamatan']);
+            $sheet->setCellValue('F' . $rowNum, $row['anggaran']);
+            $sheet->setCellValue('G' . $rowNum, $row['pelaksana']);
+            $sheet->setCellValue('H' . $rowNum, $row['sumber_dana']);
+            $sheet->setCellValue('I' . $rowNum, $row['tahun']);
+            $sheet->setCellValue('J' . $rowNum, $row['koordinat']);
             $rowNum++;
         }
 
-        // Style header
-        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
-        foreach (range('A', 'H') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
+        $sheet->getStyle('A1:J1')->getFont()->setBold(true);
+        foreach (range('A', 'J') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
 
         $filename = 'Export_Arsinum_' . date('YmdHis') . '.xlsx';
-
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
@@ -113,51 +100,98 @@ class Arsinum extends BaseController
     public function importCsv()
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        
         $file = $this->request->getFile('csv_file');
-        if (!$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
-        $handle = fopen($file->getTempName(), 'r');
-        fgetcsv($handle); 
+        if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
+
+        $content = file_get_contents($file->getTempName());
+        
+        // Deteksi Delimiter secara lebih akurat dari keseluruhan isi file
+        $countSemicolon = substr_count($content, ';');
+        $countComma = substr_count($content, ',');
+        $delimiter = ($countSemicolon > $countComma) ? ';' : ',';
+
+        $lines = explode("\n", str_replace("\r", "", $content));
+        
+        // Cari baris data pertama (biasanya baris ke-3 setelah Judul dan Header)
+        // Kita gunakan str_getcsv untuk memproses baris demi baris
         $count = 0;
-        while (($row = fgetcsv($handle)) !== FALSE) {
-            if (empty($row[0])) continue;
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        foreach ($lines as $index => $line) {
+            if (empty(trim($line))) continue;
+            
+            $row = str_getcsv($line, $delimiter);
+            
+            // Lewati jika ini adalah Judul (hanya 1 kolom besar) atau Header (berisi kata 'JENIS')
+            if (count($row) < 5 || stripos($line, 'JENIS PEKERJAAN') !== false) continue;
+
+            // Pastikan ini baris data (biasanya diawali angka NO)
+            if (!is_numeric($row[0])) continue;
+
+            // Bersihkan format anggaran (544.233.000 -> 544233000)
+            $anggaranRaw = $row[7] ?? '0';
+            $anggaran = (float)preg_replace('/[^0-9]/', '', $anggaranRaw);
+
             $this->arsinumModel->insert([
-                'nama_objek' => $row[0],
-                'kecamatan' => $row[1],
-                'desa' => $row[2],
-                'tahun' => $row[3],
-                'status' => $row[4],
-                'lokasi_koordinat' => $row[5],
-                'wkt' => $row[6] ?? null,
+                'jenis_pekerjaan' => $row[1] ?? '-',
+                'volume'          => $row[3] ?? '-',
+                'kecamatan'       => $row[4] ?? '-',
+                'desa'            => $row[5] ?? '-',
+                'pelaksana'       => $row[6] ?? '-',
+                'anggaran'        => $anggaran,
+                'sumber_dana'     => $row[8] ?? '-',
+                'koordinat'       => $row[9] ?? null,
+                'tahun'           => isset($row[10]) ? trim($row[10], " \t\n\r\0\x0B;") : date('Y')
             ]);
             $count++;
         }
-        fclose($handle);
+
+        $db->transComplete();
+
+        if ($count == 0) {
+            return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
+        }
+
         return redirect()->to('/arsinum')->with('success', "$count data berhasil diimpor.");
     }
 
     public function detail($id)
     {
         $data['item'] = $this->arsinumModel->find($id);
-        if (!$data['item']) return redirect()->to('/arsinum');
+        if (!$data['item']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        $data['title'] = 'Detail Arsinum';
         return view('arsinum/detail', $data);
+    }
+
+    public function create()
+    {
+        return view('arsinum/create', ['title' => 'Tambah Arsinum']);
+    }
+
+    public function store()
+    {
+        $this->arsinumModel->insert($this->request->getPost());
+        return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $data['item'] = $this->arsinumModel->find($id);
-        if (!$data['item']) return redirect()->to('/arsinum');
+        $data['title'] = 'Edit Arsinum';
         return view('arsinum/edit', $data);
     }
 
     public function update($id)
     {
         $this->arsinumModel->update($id, $this->request->getPost());
-        return redirect()->to('/arsinum')->with('success', 'Data ARSINUM berhasil diperbarui.');
+        return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         $this->arsinumModel->delete($id);
-        return redirect()->to('/arsinum')->with('success', 'Data ARSINUM berhasil dihapus.');
+        return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil dihapus.');
     }
 }
