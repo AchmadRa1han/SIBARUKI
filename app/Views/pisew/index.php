@@ -49,14 +49,6 @@
                     Database Spasial PISEW
                 </div>
             </div>
-            <?php if (empty(array_filter(array_column($pisew_all, 'koordinat')))): ?>
-            <div class="absolute inset-0 z-[1001] bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center pointer-events-none">
-                <div class="bg-white/90 dark:bg-slate-900/90 p-6 rounded-[2rem] shadow-2xl border border-white/20 text-center max-w-xs">
-                    <i data-lucide="map-off" class="w-10 h-10 text-slate-400 mx-auto mb-3"></i>
-                    <p class="text-[10px] font-black text-blue-950 dark:text-white uppercase tracking-widest">Koordinat Belum Tersedia</p>
-                </div>
-            </div>
-            <?php endif; ?>
         </div>
     </div>
 
@@ -88,7 +80,7 @@
                     <?php endforeach; ?>
                 </select>
                 <div class="relative w-full md:w-56">
-                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari desa/pekerjaan..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500 transition-all">
+                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari desa/pekerjaan..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500 transition-all uppercase">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
                 </div>
             </form>
@@ -128,7 +120,7 @@
                 </tbody>
             </table>
         </div>
-        <?php if (isset($pager)): ?><div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center"><?= $pager->links('group1', 'tailwind_full') ?></div><?php endif; ?>
+        <?php if (isset($pager)): ?><div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800"><?= $pager->links('group1', 'tailwind_full') ?></div><?php endif; ?>
     </div>
 </div>
 
@@ -136,6 +128,8 @@
 
 <script>
     let map;
+    let rot = 0;
+
     function initMap() {
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
         try {
@@ -146,31 +140,51 @@
             map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 11);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
+            // --- STANDARDIZED LAYER TOGGLE ---
             const LayerToggle = L.Control.extend({
                 onAdd: function(map) {
-                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 p-3 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 text-blue-600 hover:bg-blue-50 transition-all duration-500 active:scale-90 mt-2 flex items-center justify-center');
-                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>`;
+                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                    btn.style.width = '44px'; btn.style.height = '44px'; btn.style.cursor = 'pointer';
+                    
+                    const svgColor = isDark ? '#60a5fa' : '#2563eb';
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
                     
                     L.DomEvent.disableClickPropagation(btn);
                     L.DomEvent.on(btn, 'click', function(e) {
+                        rot += 360;
                         const svg = btn.querySelector('svg');
-                        svg.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-                        svg.style.transform = 'rotate(360deg)';
+                        svg.style.transform = `rotate(${rot}deg)`;
                         setTimeout(() => {
                             if (map.hasLayer(standard)) {
                                 map.removeLayer(standard); map.addLayer(satellite);
-                                btn.classList.add('bg-blue-600', 'text-white'); btn.classList.remove('text-blue-600');
+                                btn.style.backgroundColor = '#2563eb'; svg.setAttribute('stroke', '#ffffff');
                             } else {
                                 map.removeLayer(satellite); map.addLayer(standard);
-                                btn.classList.remove('bg-blue-600', 'text-white'); btn.classList.add('text-blue-600');
+                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; svg.setAttribute('stroke', svgColor);
                             }
-                            svg.style.transition = 'none'; svg.style.transform = 'rotate(0deg)';
-                        }, 600);
+                        }, 200);
                     });
                     return btn;
                 }
             });
             map.addControl(new LayerToggle({ position: 'topright' }));
+
+            const clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
+            const pisewData = <?= json_encode($pisew_all ?? []) ?>;
+            pisewData.forEach(item => {
+                if (item.koordinat) {
+                    const coords = item.koordinat.split(',').map(c => parseFloat(c.trim()));
+                    if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                        const marker = L.circleMarker(coords, { radius: 8, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
+                        marker.bindPopup(`
+                            <div class="bg-blue-950 text-white p-4 rounded-t-xl"><p class="text-[8px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Kegiatan PISEW</p><h5 class="text-xs font-black uppercase leading-tight">${item.jenis_pekerjaan}</h5></div>
+                            <div class="p-4 bg-white dark:bg-slate-900 space-y-3 rounded-b-xl"><p class="text-[10px] font-bold text-slate-700">📍 ${item.lokasi_desa}</p><a href="<?= base_url('pisew/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all">Detail</a></div>
+                        `);
+                        clusterGroup.addLayer(marker);
+                    }
+                }
+            });
+            map.addLayer(clusterGroup);
             if (typeof lucide !== 'undefined') lucide.createIcons();
         } catch(err) {}
     }
@@ -219,6 +233,5 @@
     .leaflet-popup-content-wrapper { border-radius: 1.5rem; padding: 0; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); border: none; }
     .leaflet-popup-content { margin: 0; width: 240px !important; }
     .leaflet-container { font-family: inherit; }
-    #map i { transition: transform 0.3s ease; }
 </style>
 <?= $this->endSection() ?>

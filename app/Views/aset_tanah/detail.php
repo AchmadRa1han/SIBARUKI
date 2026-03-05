@@ -54,7 +54,25 @@
                     </div>
                     <div class="space-y-1">
                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tanggal Terbit</p>
-                        <p class="text-sm font-bold text-slate-800 dark:text-slate-100"><?= $aset['tgl_terbit'] ? date('d F Y', strtotime($aset['tgl_terbit'])) : '-' ?></p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-slate-100">
+                            <?php 
+                                if (!empty($aset['tgl_terbit']) && $aset['tgl_terbit'] !== '0000-00-00') {
+                                    $months = [
+                                        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
+                                        '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus',
+                                        '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+                                    ];
+                                    $d = explode('-', $aset['tgl_terbit']);
+                                    if (count($d) === 3) {
+                                        echo $d[2] . ' ' . ($months[$d[1]] ?? $d[1]) . ' ' . $d[0];
+                                    } else {
+                                        echo $aset['tgl_terbit'];
+                                    }
+                                } else {
+                                    echo '<span class="text-slate-300">Data Tidak Tersedia</span>';
+                                }
+                            ?>
+                        </p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nomor Hak</p>

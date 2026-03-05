@@ -80,7 +80,7 @@
                     <?php endforeach; ?>
                 </select>
                 <div class="relative w-full md:w-56">
-                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari pekerjaan..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500">
+                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari pekerjaan..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500 transition-all uppercase">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
                 </div>
             </form>
@@ -109,7 +109,7 @@
                                 <?php if($item['koordinat']): ?>
                                 <button onclick="focusMap(<?= $item['koordinat'] ?>)" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
-                                <a href="<?= base_url('arsinum/detail/'.$item['id']) ?>" class="p-2 bg-blue-950 text-white rounded-lg hover:bg-black transition-all active:scale-95" title="Detail"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
+                                <a href="<?= base_url('arsinum/detail/'.$item['id']) ?>" class="p-2 bg-blue-950 text-white rounded-lg shadow-md hover:bg-black transition-all active:scale-95" title="Detail"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
                                 <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                             </div>
                         </td>
@@ -127,7 +127,7 @@
 <script>
     let map;
     let clusterGroup;
-    let currentRotation = 0;
+    let rot = 0;
 
     function initMap() {
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
@@ -140,28 +140,29 @@
             map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 11);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            // --- Custom Layer Toggle (Robust Inline SVG) ---
+            // --- STANDARDIZED LAYER TOGGLE ---
             const LayerToggle = L.Control.extend({
                 onAdd: function(map) {
-                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 p-3 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 text-blue-600 hover:bg-blue-50 transition-all duration-500 active:scale-90 mt-2 flex items-center justify-center');
-                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                    btn.style.width = '44px'; btn.style.height = '44px'; btn.style.cursor = 'pointer';
+                    
+                    const svgColor = isDark ? '#60a5fa' : '#2563eb';
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
                     
                     L.DomEvent.disableClickPropagation(btn);
                     L.DomEvent.on(btn, 'click', function(e) {
-                        currentRotation += 360;
+                        rot += 360;
                         const svg = btn.querySelector('svg');
-                        svg.style.transition = 'transform 0.8s cubic-bezier(0.65, 0, 0.35, 1)';
-                        svg.style.transform = `rotate(${currentRotation}deg)`;
-                        
+                        svg.style.transform = `rotate(${rot}deg)`;
                         setTimeout(() => {
                             if (map.hasLayer(standard)) {
                                 map.removeLayer(standard); map.addLayer(satellite);
-                                btn.classList.add('bg-blue-600', 'text-white'); btn.classList.remove('text-blue-600');
+                                btn.style.backgroundColor = '#2563eb'; svg.setAttribute('stroke', '#ffffff');
                             } else {
                                 map.removeLayer(satellite); map.addLayer(standard);
-                                btn.classList.remove('bg-blue-600', 'text-white'); btn.classList.add('text-blue-600');
+                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; svg.setAttribute('stroke', svgColor);
                             }
-                        }, 250);
+                        }, 200);
                     });
                     return btn;
                 }
@@ -169,16 +170,18 @@
             map.addControl(new LayerToggle({ position: 'topright' }));
 
             clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
-            const data = <?= json_encode($arsinum_all ?? []) ?>;
-            data.forEach(item => {
+            const arsinumData = <?= json_encode($arsinum_all ?? []) ?>;
+            arsinumData.forEach(item => {
                 if (item.koordinat) {
                     const coords = item.koordinat.split(',').map(c => parseFloat(c.trim()));
-                    const marker = L.circleMarker(coords, { radius: 8, fillColor: "#2563eb", color: "#fff", weight: 2, fillOpacity: 0.8 });
-                    marker.bindPopup(`
-                        <div class="bg-blue-950 text-white p-4 rounded-t-xl"><p class="text-[8px] font-black uppercase tracking-widest text-blue-400 mb-1">ARSINUM</p><h5 class="text-xs font-black uppercase leading-tight">${item.jenis_pekerjaan}</h5></div>
-                        <div class="p-4 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[10px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('arsinum/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all">Detail</a></div>
-                    `);
-                    clusterGroup.addLayer(marker);
+                    if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                        const marker = L.circleMarker(coords, { radius: 8, fillColor: "#2563eb", color: "#fff", weight: 2, fillOpacity: 0.8 });
+                        marker.bindPopup(`
+                            <div class="bg-blue-950 text-white p-4 rounded-t-xl"><p class="text-[8px] font-black uppercase tracking-widest text-blue-400 mb-1">ARSINUM</p><h5 class="text-xs font-black uppercase leading-tight">${item.jenis_pekerjaan}</h5></div>
+                            <div class="p-4 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[10px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('arsinum/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all">Detail</a></div>
+                        `);
+                        clusterGroup.addLayer(marker);
+                    }
                 }
             });
             map.addLayer(clusterGroup);
@@ -231,6 +234,5 @@
     .leaflet-popup-content { margin: 0; width: 240px !important; }
     .leaflet-container { font-family: inherit; }
     .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; }
-    #map svg { transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1); }
 </style>
 <?= $this->endSection() ?>
