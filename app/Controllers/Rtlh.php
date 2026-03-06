@@ -60,7 +60,7 @@ class Rtlh extends BaseController
     {
         $db = \Config\Database::connect();
         $builder = $db->table('rtlh_rumah');
-        $builder->select('rtlh_rumah.*, rtlh_penerima.nama_kepala_keluarga as pemilik, rtlh_penerima.no_kk, rtlh_kondisi_rumah.st_atap, rtlh_kondisi_rumah.st_lantai, rtlh_kondisi_rumah.st_dinding');
+        $builder->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt_text, rtlh_penerima.nama_kepala_keluarga, rtlh_penerima.no_kk, rtlh_kondisi_rumah.st_atap, rtlh_kondisi_rumah.st_lantai, rtlh_kondisi_rumah.st_dinding');
         $builder->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left');
         $builder->join('rtlh_kondisi_rumah', 'rtlh_kondisi_rumah.id_survei = rtlh_rumah.id_survei', 'left');
         $data = $builder->get()->getResultArray();
@@ -68,7 +68,7 @@ class Rtlh extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $headers = ['ID', 'Pemilik', 'NIK', 'Alamat', 'Desa', 'Kecamatan', 'Atap', 'Lantai', 'Dinding', 'WKT'];
+        $headers = ['ID', 'Pemilik', 'NIK', 'Alamat', 'Desa', 'Atap', 'Lantai', 'Dinding', 'WKT'];
         foreach ($headers as $key => $header) {
             $sheet->setCellValueByColumnAndRow($key + 1, 1, $header);
         }
@@ -76,22 +76,21 @@ class Rtlh extends BaseController
         $rowNum = 2;
         foreach ($data as $row) {
             $sheet->setCellValue('A' . $rowNum, $row['id_survei']);
-            $sheet->setCellValue('B' . $rowNum, $row['pemilik'] ?? '-');
+            $sheet->setCellValue('B' . $rowNum, $row['nama_kepala_keluarga'] ?? '-');
             $sheet->setCellValue('C' . $rowNum, $row['nik_pemilik']);
             $sheet->setCellValue('D' . $rowNum, $row['alamat_detail']);
             $sheet->setCellValue('E' . $rowNum, $row['desa']);
-            $sheet->setCellValue('F' . $rowNum, $row['desa_id']); 
-            $sheet->setCellValue('G' . $rowNum, $row['st_atap'] ?? '-');
-            $sheet->setCellValue('H' . $rowNum, $row['st_lantai'] ?? '-');
-            $sheet->setCellValue('I' . $rowNum, $row['st_dinding'] ?? '-');
-            $sheet->setCellValue('J' . $rowNum, $row['lokasi_koordinat']);
+            $sheet->setCellValue('F' . $rowNum, $row['st_atap'] ?? '-');
+            $sheet->setCellValue('G' . $rowNum, $row['st_lantai'] ?? '-');
+            $sheet->setCellValue('H' . $rowNum, $row['st_dinding'] ?? '-');
+            $sheet->setCellValue('I' . $rowNum, $row['wkt_text'] ?? '-');
             $rowNum++;
         }
 
-        $sheet->getStyle('A1:J1')->getFont()->setBold(true);
-        foreach (range('A', 'J') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
+        $sheet->getStyle('A1:I1')->getFont()->setBold(true);
+        foreach (range('A', 'I') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
 
-        $filename = 'Export_RTLH_Lengkap_' . date('YmdHis') . '.xlsx';
+        $filename = 'Export_RTLH_' . date('YmdHis') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         $writer = new Xlsx($spreadsheet);
@@ -106,7 +105,6 @@ class Rtlh extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
-        // 1. Map Nama Field ke Alias Header CSV
         $aliasMap = [
             'nik'                  => ['*nik', 'nik'],
             'nama_kepala_keluarga' => ['*nama kepala rumah tangga', 'nama kepala rumah tangga', 'nama'],
@@ -167,7 +165,6 @@ class Rtlh extends BaseController
         $headerPos = [];
         $foundHeader = false;
 
-        // 2. Deteksi Header & Posisi Kolom
         while (($line = fgetcsv($handle, 2000, ";")) !== FALSE) {
             $lineClean = array_map(function($v) { return strtolower(trim($v)); }, $line);
             if (in_array('*nik', $lineClean) || in_array('nik', $lineClean)) {
@@ -176,7 +173,6 @@ class Rtlh extends BaseController
                     $matched = false;
                     foreach ($aliasMap as $field => $aliases) {
                         if ($colName == $field || in_array($colName, $aliases)) {
-                            // Khusus untuk dua kolom "*sumber penerangan"
                             if ($colName == '*sumber penerangan') {
                                 if ($countPenerangan == 0) {
                                     $headerPos['sumber_penerangan'] = $index;
@@ -204,7 +200,6 @@ class Rtlh extends BaseController
         $db->transStart();
         $count = 0;
 
-        // 3. Iterasi Data Baris demi Baris
         while (($row = fgetcsv($handle, 2000, ";")) !== FALSE) {
             $nik = trim($row[$headerPos['nik']] ?? '');
             if (empty($nik)) continue;
@@ -237,7 +232,6 @@ class Rtlh extends BaseController
                 }
             }
 
-            // A. rtlh_penerima
             $dataPenerima = [
                 'nik' => $nik,
                 'nama_kepala_keluarga' => $getVal('nama_kepala_keluarga'),
@@ -258,7 +252,6 @@ class Rtlh extends BaseController
                 $this->penerimaModel->insert($dataPenerima);
             }
 
-            // B. rtlh_rumah
             $desaName = strtoupper(trim($getVal('desa') ?? ''));
             $this->rumahModel->set([
                 'nik_pemilik'   => $nik,
@@ -294,7 +287,6 @@ class Rtlh extends BaseController
                 $surveiId = $this->rumahModel->getInsertID();
             }
 
-            // C. rtlh_kondisi_rumah
             $dataKondisi = [
                 'id_survei'  => $surveiId,
                 'st_pondasi' => $findId('KONDISI', $getVal('st_pondasi')),
