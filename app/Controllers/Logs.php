@@ -19,6 +19,7 @@ class Logs extends BaseController
         $filterAction = $this->request->getGet('action');
         $filterTable = $this->request->getGet('table');
         $filterDate = $this->request->getGet('date');
+        $filterSeverity = $this->request->getGet('severity');
 
         // 1. INFO SISTEM & PERFORMA
         $dbStatus = $db->connect() ? 'Stabil' : 'Error';
@@ -89,6 +90,14 @@ class Logs extends BaseController
         $massActions = $db->query("SELECT user, COUNT(*) as total FROM sys_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR) GROUP BY user, MINUTE(created_at) HAVING total > 10")->getResultArray();
         foreach($massActions as $ma) { $anomalies[] = ['type' => 'Aktivitas Masal', 'user' => $ma['user'], 'desc' => "Melakukan {$ma['total']} aksi dalam 1 menit"]; }
 
+        // 8.1 AUDIT SNAPSHOT (CRITICAL ACTIONS 24H)
+        $snapshot = [
+            'deleted' => $db->table('sys_logs')->where('action', 'Hapus')->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
+            'exported' => $db->table('sys_logs')->where('action', 'Ekspor PDF')->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
+            'created' => $db->table('sys_logs')->where('action', 'Tambah')->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
+            'critical' => $db->table('sys_logs')->whereIn('severity', ['warning', 'critical'])->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
+        ];
+
         // 9. LOGS QUERY WITH USER INFO
         $logModel->select('sys_logs.*, users.instansi, roles.role_name')
                  ->join('users', 'users.username = sys_logs.user', 'left')
@@ -97,6 +106,7 @@ class Logs extends BaseController
         if ($filterUser) $logModel->where('sys_logs.user', $filterUser);
         if ($filterAction) $logModel->where('sys_logs.action', $filterAction);
         if ($filterTable) $logModel->where('sys_logs.table_name', $filterTable);
+        if ($filterSeverity) $logModel->where('sys_logs.severity', $filterSeverity);
         if ($filterDate) $logModel->like('sys_logs.created_at', $filterDate);
 
         // Filter Dropdown Options
@@ -109,6 +119,7 @@ class Logs extends BaseController
             'pager'   => $logModel->pager,
             'perPage' => $perPage,
             'total'   => $db->table('sys_logs')->countAllResults(),
+            'snapshot' => $snapshot,
             'system'  => [
                 'dbStatus' => $dbStatus, 'serverLoad' => $serverLoad, 'phpVersion' => $phpVersion, 'os' => PHP_OS, 
                 'responseTime' => $responseTime, 'disk' => ['total' => $totalDisk, 'used' => $usedDisk, 'percent' => $diskPercent, 'path' => FCPATH]
@@ -118,7 +129,7 @@ class Logs extends BaseController
                 'trend' => ['hourly' => ['data' => $trendHourlyData, 'labels' => $trendHourlyLabels], 'daily' => ['data' => $trendDailyData, 'labels' => $trendDailyLabels], 'monthly' => ['data' => $trendMonthlyData, 'labels' => $trendMonthlyLabels]]
             ],
             'options' => ['users' => array_column($optUsers, 'user'), 'tables' => array_column($optTables, 'table_name')],
-            'filters' => ['user' => $filterUser, 'action' => $filterAction, 'table' => $filterTable, 'date' => $filterDate]
+            'filters' => ['user' => $filterUser, 'action' => $filterAction, 'table' => $filterTable, 'date' => $filterDate, 'severity' => $filterSeverity]
         ];
 
         return view('logs/index', $data);

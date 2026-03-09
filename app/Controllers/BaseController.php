@@ -39,22 +39,32 @@ abstract class BaseController extends Controller
         parent::initController($request, $response, $logger);
     }
 
-    protected function logActivity($action, $table, $description, $details = null)
+    protected function logActivity($action, $table, $description, $details = null, $severity = null)
     {
         $db = \Config\Database::connect();
         $agent = $this->request->getUserAgent();
+        $ip = $this->request->getIPAddress();
         
         $browser = $agent->getBrowser() . ' ' . $agent->getVersion();
         $platform = $agent->getPlatform();
         $userAgentString = "{$browser} on {$platform}";
 
+        // Auto-determine severity if not provided
+        if (!$severity) {
+            $severity = 'info';
+            if (in_array($action, ['Hapus', 'Login Gagal', 'Reset Password'])) $severity = 'warning';
+            if ($action === 'Housekeeping' || str_contains(strtolower($description), 'force')) $severity = 'critical';
+        }
+
         $db->table('sys_logs')->insert([
             'user'        => session()->get('username') ?? 'System',
             'action'      => $action,
+            'severity'    => $severity,
             'table_name'  => $table,
             'description' => $description,
             'details'     => $details,
             'user_agent'  => $userAgentString,
+            'ip_address'  => $ip,
             'created_at'  => date('Y-m-d H:i:s'),
         ]);
     }
