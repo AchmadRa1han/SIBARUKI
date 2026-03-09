@@ -10,14 +10,18 @@
 
 ## Standar UI/UX ("Mewah" Style)
 - **Tema Warna:** Biru Sangat Gelap (`blue-950`).
+- **Layout Utama (Dashboard):**
+  - **Tactical Command Center:** Fokus pada visualisasi data terpadu (Integrated Data Ecosystem) dari 7 tabel master (RTLH, Kumuh, Formal, PSU, PISEW, Aset, Arsinum).
+  - **Unified Metrics Grid:** Kartu statistik menggunakan hover scaling dan ikon spesifik kategori.
 - **Layout Utama (Data Spasial):** 
-  - **Integrated Map & Table:** Peta Interaktif berada di bagian atas, diikuti oleh Tabel Data di bagian bawah dalam satu halaman.
-  - **Scroll Preservation:** Wajib menggunakan `localStorage` untuk menyimpan posisi scroll elemen `#main-content` saat auto-refresh atau pindah halaman pagination.
-  - **Dynamic Sorting:** Header tabel harus mendukung pengurutan Ascending/Descending via klik judul kolom tanpa menghilangkan state filter lain.
+  - **Integrated Map & Table:** Peta Interaktif berada di bagian atas, diikuti oleh Tabel Data di bawahnya.
+...
 - **Peta & Geospasial:** 
+  - **Village-Grain Mapping:** Menggunakan poligon tingkat desa (`kode_desa`) untuk membentuk peta kabupaten utuh guna menghindari data kecamatan yang terpotong.
+  - **WKT Healing:** JavaScript wajib memiliki logika auto-repair untuk WKT yang terpotong (truncated) pada batas 32KB.
+  - **UTM Support:** Penanganan koordinat UTM Zone 51S wajib dikonversi ke Lat/Lng di sisi client untuk dataset tertentu (misal: PSU).
   - **Marker Clustering:** Wajib menggunakan `Leaflet.markercluster` untuk data titik yang banyak.
-  - **Satellite Toggle:** Peta harus memiliki kontrol untuk berpindah antara layer standard (CartoDB) dan Satellite (Esri).
-  - **Focus Map:** Tombol aksi pada tabel wajib memiliki fungsi `focusMap` yang melakukan auto-zoom ke objek dan auto-scroll ke kontainer peta.
+  - **Satellite Toggle:** Kontrol perpindahan layer CartoDB (Standard) dan Esri (Satellite) dengan animasi rotasi.
 - **Sidebar & Navigasi:** 
   - **Scroll Memory:** Posisi scroll sidebar tersimpan via `localStorage`.
   - **Auto-Open:** Dropdown otomatis terbuka berdasarkan rute URL aktif.
