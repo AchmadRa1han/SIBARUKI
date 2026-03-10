@@ -10,31 +10,22 @@
 
 ---
 
-## 🎯 Tujuan Sistem
-- **Pusat Data Terpadu:** Menyediakan satu sumber data valid untuk informasi perumahan, kawasan permukiman, dan pertanahan di Kabupaten Sinjai.
-- **Monitoring & Evaluasi:** Memfasilitasi pelaporan dan pemantauan Rumah Tidak Layak Huni (RTLH), backlog perumahan, serta program strategis dinas lainnya.
-- **Akuntabilitas:** Meningkatkan transparansi melalui visualisasi data berbasis lokasi (GIS) dan audit trail aktivitas pengguna.
+## ✨ Fitur Unggulan Terbaru
 
----
+### 📊 Monitoring RTLH & RLH
+- **Village Recap:** Rekapitulasi data RTLH otomatis per desa/kelurahan untuk memudahkan alokasi bantuan.
+- **Auto-Archive RLH:** Data RTLH yang telah tuntas dibantu otomatis pindah ke daftar RLH (Rumah Layak Huni).
+- **Transformation History:** Fitur "Before & After" yang menyimpan potret data teknis rumah sebelum dan sesudah menerima bantuan untuk keperluan audit.
 
-## ✨ Fitur Unggulan
+### 🗺️ GIS Interaktif (Click-to-Map)
+- **Point-to-Pin:** Petugas dapat menentukan lokasi rumah hanya dengan mengklik peta, menggantikan input koordinat manual yang rumit.
+- **Polygon Drawing:** Fitur menggambar area kumuh secara interaktif dengan kalkulasi luas otomatis (Hektar).
+- **GPS Integration:** Mendukung pengambilan titik lokasi langsung via sensor GPS perangkat.
 
-### 📊 Single Data Portal & Monitoring
-- **Dashboard Analisis:** Pemantauan statistik RTLH dan Wilayah Kumuh secara real-time dengan indikator kesehatan sistem (Database, Server Load, & Latensi Sinyal).
-- **Audit Trail (Log Aktivitas):** Pencatatan detail setiap perubahan data secara spesifik (siapa, kapan, dan detail kolom apa yang diubah).
-
-### 🛡️ Manajemen Pengguna & Keamanan (RBAC)
-- **Role-Based Access Control:** Diferensiasi hak akses yang ketat antara Admin Pusat dan Petugas Lapangan.
-- **Smart Assignment:** Fitur penugasan wilayah kerja yang memungkinkan satu petugas mengelola satu atau banyak desa menggunakan pencarian *Tom Select* yang intuitif.
-- **Data Isolation:** Isolasi data otomatis yang memastikan petugas hanya dapat melihat dan mengelola data di wilayah desa penugasannya.
-
-### ⚡ UI/UX "Mewah" Experience
-- **AJAX Live Search:** Pencarian data dinamis tanpa *refresh* halaman menggunakan Fetch API untuk efisiensi kerja tinggi.
-- **Glassmorphism Loader:** Transisi halaman yang halus dengan efek blur modern dan dukungan *Back-Forward Cache*.
-- **Persistent Navigation:** Sidebar cerdas yang mengingat status menu terakhir pengguna melalui *LocalStorage*.
-
-### 🗺️ GIS & Peta Digital
-- **Spatial Data Integration:** Mendukung penyimpanan koordinat format *Well-Known Text* (WKT) untuk pemetaan titik lokasi RTLH dan zonasi wilayah kumuh.
+### 🛡️ Keamanan & User Experience (UX)
+- **Floating Sidebar:** Navigasi modern dengan tombol toggle yang menonjol dan memori status otomatis.
+- **Mobile First:** Sidebar mode HP dengan efek glassmorphism dan dukungan gestur **Swipe-to-Close**.
+- **Audit Trail:** Pencatatan setiap detil perubahan data teknis (Old Value vs New Value).
 
 ---
 
@@ -42,11 +33,11 @@
 
 | Layer | Komponen |
 | --- | --- |
-| **Core Framework** | CodeIgniter 4 (Modern PHP Framework) |
-| **Styling Engine** | Tailwind CSS (Utility-First Framework) |
-| **Database** | MySQL (Relational Management) |
-| **Interactive JS** | Fetch API, Tom Select, Lucide Icons |
-| **Mapping Engine** | Leaflet.js (GIS Visualization) |
+| **Core Framework** | CodeIgniter 4.6 (Modern PHP) |
+| **Styling Engine** | Tailwind CSS v3 |
+| **Database** | MySQL with Spatial Support (WKT) |
+| **Interactive JS** | Leaflet.js, Leaflet.draw, Lucide Icons |
+| **Caching** | LocalStorage for UI States |
 
 ---
 

@@ -11,45 +11,42 @@
 ## Standar UI/UX ("Mewah" Style)
 - **Tema Warna:** Biru Sangat Gelap (`blue-950`).
 - **Layout Utama (Dashboard):**
-  - **Tactical Command Center:** Fokus pada visualisasi data terpadu (Integrated Data Ecosystem) dari 7 tabel master (RTLH, Kumuh, Formal, PSU, PISEW, Aset, Arsinum).
-  - **Unified Metrics Grid:** Kartu statistik menggunakan hover scaling dan ikon spesifik kategori.
+  - **Tactical Command Center:** Fokus pada visualisasi data terpadu dari 7 tabel master.
+  - **Clickable Metrics:** Kartu statistik di dashboard berfungsi sebagai navigasi langsung ke tabel data terkait.
 - **Layout Utama (Data Spasial):** 
   - **Integrated Map & Table:** Peta Interaktif berada di bagian atas, diikuti oleh Tabel Data di bawahnya.
-...
-- **Peta & Geospasial:** 
-  - **Village-Grain Mapping:** Menggunakan poligon tingkat desa (`kode_desa`) untuk membentuk peta kabupaten utuh guna menghindari data kecamatan yang terpotong.
-  - **WKT Healing:** JavaScript wajib memiliki logika auto-repair untuk WKT yang terpotong (truncated) pada batas 32KB.
-  - **UTM Support:** Penanganan koordinat UTM Zone 51S wajib dikonversi ke Lat/Lng di sisi client untuk dataset tertentu (misal: PSU).
-  - **Marker Clustering:** Wajib menggunakan `Leaflet.markercluster` untuk data titik yang banyak.
-  - **Satellite Toggle:** Kontrol perpindahan layer CartoDB (Standard) dan Esri (Satellite) dengan animasi rotasi.
 - **Sidebar & Navigasi:** 
-  - **Scroll Memory:** Posisi scroll sidebar tersimpan via `localStorage`.
-  - **Auto-Open:** Dropdown otomatis terbuka berdasarkan rute URL aktif.
-  - **Hub Pengaturan:** Menu manajemen dipusatkan dalam halaman `/settings`.
+  - **Floating Toggle:** Tombol buka/tutup sidebar yang menonjol di tengah (`h-52`) untuk aksesibilitas maksimal.
+  - **Scroll & State Memory:** Posisi scroll dan status (collapsed/expanded) tersimpan via `localStorage`.
+  - **Mobile Responsive:** Sidebar mode HP menggunakan efek **Glassmorphism**, dukungan **Swipe-to-Close**, dan overlay backdrop.
 - **Kartu Informasi:** Sudut sangat bulat (`rounded-[2.5rem]`), border tipis, dan bayangan lembut (`shadow-sm`).
 - **Dark Mode:** Didukung penuh (`dark:`) dengan persistensi tema.
 
 ## Peta & Geospasial
-- **Engine:** Leaflet.js (CDN JSDelivr).
-- **WKT Parser:** Menggunakan logika parser mandiri (Zero-dependency) di sisi JavaScript untuk stabilitas tinggi.
+- **Engine:** Leaflet.js & Leaflet.draw.
+- **Interactive Picking:** 
+  - **Click-to-Pin:** Input koordinat titik (RTLH) dilakukan dengan mengklik langsung pada peta atau menggunakan GPS.
+  - **Polygon Drawing:** Input wilayah (Kumuh) menggunakan toolbar gambar interaktif dengan kalkulasi luas area otomatis.
 - **Visualisasi:** 
-  - Poligon otomatis berubah warna berdasarkan skor (Merah: Berat, Oranye: Sedang, Kuning: Ringan).
-  - Dilengkapi Legenda melayang (*Floating Legend*) dan popup detail interaktif.
+  - Poligon otomatis berubah warna berdasarkan skor.
+  - WKT Auto-Repair untuk memastikan validitas geometri yang disimpan ke database.
+  - Satellite Toggle untuk akurasi posisi bangunan.
 
-## Monitoring & Audit
+## Monitoring, Audit & Histori
 - **Audit Trail:** Log detail "Data Diff" (membandingkan nilai lama vs baru).
-- **Security Alarm:** Pelacakan login gagal dan deteksi aktivitas mencurigakan.
-- **System Health:** Monitoring beban CPU, status Database, dan Disk Server secara real-time.
+- **Histori Transformasi (RLH):** 
+  - Pencatatan snapshot data teknis sebelum dan sesudah bantuan (RTLH ➔ RLH).
+  - Penyimpanan snapshot dalam format JSON untuk perbandingan *Side-by-Side*.
+  - Akses melalui menu **Pengaturan ➔ Histori Perubahan (RLH)**.
 
 ## Konvensi Pengembangan
 - **CRUD Terpadu:** Pengelolaan data lintas tabel wajib menggunakan Transaksi Database (`$db->transStart()`).
+- **Status Bantuan:** Modul RTLH wajib memfilter data dengan `status_bantuan = 'Belum Menerima'` secara default untuk menjaga kebersihan daftar target.
 - **Security Check:** Validasi izin di Controller menggunakan helper `has_permission('nama_izin')`.
-- **Filtering:** Mengutamakan **Live Search** pada header untuk akses data cepat. Filter lanjutan disembunyikan jika tidak diperlukan untuk menjaga kebersihan UI.
-- **Pagination:** Template kustom `tailwind_full` dengan posisi **Tengah (Center)**.
 
 ## Perintah Pengembangan
 - Run Localhost: `php spark serve`
 - Build CSS: `npm run build`
 - Update RBAC: `php spark db:seed RbacSeeder`
-- Update Koordinat: `php spark wkt:update` (dari output.csv)
+- Update Koordinat: `php spark wkt:update`
 - Fix Data WKT: `php spark wkt:fix`
