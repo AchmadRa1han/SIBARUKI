@@ -170,6 +170,14 @@
                 <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase mb-2 tracking-widest opacity-80">Bantuan Perumahan</p>
                 <p class="text-sm font-bold text-slate-800 dark:text-slate-300"><?= $rumah['bantuan_perumahan'] ?? '-' ?></p>
             </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase mb-2 tracking-widest opacity-80">Status Backlog</p>
+                <p class="text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-md w-fit italic"><?= $rumah['status_backlog'] ?: 'Tidak Ada' ?></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-blue-900 dark:text-blue-500 uppercase mb-2 tracking-widest opacity-80">Desil Nasional</p>
+                <p class="text-sm font-black text-blue-950 dark:text-white"><?= $rumah['desil_nasional'] ?: '-' ?></p>
+            </div>
         </div>
     </div>
 
