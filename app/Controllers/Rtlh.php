@@ -572,6 +572,7 @@ class Rtlh extends BaseController
 
     public function edit($id)
     {
+        $db = \Config\Database::connect();
         $rumah = $this->rumahModel->find($id);
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
@@ -584,12 +585,15 @@ class Rtlh extends BaseController
             $master[$ref['kategori']][] = $ref;
         }
 
+        $all_desa = $db->table('kode_desa')->select('desa_id, desa_nama')->get()->getResultArray();
+
         $data = [
             'title' => 'Edit RTLH',
             'rumah' => $rumah,
             'penerima' => $penerima,
             'kondisi' => $kondisi,
-            'master' => $master
+            'master' => $master,
+            'all_desa' => $all_desa
         ];
 
         return view('rtlh/edit', $data);
@@ -622,6 +626,8 @@ class Rtlh extends BaseController
             'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? null,
             'jenis_jamban_kloset' => $post['jenis_jamban_kloset'] ?? null,
             'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null,
+            'status_backlog' => $post['status_backlog'] ?? null,
+            'desil_nasional' => $post['desil_nasional'] ?? null,
         ]);
 
         if (!empty($post['lokasi_koordinat'])) {
