@@ -28,9 +28,14 @@ class Rtlh extends BaseController
     {
         $keyword = $this->request->getGet('keyword');
         $perPage = $this->request->getGet('per_page') ?? 10;
+        $status = $this->request->getGet('status') ?? 'Belum Menerima';
 
         $query = $this->rumahModel->select('rtlh_rumah.*, rtlh_penerima.nama_kepala_keluarga as pemilik')
                                   ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left');
+
+        if ($status !== 'semua') {
+            $query->where('status_bantuan', $status);
+        }
 
         if ($keyword) {
             $query->groupStart()
@@ -44,16 +49,52 @@ class Rtlh extends BaseController
         $data = [
             'title' => 'Data RTLH',
             'rumah' => $rumah,
-            'rumah_all' => $this->rumahModel->select('rtlh_rumah.*, rtlh_penerima.nama_kepala_keluarga as pemilik')
-                                           ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left')
-                                           ->findAll(),
             'pager' => $this->rumahModel->pager,
             'perPage' => $perPage,
             'keyword' => $keyword,
+            'status' => $status,
             'total_verifikasi' => $this->rumahModel->countAllResults(false),
         ];
 
         return view('rtlh/index', $data);
+    }
+
+    public function markTuntas($id)
+    {
+        $tahun = $this->request->getPost('tahun_bansos') ?? date('Y');
+        $program = $this->request->getPost('program_bansos');
+
+        $this->rumahModel->update($id, [
+            'status_bantuan' => 'Sudah Menerima',
+            'tahun_bansos' => $tahun,
+            'bantuan_perumahan' => $program ?: 'Bansos RTLH'
+        ]);
+
+        $this->logActivity('Tuntas Bansos', 'RTLH', "Menandai rumah ID $id telah menerima bansos tahun $tahun");
+
+        return redirect()->to('/rtlh')->with('success', 'Data berhasil ditandai sebagai Sudah Menerima Bansos (RLH).');
+    }
+
+    public function rekapDesa()
+    {
+        if (session()->get('role_id') != 1) {
+            return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat melihat data rekapan per desa.');
+        }
+
+        $db = \Config\Database::connect();
+        
+        $builder = $db->table('rtlh_rumah');
+        $builder->select('desa, desa_id, COUNT(*) as total');
+        $builder->groupBy('desa, desa_id');
+        $builder->orderBy('desa', 'ASC');
+        $rekap = $builder->get()->getResultArray();
+
+        $data = [
+            'title' => 'Rekapitulasi RTLH per Desa',
+            'rekap' => $rekap
+        ];
+
+        return view('rtlh/rekap_desa', $data);
     }
 
     public function exportExcel()

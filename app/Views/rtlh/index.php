@@ -57,17 +57,27 @@
                 </div>
             </div>
 
-            <form action="<?= base_url('rtlh') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
-                <select name="per_page" onchange="submitWithScroll(this)" class="w-full md:w-24 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                    <?php foreach([5, 10, 25, 50, 100] as $p): ?>
-                        <option value="<?= $p ?>" <?= ($perPage ?? 10) == $p ? 'selected' : '' ?>><?= $p ?> Baris</option>
-                    <?php endforeach; ?>
-                </select>
-                <div class="relative w-full md:w-64">
-                    <input type="text" name="keyword" value="<?= $keyword ?? '' ?>" placeholder="Cari Nama / Desa..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500 transition-all uppercase">
-                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <div class="flex flex-col lg:flex-row items-center gap-4 w-full lg:w-auto">
+                <!-- Status Filter Tabs -->
+                <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                    <a href="<?= base_url('rtlh?status=Belum Menerima&keyword='.$keyword) ?>" class="px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all <?= $status == 'Belum Menerima' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Target RTLH</a>
+                    <a href="<?= base_url('rtlh?status=Sudah Menerima&keyword='.$keyword) ?>" class="px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all <?= $status == 'Sudah Menerima' ? 'bg-white dark:bg-slate-700 text-emerald-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Tuntas RLH</a>
+                    <a href="<?= base_url('rtlh?status=semua&keyword='.$keyword) ?>" class="px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all <?= $status == 'semua' ? 'bg-white dark:bg-slate-700 text-slate-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Semua</a>
                 </div>
-            </form>
+
+                <form action="<?= base_url('rtlh') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
+                    <input type="hidden" name="status" value="<?= $status ?>">
+                    <select name="per_page" onchange="submitWithScroll(this)" class="w-full md:w-24 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                        <?php foreach([5, 10, 25, 50, 100] as $p): ?>
+                            <option value="<?= $p ?>" <?= ($perPage ?? 10) == $p ? 'selected' : '' ?>><?= $p ?> Baris</option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="relative w-full md:w-64">
+                        <input type="text" name="keyword" value="<?= $keyword ?? '' ?>" placeholder="Cari Nama / Desa..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black px-3 py-2.5 pl-9 focus:ring-2 focus:ring-blue-500 transition-all uppercase">
+                        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -76,16 +86,27 @@
                     <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-black text-slate-400 uppercase tracking-widest">
                         <th class="px-4 py-4 w-64">Kepala Keluarga</th>
                         <th class="px-4 py-4 w-40">Wilayah</th>
-                        <th class="px-4 py-4 w-32 text-center">Kawasan</th>
+                        <th class="px-4 py-4 w-32 text-center">Status</th>
                         <th class="px-4 py-4 text-center w-36">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]">
                     <?php if (!empty($rumah)): foreach($rumah as $item): ?>
                     <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-200">
-                        <td class="px-4 py-3"><span class="font-black text-blue-950 dark:text-white uppercase truncate block"><?= $item['pemilik'] ?? '-' ?></span></td>
+                        <td class="px-4 py-3">
+                            <span class="font-black text-blue-950 dark:text-white uppercase truncate block"><?= $item['pemilik'] ?? '-' ?></span>
+                            <?php if($item['status_bantuan'] == 'Sudah Menerima'): ?>
+                                <span class="text-[8px] font-bold text-emerald-500 uppercase tracking-tighter">Tuntas Tahun <?= $item['tahun_bansos'] ?></span>
+                            <?php endif; ?>
+                        </td>
                         <td class="px-4 py-3"><span class="font-black text-blue-600 uppercase"><?= $item['desa'] ?></span></td>
-                        <td class="px-4 py-3 text-center"><span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg font-black uppercase text-[8px] truncate block"><?= $item['jenis_kawasan'] ?? '-' ?></span></td>
+                        <td class="px-4 py-3 text-center">
+                            <?php if($item['status_bantuan'] == 'Sudah Menerima'): ?>
+                                <span class="px-2 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-lg font-black uppercase text-[8px] border border-emerald-100 dark:border-emerald-900">TUNTAS (RLH)</span>
+                            <?php else: ?>
+                                <span class="px-2 py-1 bg-amber-50 dark:bg-amber-950/30 text-amber-600 rounded-lg font-black uppercase text-[8px] border border-amber-100 dark:border-amber-900">TARGET (RTLH)</span>
+                            <?php endif; ?>
+                        </td>
                         <td class="px-4 py-3 text-center">
                             <div class="flex items-center justify-center gap-1.5">
                                 <?php if(!empty($item['lokasi_koordinat'])): ?>

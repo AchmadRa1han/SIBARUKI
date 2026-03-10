@@ -44,6 +44,15 @@
             </button>
             <?php endif; ?>
             <?php if (has_permission('edit_rtlh')) : ?>
+                <?php if (($rumah['status_bantuan'] ?? 'Belum Menerima') == 'Belum Menerima') : ?>
+                <button onclick="openModalTuntas()" class="px-6 py-3 bg-emerald-600 dark:bg-emerald-700 text-white rounded-2xl text-sm font-bold hover:bg-emerald-700 dark:hover:bg-emerald-600 shadow-xl shadow-emerald-900/20 transition-all flex items-center">
+                    <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i> Tandai Tuntas Bansos
+                </button>
+                <?php else: ?>
+                <div class="px-6 py-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl text-xs font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-800 flex items-center">
+                    <i data-lucide="award" class="w-4 h-4 mr-2"></i> Telah Dibantu (<?= $rumah['tahun_bansos'] ?>)
+                </div>
+                <?php endif; ?>
             <a href="<?= base_url('rtlh/edit/' . ($rumah['id_survei'] ?? '')) ?>" class="px-8 py-3 bg-blue-900 dark:bg-blue-700 text-white rounded-2xl text-sm font-bold hover:bg-blue-950 dark:hover:bg-blue-600 shadow-xl shadow-blue-900/30 transition-all flex items-center">
                 <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> Perbarui Data
             </a>
@@ -304,8 +313,50 @@
     </div>
 </div>
 
+    <!-- MODAL TUNTAS BANSOS -->
+    <div id="modal-tuntas" class="fixed inset-0 z-[10001] flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModalTuntas()"></div>
+        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 max-w-lg w-full relative z-10 shadow-2xl border border-slate-100 dark:border-slate-800 transition-all">
+            <div class="flex flex-col items-center text-center mb-8">
+                <div class="w-20 h-20 rounded-3xl mb-6 flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 shadow-inner">
+                    <i data-lucide="award" class="w-10 h-10"></i>
+                </div>
+                <h3 class="text-2xl font-black text-blue-950 dark:text-white uppercase tracking-tight mb-2">Konfirmasi Tuntas Bantuan</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Pastikan rumah ini telah benar-benar menerima dan menyelesaikan perbaikan melalui program bantuan.</p>
+            </div>
+
+            <form action="<?= base_url('rtlh/mark-tuntas/' . $rumah['id_survei']) ?>" method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Tahun Anggaran Bantuan</label>
+                    <input type="number" name="tahun_bansos" value="<?= date('Y') ?>" min="2000" max="2099" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Nama Program / Sumber Dana</label>
+                    <input type="text" name="program_bansos" placeholder="Contoh: BSPS, Bansos Provinsi, APBD Kab..." class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModalTuntas()" class="flex-1 px-6 py-4 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95">Batal</button>
+                    <button type="submit" class="flex-1 px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20 active:scale-95">Konfirmasi Tuntas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 <script>
     lucide.createIcons();
+
+    function openModalTuntas() {
+        const modal = document.getElementById('modal-tuntas');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModalTuntas() {
+        const modal = document.getElementById('modal-tuntas');
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
 
     function downloadPDF() {
         const element = document.getElementById('report-content');

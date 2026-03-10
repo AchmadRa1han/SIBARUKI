@@ -72,12 +72,13 @@ $routes->group('aset-tanah', function($routes) {
 
 $routes->group('rtlh', function($routes) {
     $routes->get('/', 'Rtlh::index');
+    $routes->get('rekap-desa', 'Rtlh::rekapDesa');
     $routes->get('export-excel', 'Rtlh::exportExcel');
     $routes->post('import-csv', 'Rtlh::importCsv');
     $routes->get('create', 'Rtlh::create');
     $routes->post('store', 'Rtlh::store');
     $routes->get('detail/(:num)', 'Rtlh::detail/$1');
-    $routes->post('log-export/(:num)', 'Rtlh::logExport/$1');
+    $routes->post('mark-tuntas/(:num)', 'Rtlh::markTuntas/$1');
     $routes->get('edit/(:num)', 'Rtlh::edit/$1');
     $routes->post('update/(:num)', 'Rtlh::update/$1');
     $routes->post('delete/(:num)', 'Rtlh::delete/$1');

@@ -38,20 +38,20 @@
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
         <?php 
         $metrics = [
-            ['rtlh', 'home', 'amber', 'RTLH'],
-            ['kumuh', 'map-pin', 'rose', 'KUMUH'],
-            ['formal', 'building-2', 'indigo', 'FORMAL'],
-            ['psu', 'route', 'slate', 'PSU'],
-            ['pisew', 'map', 'orange', 'PISEW'],
-            ['aset', 'layers', 'emerald', 'ASET'],
-            ['arsinum', 'droplet', 'cyan', 'ARSINUM'],
+            ['rtlh', 'home', 'amber', 'RTLH', base_url('rtlh')],
+            ['kumuh', 'map-pin', 'rose', 'KUMUH', base_url('wilayah-kumuh')],
+            ['formal', 'building-2', 'indigo', 'FORMAL', base_url('perumahan-formal')],
+            ['psu', 'route', 'slate', 'PSU', base_url('psu')],
+            ['pisew', 'map', 'orange', 'PISEW', base_url('pisew')],
+            ['aset', 'layers', 'emerald', 'ASET', base_url('aset-tanah')],
+            ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
         ];
         foreach($metrics as $m): ?>
-        <div class="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 group">
+        <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group block">
             <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><i data-lucide="<?= $m[1] ?>" class="w-5 h-5"></i></div>
             <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1"><?= $m[3] ?></p>
             <h3 class="text-xl font-black text-blue-950 dark:text-white"><?= number_format($rekap[$m[0]]) ?></h3>
-        </div>
+        </a>
         <?php endforeach; ?>
     </div>
 
