@@ -73,6 +73,7 @@ $routes->group('aset-tanah', function($routes) {
 $routes->group('rtlh', function($routes) {
     $routes->get('/', 'Rtlh::index');
     $routes->get('rekap-desa', 'Rtlh::rekapDesa');
+    $routes->get('history-transformasi', 'Rtlh::historyTransformasi');
     $routes->get('export-excel', 'Rtlh::exportExcel');
     $routes->post('import-csv', 'Rtlh::importCsv');
     $routes->get('create', 'Rtlh::create');

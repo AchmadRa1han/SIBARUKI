@@ -6,6 +6,8 @@ use App\Models\RtlhPenerimaModel;
 use App\Models\RumahRtlhModel;
 use App\Models\KondisiRumahModel;
 use App\Models\RefMasterModel;
+use App\Models\RtlhHistoryModel;
+use App\Models\BansosRtlhModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -15,6 +17,8 @@ class Rtlh extends BaseController
     protected $rumahModel;
     protected $kondisiModel;
     protected $refModel;
+    protected $historyModel;
+    protected $bansosModel;
 
     public function __construct()
     {
@@ -22,6 +26,8 @@ class Rtlh extends BaseController
         $this->rumahModel = new RumahRtlhModel();
         $this->kondisiModel = new KondisiRumahModel();
         $this->refModel = new RefMasterModel();
+        $this->historyModel = new RtlhHistoryModel();
+        $this->bansosModel = new BansosRtlhModel();
     }
 
     public function index()
@@ -64,15 +70,66 @@ class Rtlh extends BaseController
         $tahun = $this->request->getPost('tahun_bansos') ?? date('Y');
         $program = $this->request->getPost('program_bansos');
 
+        // Ambil Data Saat Ini sebagai Snapshot "Sebelum"
+        $rumah = $this->rumahModel->find($id);
+        $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
+        $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
+
+        $snapshotSebelum = [
+            'rumah' => $rumah,
+            'kondisi' => $kondisi,
+            'penerima' => $penerima
+        ];
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        // 1. Update Status di Tabel Utama
         $this->rumahModel->update($id, [
             'status_bantuan' => 'Sudah Menerima',
             'tahun_bansos' => $tahun,
             'bantuan_perumahan' => $program ?: 'Bansos RTLH'
         ]);
 
+        // 2. Simpan ke Tabel Bansos (Rekap)
+        $this->bansosModel->insert([
+            'id_survei' => $id,
+            'nik' => $rumah['nik_pemilik'],
+            'nama_penerima' => $penerima['nama_kepala_keluarga'] ?? 'Unknown',
+            'desa' => $rumah['desa'],
+            'tahun_anggaran' => $tahun,
+            'sumber_dana' => $program ?: 'Bansos RTLH',
+            'keterangan' => 'Ditandai tuntas dari modul RTLH'
+        ]);
+
+        // 3. Simpan ke Tabel Histori Perubahan (Snapshot)
+        $this->historyModel->insert([
+            'id_survei' => $id,
+            'nik' => $rumah['nik_pemilik'],
+            'nama_penerima' => $penerima['nama_kepala_keluarga'] ?? 'Unknown',
+            'sumber_bantuan' => $program ?: 'Bansos RTLH',
+            'tahun_anggaran' => $tahun,
+            'data_sebelum' => json_encode($snapshotSebelum),
+            'keterangan' => 'Transformasi RTLH ke RLH'
+        ]);
+
+        $db->transComplete();
+
         $this->logActivity('Tuntas Bansos', 'RTLH', "Menandai rumah ID $id telah menerima bansos tahun $tahun");
 
-        return redirect()->to('/rtlh')->with('success', 'Data berhasil ditandai sebagai Sudah Menerima Bansos (RLH).');
+        return redirect()->to('/rtlh')->with('success', 'Data berhasil ditandai sebagai Sudah Menerima Bansos (RLH) dan histori telah dicatat.');
+    }
+
+    public function historyTransformasi()
+    {
+        $data = [
+            'title' => 'Histori Transformasi RTLH',
+            'history' => $this->historyModel->orderBy('created_at', 'DESC')->paginate(10, 'default'),
+            'pager' => $this->historyModel->pager,
+            'ref' => $this->refModel->getAllMapped()
+        ];
+
+        return view('rtlh/history_transformasi', $data);
     }
 
     public function rekapDesa()
