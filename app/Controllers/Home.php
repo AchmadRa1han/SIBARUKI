@@ -41,14 +41,16 @@ class Home extends BaseController
         // --- 2. DATA ANALISIS (GRAFIK) ---
         
         // Status Kelayakan (RTLH)
+        // Logika: Jika status_bantuan = 'Sudah Menerima', otomatis LAYAK.
+        // Jika belum, dicek kondisi atap & lantai.
         $layakQuery = "
             SELECT 
-                SUM(CASE WHEN st_atap = 'RUSAK' AND st_lantai = 'RUSAK' THEN 1 ELSE 0 END) as tidak_layak,
-                SUM(CASE WHEN st_atap = 'BAIK' AND st_lantai = 'BAIK' THEN 1 ELSE 0 END) as layak,
-                COUNT(*) - SUM(CASE WHEN st_atap = 'RUSAK' AND st_lantai = 'RUSAK' THEN 1 ELSE 0 END) 
-                         - SUM(CASE WHEN st_atap = 'BAIK' AND st_lantai = 'BAIK' THEN 1 ELSE 0 END) as menuju_layak
-            FROM rtlh_kondisi_rumah kr
-            JOIN rtlh_rumah r ON r.id_survei = kr.id_survei
+                SUM(CASE WHEN status_bantuan = 'Belum Menerima' AND st_atap = 'RUSAK' AND st_lantai = 'RUSAK' THEN 1 ELSE 0 END) as tidak_layak,
+                SUM(CASE WHEN status_bantuan = 'Sudah Menerima' OR (st_atap = 'BAIK' AND st_lantai = 'BAIK') THEN 1 ELSE 0 END) as layak,
+                COUNT(*) - SUM(CASE WHEN status_bantuan = 'Belum Menerima' AND st_atap = 'RUSAK' AND st_lantai = 'RUSAK' THEN 1 ELSE 0 END) 
+                         - SUM(CASE WHEN status_bantuan = 'Sudah Menerima' OR (st_atap = 'BAIK' AND st_lantai = 'BAIK') THEN 1 ELSE 0 END) as menuju_layak
+            FROM rtlh_rumah r
+            LEFT JOIN rtlh_kondisi_rumah kr ON r.id_survei = kr.id_survei
         ";
         if ($roleScope === 'local') {
             $desaList = "'" . implode("','", (!empty($desaRtlh) ? $desaRtlh : ['0'])) . "'";
