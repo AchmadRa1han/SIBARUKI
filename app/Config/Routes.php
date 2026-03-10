@@ -97,7 +97,12 @@ $routes->group('wilayah-kumuh', function($routes) {
     $routes->post('delete/(:num)', 'WilayahKumuh::delete/$1');
 });
 
-$routes->get('bansos-rtlh', 'Placeholder::bansos');
+$routes->group('bansos-rtlh', function($routes) {
+    $routes->get('/', 'BansosRtlh::index');
+    $routes->get('create', 'BansosRtlh::create');
+    $routes->post('store', 'BansosRtlh::store');
+    $routes->post('delete/(:num)', 'BansosRtlh::delete/$1');
+});
 
 // SISTEM & PENGATURAN
 $routes->group('roles', function($routes) {
