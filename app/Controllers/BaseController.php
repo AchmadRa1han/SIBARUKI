@@ -45,16 +45,34 @@ abstract class BaseController extends Controller
         $agent = $this->request->getUserAgent();
         $ip = $this->request->getIPAddress();
         
-        $browser = $agent->getBrowser() . ' ' . $agent->getVersion();
+        // Forensic Device Parsing
+        $browser = $agent->getBrowser();
+        $version = $agent->getVersion();
         $platform = $agent->getPlatform();
-        $userAgentString = "{$browser} on {$platform}";
+        $isMobile = $agent->isMobile() ? 'Mobile' : 'Desktop';
+        
+        // Calculate Processing Latency
+        $startTime = $_SERVER["REQUEST_TIME_FLOAT"];
+        $endTime = microtime(true);
+        $latency = round(($endTime - $startTime) * 1000, 2); // in milliseconds
 
-        // Auto-determine severity if not provided
+        // Auto-determine severity
         if (!$severity) {
             $severity = 'info';
-            if (in_array($action, ['Hapus', 'Login Gagal', 'Reset Password'])) $severity = 'warning';
+            if (in_array($action, ['Hapus', 'Login Gagal', 'Reset Password', 'Ubah'])) $severity = 'warning';
             if ($action === 'Housekeeping' || str_contains(strtolower($description), 'force')) $severity = 'critical';
         }
+
+        // Contextual Metadata (JSON)
+        $metadata = json_encode([
+            'browser' => $browser,
+            'version' => $version,
+            'platform' => $platform,
+            'device' => $isMobile,
+            'latency_ms' => $latency,
+            'scope' => session()->get('role_scope') ?? 'unknown',
+            'url' => current_url()
+        ]);
 
         $db->table('sys_logs')->insert([
             'user'        => session()->get('username') ?? 'System',
@@ -63,7 +81,7 @@ abstract class BaseController extends Controller
             'table_name'  => $table,
             'description' => $description,
             'details'     => $details,
-            'user_agent'  => $userAgentString,
+            'user_agent'  => $metadata, // Simpan sebagai JSON untuk transparansi total
             'ip_address'  => $ip,
             'created_at'  => date('Y-m-d H:i:s'),
         ]);

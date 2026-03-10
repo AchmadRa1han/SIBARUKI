@@ -274,6 +274,17 @@
 
             if (!geojson) return;
 
+            // Mapping URL Detail berdasarkan Tipe Data
+            const detailUrls = {
+                rtlh: '<?= base_url('rtlh/detail') ?>',
+                kumuh: '<?= base_url('wilayah-kumuh/detail') ?>',
+                formal: '<?= base_url('perumahan-formal/detail') ?>',
+                psu: '<?= base_url('psu/detail') ?>',
+                aset: '<?= base_url('aset-tanah/detail') ?>',
+                arsinum: '<?= base_url('arsinum/detail') ?>',
+                pisew: '<?= base_url('pisew/detail') ?>'
+            };
+
             const popupContent = `
                 <div class="bg-blue-950 text-white p-4 rounded-t-xl">
                     <p class="text-[8px] font-black uppercase tracking-widest text-blue-400 mb-1">SIBARUKI: ${type.toUpperCase()}</p>
@@ -289,7 +300,9 @@
                     <div class="flex items-center gap-2 text-[10px] font-bold text-slate-700 dark:text-slate-300">
                         📍 Kabupaten Sinjai
                     </div>
-                    <button class="focus-btn w-full py-2 bg-blue-950 hover:bg-black text-white text-[9px] font-black uppercase rounded-xl transition-all shadow-lg active:scale-95">Fokus Lokasi</button>
+                    <a href="${detailUrls[type]}/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-black text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg active:scale-95">
+                        <i data-lucide="external-link" class="w-3 h-3 inline-block mr-1"></i> Lihat Detail Data
+                    </a>
                 </div>`;
 
             let layer;
@@ -311,15 +324,8 @@
 
             layer.bindPopup(popupContent);
 
-            layer.on('popupopen', (e) => {
+            layer.on('popupopen', () => {
                 lucide.createIcons();
-                const btn = e.popup._container.querySelector('.focus-btn');
-                if (btn) {
-                    btn.addEventListener('click', () => {
-                        if (geojson.type === 'Point') map.setView([geojson.coordinates[1], geojson.coordinates[0]], 18);
-                        else map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 18 });
-                    });
-                }
             });
         });
 

@@ -104,10 +104,19 @@ class WilayahKumuh extends BaseController
         return redirect()->to('/wilayah-kumuh')->with('success', "$count data berhasil diimpor.");
     }
 
+    public function peta()
+    {
+        $data = [
+            'title' => 'Peta Wilayah Kumuh',
+            'kumuh' => $this->kumuhModel->findAll(),
+        ];
+        return view('wilayah_kumuh/peta', $data);
+    }
+
     public function detail($id)
     {
-        $data['item'] = $this->kumuhModel->find($id);
-        if (!$data['item']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        $data['kumuh'] = $this->kumuhModel->find($id);
+        if (!$data['kumuh']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         $data['title'] = 'Detail Wilayah Kumuh';
         return view('wilayah_kumuh/detail', $data);
     }
@@ -125,7 +134,7 @@ class WilayahKumuh extends BaseController
 
     public function edit($id)
     {
-        $data['item'] = $this->kumuhModel->find($id);
+        $data['kumuh'] = $this->kumuhModel->find($id);
         $data['title'] = 'Edit Wilayah Kumuh';
         return view('wilayah_kumuh/edit', $data);
     }

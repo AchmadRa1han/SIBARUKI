@@ -83,29 +83,29 @@ class Home extends BaseController
 
         // Markers RTLH (Tipe: POINT/GEOMETRY -> WAJIB ST_AsText)
         $mapRtlh = $db->table('rtlh_rumah')
-            ->select('desa as name, ST_AsText(lokasi_koordinat) as wkt, "rtlh" as type')
+            ->select('id_survei as id, desa as name, ST_AsText(lokasi_koordinat) as wkt, "rtlh" as type')
             ->where('lokasi_koordinat IS NOT NULL')
             ->where('lokasi_koordinat !=', '')
             ->limit(100)->get()->getResultArray();
 
         // Markers Kumuh (Tipe: LONGTEXT -> Ambil Langsung)
-        $mapKumuh = $db->table('wilayah_kumuh')->select('Kawasan as name, WKT as wkt, skor_kumuh, "kumuh" as type')
+        $mapKumuh = $db->table('wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt, skor_kumuh, "kumuh" as type')
             ->where('WKT IS NOT NULL')->get()->getResultArray();
 
         // Markers Perumahan Formal (Gunakan Lat/Lng asli)
-        $mapFormal = $db->table('perumahan_formal')->select('nama_perumahan as name, latitude, longitude, "formal" as type')->get()->getResultArray();
+        $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude, "formal" as type')->get()->getResultArray();
 
         // Linestrings PSU (Tipe: TEXT -> Ambil Langsung)
-        $mapPsu = $db->table('psu_jalan')->select('nama_jalan as name, wkt, "psu" as type')->get()->getResultArray();
+        $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt, "psu" as type')->get()->getResultArray();
 
         // Markers Aset Tanah
-        $mapAset = $db->table('aset_tanah')->select('nama_pemilik as name, koordinat as coords, "aset" as type')->get()->getResultArray();
+        $mapAset = $db->table('aset_tanah')->select('id, nama_pemilik as name, koordinat as coords, "aset" as type')->get()->getResultArray();
 
         // Markers Arsinum
-        $mapArsinum = $db->table('arsinum')->select('jenis_pekerjaan as name, koordinat as coords, "arsinum" as type')->get()->getResultArray();
+        $mapArsinum = $db->table('arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, "arsinum" as type')->get()->getResultArray();
 
         // Markers PISEW
-        $mapPisew = $db->table('pisew')->select('jenis_pekerjaan as name, koordinat as coords, "pisew" as type')
+        $mapPisew = $db->table('pisew')->select('id, jenis_pekerjaan as name, koordinat as coords, "pisew" as type')
             ->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
 
         // --- 4. DATA LAINNYA ---

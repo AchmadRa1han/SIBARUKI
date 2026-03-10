@@ -94,6 +94,7 @@
                                 <button onclick="focusMap(<?= $item['latitude'] ?>, <?= $item['longitude'] ?>)" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
                                 <a href="<?= base_url('perumahan-formal/detail/'.$item['id']) ?>" class="p-2 bg-blue-950 text-white rounded-lg shadow-md hover:bg-black transition-all active:scale-95"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
+                                <a href="<?= base_url('perumahan-formal/edit/'.$item['id']) ?>" class="p-2 bg-amber-500 text-white rounded-lg shadow-md hover:bg-amber-600 transition-all active:scale-95"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></a>
                                 <?php if (has_permission('delete_rtlh')): ?>
                                 <button onclick="confirmDelete(<?= $item['id'] ?>, '<?= addslashes($item['nama_perumahan']) ?>')" class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>

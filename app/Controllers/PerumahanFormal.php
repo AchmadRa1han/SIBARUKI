@@ -120,6 +120,20 @@ class PerumahanFormal extends BaseController
         return view('perumahan_formal/detail', $data);
     }
 
+    public function edit($id)
+    {
+        $data['item'] = $this->perumahanModel->find($id);
+        if (!$data['item']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        $data['title'] = 'Edit Perumahan Formal';
+        return view('perumahan_formal/edit', $data);
+    }
+
+    public function update($id)
+    {
+        $this->perumahanModel->update($id, $this->request->getPost());
+        return redirect()->to('/perumahan-formal')->with('success', 'Data berhasil diperbarui.');
+    }
+
     public function delete($id)
     {
         if (!has_permission('delete_rtlh')) {
