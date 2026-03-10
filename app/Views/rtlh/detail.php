@@ -326,6 +326,7 @@
             </div>
 
             <form action="<?= base_url('rtlh/mark-tuntas/' . $rumah['id_survei']) ?>" method="POST" class="space-y-6">
+                <?= csrf_field() ?>
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Tahun Anggaran Bantuan</label>
                     <input type="number" name="tahun_bansos" value="<?= date('Y') ?>" min="2000" max="2099" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>

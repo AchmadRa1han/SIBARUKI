@@ -124,7 +124,7 @@ class Home extends BaseController
         }
 
         $data = [
-            'title'         => 'Dashboard Tactical',
+            'title'         => 'Dashboard',
             'rekap'         => [
                 'rtlh'      => $totalRtlh,
                 'kumuh'     => $totalKumuh,

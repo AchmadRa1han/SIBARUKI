@@ -5,18 +5,24 @@ namespace App\Controllers;
 use App\Models\BansosRtlhModel;
 use App\Models\RumahRtlhModel;
 use App\Models\RtlhPenerimaModel;
+use App\Models\RtlhHistoryModel;
+use App\Models\KondisiRumahModel;
 
 class BansosRtlh extends BaseController
 {
     protected $bansosModel;
     protected $rumahModel;
     protected $penerimaModel;
+    protected $historyModel;
+    protected $kondisiModel;
 
     public function __construct()
     {
         $this->bansosModel = new BansosRtlhModel();
         $this->rumahModel = new RumahRtlhModel();
         $this->penerimaModel = new RtlhPenerimaModel();
+        $this->historyModel = new RtlhHistoryModel();
+        $this->kondisiModel = new KondisiRumahModel();
     }
 
     public function index()
@@ -80,20 +86,41 @@ class BansosRtlh extends BaseController
         ]);
 
         // 2. Jika terhubung ke data survei RTLH, update statusnya otomatis
-        if ($id_survei) {
-            $this->rumahModel->update($id_survei, [
-                'status_bantuan' => 'Sudah Menerima',
-                'tahun_bansos' => $tahun,
-                'bantuan_perumahan' => $sumber
-            ]);
-        } else {
-            // Cek apakah NIK ini ada di database rumah_rtlh (mungkin diinput manual tapi NIK cocok)
-            $rumah = $this->rumahModel->where('nik_pemilik', $nik)->first();
-            if ($rumah) {
-                $this->rumahModel->update($rumah['id_survei'], [
+        $targetId = $id_survei;
+        if (!$targetId) {
+            $existing = $this->rumahModel->where('nik_pemilik', $nik)->first();
+            if ($existing) $targetId = $existing['id_survei'];
+        }
+
+        if ($targetId) {
+            // Capture Snapshot Sebelum (Gunakan ST_AsText agar tidak error json_encode)
+            $rumahData = $db->table('rtlh_rumah')
+                            ->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')
+                            ->where('id_survei', $targetId)
+                            ->get()->getRowArray();
+            
+            if ($rumahData) {
+                $kondisi = $this->kondisiModel->where('id_survei', $targetId)->first();
+                $penerima = $this->penerimaModel->where('nik', $rumahData['nik_pemilik'])->first();
+
+                $snapshot = ['rumah' => $rumahData, 'kondisi' => $kondisi, 'penerima' => $penerima];
+
+                // Update Status menggunakan Query Builder agar lebih pasti
+                $db->table('rtlh_rumah')->where('id_survei', $targetId)->update([
                     'status_bantuan' => 'Sudah Menerima',
                     'tahun_bansos' => $tahun,
                     'bantuan_perumahan' => $sumber
+                ]);
+
+                // Save to History
+                $this->historyModel->insert([
+                    'id_survei' => $targetId,
+                    'nik' => $nik,
+                    'nama_penerima' => $nama,
+                    'sumber_bantuan' => $sumber,
+                    'tahun_anggaran' => $tahun,
+                    'data_sebelum' => json_encode($snapshot),
+                    'keterangan' => 'Transformasi via Modul Bansos'
                 ]);
             }
         }
@@ -106,7 +133,7 @@ class BansosRtlh extends BaseController
 
         $this->logActivity('Input Bansos', 'Bansos', "Menginput realisasi bansos untuk $nama ($nik)");
 
-        return redirect()->to('/bansos-rtlh')->with('success', 'Data realisasi bansos berhasil disimpan.');
+        return redirect()->to('/bansos-rtlh')->with('success', 'Data realisasi bansos berhasil disimpan dan status RTLH diperbarui.');
     }
 
     public function delete($id)

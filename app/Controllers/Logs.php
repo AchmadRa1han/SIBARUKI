@@ -44,7 +44,7 @@ class Logs extends BaseController
         $trendHourlyData = array_fill(0, 24, 0);
         foreach($trendHourlyQuery as $t) { $trendHourlyData[$t['jam']] = (int)$t['total']; }
         $trendHourlyLabels = [];
-        for($i=0;$i<24;$i++) { $trendHourlyLabels[] = str_pad($i, 2, '0', STR_PAD_LEFT).':00'; }
+        for($i=0;$i<24;$i++) { $trendHourlyLabels[] = str_pad($i, 2, '0', STR_PAD_LEFT); }
 
         $trendDailyQuery = $db->query("SELECT DATE(created_at) as tgl, COUNT(*) as total FROM sys_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY DATE(created_at) ORDER BY tgl ASC")->getResultArray();
         $trendDailyData = []; $trendDailyLabels = [];

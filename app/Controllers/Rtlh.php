@@ -70,8 +70,22 @@ class Rtlh extends BaseController
         $tahun = $this->request->getPost('tahun_bansos') ?? date('Y');
         $program = $this->request->getPost('program_bansos');
 
-        // Ambil Data Saat Ini sebagai Snapshot "Sebelum"
-        $rumah = $this->rumahModel->find($id);
+        if (!$id) {
+            return redirect()->back()->with('error', 'ID Survei tidak valid.');
+        }
+
+        $db = \Config\Database::connect();
+        
+        // Ambil Data Saat Ini dengan ST_AsText untuk koordinat (agar json_encode tidak error)
+        $rumah = $db->table('rtlh_rumah')
+                    ->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')
+                    ->where('id_survei', $id)
+                    ->get()->getRowArray();
+
+        if (!$rumah) {
+            return redirect()->back()->with('error', 'Data rumah tidak ditemukan.');
+        }
+
         $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
 
@@ -81,43 +95,60 @@ class Rtlh extends BaseController
             'penerima' => $penerima
         ];
 
-        $db = \Config\Database::connect();
         $db->transStart();
 
-        // 1. Update Status di Tabel Utama
-        $this->rumahModel->update($id, [
-            'status_bantuan' => 'Sudah Menerima',
-            'tahun_bansos' => $tahun,
-            'bantuan_perumahan' => $program ?: 'Bansos RTLH'
-        ]);
+        try {
+            $now = date('Y-m-d H:i:s');
 
-        // 2. Simpan ke Tabel Bansos (Rekap)
-        $this->bansosModel->insert([
-            'id_survei' => $id,
-            'nik' => $rumah['nik_pemilik'],
-            'nama_penerima' => $penerima['nama_kepala_keluarga'] ?? 'Unknown',
-            'desa' => $rumah['desa'],
-            'tahun_anggaran' => $tahun,
-            'sumber_dana' => $program ?: 'Bansos RTLH',
-            'keterangan' => 'Ditandai tuntas dari modul RTLH'
-        ]);
+            // 1. Update Status di Tabel Utama
+            $db->table('rtlh_rumah')->where('id_survei', $id)->update([
+                'status_bantuan' => 'Sudah Menerima',
+                'tahun_bansos' => $tahun,
+                'bantuan_perumahan' => $program ?: 'Bansos RTLH',
+                'updated_at' => $now
+            ]);
 
-        // 3. Simpan ke Tabel Histori Perubahan (Snapshot)
-        $this->historyModel->insert([
-            'id_survei' => $id,
-            'nik' => $rumah['nik_pemilik'],
-            'nama_penerima' => $penerima['nama_kepala_keluarga'] ?? 'Unknown',
-            'sumber_bantuan' => $program ?: 'Bansos RTLH',
-            'tahun_anggaran' => $tahun,
-            'data_sebelum' => json_encode($snapshotSebelum),
-            'keterangan' => 'Transformasi RTLH ke RLH'
-        ]);
+            // 2. Simpan ke Tabel Bansos (Rekap)
+            $db->table('rtlh_bansos')->insert([
+                'id_survei' => $id,
+                'nik' => $rumah['nik_pemilik'],
+                'nama_penerima' => $penerima['nama_kepala_keluarga'] ?? 'Unknown',
+                'desa' => $rumah['desa'],
+                'tahun_anggaran' => $tahun,
+                'sumber_dana' => $program ?: 'Bansos RTLH',
+                'keterangan' => 'Ditandai tuntas dari modul RTLH',
+                'created_at' => $now,
+                'updated_at' => $now
+            ]);
 
-        $db->transComplete();
+            // 3. Simpan ke Tabel Histori Perubahan (Snapshot)
+            $db->table('rtlh_history_perubahan')->insert([
+                'id_survei' => $id,
+                'nik' => $rumah['nik_pemilik'],
+                'nama_penerima' => $penerima['nama_kepala_keluarga'] ?? 'Unknown',
+                'sumber_bantuan' => $program ?: 'Bansos RTLH',
+                'tahun_anggaran' => $tahun,
+                'data_sebelum' => json_encode($snapshotSebelum),
+                'keterangan' => 'Transformasi RTLH ke RLH',
+                'created_at' => $now,
+                'updated_at' => $now
+            ]);
 
-        $this->logActivity('Tuntas Bansos', 'RTLH', "Menandai rumah ID $id telah menerima bansos tahun $tahun");
+            $db->transComplete();
 
-        return redirect()->to('/rtlh')->with('success', 'Data berhasil ditandai sebagai Sudah Menerima Bansos (RLH) dan histori telah dicatat.');
+            if ($db->transStatus() === false) {
+                $error = $db->error();
+                throw new \Exception('Database Error [' . $error['code'] . ']: ' . $error['message']);
+            }
+
+            $this->logActivity('Tuntas Bansos', 'RTLH', "Menandai rumah ID $id telah menerima bansos tahun $tahun");
+
+            return redirect()->to('/rtlh?status=Sudah Menerima')->with('success', 'Data berhasil ditandai sebagai Tuntas (RLH). Silakan cek tab "Tuntas RLH".');
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return redirect()->back()->with('error', 'Gagal memproses data: ' . $e->getMessage());
+        }
     }
 
     public function historyTransformasi()
