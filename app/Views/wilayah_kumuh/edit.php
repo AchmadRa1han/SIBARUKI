@@ -104,8 +104,16 @@
                 </div>
             </div>
 
+            <!-- TOMBOL AKSI -->
             <div class="mt-12 flex items-center justify-end space-x-6 border-t dark:border-slate-800 pt-10">
-...
+                <a href="<?= base_url('wilayah-kumuh') ?>" class="text-sm font-bold text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Batal</a>
+                <button type="submit" class="bg-amber-500 dark:bg-amber-600 hover:bg-amber-600 dark:hover:bg-amber-500 text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-amber-200 transition-all flex items-center space-x-3 text-lg">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    <span>Perbarui Data Wilayah</span>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Leaflet & Draw Tools -->
@@ -153,7 +161,6 @@
         map.addLayer(drawnItems);
 
         if (polygonPoints) {
-            // Remove the last point if it's the same as the first (WKT style vs Leaflet style)
             const leafletPoints = [...polygonPoints];
             if (leafletPoints.length > 1 && 
                 leafletPoints[0][0] === leafletPoints[leafletPoints.length-1][0] && 
@@ -242,15 +249,6 @@
             });
         }
     }
+    lucide.createIcons();
 </script>
-<?= $this->endSection() ?>
-                <a href="<?= base_url('wilayah-kumuh') ?>" class="text-sm font-bold text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Batal</a>
-                <button type="submit" class="bg-amber-500 dark:bg-amber-600 hover:bg-amber-600 dark:hover:bg-amber-500 text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-amber-200 transition-all flex items-center space-x-3 text-lg">
-                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-                    <span>Perbarui Data Wilayah</span>
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 <?= $this->endSection() ?>

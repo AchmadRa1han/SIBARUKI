@@ -94,6 +94,9 @@
             </div>
 
             <div class="bg-slate-950 rounded-[2.5rem] p-10 text-white shadow-2xl flex flex-col justify-center gap-4">
+                <a href="<?= base_url('perumahan-formal/edit/' . $item['id']) ?>" class="w-full py-4 bg-amber-500 hover:bg-amber-400 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-lg shadow-amber-900/20">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> Edit Data Perumahan
+                </a>
                 <button onclick="map.setView([<?= $item['latitude'] ?>, <?= $item['longitude'] ?>], 18)" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3">
                     <i data-lucide="map-pin" class="w-4 h-4"></i> Fokus Lokasi
                 </button>

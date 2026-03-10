@@ -30,7 +30,10 @@ $routes->group('perumahan-formal', function($routes) {
     $routes->get('export-excel', 'PerumahanFormal::exportExcel');
     $routes->post('import-csv', 'PerumahanFormal::importCsv');
     $routes->get('create', 'PerumahanFormal::create');
+    $routes->post('store', 'PerumahanFormal::store');
     $routes->get('detail/(:num)', 'PerumahanFormal::detail/$1');
+    $routes->get('edit/(:num)', 'PerumahanFormal::edit/$1');
+    $routes->post('update/(:num)', 'PerumahanFormal::update/$1');
     $routes->post('delete/(:num)', 'PerumahanFormal::delete/$1');
 });
 

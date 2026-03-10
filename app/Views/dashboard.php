@@ -22,7 +22,7 @@
         <div>
             <div class="flex items-center gap-3 mb-2">
                 <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Command Center SIBARUKI v2.3</span>
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Command Center SIBARUKI v1.0</span>
             </div>
             <h1 class="text-3xl lg:text-4xl font-black tracking-tight text-blue-950 dark:text-white"><?= $greet ?>, <?= explode(' ', session()->get('username'))[0] ?>.</h1>
         </div>
