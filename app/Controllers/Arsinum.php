@@ -206,4 +206,27 @@ class Arsinum extends BaseController
         }
         return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil dihapus.');
     }
+
+    public function bulkDelete()
+    {
+        $ids = $this->request->getPost('ids');
+        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            $this->arsinumModel->whereIn('id', $ids)->delete();
+            $db->transComplete();
+
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
+
+            $this->logActivity('Hapus Massal', 'Arsinum', "Menghapus " . count($ids) . " data Arsinum sekaligus");
+
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
 }

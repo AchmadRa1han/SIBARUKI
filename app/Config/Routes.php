@@ -59,6 +59,7 @@ $routes->group('arsinum', function($routes) {
     $routes->get('edit/(:num)', 'Arsinum::edit/$1');
     $routes->post('update/(:num)', 'Arsinum::update/$1');
     $routes->post('delete/(:num)', 'Arsinum::delete/$1');
+    $routes->post('bulk-delete', 'Arsinum::bulkDelete');
 });
 
 $routes->group('aset-tanah', function($routes) {
