@@ -7,9 +7,17 @@
             <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Recycle Bin</h1>
             <p class="text-slate-400 dark:text-slate-500 text-sm font-medium italic">Data yang dihapus tersimpan di sini sebelum dibuang permanen.</p>
         </div>
-        <div class="px-6 py-3 bg-rose-50 dark:bg-rose-950/30 rounded-2xl border border-rose-100 dark:border-rose-900">
-            <p class="text-[8px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Total Sampah</p>
-            <p class="text-lg font-black text-rose-700 dark:text-rose-200"><?= count($trash) ?> Item Terdeteksi</p>
+        <div class="flex items-center gap-4">
+            <?php if(!empty($trash)): ?>
+            <button onclick="handleEmptyTrash()" class="px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-rose-900/20 transition-all flex items-center gap-2 group">
+                <i data-lucide="trash-2" class="w-4 h-4 group-hover:animate-bounce"></i>
+                Kosongkan Recycle Bin
+            </button>
+            <?php endif; ?>
+            <div class="px-6 py-3 bg-rose-50 dark:bg-rose-950/30 rounded-2xl border border-rose-100 dark:border-rose-900">
+                <p class="text-[8px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Total Sampah</p>
+                <p class="text-lg font-black text-rose-700 dark:text-rose-200"><?= count($trash) ?> Item Terdeteksi</p>
+            </div>
         </div>
     </div>
 
@@ -73,6 +81,11 @@
     async function handleDeletePerm(url) {
         const ok = await customConfirm('Hapus Permanen?', 'Data yang sudah dihapus tidak dapat dikembalikan lagi.', 'danger');
         if (ok) window.location.href = url;
+    }
+
+    async function handleEmptyTrash() {
+        const ok = await customConfirm('Kosongkan Recycle Bin?', 'Semua data di dalam Recycle Bin akan dihapus PERMANEN dan tidak bisa dipulihkan!', 'danger');
+        if (ok) window.location.href = '<?= base_url('trash/empty') ?>';
     }
 </script>
 <?= $this->endSection() ?>

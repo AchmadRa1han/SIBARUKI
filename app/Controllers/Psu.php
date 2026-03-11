@@ -138,7 +138,11 @@ class Psu extends BaseController
 
         if (!$this->validate($rules)) return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
 
-        $this->jalanModel->insert($this->request->getPost());
+        $data = $this->request->getPost();
+        $this->jalanModel->insert($data);
+        
+        $this->logActivity('Tambah', 'PSU Jalan', 'Menambah jaringan jalan: ' . $data['nama_jalan'], $this->formatLogData($data));
+
         return redirect()->to('/psu')->with('success', 'Data berhasil ditambahkan.');
     }
 
@@ -165,7 +169,14 @@ class Psu extends BaseController
 
         if (!$this->validate($rules)) return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
 
-        $this->jalanModel->update($id, $this->request->getPost());
+        $oldData = $this->jalanModel->find($id);
+        $newData = $this->request->getPost();
+        
+        $this->jalanModel->update($id, $newData);
+        
+        $diff = $this->generateDiff($oldData, $newData);
+        $this->logActivity('Ubah', 'PSU Jalan', 'Memperbarui data jalan: ' . $oldData['nama_jalan'], $diff);
+
         return redirect()->to('/psu')->with('success', 'Data berhasil diperbarui.');
     }
 
@@ -173,7 +184,12 @@ class Psu extends BaseController
     {
         if (!has_permission('delete_psu')) return redirect()->back()->with('error', 'Anda tidak memiliki izin.');
 
-        $this->jalanModel->delete($id);
+        $data = $this->jalanModel->find($id);
+        if ($data) {
+            $this->jalanModel->delete($id);
+            $this->logActivity('Hapus', 'PSU Jalan', 'Menghapus data jalan: ' . ($data['nama_jalan'] ?? 'Tanpa Nama'), $this->formatLogData($data));
+        }
+
         return redirect()->to('/psu')->with('success', 'Data berhasil dihapus.');
     }
 }

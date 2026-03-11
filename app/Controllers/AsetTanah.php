@@ -131,7 +131,9 @@ class AsetTanah extends BaseController
 
     public function store()
     {
-        $this->asetModel->insert($this->request->getPost());
+        $data = $this->request->getPost();
+        $this->asetModel->insert($data);
+        $this->logActivity('Tambah', 'Aset Tanah', "Menambah aset tanah baru: {$data['nama_pemilik']}", $this->formatLogData($data));
         return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil ditambahkan.');
     }
 
@@ -144,13 +146,23 @@ class AsetTanah extends BaseController
 
     public function update($id)
     {
-        $this->asetModel->update($id, $this->request->getPost());
+        $oldData = $this->asetModel->find($id);
+        $newData = $this->request->getPost();
+        $this->asetModel->update($id, $newData);
+        
+        $diff = $this->generateDiff($oldData, $newData);
+        $this->logActivity('Ubah', 'Aset Tanah', "Memperbarui data aset: " . ($oldData['nama_pemilik'] ?? 'Unknown'), $diff);
+        
         return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil diperbarui.');
     }
 
     public function delete($id)
     {
-        $this->asetModel->delete($id);
+        $data = $this->asetModel->find($id);
+        if ($data) {
+            $this->asetModel->delete($id);
+            $this->logActivity('Hapus', 'Aset Tanah', "Menghapus data aset: " . ($data['nama_pemilik'] ?? 'Unknown'), $this->formatLogData($data));
+        }
         return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil dihapus.');
     }
 }

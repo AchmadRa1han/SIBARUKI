@@ -63,10 +63,13 @@ class RefMaster extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $this->refModel->save([
+        $data = [
             'kategori' => $this->request->getPost('kategori'),
             'nama_pilihan' => $this->request->getPost('nama_pilihan'),
-        ]);
+        ];
+        $this->refModel->save($data);
+
+        $this->logActivity('Tambah', 'Ref Master', "Menambah referensi: {$data['kategori']} -> {$data['nama_pilihan']}", $this->formatLogData($data));
 
         return redirect()->to('/ref-master')->with('message', 'Data berhasil ditambahkan');
     }
@@ -95,10 +98,15 @@ class RefMaster extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $this->refModel->update($id, [
+        $oldData = $this->refModel->find($id);
+        $newData = [
             'kategori' => $this->request->getPost('kategori'),
             'nama_pilihan' => $this->request->getPost('nama_pilihan'),
-        ]);
+        ];
+        $this->refModel->update($id, $newData);
+
+        $diff = $this->generateDiff($oldData, $newData);
+        $this->logActivity('Ubah', 'Ref Master', "Memperbarui referensi ID: $id", $diff);
 
         return redirect()->to('/ref-master')->with('message', 'Data berhasil diubah');
     }
@@ -107,7 +115,11 @@ class RefMaster extends BaseController
     {
         if (session()->get('role_name') !== 'admin') return redirect()->to('/dashboard');
 
-        $this->refModel->delete($id);
+        $data = $this->refModel->find($id);
+        if ($data) {
+            $this->refModel->delete($id);
+            $this->logActivity('Hapus', 'Ref Master', "Menghapus referensi: {$data['kategori']} -> {$data['nama_pilihan']}", $this->formatLogData($data));
+        }
         return redirect()->to('/ref-master')->with('message', 'Data berhasil dihapus');
     }
 }

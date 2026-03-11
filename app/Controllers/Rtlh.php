@@ -172,7 +172,13 @@ class Rtlh extends BaseController
         $db = \Config\Database::connect();
         
         $builder = $db->table('rtlh_rumah');
-        $builder->select('desa, desa_id, COUNT(*) as total');
+        $builder->select("
+            desa, 
+            desa_id, 
+            COUNT(*) as total_semua,
+            COUNT(CASE WHEN status_bantuan = 'Belum Menerima' THEN 1 END) as total_rtlh,
+            COUNT(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 END) as total_rlh
+        ");
         $builder->groupBy('desa, desa_id');
         $builder->orderBy('desa', 'ASC');
         $rekap = $builder->get()->getResultArray();
@@ -538,6 +544,7 @@ class Rtlh extends BaseController
             'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? null,
             'jenis_jamban_kloset' => $post['jenis_jamban_kloset'] ?? null,
             'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null,
+            'status_bantuan' => 'Belum Menerima'
         ]);
 
         if (!empty($post['lokasi_koordinat'])) {
@@ -566,6 +573,8 @@ class Rtlh extends BaseController
         ]);
 
         $db->transComplete();
+
+        $this->logActivity('Tambah', 'RTLH', "Menambah data RTLH baru untuk: {$post['nama_kepala_keluarga']} (NIK: $nik)", $this->formatLogData($post));
 
         return redirect()->to('/rtlh')->with('success', 'Data RTLH berhasil ditambahkan.');
     }
@@ -602,6 +611,13 @@ class Rtlh extends BaseController
     public function update($id)
     {
         $db = \Config\Database::connect();
+        
+        // Ambil Data Lama untuk Audit Trail
+        $oldRumah = $this->rumahModel->find($id);
+        $oldPenerima = $this->penerimaModel->where('nik', $oldRumah['nik_pemilik'])->first();
+        $oldKondisi = $this->kondisiModel->where('id_survei', $id)->first();
+        $oldData = array_merge($oldRumah, $oldPenerima, $oldKondisi);
+
         $db->transStart();
 
         $post = $this->request->getPost();
@@ -644,8 +660,8 @@ class Rtlh extends BaseController
             'tempat_lahir' => $post['tempat_lahir'] ?? null,
             'tanggal_lahir' => $post['tanggal_lahir'] ?? null,
             'jenis_kelamin' => $post['jenis_kelamin'] ?? null,
-            'pendidikan_id' => $post['pendidikan_id'] ?? null,
-            'pekerjaan_id' => $post['pekerjaan_id'] ?? null,
+            'pendidikan_id' => $post['pendidikan_id'] ?: null,
+            'pekerjaan_id' => $post['pekerjaan_id'] ?: null,
             'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null,
             'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null,
         ];
@@ -676,12 +692,40 @@ class Rtlh extends BaseController
             return redirect()->back()->with('error', 'Gagal memperbarui data RTLH terpadu.');
         }
 
+        $newData = array_merge($rumah, $dataPenerima, $dataKondisi);
+        $diff = $this->generateDiff($oldData, $newData);
+        $this->logActivity('Ubah', 'RTLH', 'Memperbarui data RTLH: ' . $oldPenerima['nama_kepala_keluarga'], $diff);
+
         return redirect()->to('/rtlh/detail/' . $id)->with('success', 'Data RTLH berhasil diperbarui.');
     }
 
     public function delete($id)
     {
+        $db = \Config\Database::connect();
+        
+        $rumah = $this->rumahModel->find($id);
+        $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
+        
+        $db->transStart();
+
+        // 1. Hapus data kondisi fisik (Child table)
+        $db->table('rtlh_kondisi_rumah')->where('id_survei', $id)->delete();
+
+        // 2. Hapus data bansos & histori jika ada
+        $db->table('rtlh_bansos')->where('id_survei', $id)->delete();
+        $db->table('rtlh_history_perubahan')->where('id_survei', $id)->delete();
+
+        // 3. Hapus data rumah utama
         $this->rumahModel->delete($id);
+
+        $db->transComplete();
+
+        if ($db->transStatus() === FALSE) {
+            return redirect()->to('/rtlh')->with('error', 'Gagal menghapus data RTLH.');
+        }
+
+        $this->logActivity('Hapus', 'RTLH', 'Menghapus data RTLH milik: ' . ($penerima['nama_kepala_keluarga'] ?? 'Unknown'), $this->formatLogData($rumah));
+
         return redirect()->to('/rtlh')->with('success', 'Data RTLH berhasil dihapus.');
     }
 

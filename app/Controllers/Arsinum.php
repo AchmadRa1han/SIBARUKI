@@ -172,7 +172,9 @@ class Arsinum extends BaseController
 
     public function store()
     {
-        $this->arsinumModel->insert($this->request->getPost());
+        $data = $this->request->getPost();
+        $this->arsinumModel->insert($data);
+        $this->logActivity('Tambah', 'Arsinum', "Menambah data Arsinum: {$data['jenis_pekerjaan']}", $this->formatLogData($data));
         return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil ditambahkan.');
     }
 
@@ -185,13 +187,23 @@ class Arsinum extends BaseController
 
     public function update($id)
     {
-        $this->arsinumModel->update($id, $this->request->getPost());
+        $oldData = $this->arsinumModel->find($id);
+        $newData = $this->request->getPost();
+        $this->arsinumModel->update($id, $newData);
+        
+        $diff = $this->generateDiff($oldData, $newData);
+        $this->logActivity('Ubah', 'Arsinum', "Memperbarui data Arsinum: " . ($oldData['jenis_pekerjaan'] ?? 'Unknown'), $diff);
+        
         return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil diperbarui.');
     }
 
     public function delete($id)
     {
-        $this->arsinumModel->delete($id);
+        $data = $this->arsinumModel->find($id);
+        if ($data) {
+            $this->arsinumModel->delete($id);
+            $this->logActivity('Hapus', 'Arsinum', "Menghapus data Arsinum: " . ($data['jenis_pekerjaan'] ?? 'Unknown'), $this->formatLogData($data));
+        }
         return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil dihapus.');
     }
 }

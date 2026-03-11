@@ -132,7 +132,14 @@
             </div>
 
             <div class="mt-12 flex items-center justify-end space-x-6 border-t dark:border-slate-800 pt-10">
-...
+                <a href="<?= base_url('wilayah-kumuh') ?>" class="text-sm font-bold text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Batal</a>
+                <button type="submit" class="bg-blue-900 dark:bg-blue-700 hover:bg-blue-950 dark:hover:bg-blue-600 text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-blue-900/30 transition-all flex items-center space-x-3">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    <span>Simpan Wilayah</span>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Leaflet & Draw Tools -->
@@ -260,14 +267,4 @@
         }
     }
 </script>
-<?= $this->endSection() ?>
-                <a href="<?= base_url('wilayah-kumuh') ?>" class="text-sm font-bold text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Batal</a>
-                <button type="submit" class="bg-blue-900 dark:bg-blue-700 hover:bg-blue-950 dark:hover:bg-blue-600 text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-blue-900/30 transition-all flex items-center space-x-3">
-                    <i data-lucide="save" class="w-5 h-5"></i>
-                    <span>Simpan Wilayah</span>
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 <?= $this->endSection() ?>

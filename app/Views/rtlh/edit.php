@@ -117,8 +117,14 @@
                         </div>
                         <div class="md:col-span-2 space-y-6">
                             <div>
-                                <label class="block text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase mb-2 tracking-widest ml-1">Lokasi Koordinat (WKT)</label>
-                                <input type="text" name="lokasi_koordinat" id="lokasi_koordinat" value="<?= old('lokasi_koordinat', $rumah['lokasi_koordinat']) ?>" placeholder="POINT(X Y)" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none font-mono text-xs dark:text-blue-400" readonly>
+                                <label class="block text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase mb-2 tracking-widest ml-1 flex justify-between items-center">
+                                    <span>Lokasi Koordinat (WKT)</span>
+                                    <button type="button" onclick="syncFromText()" class="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 normal-case">
+                                        <i data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> Sinkronkan ke Peta
+                                    </button>
+                                </label>
+                                <input type="text" name="lokasi_koordinat" id="lokasi_koordinat" value="<?= old('lokasi_koordinat', $rumah['lokasi_koordinat']) ?>" placeholder="POINT(X Y)" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none font-mono text-xs dark:text-blue-400 focus:ring-4 focus:ring-blue-500/10">
+                                <p class="text-[8px] text-slate-400 mt-2 italic px-1">* Anda dapat mengklik peta atau mengetik koordinat manual dengan format: POINT(Longitude Latitude)</p>
                             </div>
                             <div>
                                 <label class="block text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase mb-2 tracking-widest ml-1">Status Backlog</label>
@@ -373,6 +379,26 @@
     function updateInput(lat, lng) {
         document.getElementById('lokasi_koordinat').value = `POINT(${lng.toFixed(8)} ${lat.toFixed(8)})`;
     }
+
+    function syncFromText() {
+        const val = document.getElementById('lokasi_koordinat').value;
+        const coords = parseWKT(val);
+        if (coords) {
+            updateMarker(coords.lat, coords.lng);
+            map.setView([coords.lat, coords.lng], 18);
+        } else {
+            alert('Format koordinat tidak valid. Gunakan format: POINT(Longitude Latitude)');
+        }
+    }
+
+    // Listener untuk perubahan manual di input text
+    document.getElementById('lokasi_koordinat').addEventListener('change', function() {
+        const coords = parseWKT(this.value);
+        if (coords) {
+            updateMarker(coords.lat, coords.lng);
+            map.panTo([coords.lat, coords.lng]);
+        }
+    });
 
     function getLocation() {
         if (navigator.geolocation) {

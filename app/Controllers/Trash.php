@@ -64,4 +64,16 @@ class Trash extends BaseController
 
         return redirect()->to('/trash')->with('message', 'Data dihapus secara permanen.');
     }
+
+    public function emptyTrash()
+    {
+        if (!has_permission('manage_roles')) return redirect()->to('/dashboard');
+
+        $db = \Config\Database::connect();
+        $db->table('trash_data')->truncate();
+
+        $this->logActivity('Hapus', 'Recycle Bin', 'Mengosongkan seluruh data di Recycle Bin');
+
+        return redirect()->to('/trash')->with('message', 'Recycle Bin telah dikosongkan.');
+    }
 }

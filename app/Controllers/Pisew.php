@@ -133,7 +133,9 @@ class Pisew extends BaseController
 
     public function store()
     {
-        $this->pisewModel->insert($this->request->getPost());
+        $data = $this->request->getPost();
+        $this->pisewModel->insert($data);
+        $this->logActivity('Tambah', 'PISEW', "Menambah data PISEW: {$data['jenis_pekerjaan']}", $this->formatLogData($data));
         return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil ditambahkan.');
     }
 
@@ -146,13 +148,23 @@ class Pisew extends BaseController
 
     public function update($id)
     {
-        $this->pisewModel->update($id, $this->request->getPost());
+        $oldData = $this->pisewModel->find($id);
+        $newData = $this->request->getPost();
+        $this->pisewModel->update($id, $newData);
+        
+        $diff = $this->generateDiff($oldData, $newData);
+        $this->logActivity('Ubah', 'PISEW', "Memperbarui data PISEW: " . ($oldData['jenis_pekerjaan'] ?? 'Unknown'), $diff);
+        
         return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil diperbarui.');
     }
 
     public function delete($id)
     {
-        $this->pisewModel->delete($id);
+        $data = $this->pisewModel->find($id);
+        if ($data) {
+            $this->pisewModel->delete($id);
+            $this->logActivity('Hapus', 'PISEW', "Menghapus data PISEW: " . ($data['jenis_pekerjaan'] ?? 'Unknown'), $this->formatLogData($data));
+        }
         return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil dihapus.');
     }
 }

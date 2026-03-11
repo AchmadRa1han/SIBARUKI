@@ -55,21 +55,65 @@
                             <h4 class="text-[10px] font-black text-amber-600 uppercase tracking-[0.2em]">Kondisi Awal (RTLH)</h4>
                         </div>
                         
+                        <!-- Kondisi Fisik (Prioritas) -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <?php 
-                                $fields = [
-                                    ['label' => 'Kondisi Atap', 'val' => $ref[$kondisiSeb['st_atap'] ?? ''] ?? 'N/A'],
-                                    ['label' => 'Kondisi Dinding', 'val' => $ref[$kondisiSeb['st_dinding'] ?? ''] ?? 'N/A'],
-                                    ['label' => 'Kondisi Lantai', 'val' => $ref[$kondisiSeb['st_lantai'] ?? ''] ?? 'N/A'],
-                                    ['label' => 'Material Dinding', 'val' => $ref[$kondisiSeb['mat_dinding'] ?? ''] ?? 'N/A'],
+                                $mainFields = [
+                                    ['label' => 'Atap', 'val' => ($ref[$kondisiSeb['st_atap'] ?? ''] ?? 'N/A') . ' (' . ($ref[$kondisiSeb['mat_atap'] ?? ''] ?? 'N/A') . ')'],
+                                    ['label' => 'Dinding', 'val' => ($ref[$kondisiSeb['st_dinding'] ?? ''] ?? 'N/A') . ' (' . ($ref[$kondisiSeb['mat_dinding'] ?? ''] ?? 'N/A') . ')'],
+                                    ['label' => 'Lantai', 'val' => ($ref[$kondisiSeb['st_lantai'] ?? ''] ?? 'N/A') . ' (' . ($ref[$kondisiSeb['mat_lantai'] ?? ''] ?? 'N/A') . ')'],
+                                    ['label' => 'Pondasi', 'val' => $ref[$kondisiSeb['st_pondasi'] ?? ''] ?? 'N/A'],
                                 ];
-                                foreach($fields as $f):
+                                foreach($mainFields as $f):
                             ?>
                             <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800/50">
                                 <p class="text-[8px] font-bold text-slate-400 uppercase mb-1"><?= $f['label'] ?></p>
                                 <p class="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase"><?= $f['val'] ?></p>
                             </div>
                             <?php endforeach; ?>
+                        </div>
+
+                        <!-- Komponen Struktural Lainnya -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <?php 
+                                $structFields = [
+                                    ['label' => 'Kolom', 'val' => $ref[$kondisiSeb['st_kolom'] ?? ''] ?? 'N/A'],
+                                    ['label' => 'Balok', 'val' => $ref[$kondisiSeb['st_balok'] ?? ''] ?? 'N/A'],
+                                    ['label' => 'Sloof', 'val' => $ref[$kondisiSeb['st_sloof'] ?? ''] ?? 'N/A'],
+                                    ['label' => 'Rangka Atap', 'val' => $ref[$kondisiSeb['st_rangka_atap'] ?? ''] ?? 'N/A'],
+                                    ['label' => 'Plafon', 'val' => $ref[$kondisiSeb['st_plafon'] ?? ''] ?? 'N/A'],
+                                    ['label' => 'Ventilasi', 'val' => $ref[$kondisiSeb['st_ventilasi'] ?? ''] ?? 'N/A'],
+                                ];
+                                foreach($structFields as $f):
+                            ?>
+                            <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <p class="text-[7px] font-bold text-slate-400 uppercase mb-1"><?= $f['label'] ?></p>
+                                <p class="text-[9px] font-extrabold text-slate-600 dark:text-slate-400 uppercase"><?= $f['val'] ?></p>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <!-- Fasilitas & Luas -->
+                        <div class="p-5 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800/50">
+                            <h5 class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-4">Fasilitas & Luas Bangunan</h5>
+                            <div class="grid grid-cols-2 gap-y-4 gap-x-6">
+                                <div>
+                                    <p class="text-[7px] font-bold text-slate-400 uppercase mb-0.5">Luas Rumah / Lahan</p>
+                                    <p class="text-[10px] font-black text-slate-700 dark:text-slate-300"><?= $rumahSeb['luas_rumah_m2'] ?? '0' ?> m² / <?= $rumahSeb['luas_lahan_m2'] ?? '0' ?> m²</p>
+                                </div>
+                                <div>
+                                    <p class="text-[7px] font-bold text-slate-400 uppercase mb-0.5">Penghuni</p>
+                                    <p class="text-[10px] font-black text-slate-700 dark:text-slate-300"><?= $rumahSeb['jumlah_penghuni_jiwa'] ?? '0' ?> Jiwa</p>
+                                </div>
+                                <div>
+                                    <p class="text-[7px] font-bold text-slate-400 uppercase mb-0.5">Air Minum</p>
+                                    <p class="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase"><?= $rumahSeb['sumber_air_minum'] ?? 'N/A' ?></p>
+                                </div>
+                                <div>
+                                    <p class="text-[7px] font-bold text-slate-400 uppercase mb-0.5">Sanitasi</p>
+                                    <p class="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase"><?= $rumahSeb['kamar_mandi_dan_jamban'] ?? 'N/A' ?></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

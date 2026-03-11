@@ -134,6 +134,7 @@ $routes->group('trash', function($routes) {
     $routes->get('/', 'Trash::index');
     $routes->get('restore/(:num)', 'Trash::restore/$1');
     $routes->get('delete-perm/(:num)', 'Trash::deletePermanently/$1');
+    $routes->get('empty', 'Trash::emptyTrash');
 });
 
 $routes->group('ref-master', function($routes) {

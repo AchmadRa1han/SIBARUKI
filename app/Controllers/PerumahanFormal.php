@@ -108,7 +108,31 @@ class PerumahanFormal extends BaseController
 
     public function create()
     {
+        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
         return view('perumahan_formal/create', ['title' => 'Tambah Perumahan Formal']);
+    }
+
+    public function store()
+    {
+        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+
+        $rules = [
+            'nama_perumahan' => 'required',
+            'pengembang' => 'required',
+            'tahun_pembangunan' => 'required|numeric',
+            'luas_kawasan_ha' => 'required|numeric',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $data = $this->request->getPost();
+        $this->perumahanModel->insert($data);
+        
+        $this->logActivity('Tambah', 'Perumahan Formal', 'Menambah perumahan: ' . $data['nama_perumahan'], $this->formatLogData($data));
+
+        return redirect()->to('/perumahan-formal')->with('success', 'Data perumahan berhasil ditambahkan.');
     }
 
     public function detail($id)
@@ -130,7 +154,14 @@ class PerumahanFormal extends BaseController
 
     public function update($id)
     {
-        $this->perumahanModel->update($id, $this->request->getPost());
+        $oldData = $this->perumahanModel->find($id);
+        $newData = $this->request->getPost();
+        
+        $this->perumahanModel->update($id, $newData);
+        
+        $diff = $this->generateDiff($oldData, $newData);
+        $this->logActivity('Ubah', 'Perumahan Formal', 'Memperbarui data perumahan: ' . $oldData['nama_perumahan'], $diff);
+
         return redirect()->to('/perumahan-formal')->with('success', 'Data berhasil diperbarui.');
     }
 
@@ -140,7 +171,12 @@ class PerumahanFormal extends BaseController
             return redirect()->back()->with('error', 'Izin ditolak.');
         }
 
-        $this->perumahanModel->delete($id);
+        $data = $this->perumahanModel->find($id);
+        if ($data) {
+            $this->perumahanModel->delete($id);
+            $this->logActivity('Hapus', 'Perumahan Formal', 'Menghapus data perumahan: ' . ($data['nama_perumahan'] ?? 'Tanpa Nama'), $this->formatLogData($data));
+        }
+
         return redirect()->to('/perumahan-formal')->with('success', 'Data berhasil dihapus.');
     }
 }

@@ -128,7 +128,14 @@ class WilayahKumuh extends BaseController
 
     public function store()
     {
-        $this->kumuhModel->insert($this->request->getPost());
+        $data = $this->request->getPost();
+        
+        // Handle empty fields for foreign keys or auto-increment
+        if (empty($data['FID'])) unset($data['FID']);
+        if (empty($data['desa_id'])) $data['desa_id'] = null;
+
+        $this->kumuhModel->insert($data);
+        $this->logActivity('Tambah', 'Wilayah Kumuh', "Menambah wilayah kumuh: " . ($data['Kawasan'] ?? 'Tanpa Nama'), $this->formatLogData($data));
         return redirect()->to('/wilayah-kumuh')->with('success', 'Data berhasil ditambahkan.');
     }
 
@@ -141,13 +148,26 @@ class WilayahKumuh extends BaseController
 
     public function update($id)
     {
-        $this->kumuhModel->update($id, $this->request->getPost());
+        $oldData = $this->kumuhModel->find($id);
+        $newData = $this->request->getPost();
+        
+        if (empty($newData['desa_id'])) $newData['desa_id'] = null;
+
+        $this->kumuhModel->update($id, $newData);
+        
+        $diff = $this->generateDiff($oldData, $newData);
+        $this->logActivity('Ubah', 'Wilayah Kumuh', "Memperbarui data wilayah kumuh: " . ($oldData['Kawasan'] ?? 'Unknown'), $diff);
+        
         return redirect()->to('/wilayah-kumuh')->with('success', 'Data berhasil diperbarui.');
     }
 
     public function delete($id)
     {
-        $this->kumuhModel->delete($id);
+        $data = $this->kumuhModel->find($id);
+        if ($data) {
+            $this->kumuhModel->delete($id);
+            $this->logActivity('Hapus', 'Wilayah Kumuh', "Menghapus data wilayah kumuh: " . ($data['Kawasan'] ?? 'Unknown'), $this->formatLogData($data));
+        }
         return redirect()->to('/wilayah-kumuh')->with('success', 'Data berhasil dihapus.');
     }
 }

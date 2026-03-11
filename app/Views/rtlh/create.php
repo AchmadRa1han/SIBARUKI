@@ -1,7 +1,7 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<div class="max-w-6xl mx-auto space-y-8">
+<div class="max-w-6xl mx-auto space-y-8 pb-32">
     
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border dark:border-slate-800 shadow-sm transition-all duration-300">
@@ -267,13 +267,9 @@
                             <div class="absolute -inset-1 bg-gradient-to-r from-amber-600 to-orange-600 rounded-[2.5rem] blur opacity-10 transition duration-1000"></div>
                             <div class="relative bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800">
                                 <div id="map-picker" class="w-full h-80 z-10" style="min-height: 320px; background: #ececec;"></div>
-                                
-                                <!-- GPS Button -->
                                 <button type="button" onclick="getLocation()" class="absolute top-4 right-4 z-[1000] p-3 bg-white dark:bg-slate-800 text-blue-600 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-90 flex items-center gap-2 font-black text-[9px] uppercase tracking-widest">
                                     <i data-lucide="crosshair" class="w-4 h-4"></i> Lokasi Saya
                                 </button>
-
-                                <!-- Helper Overlay -->
                                 <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] pointer-events-none">
                                     <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest shadow-2xl border border-white/10 flex items-center gap-2">
                                         <i data-lucide="mouse-pointer-2" class="w-3 h-3"></i> Klik pada peta untuk menentukan titik rumah
@@ -290,93 +286,6 @@
             </div>
 
             <!-- SECTION 4: PENILAIAN TEKNIS -->
-...
-</div>
-
-<!-- Leaflet & Script -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-    let map, marker;
-    let rot = 0;
-
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(initMapPicker, 500);
-    });
-
-    function initMapPicker() {
-        const isDark = document.documentElement.classList.contains('dark');
-        const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
-        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' });
-
-        map = L.map('map-picker', { 
-            zoomControl: false, 
-            layers: [satellite] 
-        }).setView([-5.1245, 120.2536], 15);
-
-        L.control.zoom({ position: 'topright' }).addTo(map);
-
-        // Standardized Layer Toggle
-        const LayerToggle = L.Control.extend({
-            onAdd: function(map) {
-                const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
-                btn.type = 'button'; btn.style.width = '44px'; btn.style.height = '44px'; btn.style.cursor = 'pointer';
-                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isDark?'#60a5fa':'#2563eb'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
-                
-                L.DomEvent.disableClickPropagation(btn);
-                L.DomEvent.on(btn, 'click', function(e) {
-                    if (map.hasLayer(standard)) {
-                        map.removeLayer(standard); map.addLayer(satellite);
-                        btn.style.backgroundColor = '#2563eb';
-                    } else {
-                        map.removeLayer(satellite); map.addLayer(standard);
-                        btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff';
-                    }
-                });
-                return btn;
-            }
-        });
-        new LayerToggle({ position: 'topright' }).addTo(map);
-
-        map.on('click', function(e) {
-            updateMarker(e.latlng.lat, e.latlng.lng);
-        });
-    }
-
-    function updateMarker(lat, lng) {
-        if (marker) {
-            marker.setLatLng([lat, lng]);
-        } else {
-            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
-            marker.on('dragend', function(e) {
-                const pos = e.target.getLatLng();
-                updateInput(pos.lat, pos.lng);
-            });
-        }
-        updateInput(lat, lng);
-        map.panTo([lat, lng]);
-    }
-
-    function updateInput(lat, lng) {
-        document.getElementById('lokasi_koordinat').value = `POINT(${lng.toFixed(8)} ${lat.toFixed(8)})`;
-    }
-
-    function getLocation() {
-        if (navigator.geolocation) {
-            showToast('Mengakses GPS...', 'success');
-            navigator.geolocation.getCurrentPosition((position) => {
-                updateMarker(position.coords.latitude, position.coords.longitude);
-                map.setZoom(18);
-            }, (err) => {
-                showToast('Gagal mengakses lokasi. Pastikan GPS aktif.', 'error');
-            });
-        } else {
-            showToast('Browser tidak mendukung Geolocation.', 'error');
-        }
-    }
-</script>
-<?= $this->endSection() ?>
             <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
                 <div class="p-6 border-b dark:border-slate-800 bg-rose-50/30 dark:bg-rose-950/30">
                     <h3 class="font-black text-rose-700 dark:text-rose-400 uppercase tracking-widest text-xs flex items-center">
@@ -470,7 +379,7 @@
             </div>
 
             <!-- BUTTON SIMPAN -->
-            <div class="flex justify-end pb-32">
+            <div class="flex justify-end">
                 <button type="submit" class="group flex items-center space-x-6 bg-blue-950 dark:bg-blue-700 hover:bg-black text-white px-16 py-6 rounded-[2.5rem] font-black shadow-2xl transition-all active:scale-95">
                     <div class="flex flex-col text-right">
                         <span class="text-[10px] uppercase tracking-[0.3em] opacity-60">Konfirmasi Final</span>
@@ -482,4 +391,82 @@
         </div>
     </form>
 </div>
+
+<!-- Leaflet & Script -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    let map, marker;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initMapPicker, 500);
+    });
+
+    function initMapPicker() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' });
+
+        map = L.map('map-picker', { 
+            zoomControl: false, 
+            layers: [satellite] 
+        }).setView([-5.1245, 120.2536], 15);
+
+        L.control.zoom({ position: 'topright' }).addTo(map);
+
+        const LayerToggle = L.Control.extend({
+            onAdd: function(map) {
+                const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                btn.type = 'button'; btn.style.width = '44px'; btn.style.height = '44px'; btn.style.cursor = 'pointer';
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isDark?'#60a5fa':'#2563eb'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                L.DomEvent.disableClickPropagation(btn);
+                L.DomEvent.on(btn, 'click', function(e) {
+                    if (map.hasLayer(standard)) {
+                        map.removeLayer(standard); map.addLayer(satellite);
+                        btn.style.backgroundColor = '#2563eb';
+                    } else {
+                        map.removeLayer(satellite); map.addLayer(standard);
+                        btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff';
+                    }
+                });
+                return btn;
+            }
+        });
+        new LayerToggle({ position: 'topright' }).addTo(map);
+
+        map.on('click', function(e) {
+            updateMarker(e.latlng.lat, e.latlng.lng);
+        });
+    }
+
+    function updateMarker(lat, lng) {
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+            marker.on('dragend', function(e) {
+                const pos = e.target.getLatLng();
+                updateInput(pos.lat, pos.lng);
+            });
+        }
+        updateInput(lat, lng);
+        map.panTo([lat, lng]);
+    }
+
+    function updateInput(lat, lng) {
+        document.getElementById('lokasi_koordinat').value = `POINT(${lng.toFixed(8)} ${lat.toFixed(8)})`;
+    }
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                updateMarker(position.coords.latitude, position.coords.longitude);
+                map.setZoom(18);
+            }, (err) => {
+                alert('Gagal mengakses lokasi. Pastikan GPS aktif.');
+            });
+        }
+    }
+</script>
 <?= $this->endSection() ?>

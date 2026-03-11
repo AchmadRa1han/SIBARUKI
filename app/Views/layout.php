@@ -298,6 +298,79 @@
             if (el) { el.classList.remove('open'); if (arrow) arrow.style.transform = 'rotate(0deg)'; localStorage.setItem(id, 'closed'); }
         }
 
+        /**
+         * customConfirm
+         * Global confirmation modal with SIBARUKI "Mewah" style
+         */
+        function customConfirm(title, message, type = 'info') {
+            return new Promise((resolve) => {
+                // Support for object-based call (like in aset_tanah/detail.php)
+                let options = {};
+                if (typeof title === 'object') {
+                    options = title;
+                    title = options.title || 'Konfirmasi';
+                    message = options.message || '';
+                    type = options.type || 'info';
+                }
+
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 z-[2000] flex items-center justify-center p-6 transition-opacity duration-300 opacity-0';
+                
+                const typeColors = {
+                    danger: { bg: 'rose-500', text: 'rose-500', light: 'rose-50', dark: 'rose-950/30', icon: 'alert-triangle' },
+                    info: { bg: 'blue-500', text: 'blue-500', light: 'blue-50', dark: 'blue-950/30', icon: 'info' },
+                    warning: { bg: 'amber-500', text: 'amber-500', light: 'amber-50', dark: 'amber-950/30', icon: 'alert-circle' }
+                };
+
+                const colors = typeColors[type] || typeColors.info;
+                const isDark = document.documentElement.classList.contains('dark');
+
+                modal.innerHTML = `
+                    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md"></div>
+                    <div class="relative bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden scale-95 transition-transform duration-300">
+                        <div class="p-10 text-center">
+                            <div class="w-20 h-20 bg-${colors.light} dark:bg-${colors.dark} text-${colors.text} rounded-[2rem] flex items-center justify-center mx-auto mb-8">
+                                <i data-lucide="${colors.icon}" class="w-10 h-10"></i>
+                            </div>
+                            <h3 class="text-2xl font-black text-blue-950 dark:text-white uppercase tracking-tight mb-4">${title}</h3>
+                            <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">${message}</p>
+                        </div>
+                        <div class="p-8 bg-slate-50/50 dark:bg-slate-950/50 border-t dark:border-slate-800 flex gap-4">
+                            <button id="confirm-cancel" class="flex-1 py-4 text-sm font-black text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest">Batal</button>
+                            <button id="confirm-ok" class="flex-[2] py-4 bg-${colors.bg} text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-${colors.text}/20 hover:scale-[1.02] active:scale-95 transition-all">
+                                ${options.confirmText || 'Ya, Lanjutkan'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+                lucide.createIcons({ attrs: { 'stroke-width': 2.5 } });
+
+                // Animate in
+                setTimeout(() => {
+                    modal.classList.add('opacity-100');
+                    modal.querySelector('.relative').classList.remove('scale-95');
+                }, 10);
+
+                const cleanup = (result) => {
+                    modal.classList.remove('opacity-100');
+                    modal.querySelector('.relative').classList.add('scale-95');
+                    setTimeout(() => {
+                        modal.remove();
+                        if (result && typeof options.onConfirm === 'function') {
+                            options.onConfirm();
+                        }
+                        resolve(result);
+                    }, 300);
+                };
+
+                modal.querySelector('#confirm-ok').addEventListener('click', () => cleanup(true));
+                modal.querySelector('#confirm-cancel').addEventListener('click', () => cleanup(false));
+                modal.querySelector('.fixed.inset-0').addEventListener('click', () => cleanup(false));
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const isDark = document.documentElement.classList.contains('dark');
             updateThemeIcons(isDark);

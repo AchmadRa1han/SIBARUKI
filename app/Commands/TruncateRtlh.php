@@ -21,8 +21,10 @@ class TruncateRtlh extends BaseCommand
         $db->query("TRUNCATE TABLE rtlh_kondisi_rumah");
         $db->query("TRUNCATE TABLE rtlh_rumah");
         $db->query("TRUNCATE TABLE rtlh_penerima");
+        $db->query("TRUNCATE TABLE rtlh_bansos");
+        $db->query("TRUNCATE TABLE rtlh_history_perubahan");
         $db->query("SET FOREIGN_KEY_CHECKS = 1;");
         
-        CLI::write('Berhasil! Tabel rtlh_penerima, rtlh_rumah, dan rtlh_kondisi_rumah telah kosong.', 'green');
+        CLI::write('Berhasil! Semua tabel terkait RTLH (Rumah, Kondisi, Penerima, Bansos, & Histori) telah kosong.', 'green');
     }
 }

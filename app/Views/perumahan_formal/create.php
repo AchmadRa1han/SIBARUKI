@@ -8,7 +8,7 @@
         </a>
         <div>
             <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Tambah Perumahan</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Input data perumahan formal baru.</p>
+            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Input data perumahan formal baru secara manual atau via CSV.</p>
         </div>
     </div>
 
@@ -32,10 +32,45 @@
         </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center py-20">
-        <i data-lucide="constructor" class="w-16 h-16 text-slate-200 mb-4"></i>
-        <h3 class="text-lg font-black text-blue-950 dark:text-white uppercase tracking-tight">Form Manual Segera Hadir</h3>
-        <p class="text-slate-400 text-sm max-w-sm">Untuk saat ini, silakan gunakan fitur **Import via CSV** di atas untuk menambahkan data perumahan.</p>
-    </div>
+    <form action="<?= base_url('perumahan-formal/store') ?>" method="post" class="space-y-6">
+        <?= csrf_field() ?>
+        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-sm border border-slate-100 dark:border-slate-800">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2 space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Perumahan</label>
+                    <input type="text" name="nama_perumahan" value="<?= old('nama_perumahan') ?>" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all uppercase" placeholder="CONTOH: PERUMAHAN BUMI SINJAI">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pengembang</label>
+                    <input type="text" name="pengembang" value="<?= old('pengembang') ?>" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all uppercase" placeholder="NAMA PT / DEVELOPER">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tahun Pembangunan</label>
+                    <input type="number" name="tahun_pembangunan" value="<?= old('tahun_pembangunan') ?>" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="2024">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Luas Kawasan (Ha)</label>
+                    <input type="number" step="0.01" name="luas_kawasan_ha" value="<?= old('luas_kawasan_ha') ?>" required class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="0.00">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Longitude</label>
+                    <input type="text" name="longitude" value="<?= old('longitude') ?>" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="120.xxxx">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Latitude</label>
+                    <input type="text" name="latitude" value="<?= old('latitude') ?>" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all" placeholder="-5.xxxx">
+                </div>
+                <div class="md:col-span-2 space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Data Spasial (WKT)</label>
+                    <textarea name="wkt" rows="3" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all font-mono text-xs" placeholder="POLYGON((...)) atau POINT(...)"><?= old('wkt') ?></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end gap-4">
+            <button type="submit" class="px-12 py-4 bg-blue-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-black transition-all flex items-center gap-3">
+                Simpan Data Perumahan <i data-lucide="save" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </form>
 </div>
 <?= $this->endSection() ?>
