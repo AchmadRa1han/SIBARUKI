@@ -86,6 +86,7 @@ $routes->group('rtlh', function($routes) {
     $routes->get('edit/(:num)', 'Rtlh::edit/$1');
     $routes->post('update/(:num)', 'Rtlh::update/$1');
     $routes->post('delete/(:num)', 'Rtlh::delete/$1');
+    $routes->post('bulk-delete', 'Rtlh::bulkDelete');
 });
 
 $routes->group('wilayah-kumuh', function($routes) {

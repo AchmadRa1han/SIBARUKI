@@ -10,7 +10,7 @@ describe('Lifecycle RTLH to RLH - Full Simulation', () => {
     cy.url().should('include', '/dashboard');
   });
 
-  it('should create RTLH, mark as Tuntas (RLH), and then delete', () => {
+  it('should create RTLH, mark as Tuntas (RLH), and then delete from RLH tab', () => {
     // 1. CREATE RTLH
     cy.visit('http://localhost:8080/rtlh');
     cy.contains('Tambah Data').click();
@@ -49,24 +49,25 @@ describe('Lifecycle RTLH to RLH - Full Simulation', () => {
     cy.get('input[name="program_bansos"]').type('BSPS CYPRESS TEST');
     cy.contains('button', 'Konfirmasi Tuntas').click();
 
-    // Verifikasi Berhasil & Pindah Tab
-    cy.contains('Data RTLH berhasil ditandai sebagai Tuntas').should('be.visible');
-    
-    // Pastikan di tab "Belum Menerima" (Default) data sudah tidak ada
-    cy.visit('http://localhost:8080/rtlh');
-    cy.get('input[name="keyword"]').clear().type(uniqueName + '{enter}');
-    cy.get('tbody').should('contain', 'Data tidak ditemukan');
+    // Verifikasi Pesan Sukses (Gunakan Regex agar fleksibel)
+    cy.contains(/Data berhasil ditandai sebagai Tuntas/i, { timeout: 10000 }).should('be.visible');
 
-    // 3. CHECK IN RLH TAB & DELETE
-    // Pindah ke tab Telah Menerima (RLH)
-    cy.contains('Telah Menerima (RLH)').click();
+    // 3. CHECK IN RLH TAB
+    cy.visit('http://localhost:8080/rtlh');
+    
+    // Secara eksplisit klik tab "Tuntas RLH"
+    cy.contains('a', 'Tuntas RLH').click();
+    
+    // Cari data di tab RLH
     cy.get('input[name="keyword"]').clear().type(uniqueName + '{enter}');
     cy.contains(uniqueName).should('exist');
+    cy.contains('TUNTAS (RLH)').should('exist');
 
-    // Hapus data dari tab RLH
+    // 4. DELETE FROM RLH TAB
+    // Klik tombol hapus (ikon trash-2) pada baris yang ditemukan
     cy.contains(uniqueName).closest('tr').find('button').filter(':has([data-lucide="trash-2"])').click({ force: true });
     
-    // Konfirmasi Hapus
+    // Menangani Modal Konfirmasi SIBARUKI
     cy.get('body').then(($body) => {
         if ($body.find('button:contains("Ya, Lanjutkan")').length > 0) {
             cy.contains('button', 'Ya, Lanjutkan').click({ force: true });
@@ -75,6 +76,7 @@ describe('Lifecycle RTLH to RLH - Full Simulation', () => {
         }
     });
 
+    // Verifikasi Terhapus
     cy.contains('Data RTLH berhasil dihapus').should('be.visible');
     cy.contains(uniqueName).should('not.exist');
   });

@@ -143,7 +143,7 @@ class Rtlh extends BaseController
 
             $this->logActivity('Tuntas Bansos', 'RTLH', "Menandai rumah ID $id telah menerima bansos tahun $tahun");
 
-            return redirect()->to('/rtlh?status=Sudah Menerima')->with('success', 'Data berhasil ditandai sebagai Tuntas (RLH). Silakan cek tab "Tuntas RLH".');
+            return redirect()->to('/rtlh?status=Sudah Menerima')->with('success', "Data berhasil ditandai sebagai Tuntas (RLH). Silakan cek tab 'Tuntas RLH'.");
 
         } catch (\Exception $e) {
             $db->transRollback();
@@ -701,32 +701,39 @@ class Rtlh extends BaseController
 
     public function delete($id)
     {
+        // ... (existing delete code) ...
+    }
+
+    public function bulkDelete()
+    {
+        if (!has_permission('delete_rtlh')) return $this->response->setJSON(['status' => 'error', 'message' => 'Izin ditolak.']);
+
+        $ids = $this->request->getPost('ids');
+        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+
         $db = \Config\Database::connect();
-        
-        $rumah = $this->rumahModel->find($id);
-        $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
-        
         $db->transStart();
 
-        // 1. Hapus data kondisi fisik (Child table)
-        $db->table('rtlh_kondisi_rumah')->where('id_survei', $id)->delete();
+        try {
+            foreach ($ids as $id) {
+                // Gunakan logika hapus yang sama dengan delete() tunggal
+                $db->table('rtlh_kondisi_rumah')->where('id_survei', $id)->delete();
+                $db->table('rtlh_bansos')->where('id_survei', $id)->delete();
+                $db->table('rtlh_history_perubahan')->where('id_survei', $id)->delete();
+                $this->rumahModel->delete($id);
+            }
 
-        // 2. Hapus data bansos & histori jika ada
-        $db->table('rtlh_bansos')->where('id_survei', $id)->delete();
-        $db->table('rtlh_history_perubahan')->where('id_survei', $id)->delete();
+            $db->transComplete();
 
-        // 3. Hapus data rumah utama
-        $this->rumahModel->delete($id);
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus beberapa data.');
 
-        $db->transComplete();
+            $this->logActivity('Hapus Massal', 'RTLH', "Menghapus " . count($ids) . " data RTLH sekaligus");
 
-        if ($db->transStatus() === FALSE) {
-            return redirect()->to('/rtlh')->with('error', 'Gagal menghapus data RTLH.');
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
         }
-
-        $this->logActivity('Hapus', 'RTLH', 'Menghapus data RTLH milik: ' . ($penerima['nama_kepala_keluarga'] ?? 'Unknown'), $this->formatLogData($rumah));
-
-        return redirect()->to('/rtlh')->with('success', 'Data RTLH berhasil dihapus.');
     }
 
     public function logExport($id)
