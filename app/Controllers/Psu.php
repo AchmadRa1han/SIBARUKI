@@ -192,4 +192,24 @@ class Psu extends BaseController
 
         return redirect()->to('/psu')->with('success', 'Data berhasil dihapus.');
     }
+
+    public function bulkDelete()
+    {
+        if (!has_permission('delete_psu')) return $this->response->setJSON(['status' => 'error', 'message' => 'Izin ditolak.']);
+        $ids = $this->request->getPost('ids');
+        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+        try {
+            $this->jalanModel->whereIn('id', $ids)->delete();
+            $db->transComplete();
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
+            $this->logActivity('Hapus Massal', 'PSU Jalan', "Menghapus " . count($ids) . " data jalan sekaligus");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
 }

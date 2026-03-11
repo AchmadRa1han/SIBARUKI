@@ -22,10 +22,27 @@
         </div>
     <?php endif; ?>
 
-    <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+    <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300 relative">
+        <!-- Floating Bulk Action Bar -->
+        <div id="bulk-action-bar" class="absolute top-0 left-0 right-0 z-50 bg-blue-950 text-white p-4 transform -translate-y-full transition-transform duration-300 flex items-center justify-between px-10">
+            <div class="flex items-center gap-4">
+                <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-full text-[10px] font-black tracking-widest">0 TERPILIH</span>
+                <p class="text-[10px] font-bold uppercase tracking-widest opacity-70">Aksi massal untuk manajemen user</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="handleBulkDelete()" class="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus Terpilih
+                </button>
+                <button onclick="clearSelection()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Batal</button>
+            </div>
+        </div>
+
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50/50 dark:bg-slate-950/50 border-b border-slate-100 dark:border-slate-800 transition-colors duration-300">
+                    <th class="p-6 w-16 text-center">
+                        <input type="checkbox" id="select-all" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-blue-950 focus:ring-blue-900/20 cursor-pointer transition-all">
+                    </th>
                     <th class="p-6 text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest">Username</th>
                     <th class="p-6 text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest">Instansi</th>
                     <th class="p-6 text-[10px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest">Role</th>
@@ -36,6 +53,11 @@
             <tbody class="divide-y divide-slate-50 dark:divide-slate-800 transition-colors duration-300">
                 <?php foreach($users as $user): ?>
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group">
+                    <td class="p-6 text-center">
+                        <?php if($user['username'] !== 'admin'): ?>
+                        <input type="checkbox" name="ids[]" value="<?= $user['id'] ?>" class="row-checkbox w-5 h-5 rounded-lg border-2 border-slate-200 text-blue-950 focus:ring-blue-900/20 cursor-pointer transition-all">
+                        <?php endif; ?>
+                    </td>
                     <td class="p-6">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center font-black text-xs uppercase">
@@ -89,6 +111,86 @@
             form.appendChild(csrf);
             document.body.appendChild(form);
             form.submit();
+        }
+    }
+
+    // --- BULK DELETE LOGIC ---
+    const selectAll = document.getElementById('select-all');
+    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+    const bulkBar = document.getElementById('bulk-action-bar');
+    const selectedCount = document.getElementById('selected-count');
+
+    function updateBulkBar() {
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        if (checked.length > 0) {
+            bulkBar.classList.remove('-translate-y-full');
+            selectedCount.innerText = `${checked.length} TERPILIH`;
+        } else {
+            bulkBar.classList.add('-translate-y-full');
+        }
+    }
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            rowCheckboxes.forEach(cb => {
+                cb.checked = this.checked;
+                const row = cb.closest('tr');
+                if (this.checked) row.classList.add('bg-blue-50/50', 'dark:bg-blue-900/10');
+                else row.classList.remove('bg-blue-50/50', 'dark:bg-blue-900/10');
+            });
+            updateBulkBar();
+        });
+    }
+
+    rowCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const row = this.closest('tr');
+            if (this.checked) row.classList.add('bg-blue-50/50', 'dark:bg-blue-900/10');
+            else row.classList.remove('bg-blue-50/50', 'dark:bg-blue-900/10');
+            
+            const allChecked = document.querySelectorAll('.row-checkbox:checked').length === rowCheckboxes.length;
+            selectAll.checked = allChecked;
+            updateBulkBar();
+        });
+    });
+
+    function clearSelection() {
+        selectAll.checked = false;
+        rowCheckboxes.forEach(cb => {
+            cb.checked = false;
+            cb.closest('tr').classList.remove('bg-blue-50/50', 'dark:bg-blue-900/10');
+        });
+        updateBulkBar();
+    }
+
+    async function handleBulkDelete() {
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const ids = Array.from(checked).map(cb => cb.value);
+        
+        const ok = await window.customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} user yang dipilih?`, 'danger');
+        
+        if (ok) {
+            const formData = new FormData();
+            ids.forEach(id => formData.append('ids[]', id));
+            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+
+            try {
+                const response = await fetch('<?= base_url('users/bulk-delete') ?>', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showToast(result.message, 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Terjadi kesalahan sistem.', 'error');
+            }
         }
     }
 </script>

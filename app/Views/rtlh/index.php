@@ -287,17 +287,19 @@
     }
 
     async function handleBulkDelete() {
-        const checked = document.querySelectorAll('.row-checkbox:checked');
-        const ids = Array.from(checked).map(cb => cb.value);
-        
-        const ok = await customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} data RTLH yang dipilih? Tindakan ini tidak dapat dibatalkan.`, 'danger');
-        
-        if (ok) {
-            const formData = new FormData();
-            ids.forEach(id => formData.append('ids[]', id));
-            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+        try {
+            const checked = document.querySelectorAll('.row-checkbox:checked');
+            const ids = Array.from(checked).map(cb => cb.value);
+            
+            if (ids.length === 0) return;
 
-            try {
+            const ok = await window.customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} data RTLH yang dipilih? Tindakan ini tidak dapat dibatalkan.`, 'danger');
+            
+            if (ok) {
+                const formData = new FormData();
+                ids.forEach(id => formData.append('ids[]', id));
+                formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+
                 const response = await fetch('<?= base_url('rtlh/bulk-delete') ?>', {
                     method: 'POST',
                     body: formData,
@@ -311,9 +313,10 @@
                 } else {
                     showToast(result.message, 'error');
                 }
-            } catch (error) {
-                showToast('Terjadi kesalahan sistem.', 'error');
             }
+        } catch (error) {
+            console.error('Bulk Delete Error:', error);
+            showToast('Terjadi kesalahan saat memproses hapus massal.', 'error');
         }
     }
 

@@ -170,4 +170,23 @@ class WilayahKumuh extends BaseController
         }
         return redirect()->to('/wilayah-kumuh')->with('success', 'Data berhasil dihapus.');
     }
+
+    public function bulkDelete()
+    {
+        $ids = $this->request->getPost('ids');
+        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+        try {
+            $this->kumuhModel->whereIn('FID', $ids)->delete();
+            $db->transComplete();
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
+            $this->logActivity('Hapus Massal', 'Wilayah Kumuh', "Menghapus " . count($ids) . " data wilayah kumuh sekaligus");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
 }

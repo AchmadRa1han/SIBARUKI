@@ -216,14 +216,26 @@ class Arsinum extends BaseController
         $db->transStart();
 
         try {
+            $items = $this->arsinumModel->whereIn('id', $ids)->findAll();
+            
+            foreach ($items as $item) {
+                $db->table('trash_data')->insert([
+                    'entity_type' => 'ARSINUM',
+                    'entity_id'   => $item['id'],
+                    'data_json'   => json_encode($item),
+                    'deleted_by'  => session()->get('username'),
+                    'created_at'  => date('Y-m-d H:i:s')
+                ]);
+            }
+
             $this->arsinumModel->whereIn('id', $ids)->delete();
             $db->transComplete();
 
             if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
 
-            $this->logActivity('Hapus Massal', 'Arsinum', "Menghapus " . count($ids) . " data Arsinum sekaligus");
+            $this->logActivity('Hapus Massal', 'Arsinum', "Menghapus " . count($ids) . " data Arsinum ke Recycle Bin");
 
-            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dipindahkan ke Recycle Bin.']);
         } catch (\Exception $e) {
             $db->transRollback();
             return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);

@@ -96,6 +96,9 @@
             <table class="w-full text-left border-collapse table-fixed">
                 <thead>
                     <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        <th class="px-6 py-4 w-16 text-center">
+                            <input type="checkbox" id="select-all" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-blue-950 focus:ring-blue-900/20 cursor-pointer transition-all">
+                        </th>
                         <th class="px-4 py-4 w-64 cursor-pointer hover:text-blue-600" onclick="applySort('jenis_pekerjaan')">Jenis Pekerjaan</th>
                         <th class="px-4 py-4 w-24 text-center">Volume</th>
                         <th class="px-4 py-4 w-48">Wilayah (Desa/Kec)</th>
@@ -105,6 +108,9 @@
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]">
                     <?php foreach($arsinum as $item): ?>
                     <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-200">
+                        <td class="px-6 py-3 text-center">
+                            <input type="checkbox" name="ids[]" value="<?= $item['id'] ?>" class="row-checkbox w-5 h-5 rounded-lg border-2 border-slate-200 text-blue-950 focus:ring-blue-900/20 cursor-pointer transition-all">
+                        </td>
                         <td class="px-4 py-3 font-black text-blue-950 dark:text-white uppercase truncate" title="<?= $item['jenis_pekerjaan'] ?>"><?= $item['jenis_pekerjaan'] ?></td>
                         <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-md font-bold"><?= $item['volume'] ?></span></td>
                         <td class="px-4 py-3">
@@ -285,7 +291,7 @@
         const checked = document.querySelectorAll('.row-checkbox:checked');
         const ids = Array.from(checked).map(cb => cb.value);
         
-        const ok = await customConfirm('Hapus Massal?', `Hapus ${ids.length} data arsinum yang dipilih?`, 'danger');
+        const ok = await window.customConfirm('Hapus Massal?', `Hapus ${ids.length} data arsinum yang dipilih?`, 'danger');
         
         if (ok) {
             const formData = new FormData();

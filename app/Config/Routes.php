@@ -23,6 +23,7 @@ $routes->group('psu', function($routes) {
     $routes->get('edit/(:num)', 'Psu::edit/$1');
     $routes->post('update/(:num)', 'Psu::update/$1');
     $routes->post('delete/(:num)', 'Psu::delete/$1');
+    $routes->post('bulk-delete', 'Psu::bulkDelete');
 });
 
 $routes->group('perumahan-formal', function($routes) {
@@ -35,6 +36,7 @@ $routes->group('perumahan-formal', function($routes) {
     $routes->get('edit/(:num)', 'PerumahanFormal::edit/$1');
     $routes->post('update/(:num)', 'PerumahanFormal::update/$1');
     $routes->post('delete/(:num)', 'PerumahanFormal::delete/$1');
+    $routes->post('bulk-delete', 'PerumahanFormal::bulkDelete');
 });
 
 $routes->group('pisew', function($routes) {
@@ -47,6 +49,7 @@ $routes->group('pisew', function($routes) {
     $routes->get('edit/(:num)', 'Pisew::edit/$1');
     $routes->post('update/(:num)', 'Pisew::update/$1');
     $routes->post('delete/(:num)', 'Pisew::delete/$1');
+    $routes->post('bulk-delete', 'Pisew::bulkDelete');
 });
 
 $routes->group('arsinum', function($routes) {
@@ -72,6 +75,7 @@ $routes->group('aset-tanah', function($routes) {
     $routes->get('edit/(:num)', 'AsetTanah::edit/$1');
     $routes->post('update/(:num)', 'AsetTanah::update/$1');
     $routes->post('delete/(:num)', 'AsetTanah::delete/$1');
+    $routes->post('bulk-delete', 'AsetTanah::bulkDelete');
 });
 
 $routes->group('rtlh', function($routes) {
@@ -101,6 +105,7 @@ $routes->group('wilayah-kumuh', function($routes) {
     $routes->get('edit/(:num)', 'WilayahKumuh::edit/$1');
     $routes->post('update/(:num)', 'WilayahKumuh::update/$1');
     $routes->post('delete/(:num)', 'WilayahKumuh::delete/$1');
+    $routes->post('bulk-delete', 'WilayahKumuh::bulkDelete');
 });
 
 $routes->group('bansos-rtlh', function($routes) {
@@ -127,6 +132,7 @@ $routes->group('users', function($routes) {
     $routes->get('edit/(:num)', 'Users::edit/$1');
     $routes->post('update/(:num)', 'Users::update/$1');
     $routes->post('delete/(:num)', 'Users::delete/$1');
+    $routes->post('bulk-delete', 'Users::bulkDelete');
 });
 
 $routes->get('logs', 'Logs::index');
@@ -145,5 +151,6 @@ $routes->group('ref-master', function($routes) {
     $routes->post('store', 'RefMaster::store');
     $routes->get('edit/(:num)', 'RefMaster::edit/$1');
     $routes->post('update/(:num)', 'RefMaster::update/$1');
-    $routes->get('delete/(:num)', 'RefMaster::delete/$1');
+    $routes->post('delete/(:num)', 'RefMaster::delete/$1');
+    $routes->post('bulk-delete', 'RefMaster::bulkDelete');
 });

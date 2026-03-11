@@ -122,4 +122,24 @@ class RefMaster extends BaseController
         }
         return redirect()->to('/ref-master')->with('message', 'Data berhasil dihapus');
     }
+
+    public function bulkDelete()
+    {
+        if (session()->get('role_name') !== 'admin') return $this->response->setJSON(['status' => 'error', 'message' => 'Izin ditolak.']);
+        $ids = $this->request->getPost('ids');
+        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+        try {
+            $this->refModel->whereIn('id', $ids)->delete();
+            $db->transComplete();
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
+            $this->logActivity('Hapus Massal', 'Ref Master', "Menghapus " . count($ids) . " referensi sekaligus");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' referensi berhasil dihapus.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
 }

@@ -209,4 +209,24 @@ class Users extends BaseController
 
         return redirect()->to('/users')->with('message', 'User telah dipindahkan ke Recycle Bin.');
     }
+
+    public function bulkDelete()
+    {
+        if (!has_permission('delete_users')) return $this->response->setJSON(['status' => 'error', 'message' => 'Izin ditolak.']);
+        $ids = $this->request->getPost('ids');
+        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+        try {
+            $this->userModel->whereIn('id', $ids)->delete();
+            $db->transComplete();
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
+            $this->logActivity('Hapus Massal', 'Users', "Menghapus " . count($ids) . " user sekaligus");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' user berhasil dihapus.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
 }

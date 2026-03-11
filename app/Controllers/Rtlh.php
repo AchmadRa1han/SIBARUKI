@@ -716,7 +716,30 @@ class Rtlh extends BaseController
 
         try {
             foreach ($ids as $id) {
-                // Gunakan logika hapus yang sama dengan delete() tunggal
+                // Ambil data lengkap untuk diarsipkan ke Trash
+                $rumah = $this->rumahModel->find($id);
+                if ($rumah) {
+                    $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
+                    $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
+                    $bansos = $db->table('rtlh_bansos')->where('id_survei', $id)->get()->getResultArray();
+                    
+                    $allData = [
+                        'rumah' => $rumah,
+                        'penerima' => $penerima,
+                        'kondisi' => $kondisi,
+                        'bansos' => $bansos
+                    ];
+
+                    $db->table('trash_data')->insert([
+                        'entity_type' => 'RTLH',
+                        'entity_id'   => $id,
+                        'data_json'   => json_encode($allData),
+                        'deleted_by'  => session()->get('username'),
+                        'created_at'  => date('Y-m-d H:i:s')
+                    ]);
+                }
+
+                // Logika hapus asli
                 $db->table('rtlh_kondisi_rumah')->where('id_survei', $id)->delete();
                 $db->table('rtlh_bansos')->where('id_survei', $id)->delete();
                 $db->table('rtlh_history_perubahan')->where('id_survei', $id)->delete();
@@ -727,9 +750,9 @@ class Rtlh extends BaseController
 
             if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus beberapa data.');
 
-            $this->logActivity('Hapus Massal', 'RTLH', "Menghapus " . count($ids) . " data RTLH sekaligus");
+            $this->logActivity('Hapus Massal', 'RTLH', "Memindahkan " . count($ids) . " data RTLH ke Recycle Bin");
 
-            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dipindahkan ke Recycle Bin.']);
         } catch (\Exception $e) {
             $db->transRollback();
             return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
