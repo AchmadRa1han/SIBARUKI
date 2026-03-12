@@ -31,18 +31,6 @@
 
 ---
 
-## 🚀 Perintah Cepat
-
-| Aksi | Perintah |
-| --- | --- |
-| **Menjalankan Server** | `php spark serve` |
-| **Kompilasi CSS** | `npm run build` |
-| **Reset Data RTLH** | `php spark db:truncate_rtlh` |
-| **Reset Data Aset** | `php spark db:truncate_aset` |
-| **Menjalankan Test** | `npx cypress run` |
-
----
-
 ## 🏛️ Instansi Terkait
 - **Dinas Perumahan, Kawasan Permukiman, dan Pertanahan Kab. Sinjai** (Pemilik Program)
 - **Dinas Komunikasi, Informatika, dan Persandian Kab. Sinjai** (Pengembang Sistem)
