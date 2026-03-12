@@ -54,6 +54,49 @@ class Pisew extends BaseController
         return view('pisew/index', $data);
     }
 
+    public function exportExcel()
+    {
+        $data = $this->pisewModel->findAll();
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headers = ['ID', 'Jenis Pekerjaan', 'Lokasi Desa', 'Kecamatan', 'Pelaksana', 'Anggaran', 'Sumber Dana', 'Tahun', 'Koordinat'];
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        $rowNum = 2;
+        foreach ($data as $row) {
+            $sheet->setCellValue('A' . $rowNum, $row['id']);
+            $sheet->setCellValue('B' . $rowNum, $row['jenis_pekerjaan']);
+            $sheet->setCellValue('C' . $rowNum, $row['lokasi_desa']);
+            $sheet->setCellValue('D' . $rowNum, $row['kecamatan']);
+            $sheet->setCellValue('E' . $rowNum, $row['pelaksana']);
+            $sheet->setCellValue('F' . $rowNum, $row['anggaran']);
+            $sheet->setCellValue('G' . $rowNum, $row['sumber_dana']);
+            $sheet->setCellValue('H' . $rowNum, $row['tahun']);
+            $sheet->setCellValue('I' . $rowNum, $row['koordinat']);
+            $rowNum++;
+        }
+
+        $sheet->getStyle('A1:I1')->getFont()->setBold(true);
+        foreach (range('A', 'I') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        // Catat Log
+        $this->logActivity('Export Excel', 'PISEW', "Mengekspor " . count($data) . " data PISEW");
+
+        $filename = 'Export_PISEW_' . date('YmdHis') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
     public function importCsv()
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');

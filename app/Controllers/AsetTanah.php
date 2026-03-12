@@ -29,6 +29,7 @@ class AsetTanah extends BaseController
             $query = $query->groupStart()
                 ->like('nama_pemilik', $search)
                 ->orLike('no_sertifikat', $search)
+                ->orLike('lokasi', $search)
                 ->groupEnd();
         }
 
@@ -61,13 +62,17 @@ class AsetTanah extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->setCellValue('A1', 'ID');
-        $sheet->setCellValue('B1', 'No Sertifikat');
-        $sheet->setCellValue('C1', 'Nama Pemilik');
-        $sheet->setCellValue('D1', 'Luas (m2)');
-        $sheet->setCellValue('E1', 'Kecamatan');
-        $sheet->setCellValue('F1', 'Desa');
-        $sheet->setCellValue('G1', 'Koordinat');
+        $headers = [
+            'ID', 'No Sertifikat', 'Nama Pemilik / Instansi', 'Luas (m2)', 
+            'Lokasi / Alamat', 'Desa / Kelurahan', 'Kecamatan', 'Tgl Terbit Sertifikat', 
+            'Nomor Hak', 'Peruntukan', 'Koordinat', 'Nilai Aset (Rp)', 'Status Tanah', 'Keterangan'
+        ];
+        
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
 
         $rowNum = 2;
         foreach ($data as $row) {
@@ -75,16 +80,28 @@ class AsetTanah extends BaseController
             $sheet->setCellValue('B' . $rowNum, $row['no_sertifikat']);
             $sheet->setCellValue('C' . $rowNum, $row['nama_pemilik']);
             $sheet->setCellValue('D' . $rowNum, $row['luas_m2']);
-            $sheet->setCellValue('E' . $rowNum, $row['kecamatan']);
+            $sheet->setCellValue('E' . $rowNum, $row['lokasi']);
             $sheet->setCellValue('F' . $rowNum, $row['desa_kelurahan']);
-            $sheet->setCellValue('G' . $rowNum, $row['koordinat']);
+            $sheet->setCellValue('G' . $rowNum, $row['kecamatan']);
+            $sheet->setCellValue('H' . $rowNum, $row['tgl_terbit']);
+            $sheet->setCellValue('I' . $rowNum, $row['nomor_hak']);
+            $sheet->setCellValue('J' . $rowNum, $row['peruntukan']);
+            $sheet->setCellValue('K' . $rowNum, $row['koordinat']);
+            $sheet->setCellValue('L' . $rowNum, $row['nilai_aset']);
+            $sheet->setCellValue('M' . $rowNum, $row['status_tanah']);
+            $sheet->setCellValue('N' . $rowNum, $row['keterangan']);
             $rowNum++;
         }
 
-        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
-        foreach (range('A', 'G') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
+        $sheet->getStyle('A1:N1')->getFont()->setBold(true);
+        foreach (range('A', 'N') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
 
-        $filename = 'Export_Aset_Tanah_' . date('YmdHis') . '.xlsx';
+        // Catat Log
+        $this->logActivity('Export Excel', 'Aset Tanah', "Mengekspor " . count($data) . " data Aset Tanah Lengkap");
+
+        $filename = 'Export_Lengkap_Aset_Tanah_' . date('YmdHis') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         $writer = new Xlsx($spreadsheet);
@@ -122,6 +139,7 @@ class AsetTanah extends BaseController
         try {
             $handle = fopen($file->getTempName(), 'r');
             while (($row = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
+                // Lewati header atau baris judul
                 if (count($row) < 10 || stripos(implode(' ', $row), 'Sertifikat') !== false || !is_numeric($row[0])) {
                     continue;
                 }
@@ -133,17 +151,33 @@ class AsetTanah extends BaseController
                 $nilaiRaw = $row[12] ?? '0';
                 $nilai = (float)str_replace(',', '.', str_replace('.', '', $nilaiRaw));
 
+                // Parsing Tanggal (d-m-Y -> Y-m-d)
+                $tglTerbit = null;
+                $tglRaw = trim($row[7] ?? '');
+                if ($tglRaw) {
+                    $dt = \DateTime::createFromFormat('d-m-Y', $tglRaw);
+                    if ($dt) $tglTerbit = $dt->format('Y-m-d');
+                }
+
+                // Gabungkan Koordinat
+                $lon = trim($row[10] ?? '');
+                $lat = trim($row[11] ?? '');
+                $coords = ($lat && $lon) ? "$lat, $lon" : null;
+
                 $this->asetModel->insert([
-                    'no_sertifikat'  => $row[1] ?? '-',
-                    'nama_pemilik'   => $row[2] ?? '-',
+                    'no_sertifikat'  => trim($row[1] ?? '-'),
+                    'nama_pemilik'   => trim($row[2] ?? '-'),
                     'luas_m2'        => $luas,
-                    'lokasi'         => $row[4] ?? '-',
-                    'desa_kelurahan' => $row[5] ?? '-',
-                    'kecamatan'      => $row[6] ?? '-',
-                    'tgl_terbit'     => $row[7] ?? null,
-                    'longitude'      => $row[10] ?? null,
-                    'latitude'       => $row[11] ?? null,
+                    'lokasi'         => trim($row[4] ?? '-'),
+                    'desa_kelurahan' => trim($row[5] ?? '-'),
+                    'kecamatan'      => trim($row[6] ?? '-'),
+                    'tgl_terbit'     => $tglTerbit,
+                    'nomor_hak'      => trim($row[8] ?? '-'),
+                    'peruntukan'     => trim($row[9] ?? '-'),
+                    'koordinat'      => $coords,
                     'nilai_aset'     => $nilai,
+                    'status_tanah'   => trim($row[13] ?? '-'),
+                    'keterangan'     => trim($row[14] ?? '-'),
                 ]);
                 $count++;
             }
@@ -158,6 +192,8 @@ class AsetTanah extends BaseController
             if ($count == 0) {
                 return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
             }
+
+            $this->logActivity('Import', 'Aset Tanah', "Berhasil mengimpor $count data Aset Tanah");
 
             return redirect()->to('/aset-tanah')->with('success', "$count data Aset Tanah berhasil diimpor.");
 
@@ -191,6 +227,7 @@ class AsetTanah extends BaseController
     public function edit($id)
     {
         $data['aset'] = $this->asetModel->find($id);
+        if (!$data['aset']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         $data['title'] = 'Edit Aset Tanah';
         return view('aset_tanah/edit', $data);
     }
