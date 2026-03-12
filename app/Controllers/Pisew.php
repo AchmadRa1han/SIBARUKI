@@ -54,68 +54,82 @@ class Pisew extends BaseController
         return view('pisew/index', $data);
     }
 
-    public function exportExcel()
-    {
-        $data = $this->pisewModel->findAll();
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->setCellValue('A1', 'ID');
-        $sheet->setCellValue('B1', 'Jenis Pekerjaan');
-        $sheet->setCellValue('C1', 'Lokasi Desa');
-        $sheet->setCellValue('D1', 'Kecamatan');
-        $sheet->setCellValue('E1', 'Anggaran');
-        $sheet->setCellValue('F1', 'Tahun');
-        $sheet->setCellValue('G1', 'Pelaksana');
-        $sheet->setCellValue('H1', 'Koordinat');
-
-        $rowNum = 2;
-        foreach ($data as $row) {
-            $sheet->setCellValue('A' . $rowNum, $row['id']);
-            $sheet->setCellValue('B' . $rowNum, $row['jenis_pekerjaan']);
-            $sheet->setCellValue('C' . $rowNum, $row['lokasi_desa']);
-            $sheet->setCellValue('D' . $rowNum, $row['kecamatan']);
-            $sheet->setCellValue('E' . $rowNum, $row['anggaran']);
-            $sheet->setCellValue('F' . $rowNum, $row['tahun']);
-            $sheet->setCellValue('G' . $rowNum, $row['pelaksana']);
-            $sheet->setCellValue('H' . $rowNum, $row['koordinat']);
-            $rowNum++;
-        }
-
-        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
-        foreach (range('A', 'H') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
-
-        $filename = 'Export_PISEW_' . date('YmdHis') . '.xlsx';
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
-    }
-
     public function importCsv()
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        
         $file = $this->request->getFile('csv_file');
-        if (!$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
+        if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
+
         $handle = fopen($file->getTempName(), 'r');
-        fgetcsv($handle); 
+        
+        // 1. Deteksi Delimiter (Semikolon vs Koma)
+        $firstLine = fgets($handle);
+        $secondLine = fgets($handle);
+        $thirdLine = fgets($handle); // Baris header NO.;JENIS PEKERJAAN;...
+        
+        $combined = $firstLine . $secondLine . $thirdLine;
+        $delimiter = (substr_count($combined, ';') > substr_count($combined, ',')) ? ';' : ',';
+        
+        rewind($handle);
+
         $count = 0;
-        while (($row = fgetcsv($handle)) !== FALSE) {
-            if (empty($row[0])) continue;
-            $this->pisewModel->insert([
-                'jenis_pekerjaan' => $row[0],
-                'lokasi_desa' => $row[1],
-                'kecamatan' => $row[2],
-                'pelaksana' => $row[3],
-                'anggaran' => $row[4],
-                'tahun' => $row[5],
-                'koordinat' => $row[6] ?? null,
-            ]);
-            $count++;
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            while (($row = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
+                // Lewati baris judul (biasanya kata 'PISEW' atau 'DATA KEGIATAN')
+                // Lewati baris header (berisi 'JENIS PEKERJAAN')
+                // Pastikan kolom pertama (NO) adalah angka
+                if (count($row) < 6 || stripos(implode(' ', $row), 'JENIS PEKERJAAN') !== false || !is_numeric($row[0])) {
+                    continue;
+                }
+
+                /* 
+                   Berdasarkan analisis file PISEW KAB. SINJAI 2022-2025.csv:
+                   Index 0: NO.
+                   Index 1: JENIS PEKERJAAN
+                   Index 2: (KOSONG)
+                   Index 3: LOKASI (Desa)
+                   Index 4: KECAMATAN
+                   Index 5: PELAKSANA
+                   Index 6: ANGGARAN (Rp.) -> Contoh: 600.000.000
+                   Index 7: SUMBER DANA
+                   Index 8: TAHUN
+                */
+
+                $anggaran = (float)preg_replace('/[^0-9]/', '', $row[6] ?? '0');
+
+                $this->pisewModel->insert([
+                    'jenis_pekerjaan' => trim($row[1] ?? '-'),
+                    'lokasi_desa'     => trim($row[3] ?? '-'),
+                    'kecamatan'       => trim($row[4] ?? '-'),
+                    'pelaksana'       => trim($row[5] ?? '-'),
+                    'anggaran'        => $anggaran,
+                    'tahun'           => trim($row[8] ?? date('Y')),
+                    'sumber_dana'     => trim($row[7] ?? '-'),
+                ]);
+                $count++;
+            }
+            fclose($handle);
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return redirect()->back()->with('error', 'Gagal menyimpan data ke database.');
+            }
+
+            if ($count == 0) {
+                return redirect()->back()->with('error', 'Tidak ada data valid yang diimpor. Periksa format CSV.');
+            }
+
+            return redirect()->to('/pisew')->with('success', "$count data PISEW berhasil diimpor.");
+
+        } catch (\Exception $e) {
+            if (isset($handle)) fclose($handle);
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
-        fclose($handle);
-        return redirect()->to('/pisew')->with('success', "$count data berhasil diimpor.");
     }
 
     public function detail($id)
@@ -162,10 +176,19 @@ class Pisew extends BaseController
     {
         $data = $this->pisewModel->find($id);
         if ($data) {
+            $db = \Config\Database::connect();
+            $db->table('trash_data')->insert([
+                'entity_type' => 'PISEW',
+                'entity_id'   => $id,
+                'data_json'   => json_encode($data),
+                'deleted_by'  => session()->get('username'),
+                'created_at'  => date('Y-m-d H:i:s')
+            ]);
+
             $this->pisewModel->delete($id);
-            $this->logActivity('Hapus', 'PISEW', "Menghapus data PISEW: " . ($data['jenis_pekerjaan'] ?? 'Unknown'), $this->formatLogData($data));
+            $this->logActivity('Hapus', 'PISEW', "Memindahkan data PISEW ke Recycle Bin: " . ($data['jenis_pekerjaan'] ?? 'Unknown'), $this->formatLogData($data));
         }
-        return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil dihapus.');
+        return redirect()->to('/pisew')->with('success', 'Data berhasil dipindahkan ke Recycle Bin.');
     }
 
     public function bulkDelete()
@@ -176,11 +199,22 @@ class Pisew extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
         try {
+            $items = $this->pisewModel->whereIn('id', $ids)->findAll();
+            foreach ($items as $item) {
+                $db->table('trash_data')->insert([
+                    'entity_type' => 'PISEW',
+                    'entity_id'   => $item['id'],
+                    'data_json'   => json_encode($item),
+                    'deleted_by'  => session()->get('username'),
+                    'created_at'  => date('Y-m-d H:i:s')
+                ]);
+            }
+
             $this->pisewModel->whereIn('id', $ids)->delete();
             $db->transComplete();
             if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
-            $this->logActivity('Hapus Massal', 'PISEW', "Menghapus " . count($ids) . " data PISEW sekaligus");
-            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+            $this->logActivity('Hapus Massal', 'PISEW', "Memindahkan " . count($ids) . " data PISEW ke Recycle Bin");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dipindahkan ke Recycle Bin.']);
         } catch (\Exception $e) {
             $db->transRollback();
             return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);

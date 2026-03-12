@@ -10,7 +10,11 @@ class SysLogModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $allowedFields    = ['user', 'action', 'table_name', 'description', 'details', 'created_at'];
+    protected $allowedFields    = [
+        'user', 'action', 'severity', 'table_name', 
+        'description', 'details', 'user_agent', 
+        'ip_address', 'created_at'
+    ];
 
     // Dates
     protected $useTimestamps = false;

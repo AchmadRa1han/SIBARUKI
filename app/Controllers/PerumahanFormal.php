@@ -51,20 +51,22 @@ class PerumahanFormal extends BaseController
         $sheet = $spreadsheet->getActiveSheet();
 
         $headers = ['ID', 'Nama Perumahan', 'Pengembang', 'Tahun', 'Luas Ha', 'Longitude', 'Latitude', 'WKT'];
-        foreach ($headers as $key => $header) {
-            $sheet->setCellValueByColumnAndRow($key + 1, 1, $header);
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
         }
 
         $rowNum = 2;
         foreach ($data as $row) {
-            $sheet->setCellValueByColumnAndRow(1, $rowNum, $row['id']);
-            $sheet->setCellValueByColumnAndRow(2, $rowNum, $row['nama_perumahan']);
-            $sheet->setCellValueByColumnAndRow(3, $rowNum, $row['pengembang']);
-            $sheet->setCellValueByColumnAndRow(4, $rowNum, $row['tahun_pembangunan']);
-            $sheet->setCellValueByColumnAndRow(5, $rowNum, $row['luas_kawasan_ha']);
-            $sheet->setCellValueByColumnAndRow(6, $rowNum, $row['longitude']);
-            $sheet->setCellValueByColumnAndRow(7, $rowNum, $row['latitude']);
-            $sheet->setCellValueByColumnAndRow(8, $rowNum, $row['wkt']);
+            $sheet->setCellValue('A' . $rowNum, $row['id']);
+            $sheet->setCellValue('B' . $rowNum, $row['nama_perumahan']);
+            $sheet->setCellValue('C' . $rowNum, $row['pengembang']);
+            $sheet->setCellValue('D' . $rowNum, $row['tahun_pembangunan']);
+            $sheet->setCellValue('E' . $rowNum, $row['luas_kawasan_ha']);
+            $sheet->setCellValue('F' . $rowNum, $row['longitude']);
+            $sheet->setCellValue('G' . $rowNum, $row['latitude']);
+            $sheet->setCellValue('H' . $rowNum, $row['wkt']);
             $rowNum++;
         }
 
@@ -84,28 +86,62 @@ class PerumahanFormal extends BaseController
     public function importCsv()
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
-        $file = $this->request->getFile('csv_file');
-        if (!$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
-        $handle = fopen($file->getTempName(), 'r');
-        fgetcsv($handle); 
-        $count = 0;
-        while (($row = fgetcsv($handle)) !== FALSE) {
-            if (empty($row[0])) continue;
-            $this->perumahanModel->insert([
-                'nama_perumahan' => $row[0],
-                'pengembang' => $row[1],
-                'tahun_pembangunan' => $row[2],
-                'luas_kawasan_ha' => $row[3],
-                'longitude' => $row[4],
-                'latitude' => $row[5],
-                'wkt' => $row[6] ?? null,
-            ]);
-            $count++;
-        }
-        fclose($handle);
-        return redirect()->to('/perumahan-formal')->with('success', "$count data berhasil diimpor.");
-    }
 
+        $file = $this->request->getFile('csv_file');
+        if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
+
+        $handle = fopen($file->getTempName(), 'r');
+        $firstLine = fgets($handle);
+        $secondLine = fgets($handle);
+        fclose($handle);
+
+        $combined = $firstLine . $secondLine;
+        $countSemicolon = substr_count($combined, ';');
+        $countComma = substr_count($combined, ',');
+        $delimiter = ($countSemicolon > $countComma) ? ';' : ',';
+
+        $count = 0;
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            $handle = fopen($file->getTempName(), 'r');
+            while (($row = fgetcsv($handle, 5000, $delimiter)) !== FALSE) {
+                // Lewati header atau baris yang tidak valid (Id biasanya numerik di baris data)
+                if (count($row) < 7 || stripos(implode(' ', $row), 'Keterangan') !== false || !is_numeric($row[1] ?? null)) {
+                    continue;
+                }
+
+                $this->perumahanModel->insert([
+                    'nama_perumahan'    => $row[2] ?? '-',
+                    'pengembang'        => $row[6] ?? '-',
+                    'tahun_pembangunan' => (int)($row[7] ?? date('Y')),
+                    'luas_kawasan_ha'   => (float)str_replace(',', '.', $row[3] ?? '0'),
+                    'longitude'         => $row[4] ?? null,
+                    'latitude'          => $row[5] ?? null,
+                    'wkt'               => $row[0] ?? null,
+                ]);
+                $count++;
+            }
+            fclose($handle);
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data ke database.');
+            }
+
+            if ($count == 0) {
+                return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
+            }
+
+            return redirect()->to('/perumahan-formal')->with('success', "$count data Perumahan Formal berhasil diimpor.");
+
+        } catch (\Exception $e) {
+            if (isset($handle)) fclose($handle);
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
     public function create()
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
@@ -173,11 +209,20 @@ class PerumahanFormal extends BaseController
 
         $data = $this->perumahanModel->find($id);
         if ($data) {
+            $db = \Config\Database::connect();
+            $db->table('trash_data')->insert([
+                'entity_type' => 'PERUMAHAN',
+                'entity_id'   => $id,
+                'data_json'   => json_encode($data),
+                'deleted_by'  => session()->get('username'),
+                'created_at'  => date('Y-m-d H:i:s')
+            ]);
+
             $this->perumahanModel->delete($id);
-            $this->logActivity('Hapus', 'Perumahan Formal', 'Menghapus data perumahan: ' . ($data['nama_perumahan'] ?? 'Tanpa Nama'), $this->formatLogData($data));
+            $this->logActivity('Hapus', 'Perumahan Formal', 'Memindahkan perumahan ke Recycle Bin: ' . ($data['nama_perumahan'] ?? 'Tanpa Nama'), $this->formatLogData($data));
         }
 
-        return redirect()->to('/perumahan-formal')->with('success', 'Data berhasil dihapus.');
+        return redirect()->to('/perumahan-formal')->with('success', 'Data berhasil dipindahkan ke Recycle Bin.');
     }
 
     public function bulkDelete()
@@ -189,11 +234,22 @@ class PerumahanFormal extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
         try {
+            $items = $this->perumahanModel->whereIn('id', $ids)->findAll();
+            foreach ($items as $item) {
+                $db->table('trash_data')->insert([
+                    'entity_type' => 'PERUMAHAN',
+                    'entity_id'   => $item['id'],
+                    'data_json'   => json_encode($item),
+                    'deleted_by'  => session()->get('username'),
+                    'created_at'  => date('Y-m-d H:i:s')
+                ]);
+            }
+
             $this->perumahanModel->whereIn('id', $ids)->delete();
             $db->transComplete();
             if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
-            $this->logActivity('Hapus Massal', 'Perumahan Formal', "Menghapus " . count($ids) . " data perumahan sekaligus");
-            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+            $this->logActivity('Hapus Massal', 'Perumahan Formal', "Memindahkan " . count($ids) . " data perumahan ke Recycle Bin");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dipindahkan ke Recycle Bin.']);
         } catch (\Exception $e) {
             $db->transRollback();
             return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);

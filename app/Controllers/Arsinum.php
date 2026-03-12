@@ -104,57 +104,61 @@ class Arsinum extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
-        $content = file_get_contents($file->getTempName());
-        
-        // Deteksi Delimiter secara lebih akurat dari keseluruhan isi file
-        $countSemicolon = substr_count($content, ';');
-        $countComma = substr_count($content, ',');
+        $handle = fopen($file->getTempName(), 'r');
+        $firstLine = fgets($handle);
+        $secondLine = fgets($handle);
+        fclose($handle);
+
+        $combined = $firstLine . $secondLine;
+        $countSemicolon = substr_count($combined, ';');
+        $countComma = substr_count($combined, ',');
         $delimiter = ($countSemicolon > $countComma) ? ';' : ',';
 
-        $lines = explode("\n", str_replace("\r", "", $content));
-        
-        // Cari baris data pertama (biasanya baris ke-3 setelah Judul dan Header)
-        // Kita gunakan str_getcsv untuk memproses baris demi baris
         $count = 0;
         $db = \Config\Database::connect();
         $db->transStart();
 
-        foreach ($lines as $index => $line) {
-            if (empty(trim($line))) continue;
-            
-            $row = str_getcsv($line, $delimiter);
-            
-            // Lewati jika ini adalah Judul (hanya 1 kolom besar) atau Header (berisi kata 'JENIS')
-            if (count($row) < 5 || stripos($line, 'JENIS PEKERJAAN') !== false) continue;
+        try {
+            $handle = fopen($file->getTempName(), 'r');
+            while (($row = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
+                if (count($row) < 8 || stripos(implode(' ', $row), 'JENIS PEKERJAAN') !== false || !is_numeric($row[0])) {
+                    continue;
+                }
 
-            // Pastikan ini baris data (biasanya diawali angka NO)
-            if (!is_numeric($row[0])) continue;
+                $anggaranRaw = $row[7] ?? '0';
+                $anggaran = (float)preg_replace('/[^0-9]/', '', $anggaranRaw);
 
-            // Bersihkan format anggaran (544.233.000 -> 544233000)
-            $anggaranRaw = $row[7] ?? '0';
-            $anggaran = (float)preg_replace('/[^0-9]/', '', $anggaranRaw);
+                $this->arsinumModel->insert([
+                    'jenis_pekerjaan' => $row[1] ?? '-',
+                    'volume'          => $row[3] ?? '-',
+                    'kecamatan'       => $row[4] ?? '-',
+                    'desa'            => $row[5] ?? '-',
+                    'pelaksana'       => $row[6] ?? '-',
+                    'anggaran'        => $anggaran,
+                    'sumber_dana'     => $row[8] ?? '-',
+                    'koordinat'       => $row[9] ?? null,
+                    'tahun'           => isset($row[10]) ? trim($row[10], " \t\n\r\0\x0B;") : date('Y')
+                ]);
+                $count++;
+            }
+            fclose($handle);
 
-            $this->arsinumModel->insert([
-                'jenis_pekerjaan' => $row[1] ?? '-',
-                'volume'          => $row[3] ?? '-',
-                'kecamatan'       => $row[4] ?? '-',
-                'desa'            => $row[5] ?? '-',
-                'pelaksana'       => $row[6] ?? '-',
-                'anggaran'        => $anggaran,
-                'sumber_dana'     => $row[8] ?? '-',
-                'koordinat'       => $row[9] ?? null,
-                'tahun'           => isset($row[10]) ? trim($row[10], " \t\n\r\0\x0B;") : date('Y')
-            ]);
-            $count++;
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data ke database.');
+            }
+
+            if ($count == 0) {
+                return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
+            }
+
+            return redirect()->to('/arsinum')->with('success', "$count data Arsinum berhasil diimpor.");
+
+        } catch (\Exception $e) {
+            if (isset($handle)) fclose($handle);
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
-
-        $db->transComplete();
-
-        if ($count == 0) {
-            return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
-        }
-
-        return redirect()->to('/arsinum')->with('success', "$count data berhasil diimpor.");
     }
 
     public function detail($id)

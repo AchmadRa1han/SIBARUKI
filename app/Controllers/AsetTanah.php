@@ -95,25 +95,70 @@ class AsetTanah extends BaseController
     public function importCsv()
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        
         $file = $this->request->getFile('csv_file');
-        if (!$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
+        if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
+
         $handle = fopen($file->getTempName(), 'r');
-        fgetcsv($handle); 
-        $count = 0;
-        while (($row = fgetcsv($handle)) !== FALSE) {
-            if (empty($row[0])) continue;
-            $this->asetModel->insert([
-                'no_sertifikat' => $row[0],
-                'nama_pemilik' => $row[1],
-                'luas_m2' => $row[2],
-                'kecamatan' => $row[3],
-                'desa_kelurahan' => $row[4],
-                'koordinat' => $row[5] ?? null,
-            ]);
-            $count++;
-        }
+        $firstLine = fgets($handle);
+        $secondLine = fgets($handle);
         fclose($handle);
-        return redirect()->to('/aset-tanah')->with('success', "$count data berhasil diimpor.");
+
+        $combined = $firstLine . $secondLine;
+        $countSemicolon = substr_count($combined, ';');
+        $countComma = substr_count($combined, ',');
+        $delimiter = ($countSemicolon > $countComma) ? ';' : ',';
+
+        $count = 0;
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            $handle = fopen($file->getTempName(), 'r');
+            while (($row = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
+                if (count($row) < 10 || stripos(implode(' ', $row), 'Sertifikat') !== false || !is_numeric($row[0])) {
+                    continue;
+                }
+
+                // Bersihkan format angka Indonesia (misal: 6.890,00 -> 6890.00)
+                $luasRaw = $row[3] ?? '0';
+                $luas = (float)str_replace(',', '.', str_replace('.', '', $luasRaw));
+
+                $nilaiRaw = $row[12] ?? '0';
+                $nilai = (float)str_replace(',', '.', str_replace('.', '', $nilaiRaw));
+
+                $this->asetModel->insert([
+                    'no_sertifikat'  => $row[1] ?? '-',
+                    'nama_pemilik'   => $row[2] ?? '-',
+                    'luas_m2'        => $luas,
+                    'lokasi'         => $row[4] ?? '-',
+                    'desa_kelurahan' => $row[5] ?? '-',
+                    'kecamatan'      => $row[6] ?? '-',
+                    'tgl_terbit'     => $row[7] ?? null,
+                    'longitude'      => $row[10] ?? null,
+                    'latitude'       => $row[11] ?? null,
+                    'nilai_aset'     => $nilai,
+                ]);
+                $count++;
+            }
+            fclose($handle);
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data ke database.');
+            }
+
+            if ($count == 0) {
+                return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
+            }
+
+            return redirect()->to('/aset-tanah')->with('success', "$count data Aset Tanah berhasil diimpor.");
+
+        } catch (\Exception $e) {
+            if (isset($handle)) fclose($handle);
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 
     public function detail($id)
@@ -160,10 +205,19 @@ class AsetTanah extends BaseController
     {
         $data = $this->asetModel->find($id);
         if ($data) {
+            $db = \Config\Database::connect();
+            $db->table('trash_data')->insert([
+                'entity_type' => 'ASET_TANAH',
+                'entity_id'   => $id,
+                'data_json'   => json_encode($data),
+                'deleted_by'  => session()->get('username'),
+                'created_at'  => date('Y-m-d H:i:s')
+            ]);
+
             $this->asetModel->delete($id);
-            $this->logActivity('Hapus', 'Aset Tanah', "Menghapus data aset: " . ($data['nama_pemilik'] ?? 'Unknown'), $this->formatLogData($data));
+            $this->logActivity('Hapus', 'Aset Tanah', "Memindahkan data aset ke Recycle Bin: " . ($data['nama_pemilik'] ?? 'Unknown'), $this->formatLogData($data));
         }
-        return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil dihapus.');
+        return redirect()->to('/aset-tanah')->with('success', 'Data berhasil dipindahkan ke Recycle Bin.');
     }
 
     public function bulkDelete()
@@ -174,11 +228,22 @@ class AsetTanah extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
         try {
+            $items = $this->asetModel->whereIn('id', $ids)->findAll();
+            foreach ($items as $item) {
+                $db->table('trash_data')->insert([
+                    'entity_type' => 'ASET_TANAH',
+                    'entity_id'   => $item['id'],
+                    'data_json'   => json_encode($item),
+                    'deleted_by'  => session()->get('username'),
+                    'created_at'  => date('Y-m-d H:i:s')
+                ]);
+            }
+
             $this->asetModel->whereIn('id', $ids)->delete();
             $db->transComplete();
             if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
-            $this->logActivity('Hapus Massal', 'Aset Tanah', "Menghapus " . count($ids) . " data aset sekaligus");
-            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+            $this->logActivity('Hapus Massal', 'Aset Tanah', "Memindahkan " . count($ids) . " data aset ke Recycle Bin");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dipindahkan ke Recycle Bin.']);
         } catch (\Exception $e) {
             $db->transRollback();
             return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);

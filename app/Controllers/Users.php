@@ -219,11 +219,29 @@ class Users extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
         try {
-            $this->userModel->whereIn('id', $ids)->delete();
+            $items = $this->userModel->whereIn('id', $ids)->findAll();
+            foreach ($items as $item) {
+                if ($item['username'] === 'admin') continue; // Proteksi admin utama
+
+                $assignments = $db->table('user_desa')->where('user_id', $item['id'])->get()->getResultArray();
+                $allData = ['user' => $item, 'assignments' => $assignments];
+
+                $db->table('trash_data')->insert([
+                    'entity_type' => 'USER',
+                    'entity_id'   => $item['id'],
+                    'data_json'   => json_encode($allData),
+                    'deleted_by'  => session()->get('username'),
+                    'created_at'  => date('Y-m-d H:i:s')
+                ]);
+                
+                $db->table('user_desa')->where('user_id', $item['id'])->delete();
+            }
+
+            $this->userModel->whereIn('id', $ids)->where('username !=', 'admin')->delete();
             $db->transComplete();
             if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
-            $this->logActivity('Hapus Massal', 'Users', "Menghapus " . count($ids) . " user sekaligus");
-            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' user berhasil dihapus.']);
+            $this->logActivity('Hapus Massal', 'Users', "Memindahkan " . count($ids) . " user ke Recycle Bin");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' user berhasil dipindahkan ke Recycle Bin.']);
         } catch (\Exception $e) {
             $db->transRollback();
             return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);

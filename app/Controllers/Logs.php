@@ -93,7 +93,7 @@ class Logs extends BaseController
         // 8.1 AUDIT SNAPSHOT (CRITICAL ACTIONS 24H)
         $snapshot = [
             'deleted' => $db->table('sys_logs')->where('action', 'Hapus')->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
-            'exported' => $db->table('sys_logs')->where('action', 'Ekspor PDF')->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
+            'exported' => $db->table('sys_logs')->whereIn('action', ['Ekspor PDF', 'Export Excel'])->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
             'created' => $db->table('sys_logs')->where('action', 'Tambah')->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
             'critical' => $db->table('sys_logs')->whereIn('severity', ['warning', 'critical'])->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))->countAllResults(),
         ];
