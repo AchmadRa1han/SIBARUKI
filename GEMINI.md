@@ -7,6 +7,7 @@
 - **Sistem Hak Akses (RBAC):** Dinamis berbasis tabel `roles`, `permissions`, dan `role_permissions`. 
 - **Restriksi Detail:** Data sensitif (NIK, rincian teknis) wajib dilindungi izin khusus (`view_rtlh_detail`, `view_kumuh_detail`).
 - **Data Integrity:** Fitur **Recycle Bin** (`trash_data`) untuk menyimpan data terhapus dalam format JSON agar bisa dipulihkan.
+- **Auto-Archiving:** Seluruh operasi penghapusan (Delete & Bulk Delete) wajib memindahkan data ke `trash_data` sebelum dihapus dari tabel utama.
 
 ## Standar UI/UX ("Mewah" Style)
 - **Tema Warna:** Biru Sangat Gelap (`blue-950`).
@@ -17,36 +18,32 @@
   - **Integrated Map & Table:** Peta Interaktif berada di bagian atas, diikuti oleh Tabel Data di bawahnya.
 - **Sidebar & Navigasi:** 
   - **Floating Toggle:** Tombol buka/tutup sidebar yang menonjol di tengah (`h-52`) untuk aksesibilitas maksimal.
-  - **Scroll & State Memory:** Posisi scroll dan status (collapsed/expanded) tersimpan via `localStorage`.
-  - **Mobile Responsive:** Sidebar mode HP menggunakan efek **Glassmorphism**, dukungan **Swipe-to-Close**, dan overlay backdrop.
-- **Kartu Informasi:** Sudut sangat bulat (`rounded-[2.5rem]`), border tipis, dan bayangan lembut (`shadow-sm`).
-- **Dark Mode:** Didukung penuh (`dark:`) dengan persistensi tema.
+- **Bulk Action Bar:** UI terapung (floating) berwarna biru yang muncul otomatis saat baris tabel dicentang untuk aksi massal.
 
 ## Peta & Geospasial
 - **Engine:** Leaflet.js & Leaflet.draw.
 - **Interactive Picking:** 
-  - **Click-to-Pin:** Input koordinat titik (RTLH) dilakukan dengan mengklik langsung pada peta atau menggunakan GPS.
+  - **Click-to-Pin:** Input koordinat titik (RTLH) dilakukan dengan mengklik langsung pada peta.
   - **Polygon Drawing:** Input wilayah (Kumuh) menggunakan toolbar gambar interaktif dengan kalkulasi luas area otomatis.
-- **Visualisasi:** 
-  - Poligon otomatis berubah warna berdasarkan skor.
-  - WKT Auto-Repair untuk memastikan validitas geometri yang disimpan ke database.
-  - Satellite Toggle untuk akurasi posisi bangunan.
+- **Visualisasi:** Poligon otomatis berubah warna berdasarkan skor. Default tampilan peta menggunakan mode **Satelit** untuk akurasi posisi bangunan.
 
 ## Monitoring, Audit & Histori
-- **Audit Trail:** Log detail "Data Diff" (membandingkan nilai lama vs baru).
-- **Histori Transformasi (RLH):** 
-  - Pencatatan snapshot data teknis sebelum dan sesudah bantuan (RTLH ➔ RLH).
-  - Penyimpanan snapshot dalam format JSON untuk perbandingan *Side-by-Side*.
-  - Akses melalui menu **Pengaturan ➔ Histori Perubahan (RLH)**.
+- **Audit Trail:** Log detail mencakup "Data Diff" (lama vs baru), IP Address, User Agent, dan Latency.
+- **Export Logging:** Aktivitas ekspor data (Excel/PDF) wajib dicatat dalam Audit Trail dengan aksi `'Export Excel'`.
+- **Histori Transformasi (RLH):** Pencatatan snapshot data teknis sebelum dan sesudah bantuan (RTLH ➔ RLH).
 
 ## Konvensi Pengembangan
 - **CRUD Terpadu:** Pengelolaan data lintas tabel wajib menggunakan Transaksi Database (`$db->transStart()`).
-- **Status Bantuan:** Modul RTLH wajib memfilter data dengan `status_bantuan = 'Belum Menerima'` secara default untuk menjaga kebersihan daftar target.
-- **Security Check:** Validasi izin di Controller menggunakan helper `has_permission('nama_izin')`.
+- **Robust CSV Import:** 
+  - Wajib mendukung deteksi delimiter otomatis (`,` atau `;`).
+  - Wajib menyertakan logika **Auto-Reset ID** (`ALTER TABLE ... AUTO_INCREMENT = 1`) jika tabel kosong saat import.
+  - Wajib melakukan pembersihan data (NIK, Anggaran, Luas) dari karakter non-numerik.
+- **Testing:** Seluruh siklus CRUD utama wajib memiliki pengujian E2E menggunakan **Cypress**.
 
 ## Perintah Pengembangan
 - Run Localhost: `php spark serve`
 - Build CSS: `npm run build`
-- Update RBAC: `php spark db:seed RbacSeeder`
-- Update Koordinat: `php spark wkt:update`
+- Run Testing: `npx cypress run`
+- Truncate RTLH: `php spark db:truncate_rtlh`
+- Truncate Aset: `php spark db:truncate_aset`
 - Fix Data WKT: `php spark wkt:fix`

@@ -12,38 +12,40 @@
 
 ## ✨ Fitur Unggulan Terbaru
 
-### 📊 Monitoring RTLH & RLH
-- **Village Recap:** Rekapitulasi data RTLH otomatis per desa/kelurahan untuk memudahkan alokasi bantuan.
-- **Auto-Archive RLH:** Data RTLH yang telah tuntas dibantu otomatis pindah ke daftar RLH (Rumah Layak Huni).
-- **Transformation History:** Fitur "Before & After" yang menyimpan potret data teknis rumah sebelum dan sesudah menerima bantuan untuk keperluan audit.
+### 📊 Manajemen Data RTLH & RLH
+- **Village Recap:** Rekapitulasi data RTLH otomatis per desa/kelurahan untuk alokasi bantuan.
+- **Auto-Archive RLH:** Data RTLH yang tuntas dibantu otomatis pindah ke daftar RLH (Rumah Layak Huni).
+- **Comprehensive Import:** Import CSV masif mencakup 44+ kolom data teknis dan identitas.
+- **Full Cycle Export:** Ekspor data lengkap (48 kolom) ke Excel dengan konversi teks otomatis.
 
-### 🗺️ GIS Interaktif (Click-to-Map)
-- **Point-to-Pin:** Petugas dapat menentukan lokasi rumah hanya dengan mengklik peta, menggantikan input koordinat manual yang rumit.
-- **Polygon Drawing:** Fitur menggambar area kumuh secara interaktif dengan kalkulasi luas otomatis (Hektar).
-- **GPS Integration:** Mendukung pengambilan titik lokasi langsung via sensor GPS perangkat.
+### 🗺️ GIS & Spasial
+- **Interactive Mapping:** Point-to-Pin untuk RTLH dan Polygon Drawing untuk area kumuh.
+- **Standardized Visualization:** Tampilan peta Satelit default untuk akurasi monitoring fisik.
+- **Geospatial Import:** Dukungan import data WKT (Well-Known Text) secara massal.
 
-### 🛡️ Keamanan & User Experience (UX)
-- **Floating Sidebar:** Navigasi modern dengan tombol toggle yang menonjol dan memori status otomatis.
-- **Mobile First:** Sidebar mode HP dengan efek glassmorphism dan dukungan gestur **Swipe-to-Close**.
-- **Audit Trail:** Pencatatan setiap detil perubahan data teknis (Old Value vs New Value).
+### 🛡️ Keamanan & Integritas
+- **Audit Trail Forensic:** Pencatatan setiap perubahan data (Data Diff), alamat IP, dan User Agent.
+- **Bulk Operations:** Fitur **Hapus Massal** di seluruh tabel utama dengan konfirmasi keamanan.
+- **Recycle Bin System:** Data yang dihapus (individu maupun massal) otomatis masuk ke tempat sampah untuk pemulihan.
+- **E2E Testing:** Kualitas kode terjamin dengan pengujian alur kerja otomatis menggunakan **Cypress**.
 
 ---
 
-## 🚀 Arsitektur Teknologi
+## 🚀 Perintah Cepat
 
-| Layer | Komponen |
+| Aksi | Perintah |
 | --- | --- |
-| **Core Framework** | CodeIgniter 4.6 (Modern PHP) |
-| **Styling Engine** | Tailwind CSS v3 |
-| **Database** | MySQL with Spatial Support (WKT) |
-| **Interactive JS** | Leaflet.js, Leaflet.draw, Lucide Icons |
-| **Caching** | LocalStorage for UI States |
+| **Menjalankan Server** | `php spark serve` |
+| **Kompilasi CSS** | `npm run build` |
+| **Reset Data RTLH** | `php spark db:truncate_rtlh` |
+| **Reset Data Aset** | `php spark db:truncate_aset` |
+| **Menjalankan Test** | `npx cypress run` |
 
 ---
 
 ## 🏛️ Instansi Terkait
-- **Dinas Perumahan, Kawasan Permukiman, dan Pertanahan Kab. Sinjai** (Sebagai Pemilik Program)
-- **Dinas Komunikasi, Informatika, dan Persandian Kab. Sinjai** (Sebagai Pengembang Sistem)
+- **Dinas Perumahan, Kawasan Permukiman, dan Pertanahan Kab. Sinjai** (Pemilik Program)
+- **Dinas Komunikasi, Informatika, dan Persandian Kab. Sinjai** (Pengembang Sistem)
 
 ---
 **© 2026 PEMERINTAH KABUPATEN SINJAI**
