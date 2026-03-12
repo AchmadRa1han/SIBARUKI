@@ -111,6 +111,12 @@ class AsetTanah extends BaseController
 
         $count = 0;
         $db = \Config\Database::connect();
+
+        // Reset Auto Increment jika tabel kosong
+        if ($db->table('aset_tanah')->countAllResults() === 0) {
+            $db->query("ALTER TABLE aset_tanah AUTO_INCREMENT = 1");
+        }
+
         $db->transStart();
 
         try {

@@ -116,6 +116,12 @@ class Arsinum extends BaseController
 
         $count = 0;
         $db = \Config\Database::connect();
+
+        // Reset Auto Increment jika tabel kosong
+        if ($db->table('arsinum')->countAllResults() === 0) {
+            $db->query("ALTER TABLE arsinum AUTO_INCREMENT = 1");
+        }
+
         $db->transStart();
 
         try {

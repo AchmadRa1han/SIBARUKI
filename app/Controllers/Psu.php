@@ -103,6 +103,12 @@ class Psu extends BaseController
 
         $count = 0;
         $db = \Config\Database::connect();
+
+        // Reset Auto Increment jika tabel kosong agar ID mulai dari 1 lagi
+        if ($db->table('psu_jalan')->countAllResults() === 0) {
+            $db->query("ALTER TABLE psu_jalan AUTO_INCREMENT = 1");
+        }
+
         $db->transStart();
 
         try {

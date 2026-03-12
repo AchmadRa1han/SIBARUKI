@@ -68,6 +68,29 @@
                 </div>
                 <p class="mt-4 text-[10px] text-rose-700/60 dark:text-rose-400/60 font-medium leading-relaxed italic">Semakin tinggi skor, semakin mendesak penanganan kawasan.</p>
             </div>
+
+            <!-- Panel Data Administrasi Tambahan -->
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+                <h3 class="text-slate-900 dark:text-slate-400 font-black uppercase text-[10px] tracking-widest mb-8 border-b dark:border-slate-800 pb-4">Data Administrasi</h3>
+                <div class="space-y-5">
+                    <div class="flex justify-between items-center group">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover:text-blue-500 transition-colors">Kode Provinsi</span>
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-200"><?= $kumuh['Kode_Prov'] ?? '-' ?></span>
+                    </div>
+                    <div class="flex justify-between items-center group border-t dark:border-slate-800 pt-4">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover:text-blue-500 transition-colors">Kode Kab/Kota</span>
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-200"><?= $kumuh['Kode_Kab'] ?? '-' ?></span>
+                    </div>
+                    <div class="flex justify-between items-center group border-t dark:border-slate-800 pt-4">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover:text-blue-500 transition-colors">Kode Kecamatan</span>
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-200"><?= $kumuh['Kode_Kec'] ?? '-' ?></span>
+                    </div>
+                    <div class="flex justify-between items-center group border-t dark:border-slate-800 pt-4">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover:text-blue-500 transition-colors">Kode Kelurahan</span>
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-200"><?= $kumuh['Kode_Kel'] ?? '-' ?></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Panel Visual Peta -->
@@ -79,7 +102,20 @@
                     </h3>
                     <span class="px-3 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 rounded-full text-[9px] font-black uppercase tracking-tighter border border-blue-100 dark:border-blue-900"><?= $kumuh['Kawasan'] ?></span>
                 </div>
-                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed italic">"Kawasan ini teridentifikasi sebagai titik pantau kekumuhan berdasarkan survei infrastruktur dan sanitasi lingkungan."</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-3xl border border-slate-100 dark:border-slate-800">
+                            <p class="text-[8px] font-black text-slate-400 uppercase mb-2">No. SK Kumuh</p>
+                            <p class="text-xs font-black text-slate-700 dark:text-slate-200"><?= $kumuh['Sk_Kumuh'] ?: 'Belum Terdaftar' ?></p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-5 bg-slate-50 dark:bg-slate-950 rounded-3xl border border-slate-100 dark:border-slate-800">
+                            <p class="text-[8px] font-black text-slate-400 uppercase mb-2">Sumber Data</p>
+                            <p class="text-xs font-black text-slate-700 dark:text-slate-200"><?= $kumuh['Sumber_data'] ?: '-' ?></p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- VISUALISASI PETA -->
@@ -95,7 +131,7 @@
                 </div>
                 <div class="p-6 bg-slate-50/50 dark:bg-slate-950/50 flex justify-between items-center text-[10px]">
                     <span class="text-slate-400 dark:text-slate-500 italic">Gunakan layer control di kanan atas untuk beralih ke tampilan Satelit.</span>
-                    <button onclick="toggleWKT()" class="text-blue-900 dark:text-blue-400 font-black hover:underline uppercase tracking-widest">Lihat Data Teks</button>
+                    <button onclick="toggleWKT()" class="text-blue-900 dark:text-blue-400 font-black hover:underline uppercase tracking-widest">Lihat Data Teks (WKT)</button>
                 </div>
                 <div id="wkt-box" class="hidden p-6 bg-slate-100 dark:bg-slate-950 border-t dark:border-slate-800 text-[9px] font-mono text-slate-500 dark:text-slate-600 break-all leading-relaxed">
                     <?= $kumuh['WKT'] ?>
@@ -138,12 +174,12 @@
                 });
 
                 const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EBP, and the GIS User Community'
+                    attribution: 'Tiles &copy; Esri'
                 });
 
                 const map = L.map('map', { 
                     attributionControl: false,
-                    layers: [osm] // Default
+                    layers: [satellite] // Default satelit agar lebih detail
                 }).setView(coords[0], 17);
 
                 const baseMaps = {
@@ -154,13 +190,13 @@
                 L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
                 if (coords.length > 1) {
-                    const polygon = L.polygon(coords, { color: '#1e3a8a', weight: 3, fillOpacity: 0.2 }).addTo(map);
+                    const polygon = L.polygon(coords, { color: '#e11d48', weight: 3, fillOpacity: 0.3 }).addTo(map);
                     map.fitBounds(polygon.getBounds());
-                    statusEl.innerText = "POLYGON";
+                    statusEl.innerText = "POLYGON DETECTED";
                 } else {
                     L.marker(coords[0]).addTo(map);
                     map.setView(coords[0], 17);
-                    statusEl.innerText = "HANYA TITIK";
+                    statusEl.innerText = "POINT DETECTED";
                 }
             }
         } catch (e) {

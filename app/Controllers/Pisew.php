@@ -75,6 +75,12 @@ class Pisew extends BaseController
 
         $count = 0;
         $db = \Config\Database::connect();
+
+        // Reset Auto Increment jika tabel kosong
+        if ($db->table('pisew')->countAllResults() === 0) {
+            $db->query("ALTER TABLE pisew AUTO_INCREMENT = 1");
+        }
+
         $db->transStart();
 
         try {

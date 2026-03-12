@@ -48,30 +48,49 @@ class WilayahKumuh extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->setCellValue('A1', 'FID');
-        $sheet->setCellValue('B1', 'Kecamatan');
-        $sheet->setCellValue('C1', 'Kelurahan');
-        $sheet->setCellValue('D1', 'Kawasan');
-        $sheet->setCellValue('E1', 'Luas Kumuh (Ha)');
-        $sheet->setCellValue('F1', 'Skor Kumuh');
-        $sheet->setCellValue('G1', 'WKT');
+        $headers = [
+            'FID', 'Provinsi', 'Kode Prov', 'Kab/Kota', 'Kode Kab', 
+            'Kecamatan', 'Kode Kec', 'Kelurahan', 'Kode Kel', 
+            'RT/RW', 'Luas (Ha)', 'Skor', 'Sumber Data', 
+            'SK Kumuh', 'Kawasan', 'WKT'
+        ];
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
 
         $rowNum = 2;
         foreach ($data as $row) {
             $sheet->setCellValue('A' . $rowNum, $row['FID']);
-            $sheet->setCellValue('B' . $rowNum, $row['Kecamatan']);
-            $sheet->setCellValue('C' . $rowNum, $row['Kelurahan']);
-            $sheet->setCellValue('D' . $rowNum, $row['Kawasan']);
-            $sheet->setCellValue('E' . $rowNum, $row['Luas_kumuh']);
-            $sheet->setCellValue('F' . $rowNum, $row['skor_kumuh']);
-            $sheet->setCellValue('G' . $rowNum, $row['WKT']);
+            $sheet->setCellValue('B' . $rowNum, $row['Provinsi']);
+            $sheet->setCellValue('C' . $rowNum, $row['Kode_Prov']);
+            $sheet->setCellValue('D' . $rowNum, $row['Kab_Kota']);
+            $sheet->setCellValue('E' . $rowNum, $row['Kode_Kab']);
+            $sheet->setCellValue('F' . $rowNum, $row['Kecamatan']);
+            $sheet->setCellValue('G' . $rowNum, $row['Kode_Kec']);
+            $sheet->setCellValue('H' . $rowNum, $row['Kelurahan']);
+            $sheet->setCellValue('I' . $rowNum, $row['Kode_Kel']);
+            $sheet->setCellValue('J' . $rowNum, $row['Kode_RT_RW']);
+            $sheet->setCellValue('K' . $rowNum, $row['Luas_kumuh']);
+            $sheet->setCellValue('L' . $rowNum, $row['skor_kumuh']);
+            $sheet->setCellValue('M' . $rowNum, $row['Sumber_data']);
+            $sheet->setCellValue('N' . $rowNum, $row['Sk_Kumuh']);
+            $sheet->setCellValue('O' . $rowNum, $row['Kawasan']);
+            $sheet->setCellValue('P' . $rowNum, $row['WKT']);
             $rowNum++;
         }
 
-        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
-        foreach (range('A', 'G') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
+        $sheet->getStyle('A1:P1')->getFont()->setBold(true);
+        foreach (range('A', 'P') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
 
-        $filename = 'Export_Wilayah_Kumuh_' . date('YmdHis') . '.xlsx';
+        // Catat Log
+        $this->logActivity('Export Excel', 'Wilayah Kumuh', "Mengekspor " . count($data) . " data Wilayah Kumuh Lengkap");
+
+        $filename = 'Export_Lengkap_Wilayah_Kumuh_' . date('YmdHis') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         $writer = new Xlsx($spreadsheet);
@@ -95,6 +114,12 @@ class WilayahKumuh extends BaseController
 
         $count = 0;
         $db = \Config\Database::connect();
+
+        // Reset Auto Increment jika tabel kosong
+        if ($db->table('wilayah_kumuh')->countAllResults() === 0) {
+            $db->query("ALTER TABLE wilayah_kumuh AUTO_INCREMENT = 1");
+        }
+
         $db->transStart();
 
         try {
@@ -118,15 +143,21 @@ class WilayahKumuh extends BaseController
                 */
 
                 $this->kumuhModel->insert([
-                    'Kawasan'    => trim($row[14] ?? '-'),
-                    'Kecamatan'  => trim($row[5] ?? '-'),
-                    'Kelurahan'  => trim($row[7] ?? '-'),
-                    'Kode_RT_RW' => trim($row[9] ?? '-'),
-                    'Luas_kumuh' => (float)($row[10] ?? '0'),
-                    'skor_kumuh' => (float)($row[11] ?? '0'),
-                    'Sumber_data'=> trim($row[12] ?? '-'),
-                    'Sk_Kumuh'   => trim($row[13] ?? '-'),
-                    'WKT'        => $row[0] ?? null,
+                    'WKT'         => $row[0] ?? null,
+                    'Provinsi'    => trim($row[1] ?? 'Sulawesi Selatan'),
+                    'Kode_Prov'   => trim($row[2] ?? '73'),
+                    'Kab_Kota'    => trim($row[3] ?? 'Sinjai'),
+                    'Kode_Kab'    => trim($row[4] ?? '07'),
+                    'Kecamatan'   => trim($row[5] ?? '-'),
+                    'Kode_Kec'    => trim($row[6] ?? '-'),
+                    'Kelurahan'   => trim($row[7] ?? '-'),
+                    'Kode_Kel'    => trim($row[8] ?? '-'),
+                    'Kode_RT_RW'  => trim($row[9] ?? '-'),
+                    'Luas_kumuh'  => (float)($row[10] ?? '0'),
+                    'skor_kumuh'  => (float)($row[11] ?? '0'),
+                    'Sumber_data' => trim($row[12] ?? '-'),
+                    'Sk_Kumuh'    => trim($row[13] ?? '-'),
+                    'Kawasan'     => trim($row[14] ?? '-'),
                 ]);
                 $count++;
             }

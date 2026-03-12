@@ -102,6 +102,12 @@ class PerumahanFormal extends BaseController
 
         $count = 0;
         $db = \Config\Database::connect();
+
+        // Reset Auto Increment jika tabel kosong agar ID mulai dari 1 lagi
+        if ($db->table('perumahan_formal')->countAllResults() === 0) {
+            $db->query("ALTER TABLE perumahan_formal AUTO_INCREMENT = 1");
+        }
+
         $db->transStart();
 
         try {
