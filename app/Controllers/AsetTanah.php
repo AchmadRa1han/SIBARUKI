@@ -159,9 +159,23 @@ class AsetTanah extends BaseController
                     if ($dt) $tglTerbit = $dt->format('Y-m-d');
                 }
 
-                // Gabungkan Koordinat
-                $lon = trim($row[10] ?? '');
-                $lat = trim($row[11] ?? '');
+                // Gabungkan & Sembuhkan Koordinat (Hilangkan titik ribuan pada lat/lng)
+                $lonRaw = trim($row[10] ?? '');
+                $latRaw = trim($row[11] ?? '');
+                
+                $lon = str_replace(',', '.', $lonRaw);
+                $lat = str_replace(',', '.', $latRaw);
+                
+                // Jika lat/lng punya > 1 titik, asumsikan titik pertama adalah pemisah ribuan yang salah
+                if (substr_count($lat, '.') > 1) {
+                    $firstDot = strpos($lat, '.');
+                    $lat = substr($lat, 0, $firstDot) . substr($lat, $firstDot + 1);
+                }
+                if (substr_count($lon, '.') > 1) {
+                    $firstDot = strpos($lon, '.');
+                    $lon = substr($lon, 0, $firstDot) . substr($lon, $firstDot + 1);
+                }
+
                 $coords = ($lat && $lon) ? "$lat, $lon" : null;
 
                 $this->asetModel->insert([

@@ -101,7 +101,9 @@ class Home extends BaseController
         $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt, "psu" as type')->get()->getResultArray();
 
         // Markers Aset Tanah
-        $mapAset = $db->table('aset_tanah')->select('id, nama_pemilik as name, koordinat as coords, "aset" as type')->get()->getResultArray();
+        $mapAset = $db->table('aset_tanah')
+            ->select('id, nama_pemilik as name, koordinat as coords, "aset" as type')
+            ->get()->getResultArray();
 
         // Markers Arsinum
         $mapArsinum = $db->table('arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, "arsinum" as type')->get()->getResultArray();

@@ -118,7 +118,6 @@
     const spasialData = <?= json_encode($spasial) ?>;
     let map, clusterGroup, kecLayerGroup, activeDataGroup;
     let standard, satellite;
-    let rot = 0;
 
     function utmToLatLng(easting, northing) {
         const a = 6378137, f = 1 / 298.257223563;
@@ -140,14 +139,11 @@
         try {
             let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
             
-            // --- HEALING LOGIC UNTUK DATA TERPOTONG (32KB LIMIT) ---
+            // --- HEALING LOGIC UNTUK DATA TERPOTONG ---
             if (cleanWkt.length >= 32760) {
-                // Cari angka terakhir sebelum pemotongan yang mungkin merusak JSON
-                // Kita coba potong sampai koma terakhir agar koordinatnya pas
                 const lastComma = cleanWkt.lastIndexOf(',');
                 if (lastComma > 0) {
                     cleanWkt = cleanWkt.substring(0, lastComma);
-                    // Hitung jumlah kurung buka dan tutup
                     const openParen = (cleanWkt.match(/\(/g) || []).length;
                     const closeParen = (cleanWkt.match(/\)/g) || []).length;
                     cleanWkt += ')'.repeat(openParen - closeParen);
@@ -161,10 +157,18 @@
                 geojson.coordinates = convert(geojson.coordinates);
             }
             return geojson;
-        } catch(e) { 
-            console.warn('WKT Repair Failed:', e);
-            return null; 
+        } catch(e) { return null; }
+    }
+
+    function healCoordinate(val, isLat) {
+        if (!val) return null;
+        let s = val.toString().replace(/[ "]/g, '').replace(/,/g, '.');
+        let digits = s.replace(/[^0-9-]/g, '');
+        if (digits.length > 3) {
+            let dotPos = digits.startsWith('-') ? 2 : 3;
+            return parseFloat(digits.substring(0, dotPos) + '.' + digits.substring(dotPos));
         }
+        return parseFloat(s);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -183,154 +187,99 @@
         map = L.map('tacticalMap', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 11);
         L.control.zoom({ position: 'topright' }).addTo(map);
 
-        const LayerToggle = L.Control.extend({
-            onAdd: () => {
-                const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
-                btn.style.width = '44px'; btn.style.height = '44px';
-                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isDark?'#60a5fa':'#2563eb'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
-                L.DomEvent.disableClickPropagation(btn);
-                L.DomEvent.on(btn, 'click', () => {
-                    if (map.hasLayer(standard)) { map.removeLayer(standard); map.addLayer(satellite); btn.style.backgroundColor = '#2563eb'; btn.querySelector('svg').setAttribute('stroke', '#fff'); }
-                    else { map.removeLayer(satellite); map.addLayer(standard); btn.style.backgroundColor = isDark ? '#0f172a' : '#fff'; btn.querySelector('svg').setAttribute('stroke', isDark?'#60a5fa':'#2563eb'); }
-                });
-                return btn;
-            }
-        });
-        map.addControl(new LayerToggle({ position: 'topright' }));
-
         clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 }).addTo(map);
         activeDataGroup = L.featureGroup().addTo(map);
         kecLayerGroup = L.featureGroup().addTo(map);
 
-        // Draw Village Boundaries (Unified as Kecamatan Map)
-        let kecCount = 0;
-        
-        // Custom High-Contrast Palette for Sinjai (Mapping by ID for Stability)
         const kecColorMap = {
-            '730701': '#1e1b4b', // SINJAI BARAT
-            '730702': '#1e40af', // SINJAI BORONG
-            '730703': '#2563eb', // SINJAI SELATAN
-            '730704': '#1d4ed8', // TELLU LIMPOE
-            '730705': '#0ea5e9', // SINJAI TIMUR
-            '730706': '#3b82f6', // SINJAI TENGAH
-            '730707': '#0891b2', // SINJAI UTARA
-            '730708': '#4338ca', // BULUPODDO
-            '730709': '#0369a1'  // PULAU SEMBILAN
+            '730701': '#1e1b4b', '730702': '#1e40af', '730703': '#2563eb', '730704': '#1d4ed8', 
+            '730705': '#0ea5e9', '730706': '#3b82f6', '730707': '#0891b2', '730708': '#4338ca', '730709': '#0369a1'
         };
-
-        const defaultPalette = ['#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa', '#1d4ed8', '#1e40af'];
-        let colorIndex = 0;
         
         spasialData.kecamatan.forEach(k => {
-            let fillColor = kecColorMap[k.kecamatan_id];
-            
-            if (!fillColor) {
-                fillColor = defaultPalette[colorIndex % defaultPalette.length];
-                colorIndex++;
-            }
-
-            const geojson = parseWKTUniversal(k.wkt, false);
-            if (geojson) {
-                L.geoJSON(geojson, { 
-                    style: { 
-                        color: isDark ? '#0f172a' : '#ffffff', 
-                        fillColor: fillColor, 
-                        weight: 0.5, 
-                        fillOpacity: isDark ? 0.6 : 0.5 
-                    } 
-                }).addTo(kecLayerGroup).bindTooltip(`
-                    <div class="p-2">
-                        <p class="font-black uppercase text-[10px] text-white">${k.desa_nama}</p>
-                        <p class="text-[8px] font-bold text-blue-200 uppercase">Kec. ${k.kecamatan_nama}</p>
-                    </div>`, { sticky: true, className: 'custom-tooltip' });
-                kecCount++;
-            }
+            try {
+                const geojson = parseWKTUniversal(k.wkt);
+                if (geojson) {
+                    L.geoJSON(geojson, { 
+                        style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColorMap[k.kecamatan_id] || '#2563eb', weight: 0.5, fillOpacity: isDark ? 0.6 : 0.5 } 
+                    }).addTo(kecLayerGroup).bindTooltip(`<div class="p-2"><p class="font-black uppercase text-[10px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
+                }
+            } catch (e) {}
         });
+        kecLayerGroup.bringToBack();
     }
 
     function switchLayer(type) {
-        clusterGroup.clearLayers();
-        activeDataGroup.clearLayers();
-        
-        document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
-        document.getElementById('activeLayerLabel').innerText = `Database: ${type === 'formal' ? 'PERUMAHAN' : type.toUpperCase()}`;
+        try {
+            clusterGroup.clearLayers();
+            activeDataGroup.clearLayers();
+            
+            document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
+            document.getElementById('activeLayerLabel').innerText = `Database: ${type.toUpperCase()}`;
 
-        const items = spasialData[type];
-        const colorMap = { rtlh: '#f59e0b', formal: '#6366f1', aset: '#1e1b4b', arsinum: '#06b6d4', pisew: '#f97316', psu: '#3b82f6' };
+            const items = spasialData[type] || [];
+            const colorMap = { rtlh: '#f59e0b', formal: '#6366f1', aset: '#1e1b4b', arsinum: '#06b6d4', pisew: '#f97316', psu: '#3b82f6' };
 
-        items.forEach(item => {
-            let geojson = null;
-            if (type === 'formal' && item.latitude) geojson = { type: 'Point', coordinates: [parseFloat(item.longitude), parseFloat(item.latitude)] };
-            else if (item.wkt) {
-                if (type === 'rtlh' && item.wkt.indexOf(',') !== -1 && item.wkt.indexOf('POINT') === -1) {
-                    const p = item.wkt.split(',').map(x => parseFloat(x.trim()));
-                    if (!isNaN(p[0])) geojson = { type: 'Point', coordinates: [p[1], p[0]] };
-                } else geojson = parseWKTUniversal(item.wkt, (type==='psu'));
-            } else if (item.coords) {
-                const p = item.coords.split(',').map(x => parseFloat(x.trim()));
-                geojson = { type: 'Point', coordinates: [p[1], p[0]] };
-            }
+            items.forEach(item => {
+                try {
+                    let geojson = null;
+                    let lat = null, lon = null;
 
-            if (!geojson) return;
+                    if (item.latitude && item.longitude) {
+                        lat = parseFloat(item.latitude);
+                        lon = parseFloat(item.longitude);
+                    } else if (item.coords) {
+                        let p = item.coords.toString().split(',');
+                        if (p.length === 2) {
+                            lat = healCoordinate(p[0], true);
+                            lon = healCoordinate(p[1], false);
+                        }
+                    }
 
-            // Mapping URL Detail berdasarkan Tipe Data
-            const detailUrls = {
-                rtlh: '<?= base_url('rtlh/detail') ?>',
-                kumuh: '<?= base_url('wilayah-kumuh/detail') ?>',
-                formal: '<?= base_url('perumahan-formal/detail') ?>',
-                psu: '<?= base_url('psu/detail') ?>',
-                aset: '<?= base_url('aset-tanah/detail') ?>',
-                arsinum: '<?= base_url('arsinum/detail') ?>',
-                pisew: '<?= base_url('pisew/detail') ?>'
-            };
+                    if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) {
+                        geojson = { type: 'Point', coordinates: [lon, lat] };
+                    } else if (item.wkt) {
+                        // Gunakan isUTM = true jika tipenya PSU
+                        geojson = parseWKTUniversal(item.wkt, (type === 'psu'));
+                    }
 
-            const popupContent = `
-                <div class="bg-blue-950 text-white p-4 rounded-t-xl">
-                    <p class="text-[8px] font-black uppercase tracking-widest text-blue-400 mb-1">SIBARUKI: ${type === 'formal' ? 'PERUMAHAN' : type.toUpperCase()}</p>
-                    <h5 class="text-xs font-black uppercase leading-tight">${item.name}</h5>
-                </div>
-                <div class="p-4 bg-white dark:bg-slate-900 space-y-3 rounded-b-xl">
-                    ${type === 'kumuh' ? `
-                        <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase">Skor Kumuh</span>
-                            <span class="text-xs font-black ${item.skor_kumuh >= 60 ? 'text-rose-600' : (item.skor_kumuh >= 40 ? 'text-orange-500' : 'text-amber-500')}">${parseFloat(item.skor_kumuh).toFixed(1)}</span>
-                        </div>
-                    ` : ''}
-                    <div class="flex items-center gap-2 text-[10px] font-bold text-slate-700 dark:text-slate-300">
-                        📍 Kabupaten Sinjai
-                    </div>
-                    <a href="${detailUrls[type]}/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-black text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg active:scale-95">
-                        <i data-lucide="external-link" class="w-3 h-3 inline-block mr-1"></i> Lihat Detail Data
-                    </a>
-                </div>`;
+                    if (!geojson) return;
 
-            let layer;
-            if (geojson.type === 'Point') {
-                layer = L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { 
-                    radius: 8, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 
-                });
-                clusterGroup.addLayer(layer);
-            } else {
-                let style = { color: colorMap[type], weight: type==='psu'?4:2, fillOpacity: 0.5 };
-                if (type === 'kumuh') {
-                    const s = parseFloat(item.skor_kumuh);
-                    const c = s >= 60 ? '#ef4444' : (s >= 40 ? '#f97316' : '#f59e0b');
-                    style = { color: c, fillColor: c, weight: 2, fillOpacity: 0.6 };
-                }
-                layer = L.geoJSON(geojson, { style: style });
-                activeDataGroup.addLayer(layer);
-            }
+                    const detailUrls = {
+                        rtlh: '<?= base_url('rtlh/detail') ?>',
+                        kumuh: '<?= base_url('wilayah-kumuh/detail') ?>',
+                        formal: '<?= base_url('perumahan-formal/detail') ?>',
+                        psu: '<?= base_url('psu/detail') ?>',
+                        aset: '<?= base_url('aset-tanah/detail') ?>',
+                        arsinum: '<?= base_url('arsinum/detail') ?>',
+                        pisew: '<?= base_url('pisew/detail') ?>'
+                    };
 
-            layer.bindPopup(popupContent);
+                    const popupContent = `
+                        <div class="bg-blue-950 text-white p-4 rounded-t-xl"><h5 class="text-xs font-black uppercase leading-tight">${item.name}</h5></div>
+                        <div class="p-4 bg-white dark:bg-slate-900 rounded-b-xl">
+                            <a href="${detailUrls[type]}/${item.id}" class="block w-full py-2.5 bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl shadow-lg">Lihat Detail Data</a>
+                        </div>`;
 
-            layer.on('popupopen', () => {
-                lucide.createIcons();
+                    if (geojson.type === 'Point') {
+                        L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 8, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(clusterGroup);
+                    } else {
+                        L.geoJSON(geojson, { style: { color: colorMap[type] || '#ef4444', weight: 3, fillOpacity: 0.5 } }).bindPopup(popupContent).addTo(activeDataGroup);
+                    }
+                } catch (e) {}
             });
-        });
 
-        const allLayers = L.featureGroup([clusterGroup, activeDataGroup]);
-        if (allLayers.getLayers().length > 0) map.fitBounds(allLayers.getBounds(), { padding: [50, 50] });
+            const bounds = L.latLngBounds();
+            let valid = false;
+            [clusterGroup, activeDataGroup].forEach(g => { if(g.getLayers().length > 0) { bounds.extend(g.getBounds()); valid = true; } });
+            
+            if (valid && bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
+            else if (kecLayerGroup.getLayers().length > 0) map.fitBounds(kecLayerGroup.getBounds(), { padding: [30, 30] });
+
+            kecLayerGroup.bringToBack();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        } catch (err) { console.error("Switch Error:", err); }
     }
 
     function initChart() {

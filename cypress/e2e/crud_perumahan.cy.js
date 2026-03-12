@@ -30,7 +30,7 @@ describe('CRUD Perumahan Formal - Full Cycle', () => {
     cy.contains(/berhasil ditambahkan/i, { timeout: 15000 }).should('be.visible');
     
     // Cari data
-    cy.get('input[name="search"]').clear().type(uniqueName + '{enter}');
+    cy.get('input[name="keyword"]').clear().type(uniqueName + '{enter}');
     cy.contains(uniqueName).should('exist');
 
     // 2. READ & UPDATE
@@ -45,7 +45,7 @@ describe('CRUD Perumahan Formal - Full Cycle', () => {
     
     // 3. DELETE
     cy.visit('http://localhost:8080/perumahan-formal');
-    cy.get('input[name="search"]').clear().type(updatedName + '{enter}');
+    cy.get('input[name="keyword"]').clear().type(updatedName + '{enter}');
     
     // Klik hapus
     cy.contains(updatedName).closest('tr').find('button').filter(':has([data-lucide="trash-2"])').click({ force: true });
