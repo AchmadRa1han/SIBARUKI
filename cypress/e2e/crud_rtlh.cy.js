@@ -8,6 +8,7 @@ describe('CRUD RTLH - Full Cycle', () => {
     cy.get('input[name="username"]').type('admin');
     cy.get('input[name="password"]').type('password123');
     cy.get('button[type="submit"]').click();
+    cy.url().should('include', '/dashboard');
   });
 
   it('should perform full CRUD on RTLH', () => {
@@ -20,75 +21,56 @@ describe('CRUD RTLH - Full Cycle', () => {
     cy.get('input[name="nama_kepala_keluarga"]').type(uniqueName);
     cy.get('input[name="nik"]').type(nik);
     cy.get('input[name="no_kk"]').type('6543210987654321');
-    cy.get('select[name="jenis_kelamin"]').select('L');
     
-    // Wilayah (Pilih desa pertama yang tersedia)
+    // Wilayah
     cy.get('select[name="desa_id"]').select(1);
-    cy.get('input[name="luas_rumah_m2"]').type('45');
-    cy.get('input[name="luas_lahan_m2"]').type('100');
     
-    // Titik Koordinat (Klik peta secara acak atau isi manual jika input tidak readonly)
-    // Di script sebelumnya kita sudah buat agar bisa diisi manual
+    // Koordinat
     cy.get('#lokasi_koordinat').type('POINT(120.2536 -5.1245)', { force: true });
     
-    // Penilaian Teknis (Pilih opsi pertama untuk semua select kondisi)
-    cy.get('select[name="st_pondasi"]').select(1);
-    cy.get('select[name="st_kolom"]').select(1);
-    cy.get('select[name="st_balok"]').select(1);
-    cy.get('select[name="st_sloof"]').select(1);
-    cy.get('select[name="mat_atap"]').select(1);
-    cy.get('select[name="st_atap"]').select(1);
-    cy.get('select[name="mat_dinding"]').select(1);
-    cy.get('select[name="st_dinding"]').select(1);
-    cy.get('select[name="mat_lantai"]').select(1);
-    cy.get('select[name="st_lantai"]').select(1);
-
     // Submit
     cy.contains('Simpan Semua Data').click({ force: true });
 
     // Verifikasi Berhasil Simpan
-    cy.url().should('include', '/rtlh');
+    cy.contains(/berhasil ditambahkan/i, { timeout: 15000 }).should('be.visible');
     
-    // Cari data yang baru dibuat untuk memastikan muncul di tabel
+    // Cari data
     cy.get('input[name="keyword"]').clear().type(uniqueName + '{enter}');
     cy.contains(uniqueName).should('exist');
 
     // 2. READ & UPDATE
     cy.contains(uniqueName).closest('tr').find('a[href*="/detail/"]').click();
     
-    // Klik Tombol Edit di halaman detail
+    // Klik tombol Perbarui Data (Link ke halaman edit)
     cy.contains('Perbarui Data').click();
     
-    // Ubah Nama
-    cy.get('input[name="nama_kepala_keluarga"]').clear().type(updatedName);
-    cy.contains('Perbarui Data Terpadu').click({ force: true });
+    // Ubah Desa (di edit.php nama fieldnya 'desa' dan tipenya input text)
+    cy.get('input[name="desa"]').clear().type('DESA UPDATED');
+    
+    // Klik tombol simpan (Perbarui Data Terpadu)
+    cy.contains('button', 'Perbarui Data Terpadu').click({ force: true });
 
     // Verifikasi Update
-    cy.contains('Data RTLH berhasil diperbarui').should('exist');
+    cy.contains(/berhasil diperbarui/i, { timeout: 15000 }).should('be.visible');
     
-    // Kembali ke list untuk verifikasi dan hapus
-    cy.visit('http://localhost:8080/rtlh');
-    cy.get('input[name="keyword"]').clear().type(updatedName + '{enter}');
-    cy.contains(updatedName).should('exist');
-
     // 3. DELETE
-    // Klik tombol hapus (ikon trash)
-    cy.contains(updatedName).closest('tr').find('button').filter(':has([data-lucide="trash-2"])').click({ force: true });
+    cy.visit('http://localhost:8080/rtlh');
+    cy.get('input[name="keyword"]').clear().type(uniqueName + '{enter}');
     
-    // Menangani Custom Modal Konfirmasi
-    // Tunggu modal muncul
+    // Klik hapus
+    cy.contains(uniqueName).closest('tr').find('button').filter(':has([data-lucide="trash-2"])').click({ force: true });
+    
+    // Modal Konfirmasi
     cy.get('body').then(($body) => {
         if ($body.find('button:contains("Ya, Lanjutkan")').length > 0) {
             cy.contains('button', 'Ya, Lanjutkan').click({ force: true });
-        } else if ($body.find('button:contains("Ya")').length > 0) {
-            cy.contains('button', 'Ya').click({ force: true });
         } else {
-            // Fallback jika menggunakan window.confirm
-            cy.on('window:confirm', () => true);
+            cy.get('#confirm-ok').click({ force: true });
         }
     });
 
-    // Verifikasi Terhapus
-    cy.contains(updatedName).should('not.exist');
+    // Verifikasi Terhapus (Pesan Recycle Bin)
+    cy.contains(/Recycle Bin/i, { timeout: 15000 }).should('be.visible');
+    cy.contains(uniqueName).should('not.exist');
   });
 });

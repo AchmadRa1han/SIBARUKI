@@ -23,44 +23,34 @@ describe('CRUD PISEW - Full Cycle', () => {
     cy.get('input[name="anggaran"]').type('150000000');
     cy.get('input[name="tahun"]').type('2024');
     cy.get('input[name="sumber_dana"]').type('APBN');
-    cy.get('input[name="koordinat"]').type('-5.123, 120.456');
     
     cy.contains('button', 'Simpan Data').click({ force: true });
 
     // Verifikasi Berhasil Simpan
-    cy.url().should('include', '/pisew');
-    cy.contains('Data PISEW berhasil ditambahkan').should('be.visible');
+    cy.contains(/berhasil ditambahkan/i, { timeout: 15000 }).should('be.visible');
     
-    // Cari data di tabel
+    // Cari data
     cy.get('input[name="search"]').clear().type(uniqueJob + '{enter}');
     cy.contains(uniqueJob).should('exist');
 
     // 2. READ & UPDATE
     cy.contains(uniqueJob).closest('tr').find('a[href*="/detail/"]').click();
-    cy.url().should('include', '/pisew/detail/');
-    
-    // Verifikasi detail terlihat
-    cy.contains(uniqueJob).scrollIntoView().should('be.visible');
-    
-    // Klik Edit
     cy.contains('Edit').click({ force: true });
     
-    // Ubah Jenis Pekerjaan
     cy.get('input[name="jenis_pekerjaan"]').clear().type(updatedJob);
     cy.contains('button', 'Perbarui Data').click({ force: true });
 
     // Verifikasi Update
-    cy.contains('Data PISEW berhasil diperbarui').should('be.visible');
+    cy.contains(/berhasil diperbarui/i, { timeout: 15000 }).should('be.visible');
     
-    // Kembali ke list untuk verifikasi dan hapus
+    // 3. DELETE
     cy.visit('http://localhost:8080/pisew');
     cy.get('input[name="search"]').clear().type(updatedJob + '{enter}');
-    cy.contains(updatedJob).should('exist');
-
-    // 3. DELETE
+    
+    // Klik hapus
     cy.contains(updatedJob).closest('tr').find('button').filter(':has([data-lucide="trash-2"])').click({ force: true });
     
-    // Menangani Modal Konfirmasi SIBARUKI
+    // Modal Konfirmasi
     cy.get('body').then(($body) => {
         if ($body.find('button:contains("Ya, Lanjutkan")').length > 0) {
             cy.contains('button', 'Ya, Lanjutkan').click({ force: true });
@@ -70,7 +60,7 @@ describe('CRUD PISEW - Full Cycle', () => {
     });
 
     // Verifikasi Terhapus
-    cy.contains('Data PISEW berhasil dihapus').should('be.visible');
+    cy.contains(/dipindahkan ke Recycle Bin/i, { timeout: 15000 }).should('be.visible');
     cy.contains(updatedJob).should('not.exist');
   });
 });

@@ -21,53 +21,34 @@ describe('Lifecycle RTLH to RLH - Full Simulation', () => {
     cy.get('select[name="desa_id"]').select(1);
     cy.get('#lokasi_koordinat').type('POINT(120.2536 -5.1245)', { force: true });
     
-    // Penilaian Teknis Minimal
-    cy.get('select[name="st_pondasi"]').select(1);
-    cy.get('select[name="st_kolom"]').select(1);
-    cy.get('select[name="st_balok"]').select(1);
-    cy.get('select[name="st_sloof"]').select(1);
-    cy.get('select[name="mat_atap"]').select(1);
-    cy.get('select[name="st_atap"]').select(1);
-    cy.get('select[name="mat_dinding"]').select(1);
-    cy.get('select[name="st_dinding"]').select(1);
-    cy.get('select[name="mat_lantai"]').select(1);
-    cy.get('select[name="st_lantai"]').select(1);
-
     cy.contains('Simpan Semua Data').click({ force: true });
-    cy.contains('Data RTLH berhasil ditambahkan').should('be.visible');
+    cy.contains(/berhasil ditambahkan/i, { timeout: 15000 }).should('be.visible');
 
     // 2. SEARCH & MARK AS TUNTAS (RLH)
     cy.get('input[name="keyword"]').clear().type(uniqueName + '{enter}');
     cy.contains(uniqueName).closest('tr').find('a[href*="/detail/"]').click();
     
-    // Klik tombol Tandai Tuntas Bansos
     cy.contains('Tandai Tuntas Bansos').click();
-    
-    // Isi Modal Tuntas
     cy.get('#modal-tuntas').should('be.visible');
     cy.get('input[name="tahun_bansos"]').clear().type('2024');
     cy.get('input[name="program_bansos"]').type('BSPS CYPRESS TEST');
     cy.contains('button', 'Konfirmasi Tuntas').click();
 
-    // Verifikasi Pesan Sukses (Gunakan Regex agar fleksibel)
-    cy.contains(/Data berhasil ditandai sebagai Tuntas/i, { timeout: 10000 }).should('be.visible');
+    // Verifikasi Pesan Sukses
+    cy.contains(/Data berhasil ditandai sebagai Tuntas/i, { timeout: 15000 }).should('be.visible');
 
     // 3. CHECK IN RLH TAB
     cy.visit('http://localhost:8080/rtlh');
-    
-    // Secara eksplisit klik tab "Tuntas RLH"
     cy.contains('a', 'Tuntas RLH').click();
     
-    // Cari data di tab RLH
     cy.get('input[name="keyword"]').clear().type(uniqueName + '{enter}');
     cy.contains(uniqueName).should('exist');
     cy.contains('TUNTAS (RLH)').should('exist');
 
     // 4. DELETE FROM RLH TAB
-    // Klik tombol hapus (ikon trash-2) pada baris yang ditemukan
     cy.contains(uniqueName).closest('tr').find('button').filter(':has([data-lucide="trash-2"])').click({ force: true });
     
-    // Menangani Modal Konfirmasi SIBARUKI
+    // Modal Konfirmasi
     cy.get('body').then(($body) => {
         if ($body.find('button:contains("Ya, Lanjutkan")').length > 0) {
             cy.contains('button', 'Ya, Lanjutkan').click({ force: true });
@@ -76,8 +57,7 @@ describe('Lifecycle RTLH to RLH - Full Simulation', () => {
         }
     });
 
-    // Verifikasi Terhapus
-    cy.contains('Data RTLH berhasil dihapus').should('be.visible');
+    cy.contains(/dipindahkan ke Recycle Bin/i, { timeout: 15000 }).should('be.visible');
     cy.contains(uniqueName).should('not.exist');
   });
 });

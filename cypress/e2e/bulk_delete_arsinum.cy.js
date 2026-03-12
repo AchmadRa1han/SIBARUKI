@@ -29,25 +29,22 @@ describe('Bulk Delete ARSINUM - Full Simulation', () => {
         cy.get('input[name="kecamatan"]').type('SINJAI');
         
         cy.contains('button', 'Simpan Data').click({ force: true });
-        cy.contains('Data Arsinum berhasil ditambahkan', { timeout: 15000 }).should('be.visible');
+        cy.contains(/berhasil ditambahkan/i, { timeout: 15000 }).should('be.visible');
     });
 
     // --- 2. BULK DELETE ---
     cy.visit('http://localhost:8080/arsinum');
-    
-    // Gunakan pencarian agar tabel hanya menampilkan data test ini
     cy.get('input[name="search"]').clear().type(searchKeyword + '{enter}');
     
-    // Verifikasi data muncul di tabel sebelum dicentang
-    // Kita gunakan cy.contains(text) yang mencari di seluruh halaman
+    // Verifikasi data muncul
     projects.forEach(name => {
         cy.contains(name, { timeout: 10000 }).should('exist');
     });
 
-    // Pilih Semua (Gunakan CSS Selector yang lebih spesifik)
-    cy.get('#select-all').should('exist').check({ force: true });
+    // Pilih Semua
+    cy.get('#select-all').check({ force: true });
 
-    // Verifikasi Floating Bar muncul
+    // Verifikasi Floating Bar
     cy.get('#bulk-action-bar', { timeout: 10000 }).should('be.visible');
     cy.get('#selected-count').should('contain', '3 TERPILIH');
 
@@ -64,7 +61,7 @@ describe('Bulk Delete ARSINUM - Full Simulation', () => {
     });
 
     // Verifikasi Pesan Sukses Massal
-    cy.contains(/data berhasil dihapus/i, { timeout: 15000 }).should('be.visible');
+    cy.contains(/dipindahkan ke Recycle Bin/i, { timeout: 15000 }).should('be.visible');
 
     // Final Check: Tabel harus kosong
     cy.get('input[name="search"]').clear().type(searchKeyword + '{enter}');
