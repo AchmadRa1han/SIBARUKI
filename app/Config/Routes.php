@@ -154,3 +154,46 @@ $routes->group('ref-master', function($routes) {
     $routes->post('delete/(:num)', 'RefMaster::delete/$1');
     $routes->post('bulk-delete', 'RefMaster::bulkDelete');
 });
+
+// MOBILE API V1
+$routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function($routes) {
+    // Public Routes
+    $routes->post('auth/login', 'AuthApi::login');
+
+    // Protected Routes
+    $routes->group('', ['filter' => 'api_auth'], function($routes) {
+        $routes->get('auth/profile', 'AuthApi::profile');
+
+        // Master Data
+        $routes->get('master/referensi', 'MasterApi::referensi');
+        $routes->get('master/desa', 'MasterApi::desa');
+
+        // RTLH
+        $routes->group('rtlh', function($routes) {
+            $routes->get('/', 'RtlhApi::index');
+            $routes->get('(:any)', 'RtlhApi::detail/$1');
+            $routes->post('sync', 'RtlhApi::sync');
+        });
+
+        // Infrastruktur & Aset
+        $routes->group('infrastruktur', function($routes) {
+            $routes->get('(:any)', 'InfrastrukturApi::index/$1');
+            $routes->get('(:any)/(:num)', 'InfrastrukturApi::show/$1/$2');
+            $routes->post('(:any)', 'InfrastrukturApi::create/$1');
+            $routes->put('(:any)/(:num)', 'InfrastrukturApi::update/$1/$2');
+            $routes->delete('(:any)/(:num)', 'InfrastrukturApi::delete/$1/$2');
+        });
+
+        // Wilayah Kumuh
+        $routes->group('kumuh', function($routes) {
+            $routes->get('/', 'KumuhApi::index');
+            $routes->get('(:num)', 'KumuhApi::show/$1');
+            $routes->post('/', 'KumuhApi::create');
+            $routes->put('(:num)', 'KumuhApi::update/$1');
+            $routes->delete('(:num)', 'KumuhApi::delete/$1');
+        });
+
+        // Media & Upload
+        $routes->post('media/upload', 'MediaApi::upload');
+    });
+});
