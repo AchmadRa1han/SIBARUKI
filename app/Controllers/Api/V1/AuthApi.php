@@ -56,7 +56,10 @@ class AuthApi extends BaseApiController
         }
 
         // Create JWT Payload
-        $key = getenv('JWT_SECRET') ?: 'sibaruki_secret_key_2026';
+        $key = getenv('JWT_SECRET');
+        if (empty($key)) {
+            return $this->respondError('Konfigurasi server (JWT_SECRET) belum diatur', 500);
+        }
         $iat = time();
         $exp = $iat + (3600 * 24 * 7); // Token berlaku 7 hari
 

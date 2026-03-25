@@ -21,19 +21,29 @@ use Psr\Log\LoggerInterface;
 abstract class BaseController extends Controller
 {
     /**
+     * @var \CodeIgniter\Database\BaseConnection
+     */
+    protected $db;
+
+    /**
      * @return void
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         // Load here all helpers you want to be available in your controllers that extend BaseController.
         $this->helpers = ['form', 'url', 'auth'];
+        $this->db = \Config\Database::connect();
 
-        // Update Last Active User
+        // Update Last Active User (Throttled to once every 5 minutes to reduce DB load)
         if (session()->get('isLoggedIn')) {
-            $db = \Config\Database::connect();
-            $db->table('users')->where('id', session()->get('user_id'))->update([
-                'last_active' => date('Y-m-d H:i:s')
-            ]);
+            $lastUpdate = session()->get('last_active_update') ?? 0;
+            $now = time();
+            if (($now - $lastUpdate) > 300) { // 5 minutes
+                $this->db->table('users')->where('id', session()->get('user_id'))->update([
+                    'last_active' => date('Y-m-d H:i:s')
+                ]);
+                session()->set('last_active_update', $now);
+            }
         }
 
         parent::initController($request, $response, $logger);
@@ -41,7 +51,6 @@ abstract class BaseController extends Controller
 
     protected function logActivity($action, $table, $description, $details = null, $severity = null)
     {
-        $db = \Config\Database::connect();
         $agent = $this->request->getUserAgent();
         $ip = $this->request->getIPAddress();
         
@@ -74,7 +83,7 @@ abstract class BaseController extends Controller
             'url' => current_url()
         ]);
 
-        $db->table('sys_logs')->insert([
+        $this->db->table('sys_logs')->insert([
             'user'        => session()->get('username') ?? 'System',
             'action'      => $action,
             'severity'    => $severity,
@@ -92,7 +101,6 @@ abstract class BaseController extends Controller
      */
     protected function formatLogData($data, $ignoreFields = ['password', 'created_at', 'updated_at'])
     {
-        $db = \Config\Database::connect();
         $entries = [];
         foreach ($data as $key => $value) {
             if (in_array($key, $ignoreFields) || empty($value)) continue;
@@ -103,13 +111,13 @@ abstract class BaseController extends Controller
             if (is_numeric($value)) {
                 if ($key === 'role_id') {
                     // Ambil dari tabel roles
-                    $role = $db->table('roles')->where('id', $value)->get()->getRowArray();
+                    $role = $this->db->table('roles')->where('id', $value)->get()->getRowArray();
                     if ($role) $displayValue = strtoupper($role['role_name']);
                 } else {
                     // Ambil dari ref_master untuk kolom st_, mat_, atau _id lainnya
                     $isRef = str_starts_with($key, 'st_') || str_starts_with($key, 'mat_') || str_ends_with($key, '_id');
                     if ($isRef) {
-                        $ref = $db->table('ref_master')->where('id', $value)->get()->getRowArray();
+                        $ref = $this->db->table('ref_master')->where('id', $value)->get()->getRowArray();
                         if ($ref) $displayValue = $ref['nama_pilihan'];
                     }
                 }
@@ -126,7 +134,6 @@ abstract class BaseController extends Controller
      */
     protected function generateDiff($oldData, $newData, $ignoreFields = ['updated_at', 'created_at'])
     {
-        $db = \Config\Database::connect();
         $changes = [];
         
         foreach ($newData as $key => $value) {
@@ -145,22 +152,22 @@ abstract class BaseController extends Controller
                     // Logika Resolusi Nama
                     if ($key === 'role_id') {
                         if ($normOld) {
-                            $role = $db->table('roles')->where('id', $normOld)->get()->getRowArray();
+                            $role = $this->db->table('roles')->where('id', $normOld)->get()->getRowArray();
                             if ($role) $displayOld = strtoupper($role['role_name']);
                         }
                         if ($normNew) {
-                            $role = $db->table('roles')->where('id', $normNew)->get()->getRowArray();
+                            $role = $this->db->table('roles')->where('id', $normNew)->get()->getRowArray();
                             if ($role) $displayNew = strtoupper($role['role_name']);
                         }
                     } else {
                         $isRef = str_starts_with($key, 'st_') || str_starts_with($key, 'mat_') || str_ends_with($key, '_id');
                         if ($isRef) {
                             if ($normOld && is_numeric($normOld)) {
-                                $ref = $db->table('ref_master')->where('id', $normOld)->get()->getRowArray();
+                                $ref = $this->db->table('ref_master')->where('id', $normOld)->get()->getRowArray();
                                 if ($ref) $displayOld = $ref['nama_pilihan'];
                             }
                             if ($normNew && is_numeric($normNew)) {
-                                $ref = $db->table('ref_master')->where('id', $normNew)->get()->getRowArray();
+                                $ref = $this->db->table('ref_master')->where('id', $normNew)->get()->getRowArray();
                                 if ($ref) $displayNew = $ref['nama_pilihan'];
                             }
                         }

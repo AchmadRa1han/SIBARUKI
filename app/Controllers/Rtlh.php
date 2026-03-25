@@ -645,10 +645,94 @@ class Rtlh extends BaseController
     public function update($id)
     {
         $db = \Config\Database::connect();
+        $rumahLama = $this->rumahModel->find($id);
+        if (!$rumahLama) return redirect()->back()->with('error', 'Data tidak ditemukan.');
+
         $post = $this->request->getPost();
+        $nik = $rumahLama['nik_pemilik'];
+
         $db->transStart();
-        $this->rumahModel->update($id, ['desa' => $post['desa'] ?? null]);
+
+        // 1. Update Penerima
+        $dataPenerima = [
+            'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null,
+            'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''),
+            'tempat_lahir' => $post['tempat_lahir'] ?? null,
+            'tanggal_lahir' => $post['tanggal_lahir'] ?? null,
+            'jenis_kelamin' => $post['jenis_kelamin'] ?? null,
+            'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null,
+            'pendidikan_id' => $post['pendidikan_id'] ?: null,
+            'pekerjaan_id' => $post['pekerjaan_id'] ?: null,
+            'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        $this->penerimaModel->update($nik, $dataPenerima);
+
+        // 2. Update Rumah
+        $dataRumah = [
+            'alamat_detail' => $post['alamat_detail'] ?? null,
+            'desa' => $post['desa'] ?? null,
+            'jenis_kawasan' => $post['jenis_kawasan'] ?? null,
+            'luas_rumah_m2' => $post['luas_rumah_m2'] ?? null,
+            'luas_lahan_m2' => $post['luas_lahan_m2'] ?? null,
+            'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? null,
+            'fungsi_ruang' => $post['fungsi_ruang'] ?? null,
+            'kepemilikan_rumah' => $post['kepemilikan_rumah'] ?? null,
+            'kepemilikan_tanah' => $post['kepemilikan_tanah'] ?? null,
+            'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? null,
+            'sumber_penerangan' => $post['sumber_penerangan'] ?? null,
+            'sumber_penerangan_detail' => $post['sumber_penerangan_detail'] ?? null,
+            'sumber_air_minum' => $post['sumber_air_minum'] ?? null,
+            'jarak_sam_ke_tpa_tinja' => $post['jarak_sam_ke_tpa_tinja'] ?? null,
+            'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? null,
+            'jenis_jamban_kloset' => $post['jenis_jamban_kloset'] ?? null,
+            'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null,
+            'bantuan_perumahan' => $post['bantuan_perumahan'] ?? null,
+            'status_backlog' => $post['status_backlog'] ?? null,
+            'desil_nasional' => $post['desil_nasional'] ?? null,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        
+        if (!empty($post['lokasi_koordinat'])) {
+            $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
+        }
+        $this->rumahModel->update($id, $dataRumah);
+
+        // 3. Update Kondisi Fisik
+        $dataKondisi = [
+            'st_pondasi' => $post['st_pondasi'] ?: null,
+            'st_kolom' => $post['st_kolom'] ?: null,
+            'st_balok' => $post['st_balok'] ?: null,
+            'st_sloof' => $post['st_sloof'] ?: null,
+            'st_rangka_atap' => $post['st_rangka_atap'] ?: null,
+            'st_plafon' => $post['st_plafon'] ?: null,
+            'st_jendela' => $post['st_jendela'] ?: null,
+            'st_ventilasi' => $post['st_ventilasi'] ?: null,
+            'mat_atap' => $post['mat_atap'] ?: null,
+            'st_atap' => $post['st_atap'] ?: null,
+            'mat_dinding' => $post['mat_dinding'] ?: null,
+            'st_dinding' => $post['st_dinding'] ?: null,
+            'mat_lantai' => $post['mat_lantai'] ?: null,
+            'st_lantai' => $post['st_lantai'] ?: null,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        
+        $existingKondisi = $this->kondisiModel->where('id_survei', $id)->first();
+        if ($existingKondisi) {
+            $this->kondisiModel->update($id, $dataKondisi);
+        } else {
+            $dataKondisi['id_survei'] = $id;
+            $dataKondisi['created_at'] = date('Y-m-d H:i:s');
+            $this->kondisiModel->insert($dataKondisi);
+        }
+
         $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->back()->with('error', 'Gagal memperbarui data.');
+        }
+
+        $this->logActivity('Ubah', 'RTLH', "Memperbarui data RTLH Lengkap ID: $id");
         return redirect()->to('/rtlh/detail/' . $id)->with('success', 'Data RTLH berhasil diperbarui.');
     }
 
@@ -657,6 +741,7 @@ class Rtlh extends BaseController
         $rumah = $this->rumahModel->find($id);
         if ($rumah) {
             $db = \Config\Database::connect();
+            $db->transStart();
             $db->table('trash_data')->insert([
                 'entity_type' => 'RTLH',
                 'entity_id'   => $id,
@@ -666,6 +751,7 @@ class Rtlh extends BaseController
             ]);
             $db->table('rtlh_kondisi_rumah')->where('id_survei', $id)->delete();
             $this->rumahModel->delete($id);
+            $db->transComplete();
         }
         return redirect()->to('/rtlh')->with('success', 'Data berhasil dipindahkan ke Recycle Bin.');
     }

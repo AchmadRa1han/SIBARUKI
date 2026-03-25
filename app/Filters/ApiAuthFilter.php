@@ -25,7 +25,12 @@ class ApiAuthFilter implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        $key = getenv('JWT_SECRET') ?: 'sibaruki_secret_key_2026';
+        $key = getenv('JWT_SECRET');
+        if (empty($key)) {
+            return service('response')
+                ->setJSON(['status' => false, 'message' => 'Internal Server Error: JWT_SECRET not configured'])
+                ->setStatusCode(ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+        }
         $header = $request->getServer('HTTP_AUTHORIZATION');
 
         if (!$header) {
