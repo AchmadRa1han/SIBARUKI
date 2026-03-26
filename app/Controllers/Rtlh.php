@@ -617,11 +617,16 @@ class Rtlh extends BaseController
         ];
 
         // LOGIKA UPLOAD FOTO (STORE)
+        $uploadPath = FCPATH . 'uploads/rtlh/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
+
         foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
             $img = $this->request->getFile($field);
             if ($img && $img->isValid() && !$img->hasMoved()) {
                 $newName = $img->getRandomName();
-                $img->move(FCPATH . 'uploads/rtlh', $newName);
+                $img->move($uploadPath, $newName);
                 $dataRumah[$field] = $newName;
             }
         }
@@ -710,15 +715,20 @@ class Rtlh extends BaseController
         }
 
         // LOGIKA UPLOAD FOTO (UPDATE)
+        $uploadPath = FCPATH . 'uploads/rtlh/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
+
         foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
             $img = $this->request->getFile($field);
             if ($img && $img->isValid() && !$img->hasMoved()) {
                 // Hapus foto lama jika ada
-                if (!empty($rumahLama[$field]) && file_exists(FCPATH . 'uploads/rtlh/' . $rumahLama[$field])) {
-                    unlink(FCPATH . 'uploads/rtlh/' . $rumahLama[$field]);
+                if (!empty($rumahLama[$field]) && file_exists($uploadPath . $rumahLama[$field])) {
+                    unlink($uploadPath . $rumahLama[$field]);
                 }
                 $newName = $img->getRandomName();
-                $img->move(FCPATH . 'uploads/rtlh', $newName);
+                $img->move($uploadPath, $newName);
                 $dataRumah[$field] = $newName;
             }
         }
