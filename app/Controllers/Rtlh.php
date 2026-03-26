@@ -610,18 +610,30 @@ class Rtlh extends BaseController
             'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null,
         ]);
 
-        $this->rumahModel->set([
+        $dataRumah = [
             'nik_pemilik' => $nik,
             'desa' => $post['desa'] ?? null,
             'status_bantuan' => 'Belum Menerima'
-        ]);
+        ];
+
+        // LOGIKA UPLOAD FOTO (STORE)
+        foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                $newName = $img->getRandomName();
+                $img->move(FCPATH . 'uploads/rtlh', $newName);
+                $dataRumah[$field] = $newName;
+            }
+        }
+
+        $this->rumahModel->set($dataRumah);
         if (!empty($post['lokasi_koordinat'])) $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
         $this->rumahModel->insert();
         $surveiId = $this->rumahModel->getInsertID();
 
         $this->kondisiModel->insert(['id_survei' => $surveiId]);
         $db->transComplete();
-        $this->logActivity('Tambah', 'RTLH', "Menambah data RTLH NIK: $nik");
+        $this->logActivity('Tambah', 'RTLH', "Menambah data RTLH NIK: $nik beserta foto dokumentasi");
         return redirect()->to('/rtlh')->with('success', 'Data RTLH berhasil ditambahkan.');
     }
 
@@ -696,6 +708,21 @@ class Rtlh extends BaseController
         if (!empty($post['lokasi_koordinat'])) {
             $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
         }
+
+        // LOGIKA UPLOAD FOTO (UPDATE)
+        foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                // Hapus foto lama jika ada
+                if (!empty($rumahLama[$field]) && file_exists(FCPATH . 'uploads/rtlh/' . $rumahLama[$field])) {
+                    unlink(FCPATH . 'uploads/rtlh/' . $rumahLama[$field]);
+                }
+                $newName = $img->getRandomName();
+                $img->move(FCPATH . 'uploads/rtlh', $newName);
+                $dataRumah[$field] = $newName;
+            }
+        }
+
         $this->rumahModel->update($id, $dataRumah);
 
         // 3. Update Kondisi Fisik

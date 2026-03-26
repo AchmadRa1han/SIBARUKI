@@ -42,7 +42,7 @@
     <?php endif; ?>
 
     <!-- 2. FORM MANUAL -->
-    <form action="<?= base_url('rtlh/store') ?>" method="post">
+    <form action="<?= base_url('rtlh/store') ?>" method="post" enctype="multipart/form-data">
         <?= csrf_field() ?>
         <div class="space-y-8">
             <!-- SECTION 1: IDENTITAS PENERIMA -->
@@ -378,6 +378,38 @@
                 </div>
             </div>
 
+            <!-- SECTION 5: DOKUMENTASI FOTO -->
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+                <div class="p-6 border-b dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
+                    <h3 class="font-black text-slate-700 dark:text-slate-400 uppercase tracking-widest text-xs flex items-center">
+                        <span class="w-8 h-8 bg-slate-900 dark:bg-slate-700 text-white rounded-xl flex items-center justify-center mr-3 text-[10px] shadow-lg">V</span>
+                        Dokumentasi Foto Rumah (Eksisting)
+                    </h3>
+                </div>
+                <div class="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <?php 
+                        $fotos = [
+                            'foto_depan' => 'Tampak Depan',
+                            'foto_samping' => 'Tampak Samping',
+                            'foto_belakang' => 'Tampak Belakang',
+                            'foto_dalam' => 'Bagian Dalam'
+                        ];
+                        foreach($fotos as $f_key => $f_label):
+                    ?>
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1"><?= $f_label ?></label>
+                        <div class="relative group">
+                            <input type="file" name="<?= $f_key ?>" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, '<?= $f_key ?>_preview')">
+                            <div id="<?= $f_key ?>_preview" class="w-full h-40 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-blue-500">
+                                <i data-lucide="image-plus" class="w-8 h-8 text-slate-300 mb-2"></i>
+                                <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Pilih Foto</span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
             <!-- BUTTON SIMPAN -->
             <div class="flex justify-end">
                 <button type="submit" class="group flex items-center space-x-6 bg-blue-950 dark:bg-blue-700 hover:bg-black text-white px-16 py-6 rounded-[2.5rem] font-black shadow-2xl transition-all active:scale-95">
@@ -466,6 +498,19 @@
             }, (err) => {
                 alert('Gagal mengakses lokasi. Pastikan GPS aktif.');
             });
+        }
+    }
+
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                preview.classList.remove('border-dashed');
+                preview.classList.add('border-solid', 'border-blue-500');
+            }
+            reader.readAsDataURL(input.files[0]);
         }
     }
 </script>

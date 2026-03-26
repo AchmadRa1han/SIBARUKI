@@ -19,7 +19,7 @@
             </div>
         </div>
 
-        <form action="<?= base_url('rtlh/update/' . $rumah['id_survei']) ?>" method="POST" class="p-10">
+        <form action="<?= base_url('rtlh/update/' . $rumah['id_survei']) ?>" method="POST" enctype="multipart/form-data" class="p-10">
             <?= csrf_field() ?>
             <div class="space-y-16">
                 <!-- BAGIAN 1: IDENTITAS PEMILIK -->
@@ -280,10 +280,45 @@
                         <?php endforeach; ?>
                     </div>
                 </div>
-            </div>
+                </div>
 
-            <!-- FOOTER: TOMBOL AKSI -->
-            <div class="mt-12 flex items-center justify-end space-x-6 border-t dark:border-slate-800 pt-10">
+                <hr class="border-slate-100 dark:border-slate-800">
+
+                <!-- BAGIAN 5: DOKUMENTASI FOTO -->
+                <div>
+                <h3 class="text-[10px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.3em] mb-8 flex items-center">
+                    <i data-lucide="camera" class="w-4 h-4 mr-3"></i> V. Dokumentasi Foto Dokumentasi
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <?php 
+                        $fotos = [
+                            'foto_depan' => 'Tampak Depan',
+                            'foto_samping' => 'Tampak Samping',
+                            'foto_belakang' => 'Tampak Belakang',
+                            'foto_dalam' => 'Bagian Dalam'
+                        ];
+                        foreach($fotos as $f_key => $f_label):
+                            $hasPhoto = !empty($rumah[$f_key]) && file_exists(FCPATH . 'uploads/rtlh/' . $rumah[$f_key]);
+                    ?>
+                    <div class="space-y-3">
+                        <label class="block text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1"><?= $f_label ?></label>
+                        <div class="relative group">
+                            <input type="file" name="<?= $f_key ?>" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, '<?= $f_key ?>_preview')">
+                            <div id="<?= $f_key ?>_preview" class="w-full h-44 bg-slate-50 dark:bg-slate-950 border-2 <?= $hasPhoto ? 'border-solid border-amber-500/50' : 'border-dashed border-slate-200 dark:border-slate-800' ?> rounded-[2rem] flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-amber-500">
+                                <?php if($hasPhoto): ?>
+                                    <img src="<?= base_url('uploads/rtlh/' . $rumah[$f_key]) ?>" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <i data-lucide="image-plus" class="w-8 h-8 text-slate-300 mb-2"></i>
+                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest text-center px-4">Klik untuk Unggah Foto Baru</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                </div>
+
+                <!-- FOOTER: TOMBOL AKSI -->            <div class="mt-12 flex items-center justify-end space-x-6 border-t dark:border-slate-800 pt-10">
                 <a href="<?= base_url('rtlh/detail/' . $rumah['id_survei']) ?>" class="text-sm font-bold text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Batal</a>
                 <button type="submit" class="bg-amber-500 dark:bg-amber-600 hover:bg-amber-600 dark:hover:bg-amber-500 text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-amber-200 dark:shadow-none transition-all flex items-center space-x-3 text-lg">
                     <i data-lucide="refresh-cw" class="w-5 h-5"></i>
@@ -417,6 +452,19 @@
         const wrapper = document.getElementById('detail_penerangan_wrapper');
         if (val === 'Ada') { wrapper.classList.remove('hidden'); } 
         else { wrapper.classList.add('hidden'); }
+    }
+
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                preview.classList.remove('border-dashed');
+                preview.classList.add('border-solid', 'border-amber-500');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
     lucide.createIcons();

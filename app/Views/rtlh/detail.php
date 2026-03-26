@@ -181,6 +181,46 @@
         </div>
     </div>
 
+    <!-- SECTION: GALERI FOTO DOKUMENTASI -->
+    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300 no-print">
+        <div class="p-6 border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center justify-between">
+            <h3 class="font-bold text-blue-950 dark:text-blue-400 uppercase tracking-[0.2em] text-xs flex items-center">
+                <i data-lucide="camera" class="w-4 h-4 mr-2 text-blue-900 dark:text-blue-400"></i> Dokumentasi Visual Rumah (Eksisting)
+            </h3>
+        </div>
+        <div class="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <?php 
+                $fotos = [
+                    'foto_depan' => 'Tampak Depan',
+                    'foto_samping' => 'Tampak Samping',
+                    'foto_belakang' => 'Tampak Belakang',
+                    'foto_dalam' => 'Bagian Dalam'
+                ];
+                foreach($fotos as $f_key => $f_label):
+                    $photoPath = !empty($rumah[$f_key]) && file_exists(FCPATH . 'uploads/rtlh/' . $rumah[$f_key]) 
+                        ? base_url('uploads/rtlh/' . $rumah[$f_key]) 
+                        : null;
+            ?>
+            <div class="group relative bg-slate-50 dark:bg-slate-950/50 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <?php if($photoPath): ?>
+                    <img src="<?= $photoPath ?>" alt="<?= $f_label ?>" class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                        <button onclick="window.open('<?= $photoPath ?>', '_blank')" class="w-full py-2 bg-white/20 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-white/30 transition-all">Lihat Resolusi Penuh</button>
+                    </div>
+                <?php else: ?>
+                    <div class="w-full h-48 flex flex-col items-center justify-center text-slate-300 dark:text-slate-700">
+                        <i data-lucide="image-off" class="w-10 h-10 mb-2 opacity-20"></i>
+                        <span class="text-[8px] font-black uppercase tracking-[0.2em]">Foto Belum Ada</span>
+                    </div>
+                <?php endif; ?>
+                <div class="p-4 bg-white dark:bg-slate-900 border-t dark:border-slate-800">
+                    <p class="text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest text-center"><?= $f_label ?></p>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
     <!-- BAGIAN 3: FASILITAS & SANITASI -->
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
         <div class="p-6 border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center justify-between">
