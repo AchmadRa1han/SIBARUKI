@@ -47,7 +47,7 @@
                     </div>
                     <h1 class="text-3xl font-black text-white tracking-tighter mb-2">SIBARUKI</h1>
                     <p class="text-blue-200/60 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
-                        Sistem Informasi Basis Data<br>Perumahan & Pertanahan<br>Kabupaten Sinjai
+                       Sama - samaki Bangun <br>Perumahan & Permukiman<br>Kabupaten Sinjai
                     </p>
                 </div>
             </div>
