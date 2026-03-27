@@ -13,7 +13,7 @@ describe('CRUD ARSINUM - Full Cycle', () => {
   it('should perform full CRUD on ARSINUM', () => {
     // 1. CREATE
     cy.visit('http://localhost:8080/arsinum');
-    cy.contains('Tambah Data').click();
+    cy.contains('Tambah').click();
     cy.url().should('include', '/arsinum/create');
     
     cy.get('input[name="jenis_pekerjaan"]').type(uniqueProject);
@@ -22,13 +22,14 @@ describe('CRUD ARSINUM - Full Cycle', () => {
     cy.get('input[name="desa"]').type('DESA LAPPA');
     cy.get('input[name="kecamatan"]').type('SINJAI UTARA');
     
-    cy.contains('button', 'Simpan Data').click({ force: true });
+    cy.contains('button', 'Simpan').click({ force: true });
 
     // Verifikasi Berhasil Simpan
     cy.contains(/berhasil ditambahkan/i, { timeout: 15000 }).should('be.visible');
     
     // Cari data
-    cy.get('input[name="search"]').clear().type(uniqueProject + '{enter}');
+    cy.get('input[name="search"]').clear().type(uniqueProject);
+    cy.get('button').find('[data-lucide="search"]').parent().click();
     cy.contains(uniqueProject).should('exist');
 
     // 2. READ & UPDATE
@@ -36,14 +37,15 @@ describe('CRUD ARSINUM - Full Cycle', () => {
     cy.contains('Edit').click({ force: true });
     
     cy.get('input[name="jenis_pekerjaan"]').clear().type(updatedProject);
-    cy.contains('button', 'Simpan Perubahan').click({ force: true });
+    cy.contains('button', 'Simpan').click({ force: true });
 
     // Verifikasi Update
     cy.contains(/berhasil diperbarui/i, { timeout: 15000 }).should('be.visible');
     
     // 3. DELETE
     cy.visit('http://localhost:8080/arsinum');
-    cy.get('input[name="search"]').clear().type(updatedProject + '{enter}');
+    cy.get('input[name="search"]').clear().type(updatedProject);
+    cy.get('button').find('[data-lucide="search"]').parent().click();
     
     // Klik hapus
     cy.contains(updatedProject).closest('tr').find('button').filter(':has([data-lucide="trash-2"])').click({ force: true });
