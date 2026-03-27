@@ -1,0 +1,32 @@
+{
+  "short_name": "SIBARUKI",
+  "name": "SIBARUKI - Sistem Informasi Bantuan Rumah",
+  "description": "Sistem Informasi Bantuan Rumah & Kawasan Permukiman",
+  "icons": [
+    {
+      "src": "/sinjai.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/sinjai.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#0ea5e9",
+  "shortcuts": [
+    {
+      "name": "Data RTLH",
+      "short_name": "RTLH",
+      "description": "Lihat data RTLH",
+      "url": "/rtlh",
+      "icons": [{ "src": "/sinjai.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?= $title ?? 'SIBARUKI' ?></title>
     <link rel="shortcut icon" type="image/png" href="<?= base_url('sinjai.png') ?>">
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <link rel="stylesheet" href="<?= base_url('css/app.css') ?>">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
@@ -392,6 +393,15 @@
         });
 
         document.querySelectorAll('#main-sidebar a').forEach(link => { link.addEventListener('click', () => { if (window.innerWidth < 1024) toggleMobileSidebar(); }); });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('sw.js') ?>')
+                    .then(reg => console.log('SW: Registered', reg))
+                    .catch(err => console.log('SW: Failed', err));
+            });
+        }
     </script>
 </body>
 </html>
