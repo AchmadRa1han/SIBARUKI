@@ -16,6 +16,9 @@ class Home extends BaseController
         $totalKumuh = $db->table('wilayah_kumuh')->countAllResults();
         $totalFormal = $db->table('perumahan_formal')->countAllResults();
         $totalPsu = $db->table('psu_jalan')->countAllResults();
+        $totalArsinum = $db->table('arsinum')->countAllResults();
+        $totalPisew = $db->table('pisew')->countAllResults();
+        $totalAset = $db->table('aset_tanah')->countAllResults();
 
         // Data Spasial Publik (Limit untuk performa)
         $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
@@ -27,10 +30,13 @@ class Home extends BaseController
         $data = [
             'title'   => 'Selamat Datang di SIBARUKI Sinjai',
             'rekap'   => [
-                'rtlh'   => $totalRtlh,
-                'kumuh'  => $totalKumuh,
-                'formal' => $totalFormal,
-                'psu'    => $totalPsu
+                'rtlh'    => $totalRtlh,
+                'kumuh'   => $totalKumuh,
+                'formal'  => $totalFormal,
+                'psu'     => $totalPsu,
+                'arsinum' => $totalArsinum,
+                'pisew'   => $totalPisew,
+                'aset'    => $totalAset
             ],
             'spasial' => [
                 'kecamatan' => $desaPolygons,

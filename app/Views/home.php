@@ -59,21 +59,24 @@
             <h3 class="text-3xl lg:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Capaian Pembangunan Sinjai</h3>
         </div>
         
-        <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             <?php 
             $metrics = [
                 ['rtlh', 'home', 'amber', 'Rumah Tak Layak'],
                 ['kumuh', 'map-pin', 'rose', 'Wilayah Kumuh'],
                 ['formal', 'building-2', 'indigo', 'Perumahan'],
                 ['psu', 'route', 'emerald', 'Infrastruktur PSU'],
+                ['arsinum', 'droplets', 'blue', 'Air Siap Minum'],
+                ['pisew', 'hard-hat', 'orange', 'PISEW'],
+                ['aset', 'land-plot', 'cyan', 'Aset Tanah'],
             ];
             foreach($metrics as $m): ?>
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-500 group">
-                <div class="w-14 h-14 rounded-2xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner">
-                    <i data-lucide="<?= $m[1] ?>" class="w-7 h-7"></i>
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-500 group text-center">
+                <div class="w-12 h-12 mx-auto rounded-2xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                    <i data-lucide="<?= $m[1] ?>" class="w-6 h-6"></i>
                 </div>
-                <h4 class="text-3xl font-black text-blue-950 dark:text-white mb-1"><?= number_format($rekap[$m[0]]) ?></h4>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-relaxed"><?= $m[3] ?></p>
+                <h4 class="text-2xl font-black text-blue-950 dark:text-white mb-1"><?= number_format($rekap[$m[0]] ?? 0) ?></h4>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight"><?= $m[3] ?></p>
             </div>
             <?php endforeach; ?>
         </div>
@@ -130,7 +133,7 @@
     function initMap() {
         const isDark = document.documentElement.classList.contains('dark');
         const tiles = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
-
+                    
         map = L.map('publicMap', { zoomControl: false, layers: [tiles] }).setView([-5.1245, 120.2536], 11);
         L.control.zoom({ position: 'topright' }).addTo(map);
 

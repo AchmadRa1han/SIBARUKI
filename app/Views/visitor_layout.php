@@ -72,42 +72,70 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white dark:bg-slate-900 border-t dark:border-slate-800 py-16">
-        <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div>
-                <div class="flex items-center gap-4 mb-6">
-                    <img src="<?= base_url('sinjai.png') ?>" alt="Logo" class="w-10 h-10">
-                    <span class="text-xl font-black text-blue-950 dark:text-white uppercase">SIBARUKI</span>
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 pt-20 pb-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
+                <!-- Links -->
+                <div>
+                    <h4 class="text-[11px] font-black uppercase tracking-[0.3em] mb-8 text-blue-600 dark:text-blue-400">Tautan Cepat</h4>
+                    <ul class="space-y-5">
+                        <li>
+                            <a href="https://www.instagram.com/dpkppsinjai/" target="_blank" class="group flex items-center gap-3 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">
+                                <span class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
+                                    <i data-lucide="instagram" class="w-4 h-4" stroke-width="3"></i>
+                                </span>
+                                Instagram DPKPP
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://dpkpp.sinjaikab.go.id/" target="_blank" class="group flex items-center gap-3 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">
+                                <span class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
+                                    <i data-lucide="globe" class="w-4 h-4" stroke-width="3"></i>
+                                </span>
+                                Website Resmi DPKPP
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Location -->
+                <div>
+                    <h4 class="text-[11px] font-black uppercase tracking-[0.3em] mb-8 text-blue-600 dark:text-blue-400">Kantor Pelayanan</h4>
+                    <div class="flex gap-4">
+                        <span class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 text-blue-600 flex items-center justify-center">
+                            <i data-lucide="map-pin" class="w-5 h-5" stroke-width="2.5"></i>
+                        </span>
+                        <div>
+                            <p class="text-sm font-black text-blue-950 dark:text-white uppercase mb-1">Alamat Utama</p>
+                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+                                Jalan Persatuan Raya No. 116, Kelurahan Biringere<br>
+                                Kecamatan Sinjai Utara, Kab. Sinjai, 92611
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div>
-                <h4 class="text-sm font-black uppercase tracking-[0.2em] mb-8 text-blue-950 dark:text-blue-400">Tautan Cepat</h4>
-                <ul class="space-y-4 text-sm font-bold">
-                    <li><a href="#" class="text-slate-500 hover:text-blue-600 transition-colors">Kebijakan Privasi</a></li>
-                    <li><a href="#" class="text-slate-500 hover:text-blue-600 transition-colors">Panduan Pengguna</a></li>
-                    <li><a href="#" class="text-slate-500 hover:text-blue-600 transition-colors">Kontak Kami</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-sm font-black uppercase tracking-[0.2em] mb-8 text-blue-950 dark:text-blue-400">Lokasi</h4>
-                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed font-medium">
-                    Dinas Perumahan, Kawasan Permukiman dan Pertanahan <br>
-                    Kabupaten Sinjai, Sulawesi Selatan.
-                </p>
-            </div>
-        </div>
-        <div class="max-w-7xl mx-auto px-6 lg:px-12 mt-16 pt-8 border-t dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">&copy; <?= date('Y') ?> SIBARUKI v1.0 - Sinjai. All Rights Reserved.</p>
-            <div class="flex items-center gap-6">
-                <a href="#" class="text-slate-400 hover:text-blue-600 transition-colors"><i data-lucide="instagram" class="w-4 h-4"></i></a>
-                <a href="#" class="text-slate-400 hover:text-blue-600 transition-colors"><i data-lucide="facebook" class="w-4 h-4"></i></a>
-                <a href="#" class="text-slate-400 hover:text-blue-600 transition-colors"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+
+            <!-- Bottom Bar -->
+            <div class="pt-10 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        &copy; <?= date('Y') ?> SIBARUKI v1.0 <span class="mx-2 text-slate-200 dark:text-slate-700">|</span> Pemerintah Kabupaten Sinjai
+                    </p>
+                </div>
+                <div class="flex gap-4 text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest">
+                    SIBARUKI • Sinjai
+                </div>
             </div>
         </div>
     </footer>
 
+    <script src="https://unpkg.com/lucide@0.418.0/dist/umd/lucide.min.js"></script>
     <script>
+        // Inisialisasi Ikon
         lucide.createIcons();
+        
         function toggleTheme() {
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
