@@ -47,14 +47,14 @@
                     <i data-lucide="moon" id="moon-icon" class="w-5 h-5 block dark:hidden"></i>
                 </button>
                 
-                <?php if (session()->get('is_logged_in')): ?>
+                <?php if (session()->get('isLoggedIn')): ?>
                 <a href="<?= base_url('dashboard') ?>" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 transition-all active:scale-95 flex items-center gap-2">
                     <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                     Dashboard
                 </a>
                 <?php else: ?>
                 <a href="<?= base_url('login') ?>" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 transition-all active:scale-95">
-                    Internal Login
+                    Login
                 </a>
                 <?php endif; ?>
             </div>

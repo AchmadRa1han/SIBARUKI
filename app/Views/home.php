@@ -9,8 +9,8 @@
 <div class="relative overflow-hidden">
     
     <!-- 1. HERO SECTION -->
-    <section id="hero" class="relative min-h-[80vh] flex items-center pt-20 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=1920&q=80');">
-        <div class="absolute inset-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm"></div>
+    <section id="hero" class="relative min-h-[80vh] flex items-center pt-20">
+        <div class="absolute inset-0 bg-slate-50 dark:bg-slate-950"></div>
         <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
             <div class="animate-in slide-in-from-left duration-1000">
                 <div class="flex items-center gap-3 mb-6">
@@ -29,22 +29,27 @@
                 </div>
             </div>
 
-            <!-- Carousel Section -->
+            <!-- Dynamic Carousel Section -->
             <div class="relative animate-in zoom-in duration-1000">
-                <div class="swiper heroSwiper rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white dark:border-slate-900">
+                <div class="swiper heroSwiper rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white dark:border-slate-900 bg-white dark:bg-slate-900">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide relative h-[500px]">
-                            <img src="https://images.unsplash.com/photo-1577412647305-991150c7d163?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 to-transparent flex items-end p-12">
-                                <p class="text-white font-black uppercase tracking-widest text-sm">Pembangunan Rumah Layak Huni</p>
+                        <?php if(!empty($carousel)): ?>
+                            <?php foreach($carousel as $item): ?>
+                            <div class="swiper-slide relative h-[500px]">
+                                <img src="<?= $item['image'] ?>" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent flex items-end p-12">
+                                    <p class="text-white font-black uppercase tracking-widest text-sm"><?= $item['caption'] ?></p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="swiper-slide relative h-[500px]">
-                            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 to-transparent flex items-end p-12">
-                                <p class="text-white font-black uppercase tracking-widest text-sm">Infrastruktur Kawasan Permukiman</p>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="swiper-slide relative h-[500px] flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                                <div class="text-center">
+                                    <i data-lucide="image" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
+                                    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Belum Ada Gambar</p>
+                                </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
                     </div>
                     <div class="swiper-pagination"></div>
                 </div>

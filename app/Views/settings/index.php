@@ -112,6 +112,25 @@
         </a>
         <?php endif; ?>
 
+        <!-- Pengaturan Carousel -->
+        <?php if(has_permission('manage_roles')): ?>
+        <a href="<?= base_url('settings/carousel') ?>" class="group relative bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-32 h-32 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 transition-colors"></div>
+            <div class="relative z-10 space-y-6">
+                <div class="w-16 h-16 bg-blue-600 dark:bg-blue-700 text-white rounded-3xl flex items-center justify-center shadow-lg shadow-blue-900/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                    <i data-lucide="layout-template" class="w-8 h-8 text-white"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-blue-950 dark:text-white uppercase tracking-tight mb-2">Carousel Hero</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">Ganti gambar dan teks promosi pada halaman depan (Landing Page) secara mandiri.</p>
+                </div>
+                <div class="flex items-center text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-widest group-hover:gap-2 transition-all">
+                    Atur Konten <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+        </a>
+        <?php endif; ?>
+
         <!-- Histori Perubahan (RLH) -->
         <?php if(session()->get('role_id') == 1): ?>
         <a href="<?= base_url('rtlh/history-transformasi') ?>" class="group relative bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">

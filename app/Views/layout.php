@@ -103,10 +103,10 @@
                 
                 <!-- Header -->
                 <div class="h-20 flex items-center border-b border-slate-800 shrink-0 overflow-hidden">
-                    <div class="sidebar-icon-box">
-                        <img src="<?= base_url('sinjai.png') ?>" alt="Logo Sinjai" class="w-10 h-10 object-contain">
-                    </div>
-                    <span class="text-xl font-bold text-white tracking-tight sidebar-text">SIBARUKI</span>
+                    <a href="<?= base_url('/') ?>" class="sidebar-icon-box group/logo transition-all duration-300 hover:scale-105">
+                        <img src="<?= base_url('sinjai.png') ?>" alt="Logo Sinjai" class="w-10 h-10 object-contain group-hover:rotate-6 transition-transform">
+                    </a>
+                    <a href="<?= base_url('/') ?>" class="text-xl font-bold text-white tracking-tight sidebar-text hover:text-blue-400 transition-colors">SIBARUKI</a>
                     <!-- Mobile Close -->
                     <button onclick="toggleMobileSidebar()" class="lg:hidden ml-auto mr-4 p-3 bg-slate-800/50 rounded-2xl">
                         <i data-lucide="x" class="w-5 h-5"></i>

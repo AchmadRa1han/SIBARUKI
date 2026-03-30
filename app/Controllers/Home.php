@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\SettingsModel;
+
 class Home extends BaseController
 {
     /**
@@ -10,6 +12,11 @@ class Home extends BaseController
     public function index()
     {
         $db = \Config\Database::connect();
+        $settingsModel = new SettingsModel();
+
+        // Carousel Dinamis
+        $carouselJson = $settingsModel->getSetting('carousel_images', '[]');
+        $carousel = json_decode($carouselJson, true);
 
         // Statistik Publik
         $totalRtlh = $db->table('rtlh_rumah')->countAllResults();
@@ -29,6 +36,7 @@ class Home extends BaseController
 
         $data = [
             'title'   => 'Selamat Datang di SIBARUKI Sinjai',
+            'carousel' => $carousel,
             'rekap'   => [
                 'rtlh'    => $totalRtlh,
                 'kumuh'   => $totalKumuh,

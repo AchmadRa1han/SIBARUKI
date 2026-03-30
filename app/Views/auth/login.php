@@ -105,11 +105,16 @@
                         </div>
                     </div>
 
-                    <div class="pt-4">
+                    <div class="pt-4 space-y-4">
                         <button type="submit" 
                             class="w-full py-4 bg-blue-950 text-white text-sm font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-blue-900/20 hover:bg-black hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center">
                             Login
                         </button>
+                        <a href="<?= base_url('/') ?>" 
+                            class="w-full py-4 bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                            Kembali ke Beranda
+                        </a>
                     </div>
                 </form>
 

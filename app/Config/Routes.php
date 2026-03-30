@@ -11,6 +11,8 @@ $routes->post('login/process', 'Auth::login');
 $routes->get('logout', 'Auth::logout');
 $routes->get('dashboard', 'Home::dashboard');
 $routes->get('settings', 'Settings::index');
+$routes->get('settings/carousel', 'Settings::carousel');
+$routes->post('settings/update-carousel', 'Settings::updateCarousel');
 
 // MODUL DATA UTAMA
 $routes->group('psu', function($routes) {

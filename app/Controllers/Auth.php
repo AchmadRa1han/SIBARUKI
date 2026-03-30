@@ -10,9 +10,9 @@ class Auth extends BaseController
 {
     public function index()
     {
-        // Jika sudah login, redirect ke dashboard
+        // Jika sudah login, redirect ke beranda
         if (session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('dashboard'));
+            return redirect()->to(base_url('/'));
         }
         return view('auth/login');
     }
@@ -77,7 +77,7 @@ class Auth extends BaseController
                 // Catat Log Login (Menggunakan fungsi global)
                 $this->logActivity('Login', 'Users', 'User berhasil masuk ke dalam sistem');
 
-                return redirect()->to(base_url('dashboard'));
+                return redirect()->to(base_url('/'));
             } else {
                 // Catat Log Login Gagal (Password Salah)
                 $this->logActivity('Login Gagal', 'Security', 'Percobaan masuk dengan password yang salah');
