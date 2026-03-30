@@ -90,7 +90,7 @@
     <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-[2px] z-[60] hidden transition-opacity duration-300 opacity-0 cursor-pointer"></div>
 
     <!-- Sidebar Modern -->
-    <aside id="main-sidebar" class="sidebar-transition fixed inset-y-0 left-0 w-72 lg:w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col shrink-0 shadow-2xl lg:shadow-xl border-r border-slate-800 z-[70] -translate-x-full lg:translate-x-0 group/sidebar lg:relative overflow-visible">
+    <aside id="main-sidebar" class="sidebar-transition fixed inset-y-0 left-0 w-72 z-[100] -translate-x-full lg:relative lg:inset-auto lg:w-64 lg:translate-x-0 h-screen bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col shrink-0 shadow-2xl lg:shadow-xl border-r border-slate-800 group/sidebar overflow-visible">
         
         <!-- Floating Toggle Button -->
         <button onclick="toggleSidebar()" class="hidden lg:flex absolute top-1/2 -right-5 -translate-y-1/2 w-10 h-52 bg-slate-900 dark:bg-slate-950 border-y border-r border-slate-800 rounded-r-[2.5rem] items-center justify-center z-[100] hover:bg-blue-600 hover:border-blue-600 text-slate-500 hover:text-white transition-all duration-300 shadow-xl group/btn active:scale-95">

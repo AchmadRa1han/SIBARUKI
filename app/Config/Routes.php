@@ -5,11 +5,11 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Auth::index');
+$routes->get('/', 'Home::index');
 $routes->get('login', 'Auth::index');
 $routes->post('login/process', 'Auth::login');
 $routes->get('logout', 'Auth::logout');
-$routes->get('dashboard', 'Home::index');
+$routes->get('dashboard', 'Home::dashboard');
 $routes->get('settings', 'Settings::index');
 
 // MODUL DATA UTAMA

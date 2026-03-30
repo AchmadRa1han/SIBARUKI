@@ -4,7 +4,50 @@ namespace App\Controllers;
 
 class Home extends BaseController
 {
+    /**
+     * Landing Page Publik
+     */
     public function index()
+    {
+        $db = \Config\Database::connect();
+
+        // Statistik Publik
+        $totalRtlh = $db->table('rtlh_rumah')->countAllResults();
+        $totalKumuh = $db->table('wilayah_kumuh')->countAllResults();
+        $totalFormal = $db->table('perumahan_formal')->countAllResults();
+        $totalPsu = $db->table('psu_jalan')->countAllResults();
+
+        // Data Spasial Publik (Limit untuk performa)
+        $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
+        $mapRtlh = $db->table('rtlh_rumah')->select('id_survei as id, desa as name, ST_AsText(lokasi_koordinat) as wkt')->where('lokasi_koordinat IS NOT NULL')->limit(200)->get()->getResultArray();
+        $mapKumuh = $db->table('wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt')->where('WKT IS NOT NULL')->get()->getResultArray();
+        $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude')->get()->getResultArray();
+        $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt')->limit(100)->get()->getResultArray();
+
+        $data = [
+            'title'   => 'Selamat Datang di SIBARUKI Sinjai',
+            'rekap'   => [
+                'rtlh'   => $totalRtlh,
+                'kumuh'  => $totalKumuh,
+                'formal' => $totalFormal,
+                'psu'    => $totalPsu
+            ],
+            'spasial' => [
+                'kecamatan' => $desaPolygons,
+                'rtlh'      => $mapRtlh,
+                'kumuh'     => $mapKumuh,
+                'formal'    => $mapFormal,
+                'psu'       => $mapPsu
+            ]
+        ];
+
+        return view('home', $data);
+    }
+
+    /**
+     * Dashboard Internal (Hanya setelah login)
+     */
+    public function dashboard()
     {
         $db = \Config\Database::connect();
         $roleScope = session()->get('role_scope');
