@@ -21,7 +21,7 @@
                     Membangun <span class="text-blue-600">Hunian Layak</span> Untuk Semua.
                 </h1>
                 <p class="text-lg text-slate-500 dark:text-slate-400 leading-relaxed mb-10 max-w-xl font-medium">
-                    SIBARUKI adalah platform transparansi data perumahan dan permukiman Kabupaten Sinjai. Temukan informasi bantuan, aset, dan infrastruktur dalam satu peta terpadu.
+                    SIBARUKI adalah sebuah platform transparansi data perumahan dan permukiman Kabupaten Sinjai. Temukan informasi bantuan, aset, dan infrastruktur dalam satu peta terpadu.
                 </p>
                 <div class="flex flex-wrap gap-4">
                     <a href="#map" class="px-8 py-4 bg-blue-600 text-white rounded-[2rem] font-black uppercase tracking-widest text-xs shadow-2xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all">Jelajahi Peta</a>
