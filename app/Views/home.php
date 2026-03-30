@@ -124,7 +124,7 @@
 
 <script>
     // Initialize Swiper
-    const carouselCount = <?= count($carousel ?? []) ?>;
+    const carouselCount = <?= is_array($carousel) ? count($carousel) : 0 ?>;
     new Swiper('.heroSwiper', {
         loop: carouselCount > 1,
         autoplay: carouselCount > 1 ? { delay: 5000 } : false,

@@ -76,7 +76,7 @@ class Settings extends BaseController
                 $relativePath = str_replace(base_url(), '', $imageUrl);
                 $relativePath = ltrim($relativePath, '/');
                 
-                if (!str_starts_with($relativePath, 'uploads/carousel/')) {
+                if (substr($relativePath, 0, 17) !== 'uploads/carousel/') {
                     $relativePath = 'uploads/carousel/' . basename($relativePath);
                 }
 
