@@ -95,9 +95,12 @@
                 <h3 class="text-3xl lg:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tight">E-Peta SIBARUKI</h3>
             </div>
             <div class="flex flex-wrap gap-2">
-                <?php foreach(['rtlh', 'kumuh', 'formal', 'psu'] as $l): ?>
+                <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
                 <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm" data-layer="<?= $l ?>">
-                    <?= $l == 'formal' ? 'Perumahan' : strtoupper($l) ?>
+                    <?php 
+                        $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Perumahan', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
+                        echo $labels[$l];
+                    ?>
                 </button>
                 <?php endforeach; ?>
             </div>
@@ -166,13 +169,17 @@
         document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
 
         const items = spasialData[type] || [];
-        const colorMap = { rtlh: '#f59e0b', kumuh: '#ef4444', formal: '#6366f1', psu: '#10b981' };
+        const colorMap = { rtlh: '#f59e0b', kumuh: '#ef4444', formal: '#6366f1', psu: '#10b981', arsinum: '#3b82f6', pisew: '#f97316', aset: '#06b6d4' };
 
         items.forEach(item => {
             try {
                 let geojson = null;
+
                 if (item.latitude && item.longitude) {
-                    geojson = { type: 'Point', coordinates: [item.longitude, item.latitude] };
+                    geojson = { type: 'Point', coordinates: [parseFloat(item.longitude), parseFloat(item.latitude)] };
+                } else if (item.coords) {
+                    const parts = item.coords.replace(/[^\d.,-]/g, '').split(',');
+                    if (parts.length === 2) geojson = { type: 'Point', coordinates: [parseFloat(parts[1]), parseFloat(parts[0])] };
                 } else if (item.wkt) {
                     geojson = wellknown.parse(item.wkt);
                 }
