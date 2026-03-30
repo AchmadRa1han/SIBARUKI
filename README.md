@@ -6,7 +6,7 @@
 ![MySQL](https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql)
 ![Status](https://img.shields.io/badge/Status-Development-green?style=for-the-badge)
 
-**SIBARUKI** adalah *Single Data Portal* yang dikembangkan oleh **Dinas Komunikasi, Informatika, dan Persandian** berkolaborasi dengan **Dinas Perumahan, Kawasan Permukiman, dan Pertanahan Kabupaten Sinjai**. Sistem ini dirancang untuk memudahkan akses informasi, monitoring, dan pengambilan keputusan berbasis data di bidang perumahan dan kawasan permukiman secara terpadu.
+**SIBARUKI** adalah Website yang dikembangkan oleh **Dinas Komunikasi, Informatika, dan Persandian** berkolaborasi dengan **Dinas Perumahan, Kawasan Permukiman, dan Pertanahan Kabupaten Sinjai**. Sistem ini dirancang untuk memudahkan akses informasi, monitoring, dan pengambilan keputusan berbasis data di bidang perumahan dan kawasan permukiman secara terpadu.
 
 ---
 
