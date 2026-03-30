@@ -36,7 +36,7 @@
                         <?php if(!empty($carousel)): ?>
                             <?php foreach($carousel as $item): ?>
                             <div class="swiper-slide relative h-[500px]">
-                                <img src="<?= $item['image'] ?>" class="w-full h-full object-cover">
+                                <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent flex items-end p-12">
                                     <p class="text-white font-black uppercase tracking-widest text-sm"><?= $item['caption'] ?></p>
                                 </div>
@@ -124,9 +124,10 @@
 
 <script>
     // Initialize Swiper
+    const carouselCount = <?= count($carousel ?? []) ?>;
     new Swiper('.heroSwiper', {
-        loop: true,
-        autoplay: { delay: 5000 },
+        loop: carouselCount > 1,
+        autoplay: carouselCount > 1 ? { delay: 5000 } : false,
         pagination: { el: '.swiper-pagination', clickable: true },
     });
 

@@ -24,7 +24,7 @@
                     <?php foreach ($carousel as $index => $item): ?>
                     <div class="carousel-item p-8 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex flex-col lg:flex-row gap-8 items-start">
                         <div class="w-full lg:w-64 h-40 rounded-2xl overflow-hidden shadow-lg bg-slate-200 dark:bg-slate-800 flex-shrink-0">
-                            <img src="<?= $item['image'] ?>" class="w-full h-full object-cover">
+                            <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover">
                             <input type="hidden" name="old_image[<?= $index ?>]" value="<?= $item['image'] ?>">
                         </div>
                         <div class="flex-grow space-y-4 w-full">

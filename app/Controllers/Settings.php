@@ -72,9 +72,13 @@ class Settings extends BaseController
             }
 
             if (!empty($imageUrl)) {
-                // Ensure we only store the relative path (remove base_url if present)
+                // Pastikan path yang disimpan selalu diawali dengan uploads/carousel/
                 $relativePath = str_replace(base_url(), '', $imageUrl);
                 $relativePath = ltrim($relativePath, '/');
+                
+                if (!str_starts_with($relativePath, 'uploads/carousel/')) {
+                    $relativePath = 'uploads/carousel/' . basename($relativePath);
+                }
 
                 $carouselData[] = [
                     'image'   => $relativePath,
