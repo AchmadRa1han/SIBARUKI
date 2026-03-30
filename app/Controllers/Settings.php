@@ -62,18 +62,22 @@ class Settings extends BaseController
                 $newName = $files[$index]->getRandomName();
                 $files[$index]->move($uploadPath, $newName);
                 
-                // Delete old file if exists and is local
-                if (!empty($imageUrl) && str_contains($imageUrl, 'uploads/carousel')) {
-                    $oldPath = str_replace(base_url(), ROOTPATH . 'public/', $imageUrl);
+                // Delete old file if exists
+                if (!empty($imageUrl)) {
+                    $oldPath = ROOTPATH . 'public/' . str_replace(base_url(), '', $imageUrl);
                     if (file_exists($oldPath)) @unlink($oldPath);
                 }
                 
-                $imageUrl = base_url('uploads/carousel/' . $newName);
+                $imageUrl = 'uploads/carousel/' . $newName;
             }
 
             if (!empty($imageUrl)) {
+                // Ensure we only store the relative path (remove base_url if present)
+                $relativePath = str_replace(base_url(), '', $imageUrl);
+                $relativePath = ltrim($relativePath, '/');
+
                 $carouselData[] = [
-                    'image'   => $imageUrl,
+                    'image'   => $relativePath,
                     'caption' => $caption
                 ];
             }

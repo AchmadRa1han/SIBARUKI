@@ -29,13 +29,13 @@ class Home extends BaseController
 
         // Data Spasial Publik (Limit untuk performa)
         $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
-        $mapRtlh = $db->table('rtlh_rumah')->select('id_survei as id, desa as name, ST_AsText(lokasi_koordinat) as wkt')->where('lokasi_koordinat IS NOT NULL')->limit(200)->get()->getResultArray();
+        $mapRtlh = $db->table('rtlh_rumah')->select('id_survei as id, desa as name, ST_AsText(lokasi_koordinat) as wkt')->where('lokasi_koordinat IS NOT NULL')->where('lokasi_koordinat !=', '')->limit(200)->get()->getResultArray();
         $mapKumuh = $db->table('wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt')->where('WKT IS NOT NULL')->get()->getResultArray();
         $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude')->get()->getResultArray();
         $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt')->limit(100)->get()->getResultArray();
         $mapArsinum = $db->table('arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords')->get()->getResultArray();
         $mapPisew = $db->table('pisew')->select('id, jenis_pekerjaan as name, koordinat as coords')->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
-        $mapAset = $db->table('aset_tanah')->select('id, nama_pemilik as name, ST_AsText(koordinat) as wkt')->where('koordinat IS NOT NULL')->get()->getResultArray();
+        $mapAset = $db->table('aset_tanah')->select('id, nama_pemilik as name, koordinat as coords')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
 
         $data = [
             'title'   => 'Selamat Datang di SIBARUKI Sinjai',
