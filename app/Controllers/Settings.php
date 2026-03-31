@@ -46,8 +46,8 @@ class Settings extends BaseController
     public function updateCarousel()
     {
         $settingsModel = new SettingsModel();
-        $captions = $this->request->getPost('caption');
-        $oldImages = $this->request->getPost('old_image');
+        $captions = $this->request->getPost('caption') ?? [];
+        $oldImages = $this->request->getPost('old_image') ?? [];
         $files = $this->request->getFileMultiple('image');
 
         $carouselData = [];
@@ -57,12 +57,12 @@ class Settings extends BaseController
         foreach ($captions as $index => $caption) {
             $imageUrl = $oldImages[$index] ?? '';
 
-            // Handle New Upload
+            // Handle New Upload if valid
             if (isset($files[$index]) && $files[$index]->isValid() && !$files[$index]->hasMoved()) {
                 $newName = $files[$index]->getRandomName();
                 $files[$index]->move($uploadPath, $newName);
                 
-                // Delete old file if exists
+                // Delete physical old file if exists
                 if (!empty($imageUrl)) {
                     $oldPath = FCPATH . str_replace(base_url(), '', $imageUrl);
                     if (file_exists($oldPath)) @unlink($oldPath);
@@ -71,14 +71,11 @@ class Settings extends BaseController
                 $imageUrl = 'uploads/carousel/' . $newName;
             }
 
+            // Hanya tambahkan jika ada image (lama atau baru)
             if (!empty($imageUrl)) {
-                // Pastikan path yang disimpan selalu diawali dengan uploads/carousel/
+                // Bersihkan URL dari base_url() jika masih ada
                 $relativePath = str_replace(base_url(), '', $imageUrl);
                 $relativePath = ltrim($relativePath, '/');
-                
-                if (substr($relativePath, 0, 17) !== 'uploads/carousel/') {
-                    $relativePath = 'uploads/carousel/' . basename($relativePath);
-                }
 
                 $carouselData[] = [
                     'image'   => $relativePath,

@@ -62,7 +62,7 @@
 <script>
     function addNewItem() {
         const container = document.getElementById('carousel-container');
-        const index = container.querySelectorAll('.carousel-item').length;
+        const uniqueId = Date.now(); // Gunakan unique ID agar index tidak bentrok
         
         const html = `
             <div class="carousel-item p-8 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex flex-col lg:flex-row gap-8 items-start animate-in zoom-in duration-300">
@@ -73,11 +73,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih Gambar</label>
-                            <input type="file" name="image[${index}]" class="w-full text-xs font-medium text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-blue-600 file:text-white hover:file:bg-blue-700" required>
+                            <input type="file" name="image[${uniqueId}]" class="w-full text-xs font-medium text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-blue-600 file:text-white hover:file:bg-blue-700" required>
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Caption Gambar</label>
-                            <input type="text" name="caption[${index}]" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-600 transition-all" placeholder="Masukkan judul..." required>
+                            <input type="text" name="caption[${uniqueId}]" class="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-600 transition-all" placeholder="Masukkan judul..." required>
                         </div>
                     </div>
                     <button type="button" onclick="removeItem(this)" class="text-[10px] font-black text-rose-600 uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-all">
