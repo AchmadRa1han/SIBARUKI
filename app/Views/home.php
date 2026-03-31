@@ -3,7 +3,10 @@
 <?= $this->section('content') ?>
 <!-- External Assets for Map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 
 <div class="relative overflow-hidden">
@@ -119,6 +122,7 @@
     .layer-btn.active { background: #2563eb !important; color: white !important; border-color: #2563eb !important; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); }
     .leaflet-popup-content-wrapper { border-radius: 2rem; padding: 0; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); border: none; }
     .leaflet-popup-content { margin: 0; width: 220px !important; }
+    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; }
     .custom-tooltip { background: rgba(30, 27, 75, 0.9) !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 900 !important; font-size: 8px !important; text-transform: uppercase !important; }
 </style>
 
@@ -132,7 +136,60 @@
     });
 
     const spasialData = <?= json_encode($spasial) ?>;
-    let map, kecLayerGroup, activeDataGroup;
+    let map, clusterGroup, kecLayerGroup, activeDataGroup;
+
+    // --- DASHBOARD LOGIC: COORDINATE HEALING & CONVERSION ---
+    function utmToLatLng(easting, northing) {
+        const a = 6378137, f = 1 / 298.257223563;
+        const b = a * (1 - f), e = Math.sqrt(1 - (b * b) / (a * a)), e1sq = (e * e) / (1 - e * e);
+        const k0 = 0.9996, falseEasting = 500000, falseNorthing = 10000000;
+        const zoneCentralMeridian = 123 * (Math.PI / 180); 
+        let x = easting - falseEasting, y = northing - falseNorthing;
+        let M = y / k0, mu = M / (a * (1 - e * e / 4 - 3 * e * e * e * e / 64 - 5 * e * e * e * e * e * e / 256));
+        let phi1Rad = mu + (3 * e1sq / 2 - 27 * e1sq * e1sq * e1sq / 32) * Math.sin(2 * mu) + (21 * e1sq * e1sq / 16 - 55 * e1sq * e1sq * e1sq * e1sq / 32) * Math.sin(4 * mu) + (151 * e1sq * e1sq * e1sq / 96) * Math.sin(6 * mu);
+        let N1 = a / Math.sqrt(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad)), T1 = Math.tan(phi1Rad) * Math.tan(phi1Rad), C1 = e1sq * Math.cos(phi1Rad) * Math.cos(phi1Rad), R1 = a * (1 - e * e) / Math.pow(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad), 1.5);
+        let D = x / (N1 * k0);
+        let lat = phi1Rad - (N1 * Math.tan(phi1Rad) / R1) * (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e1sq) * D * D * D * D / 24 + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e1sq - 3 * C1 * C1) * D * D * D * D * D * D / 720);
+        let lon = zoneCentralMeridian + (D - (1 + 2 * T1 + C1) * D * D * D / 6 + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * e1sq + 24 * T1 * T1) * D * D * D * D * D / 120) / Math.cos(phi1Rad);
+        return [lat * (180 / Math.PI), lon * (180 / Math.PI)];
+    }
+
+    function parseWKTUniversal(wkt, isUTM = false) {
+        if (!wkt || typeof wkt !== 'string' || typeof wellknown === 'undefined') return null;
+        try {
+            let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
+            
+            // --- HEALING LOGIC UNTUK DATA TERPOTONG ---
+            if (cleanWkt.length >= 32760) {
+                const lastComma = cleanWkt.lastIndexOf(',');
+                if (lastComma > 0) {
+                    cleanWkt = cleanWkt.substring(0, lastComma);
+                    const openParen = (cleanWkt.match(/\(/g) || []).length;
+                    const closeParen = (cleanWkt.match(/\)/g) || []).length;
+                    cleanWkt += ')'.repeat(openParen - closeParen);
+                }
+            }
+
+            let geojson = wellknown.parse(cleanWkt);
+            if (!geojson) return null;
+            if (isUTM) {
+                const convert = (c) => (typeof c[0] === 'number') ? (([lat, lon] = utmToLatLng(c[0], c[1])), [lon, lat]) : c.map(convert);
+                geojson.coordinates = convert(geojson.coordinates);
+            }
+            return geojson;
+        } catch(e) { return null; }
+    }
+
+    function healCoordinate(val, isLat) {
+        if (!val) return null;
+        let s = val.toString().replace(/[ "]/g, '').replace(/,/g, '.');
+        let digits = s.replace(/[^0-9-]/g, '');
+        if (digits.length > 3) {
+            let dotPos = digits.startsWith('-') ? 2 : 3;
+            return parseFloat(digits.substring(0, dotPos) + '.' + digits.substring(dotPos));
+        }
+        return parseFloat(s);
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         initMap();
@@ -146,6 +203,7 @@
         map = L.map('publicMap', { zoomControl: false, layers: [tiles] }).setView([-5.1245, 120.2536], 11);
         L.control.zoom({ position: 'topright' }).addTo(map);
 
+        clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 }).addTo(map);
         activeDataGroup = L.featureGroup().addTo(map);
         kecLayerGroup = L.featureGroup().addTo(map);
 
@@ -153,8 +211,8 @@
         
         spasialData.kecamatan.forEach((k, idx) => {
             try {
-                if (k.wkt) {
-                    const geojson = wellknown.parse(k.wkt);
+                const geojson = parseWKTUniversal(k.wkt);
+                if (geojson) {
                     L.geoJSON(geojson, { 
                         style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.4 } 
                     }).addTo(kecLayerGroup).bindTooltip(`<div class="p-2"><p class="font-black uppercase text-[10px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
@@ -165,6 +223,7 @@
     }
 
     function switchLayer(type) {
+        clusterGroup.clearLayers();
         activeDataGroup.clearLayers();
         document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
@@ -175,14 +234,23 @@
         items.forEach(item => {
             try {
                 let geojson = null;
+                let lat = null, lon = null;
 
                 if (item.latitude && item.longitude) {
-                    geojson = { type: 'Point', coordinates: [parseFloat(item.longitude), parseFloat(item.latitude)] };
+                    lat = parseFloat(item.latitude);
+                    lon = parseFloat(item.longitude);
                 } else if (item.coords) {
-                    const parts = item.coords.replace(/[^\d.,-]/g, '').split(',');
-                    if (parts.length === 2) geojson = { type: 'Point', coordinates: [parseFloat(parts[1]), parseFloat(parts[0])] };
+                    let p = item.coords.toString().split(',');
+                    if (p.length === 2) {
+                        lat = healCoordinate(p[0], true);
+                        lon = healCoordinate(p[1], false);
+                    }
+                }
+
+                if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) {
+                    geojson = { type: 'Point', coordinates: [lon, lat] };
                 } else if (item.wkt) {
-                    geojson = wellknown.parse(item.wkt);
+                    geojson = parseWKTUniversal(item.wkt, (type === 'psu'));
                 }
 
                 if (!geojson) return;
@@ -192,14 +260,18 @@
                     <div class="p-5 bg-white dark:bg-slate-900 rounded-b-2xl"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Informasi Publik Terverifikasi</p></div>`;
 
                 if (geojson.type === 'Point') {
-                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 6, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(activeDataGroup);
+                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 6, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(clusterGroup);
                 } else {
                     L.geoJSON(geojson, { style: { color: colorMap[type], weight: 3, fillOpacity: 0.4 } }).bindPopup(popupContent).addTo(activeDataGroup);
                 }
             } catch (e) {}
         });
 
-        if (activeDataGroup.getLayers().length > 0) map.fitBounds(activeDataGroup.getBounds(), { padding: [50, 50], maxZoom: 16 });
+        const bounds = L.latLngBounds();
+        let valid = false;
+        [clusterGroup, activeDataGroup].forEach(g => { if(g.getLayers().length > 0) { bounds.extend(g.getBounds()); valid = true; } });
+
+        if (valid && bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
 </script>
 <?= $this->endSection() ?>
