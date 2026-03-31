@@ -59,12 +59,12 @@
 
     <!-- 2. SUMMARY SECTION -->
     <section id="summary" class="py-24 bg-white dark:bg-slate-900/50">
-        <div class="max-w-[1440px] mx-auto px-6 lg:px-12 text-center mb-20">
+        <div class="mx-auto px-6 lg:px-12 text-center mb-20" style="max-width: 1440px;">
             <h2 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em] mb-4">Statistik Terpadu</h2>
             <h3 class="text-3xl lg:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Pembangunan Sinjai</h3>
         </div>
 
-        <div class="max-w-[1440px] mx-auto px-6 lg:px-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-6">
+        <div class="mx-auto px-6 lg:px-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-6" style="max-width: 1440px;">
             <?php 
             $metrics = [
                 ['rtlh', 'home', 'amber', 'Rumah Tak Layak'],
