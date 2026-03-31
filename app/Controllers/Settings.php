@@ -48,7 +48,9 @@ class Settings extends BaseController
         $settingsModel = new SettingsModel();
         $captions = $this->request->getPost('caption') ?? [];
         $oldImages = $this->request->getPost('old_image') ?? [];
-        $files = $this->request->getFileMultiple('image');
+        
+        // Ambil SEMUA file yang diupload (baik index baru atau lama)
+        $uploadedFiles = $this->request->getFiles();
 
         $carouselData = [];
         $uploadPath = FCPATH . 'uploads/carousel/';
@@ -57,12 +59,19 @@ class Settings extends BaseController
         foreach ($captions as $index => $caption) {
             $imageUrl = $oldImages[$index] ?? '';
 
-            // Handle New Upload if valid
-            if (isset($files[$index]) && $files[$index]->isValid() && !$files[$index]->hasMoved()) {
-                $newName = $files[$index]->getRandomName();
-                $files[$index]->move($uploadPath, $newName);
+            // Cari file di dalam array multidimensional Files CI4
+            // Formatnya biasanya image[index]
+            $file = null;
+            if (isset($uploadedFiles['image'][$index])) {
+                $file = $uploadedFiles['image'][$index];
+            }
+
+            // Jika ada upload file baru untuk index ini
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move($uploadPath, $newName);
                 
-                // Delete physical old file if exists
+                // HAPUS file lama secara fisik jika ada penggantian
                 if (!empty($imageUrl)) {
                     $oldPath = FCPATH . str_replace(base_url(), '', $imageUrl);
                     if (file_exists($oldPath)) @unlink($oldPath);
@@ -71,9 +80,8 @@ class Settings extends BaseController
                 $imageUrl = 'uploads/carousel/' . $newName;
             }
 
-            // Hanya tambahkan jika ada image (lama atau baru)
+            // Hanya simpan jika ada gambar (baik yang baru atau yang lama tetap dipertahankan)
             if (!empty($imageUrl)) {
-                // Bersihkan URL dari base_url() jika masih ada
                 $relativePath = str_replace(base_url(), '', $imageUrl);
                 $relativePath = ltrim($relativePath, '/');
 
