@@ -51,7 +51,7 @@ class Settings extends BaseController
         $files = $this->request->getFileMultiple('image');
 
         $carouselData = [];
-        $uploadPath = ROOTPATH . 'public/uploads/carousel/';
+        $uploadPath = FCPATH . 'uploads/carousel/';
         if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
 
         foreach ($captions as $index => $caption) {
@@ -64,7 +64,7 @@ class Settings extends BaseController
                 
                 // Delete old file if exists
                 if (!empty($imageUrl)) {
-                    $oldPath = ROOTPATH . 'public/' . str_replace(base_url(), '', $imageUrl);
+                    $oldPath = FCPATH . str_replace(base_url(), '', $imageUrl);
                     if (file_exists($oldPath)) @unlink($oldPath);
                 }
                 
