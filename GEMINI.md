@@ -1,6 +1,6 @@
 # SIBARUKI - Blueprint Arsitektur & Kamus Data (Data Dictionary)
 
-Dokumen ini adalah **Spesifikasi Arsitektur Tingkat Rendah** untuk sistem SIBARUKI (Sistem Informasi Bantuan Rumah & Kawasan Permukiman). Seluruh pengembangan lanjutan, query manual, dan integrasi API wajib merujuk pada struktur tabel di bawah ini.
+Dokumen ini adalah **Spesifikasi Arsitektur Tingkat Rendah** untuk Sistem Informasi SIBARUKI (Sama-samaki Bangun Perumahan dan Permukiman). Seluruh pengembangan lanjutan, query manual, dan integrasi API wajib merujuk pada struktur tabel di bawah ini.
 
 ---
 
@@ -162,12 +162,97 @@ Setiap fungsi `importCsv` pada Controller wajib:
 
 ---
 
-## 6. Standar UI/UX ("Mewah" Style)
+## 6. Standar UI/UX & Design System ("Mewah" Style)
 
-Sistem ini didesain bukan sebagai *admin panel* kaku, melainkan *Dashboard Eksekutif*.
-- **Border Radius:** Gunakan kelas ekstrem Tailwind seperti `rounded-[2.5rem]` pada container card luar.
-- **Micro-Interactions:** Setiap unggah gambar wajib disertai script `previewImage()` (FileReader JS) untuk memunculkan gambar sebelum form dikirim.
+Sistem ini didesain bukan sebagai *admin panel* kaku, melainkan *Dashboard Eksekutif*. Untuk menjaga konsistensi, seluruh elemen UI wajib mengikuti pedoman di bawah ini.
+
+### 6.1. Tipografi (Typography)
+- **Font Family:** `font-sans` (System stack / Inter). Utamakan kejelasan di atas segalanya.
+- **Ukuran Font (Sizing):**
+  - **Judul Besar (Hero/Title):** `text-2xl` s/d `text-4xl`, `font-black`, `tracking-tighter`, `uppercase`.
+  - **Heading (Section):** `text-lg` s/d `text-xl`, `font-bold`, `tracking-tight`.
+  - **Sub-Heading / Label:** `text-[10px]`, `font-black`, `uppercase`, `tracking-[0.2em]`.
+  - **Body Text:** `text-sm` (Default), `font-medium`, `leading-relaxed`.
+  - **Small/Caption:** `text-[9px]`, `font-bold`, `uppercase`, `tracking-widest`.
+
+### 6.2. Palet Warna (Color Palette)
+- **Primary (Blue):** `blue-600` (#2563eb) untuk aksi utama, `blue-50` untuk background light, `blue-950` untuk teks gelap.
+- **Secondary (Indigo):** `indigo-600` untuk tombol dashboard atau elemen pembeda.
+- **Neutral (Slate/Gray):**
+  - Light Mode: `bg-slate-50` (Body), `bg-white` (Cards), `text-slate-500` (Secondary text).
+  - Dark Mode: `bg-slate-950` (Body), `bg-slate-900` (Cards), `text-slate-400` (Secondary text).
+- **Accents:** Gunakan `backdrop-blur-md` dan `rgba` transparency (misal: `bg-white/70`) untuk elemen navigasi (Glassmorphism).
+
+### 6.3. Elemen Visual & Kontainer
+- **Border Radius:**
+  - **Card Luar:** `rounded-[2rem]` (Melengkung elegan).
+  - **Button/Small Card:** `rounded-xl` atau `rounded-lg`.
+  - **Input Field:** `rounded-lg`.
+- **Shadows:** Gunakan bayangan lembut, contoh: `shadow-md shadow-blue-600/10`.
+- **Borders:** Hindari border hitam pekat. Gunakan `border-slate-100` (Light) atau `border-slate-800` (Dark).
+
+### 6.4. Komponen & Interaksi
+- **Buttons:**
+  - **Ukuran Standar:** `px-5 py-2.5` (Jangan terlalu besar).
+  - **Ikon:** Gunakan `w-4 h-4`.
+  - **Efek:** Wajib memiliki efek `active:scale-95` dan `transition-all`.
+- **Icons:** Gunakan **Lucide Icons** dengan `stroke-width` yang konsisten (rekomendasi: `2`).
+- **Cards:** Gunakan padding yang seimbang (`p-6` s/d `p-8`).
+- **Micro-Interactions:**
+  - Setiap unggah gambar wajib disertai script `previewImage()` (FileReader JS).
+  - Hover state pada navigasi harus halus dengan transisi minimal `300ms`.
+
+### 6.5. Mode Gelap (Dark Mode)
+- Seluruh halaman **WAJIB** mendukung `dark:` prefix secara eksplisit.
+- Jangan mengandalkan auto-invert. Warna dark mode harus dipilih untuk kenyamanan mata (Background `slate-950`, bukan hitam murni `#000`).
+
+### 6.6. Fitur Khusus
 - **Export PDF:** Fitur cetak diutamakan menggunakan *Client-Side PDF Rendering* via `html2pdf.js` dengan menyuntikkan kelas `.is-exporting` sementara ke tag body untuk menyembunyikan navigasi.
+
+### 6.7. Standar Tata Letak (Layout Consistency)
+Untuk memastikan seluruh modul memiliki pengalaman pengguna yang seragam, setiap halaman wajib mengikuti struktur berikut:
+
+#### A. Halaman Index (Daftar Tabel)
+1. **Header:** Judul halaman (`text-3xl`, `font-black`) di kiri, dan tombol aksi utama (Tambah Data) di kanan.
+2. **Filter & Search:** Baris pencarian dan filter diletakkan di atas tabel, terbungkus dalam card kecil dengan `rounded-2xl`.
+3. **Table Container:** Tabel wajib dibungkus dalam kontainer `overflow-x-auto` di dalam card utama `rounded-[2.5rem]`.
+4. **Pagination:** Kontrol navigasi halaman diletakkan di bawah tabel dengan desain minimalis.
+
+#### B. Halaman Detail (Single Data View)
+1. **Breadcrumbs:** Navigasi hirarki di bagian paling atas (misal: Dashboard > RTLH > Detail).
+2. **Main Header:** Menampilkan identitas utama (misal: Nama Pemilik & NIK) dengan Badge status di sampingnya.
+3. **Information Grid:** Gunakan sistem grid (`grid-cols-1 md:grid-cols-2 lg:grid-cols-3`) untuk menampilkan label dan nilai data.
+   - **Label:** `text-[10px]`, `font-bold`, `uppercase`, `text-slate-400`.
+   - **Value:** `text-sm`, `font-bold`, `text-slate-700/white`.
+4. **Photo Gallery:** Jika ada data visual (RTLH), gunakan layout grid untuk foto dengan aspek rasio tetap (misal: `aspect-video`) dan fitur klik untuk perbesar.
+
+#### C. Halaman Formulir (Add/Edit)
+1. **Grouped Fields:** Bagi input ke dalam beberapa kategori (misal: Data Personal, Data Lokasi) menggunakan pemisah visual atau card yang berbeda.
+2. **Action Bar:** Tombol "Simpan" (Primary) dan "Batal" (Secondary) diletakkan di bagian bawah, biasanya rata kanan (sticky bottom pada mobile).
+3. **Validation States:** Input yang error wajib memiliki border merah dan pesan peringatan kecil di bawahnya.
+
+#### D. Integrasi Peta (Geospasial)
+Setiap modul yang memiliki data koordinat (Point/Polygon/Linestring) wajib mengikuti standar tampilan peta berikut:
+1. **Library & Base Layer:** Gunakan **Leaflet.js** dengan Tile Layer dari CartoDB (Voyager/Positron) untuk kesan bersih dan modern.
+2. **Map Container:**
+   - **Pada Index:** Peta diletakkan di dalam card `rounded-[2.5rem]` dengan tinggi minimal `500px`.
+   - **Pada Detail:** Peta diletakkan di samping atau di bawah informasi teks, dengan aspek rasio `16:9` atau `square` tergantung ruang.
+3. **Marker & Popup:**
+   - Gunakan Custom Marker (Dot dengan Ring/Shadow) berwarna `Blue-600`.
+   - Popup wajib menampilkan informasi ringkas (Nama/ID) dan tombol "Lihat Detail" yang konsisten.
+4. **Interaksi:**
+   - Wajib menyertakan tombol **"Focus to Location"** (Fly to) jika peta menampilkan banyak titik.
+   - Pada form input koordinat, sertakan fitur **"Drag Marker to Pick"** atau pencarian lokasi (Geocoding).
+
+#### E. Elemen UI Pendukung (Reusable Components)
+1. **Badge Status:**
+   - Gunakan padding `px-3 py-1`, `rounded-full`, `text-[10px]`, `font-bold`, `uppercase`.
+   - **Warna:** Hijau (Sukses/Sudah), Kuning (Proses/Menunggu), Merah (Gagal/Belum), Biru (Info).
+2. **Empty State:**
+   - Jika data kosong, dilarang menampilkan tabel kosong. Tampilkan ilustrasi/ikon Lucide besar, teks `Data Tidak Ditemukan`, dan tombol "Refresh" atau "Tambah Data".
+3. **Loading State:**
+   - Gunakan skeleton screen atau spinner halus di tengah kontainer card utama saat mengambil data via Fetch API.
 
 ---
 *Dokumen ini merupakan kitab panduan final (Single Source of Truth) untuk SIBARUKI. Pembaruan arsitektur wajib direfleksikan di dalam file ini.*
+
