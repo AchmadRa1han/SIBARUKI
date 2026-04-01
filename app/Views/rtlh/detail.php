@@ -3,6 +3,9 @@
 <?= $this->section('content') ?>
 <!-- Library for PDF Download -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- Leaflet Assets -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <?php
     if (!function_exists('getStatusBadge')) {
@@ -36,8 +39,8 @@
         <div class="absolute top-0 right-0 w-48 h-48 bg-blue-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
         
         <div class="flex flex-col md:flex-row md:items-center gap-6 relative z-10">
-            <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-600/20 rotate-3">
-                <i data-lucide="user" class="w-10 h-10" stroke-width="2"></i>
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                <i data-lucide="user" class="w-8 h-8" stroke-width="2"></i>
             </div>
             <div>
                 <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -81,6 +84,18 @@
         <!-- LEFT COLUMN: IDENTITAS & LOKASI -->
         <div class="lg:col-span-2 space-y-6">
             
+            <!-- Map Card -->
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden no-print">
+                <div id="map-detail" class="w-full h-64 z-10" style="background: #ececec;"></div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-600"></i>
+                        <span id="coords-text" class="text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest">Memuat koordinat...</span>
+                    </div>
+                    <button onclick="focusMap()" class="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:underline">Focus Lokasi</button>
+                </div>
+            </div>
+
             <!-- I. Identitas Lengkap -->
             <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300">
                 <div class="p-6 border-b dark:border-slate-800 flex items-center gap-3">
@@ -222,7 +237,7 @@
         <div class="space-y-6">
             
             <!-- IV. Penilaian Teknis -->
-            <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden sticky top-24">
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div class="p-6 border-b dark:border-slate-800 bg-blue-600 text-white">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
@@ -348,7 +363,7 @@
             </div>
             
             <div class="flex gap-2 pt-4">
-                <button type="button" onclick="closeModalTuntas()" class="flex-1 py-3 text-[10px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Batal</button>
+                <button type="button" onclick="closeModalTuntas()" class="flex-1 py-3 text-[10px] font-black text-slate-400 hover:text-slate-600 transition-colors">Batal</button>
                 <button type="submit" class="flex-[2] py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-600/20 active:scale-95 transition-all">Konfirmasi</button>
             </div>
         </form>
@@ -388,6 +403,38 @@
             document.body.classList.remove('is-exporting');
         }).save();
     }
+
+    let map;
+    function initMap() {
+        const coordsStr = "<?= $rumah['lokasi_koordinat'] ?>";
+        if (!coordsStr) {
+            document.getElementById('coords-text').innerText = "KOORDINAT TIDAK TERSEDIA";
+            return;
+        }
+
+        const match = coordsStr.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+        if (!match) return;
+        const lng = parseFloat(match[1]);
+        const lat = parseFloat(match[2]);
+
+        document.getElementById('coords-text').innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+        if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
+        const isDark = document.documentElement.classList.contains('dark');
+        const tiles = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
+
+        map = L.map('map-detail', { zoomControl: false, layers: [tiles] }).setView([lat, lng], 17);
+        L.marker([lat, lng]).addTo(map);
+        setTimeout(() => map.invalidateSize(), 500);
+    }
+
+    function focusMap() {
+        const coordsStr = "<?= $rumah['lokasi_koordinat'] ?>";
+        const match = coordsStr.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+        if (match) map.setView([parseFloat(match[2]), parseFloat(match[1])], 18, { animate: true });
+    }
+
+    window.addEventListener('load', initMap);
 </script>
 
 <style>

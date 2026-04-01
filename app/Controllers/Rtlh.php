@@ -36,7 +36,7 @@ class Rtlh extends BaseController
         $perPage = $this->request->getGet('per_page') ?? 10;
         $status = $this->request->getGet('status') ?? 'Belum Menerima';
 
-        $query = $this->rumahModel->select('rtlh_rumah.*, rtlh_penerima.nama_kepala_keluarga as pemilik')
+        $query = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat, rtlh_penerima.nama_kepala_keluarga as pemilik')
                                   ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left');
 
         if ($status !== 'semua') {
@@ -44,17 +44,24 @@ class Rtlh extends BaseController
         }
 
         if ($keyword) {
-            $query = $query->groupStart()
+            $query->groupStart()
                   ->like('rtlh_penerima.nama_kepala_keluarga', $keyword)
                   ->orLike('rtlh_rumah.desa', $keyword)
                   ->groupEnd();
         }
 
         $rumah = $query->paginate($perPage, 'default');
-        
+
+        // Data untuk Map (Semua yang punya koordinat)
+        $rumah_all = $this->rumahModel->select('rtlh_rumah.id_survei, rtlh_rumah.desa, ST_AsText(lokasi_koordinat) as lokasi_koordinat, rtlh_penerima.nama_kepala_keluarga as pemilik')
+                                      ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left')
+                                      ->where('lokasi_koordinat IS NOT NULL')
+                                      ->findAll();
+
         $data = [
             'title' => 'Data RTLH',
             'rumah' => $rumah,
+            'rumah_all' => $rumah_all,
             'pager' => $this->rumahModel->pager,
             'perPage' => $perPage,
             'keyword' => $keyword,
@@ -64,7 +71,6 @@ class Rtlh extends BaseController
 
         return view('rtlh/index', $data);
     }
-
     public function markTuntas($id)
     {
         $tahun = $this->request->getPost('tahun_bansos') ?? date('Y');
@@ -428,7 +434,7 @@ class Rtlh extends BaseController
     public function detail($id)
     {
         if (!has_permission('view_rtlh_detail')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
-        $rumah = $this->rumahModel->find($id);
+        $rumah = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')->find($id);
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();

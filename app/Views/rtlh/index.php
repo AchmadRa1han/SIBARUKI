@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.js"></script>
 
 <div class="space-y-6 pb-12">
     <!-- Header -->
@@ -18,7 +18,7 @@
         </div>
         <div class="flex flex-wrap items-center gap-2 relative z-10">
             <div class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-800/50 shadow-sm">
-                <?= count($rumah_all ?? []) ?> Unit
+                <?= count($rumah_all ?? []) ?> Unit Terpetakan
             </div>
             <a href="<?= base_url('rtlh/export-excel') ?>" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition-all active:scale-95 flex items-center gap-2">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
@@ -139,7 +139,7 @@
                         <td class="px-6 py-3 text-center">
                             <div class="flex items-center justify-center gap-1.5">
                                 <?php if(!empty($item['lokasi_koordinat'])): ?>
-                                <button onclick="focusMap(<?= $item['lokasi_koordinat'] ?>)" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Peta"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="focusMapWKT('<?= $item['lokasi_koordinat'] ?>')" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Peta"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
                                 <a href="<?= base_url('rtlh/detail/'.$item['id_survei']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
                                 <?php if (has_permission('delete_rtlh')): ?>
@@ -174,6 +174,13 @@
 <script>
     let map;
     let rot = 0;
+
+    function parseWKT(wkt) {
+        if (!wkt || typeof wkt !== 'string') return null;
+        const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+        if (match) return { lng: parseFloat(match[1]), lat: parseFloat(match[2]) };
+        return null;
+    }
 
     function initMap() {
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
@@ -210,9 +217,9 @@
             const rtlhData = <?= json_encode($rumah_all ?? []) ?>;
             rtlhData.forEach(item => {
                 if (item.lokasi_koordinat) {
-                    const coords = item.lokasi_koordinat.split(',').map(c => parseFloat(c.trim()));
-                    if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-                        const marker = L.circleMarker(coords, { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
+                    const coords = parseWKT(item.lokasi_koordinat);
+                    if (coords) {
+                        const marker = L.circleMarker([coords.lat, coords.lng], { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
                         marker.bindPopup(`
                             <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-black uppercase tracking-widest text-blue-400 mb-1">RTLH</p><h5 class="text-[11px] font-black uppercase leading-tight">${item.pemilik || '-'}</h5></div>
                             <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('rtlh/detail/') ?>/${item.id_survei}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-black uppercase tracking-widest rounded-lg transition-all">Detail</a></div>
@@ -226,10 +233,13 @@
         } catch(err) {}
     }
 
-    function focusMap(lat, lng) {
-        map.setView([lat, lng], 18);
-        const mc = document.getElementById('main-content');
-        if (mc) mc.scrollTo({ top: 0, behavior: 'smooth' });
+    function focusMapWKT(wkt) {
+        const coords = parseWKT(wkt);
+        if (coords) {
+            map.setView([coords.lat, coords.lng], 18);
+            const mc = document.getElementById('main-content');
+            if (mc) mc.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     function confirmDelete(id, name) {
