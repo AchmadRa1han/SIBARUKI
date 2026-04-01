@@ -80,7 +80,7 @@
                     <h4 class="text-[11px] font-black uppercase tracking-[0.3em] mb-8 text-blue-600 dark:text-blue-400">Tautan Cepat</h4>
                     <ul class="space-y-5">
                         <li>
-                            <a href="https://www.instagram.com/dpkppsinjai/" target="_blank" class="group flex items-center gap-3 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">
+                            <a href="https://www.instagram.com/disperkimtan.sinjai/" target="_blank" class="group flex items-center gap-3 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">
                                 <span class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
                                     <i data-lucide="instagram" class="w-4 h-4" stroke-width="3"></i>
                                 </span>
