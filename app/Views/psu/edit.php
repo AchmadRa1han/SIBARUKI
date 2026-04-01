@@ -44,7 +44,7 @@
                     <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Modifikasi Parameter Geospasial</p>
                 </div>
             </div>
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div class="md:col-span-2">
                     <label class="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nama Ruas Jalan</label>
                     <input type="text" name="nama_jalan" value="<?= old('nama_jalan', $jalan['nama_jalan']) ?>" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-black uppercase" placeholder="NAMA RUAS JALAN...">
