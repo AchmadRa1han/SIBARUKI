@@ -176,14 +176,17 @@
     let rot = 0;
 
     function parseWKT(wkt) {
-        if (!wkt || typeof wkt !== 'string') return null;
-        const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
-        if (match) return { lng: parseFloat(match[1]), lat: parseFloat(match[2]) };
-        return null;
+        if (!wkt || typeof wkt !== 'string' || typeof wellknown === 'undefined') return null;
+        try {
+            let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
+            let geojson = wellknown.parse(cleanWkt);
+            if (!geojson || geojson.type !== 'Point') return null;
+            return { lng: geojson.coordinates[0], lat: geojson.coordinates[1] };
+        } catch(e) { return null; }
     }
 
     function initMap() {
-        if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
+        if (typeof L === 'undefined' || typeof wellknown === 'undefined') { setTimeout(initMap, 100); return; }
         try {
             const isDark = document.documentElement.classList.contains('dark');
             const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
@@ -218,7 +221,7 @@
             rtlhData.forEach(item => {
                 if (item.lokasi_koordinat) {
                     const coords = parseWKT(item.lokasi_koordinat);
-                    if (coords) {
+                    if (coords && !isNaN(coords.lat) && !isNaN(coords.lng)) {
                         const marker = L.circleMarker([coords.lat, coords.lng], { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
                         marker.bindPopup(`
                             <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-black uppercase tracking-widest text-blue-400 mb-1">RTLH</p><h5 class="text-[11px] font-black uppercase leading-tight">${item.pemilik || '-'}</h5></div>
@@ -229,14 +232,15 @@
                 }
             });
             map.addLayer(clusterGroup);
+            if (rtlhData.length > 0 && clusterGroup.getLayers().length > 0) map.fitBounds(clusterGroup.getBounds().pad(0.1));
             if (typeof lucide !== 'undefined') lucide.createIcons();
-        } catch(err) {}
+        } catch(err) { console.error('Map Error:', err); }
     }
 
     function focusMapWKT(wkt) {
         const coords = parseWKT(wkt);
         if (coords) {
-            map.setView([coords.lat, coords.lng], 18);
+            map.setView([coords.lat, coords.lng], 18, { animate: true });
             const mc = document.getElementById('main-content');
             if (mc) mc.scrollTo({ top: 0, behavior: 'smooth' });
         }
