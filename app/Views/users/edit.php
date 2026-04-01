@@ -1,157 +1,164 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<!-- Tom Select CSS -->
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
-<style>
-    .ts-control {
-        border: none !important;
-        padding: 1rem !important;
-        background: #f8fafc !important; /* slate-50 */
-        border-radius: 1.25rem !important;
-        transition: all 0.3s ease;
-        border: 1px solid #f1f5f9 !important;
-    }
-    .dark .ts-control {
-        background: #020617 !important; /* slate-950 */
-        color: #e2e8f0 !important; /* slate-200 */
-        border-color: #1e293b !important;
-    }
-    .ts-wrapper.multi .ts-control > div {
-        border-radius: 0.75rem !important;
-        padding: 4px 12px !important;
-        font-weight: 700 !important;
-        font-size: 10px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-    }
-    /* RTLH Specific Tag Color */
-    .rtlh-select .ts-wrapper.multi .ts-control > div {
-        background: #1e3a8a !important; /* blue-900 */
-        color: white !important;
-    }
-    /* Kumuh Specific Tag Color */
-    .kumuh-select .ts-wrapper.multi .ts-control > div {
-        background: #b45309 !important; /* amber-700 */
-        color: white !important;
-    }
-</style>
+<div class="max-w-7xl mx-auto space-y-8 pb-32">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 no-print">
+        <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <a href="<?= base_url('users') ?>" class="hover:text-blue-600 transition-colors">Otoritas Pengguna</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <span class="text-blue-600">Edit Profil Pengguna</span>
+    </nav>
 
-<div class="max-w-4xl mx-auto p-6">
-    <div class="mb-10 flex items-center justify-between border-b dark:border-slate-800 pb-8 transition-colors duration-300">
-        <div>
-            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Edit Pengguna</h1>
-            <p class="text-slate-400 dark:text-slate-500 text-sm font-medium italic mt-1">Sesuaikan profil dan hak akses pengguna: <span class="text-blue-600 dark:text-blue-400 font-bold"><?= $user['username'] ?></span></p>
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-amber-600/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div class="relative z-10 flex items-center gap-6">
+            <div class="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-amber-500/20">
+                <i data-lucide="user-cog" class="w-8 h-8"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Edit Akun</h1>
+                <p class="text-sm text-slate-500 font-bold uppercase tracking-widest mt-1">Konfigurasi Hak Akses: <span class="text-blue-600"><?= $user['username'] ?></span></p>
+            </div>
         </div>
-        <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-3xl flex items-center justify-center text-blue-900 dark:text-blue-400">
-            <i data-lucide="user-cog" class="w-8 h-8"></i>
+        <div class="flex items-center gap-4 relative z-10">
+            <a href="<?= base_url('users') ?>" class="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95">Batal</a>
         </div>
     </div>
 
-    <form action="<?= base_url('users/update/' . $user['id']) ?>" method="post" class="space-y-8">
+    <form action="<?= base_url('users/update/'.$user['id']) ?>" method="post">
         <?= csrf_field() ?>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Data Profil -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b dark:border-slate-800 bg-blue-50/30 dark:bg-blue-950/30 flex items-center gap-4">
+                        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-blue-900 dark:text-blue-400 uppercase tracking-[0.2em]">Identitas Pengguna</h3>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Informasi Dasar Petugas</p>
+                        </div>
+                    </div>
+                    <div class="p-10 space-y-8">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-3 tracking-widest ml-1">Username (Tidak Dapat Diubah)</label>
+                            <input type="text" value="<?= $user['username'] ?>" disabled class="w-full p-4 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl font-black text-slate-400 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-3 tracking-widest ml-1">Nama Instansi / Unit Kerja</label>
+                            <input type="text" name="instansi" value="<?= old('instansi', $user['instansi']) ?>" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Baris 1: Informasi Login -->
-        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
-            <h3 class="text-blue-900 dark:text-blue-400 font-black uppercase text-[10px] tracking-[0.2em] mb-8 border-b dark:border-slate-800 pb-4 flex items-center gap-2">
-                <i data-lucide="key" class="w-3.5 h-3.5"></i>
-                Update Kredensial
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1">Username</label>
-                    <input type="text" name="username" value="<?= $user['username'] ?>" required
-                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-900 dark:focus:border-blue-700 dark:text-slate-200 outline-none transition-all font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1">Ganti Password</label>
-                    <input type="password" name="password" placeholder="Kosongkan jika tidak ingin ganti..."
-                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-900 dark:focus:border-blue-700 dark:text-slate-200 outline-none transition-all font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1">Instansi / Unit Kerja</label>
-                    <input type="text" name="instansi" value="<?= $user['instansi'] ?>" placeholder="Contoh: Dinas Perkim / Desa Saukang"
-                        class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-900 dark:focus:border-blue-700 dark:text-slate-200 outline-none transition-all font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 ml-1">Role / Hak Akses</label>
-                    <div class="relative">
-                        <select name="role_id" required class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl outline-none dark:text-slate-200 appearance-none font-black text-blue-900 dark:text-blue-400 cursor-pointer focus:ring-4 focus:ring-blue-500/10">
-                            <?php foreach($roles as $role): ?>
-                                <option value="<?= $role['id'] ?>" <?= $user['role_id'] == $role['id'] ? 'selected' : '' ?>><?= strtoupper($role['role_name']) ?> - <?= strtoupper($role['scope']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <i data-lucide="chevron-down" class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"></i>
+                <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b dark:border-slate-800 bg-rose-50/30 dark:bg-rose-950/30 flex items-center gap-4">
+                        <div class="w-10 h-10 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                            <i data-lucide="lock" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-rose-900 dark:text-rose-400 uppercase tracking-[0.2em]">Keamanan</h3>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Ubah Kata Sandi Akses</p>
+                        </div>
+                    </div>
+                    <div class="p-10">
+                        <div class="bg-rose-50/50 dark:bg-rose-950/10 border border-rose-100 dark:border-rose-900/50 rounded-2xl p-6 mb-8">
+                            <p class="text-[10px] font-bold text-rose-600 uppercase tracking-widest flex items-center gap-2">
+                                <i data-lucide="info" class="w-3.5 h-3.5"></i> Perhatian Keamanan
+                            </p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">Kosongkan kolom kata sandi di bawah ini jika Anda tidak ingin melakukan perubahan akses.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-3 tracking-widest ml-1">Kata Sandi Baru</label>
+                                <input type="password" name="password" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="••••••••">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-3 tracking-widest ml-1">Ulangi Kata Sandi</label>
+                                <input type="password" name="password_confirm" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="••••••••">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Baris 2: Penugasan Wilayah -->
-        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
-            <h3 class="text-blue-900 dark:text-blue-400 font-black uppercase text-[10px] tracking-[0.2em] mb-8 border-b dark:border-slate-800 pb-4 flex items-center gap-2">
-                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
-                Penugasan Wilayah Kerja
-            </h3>
-            
+            <!-- Role & Scope -->
             <div class="space-y-8">
-                <!-- RTLH Selection -->
-                <div class="rtlh-select">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-900 dark:text-blue-400">
-                            <i data-lucide="home" class="w-4 h-4"></i>
+                <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b dark:border-slate-800 bg-amber-50/30 dark:bg-amber-950/30 flex items-center gap-4">
+                        <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                            <i data-lucide="shield" class="w-5 h-5"></i>
                         </div>
-                        <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Wilayah Tugas Data RTLH</label>
+                        <div>
+                            <h3 class="text-xs font-black text-amber-900 dark:text-amber-400 uppercase tracking-[0.2em]">Otoritas</h3>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Konfigurasi Peran</p>
+                        </div>
                     </div>
-                    <select name="desa_ids_rtlh[]" id="desa_rtlh" multiple placeholder="Pilih desa untuk tugas RTLH..." class="w-full">
-                        <?php foreach($all_desa as $desa): ?>
-                            <option value="<?= $desa['desa_id'] ?>" <?= in_array($desa['desa_id'], $assigned_rtlh) ? 'selected' : '' ?>><?= $desa['desa_nama'] ?> (<?= $desa['desa_id'] ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                    <div class="p-10 space-y-10">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-4 tracking-widest ml-1">Pilih Role Utama</label>
+                            <div class="space-y-3">
+                                <?php foreach($roles as $role): ?>
+                                <label class="flex items-center p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl cursor-pointer hover:border-blue-500 transition-all group">
+                                    <input type="radio" name="role_id" value="<?= $role['id'] ?>" <?= $user['role_id'] == $role['id'] ? 'checked' : '' ?> required class="w-5 h-5 text-blue-600 focus:ring-blue-500/20 border-slate-300">
+                                    <div class="ml-4">
+                                        <p class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-tight"><?= $role['role_name'] ?></p>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Scope: <?= $role['scope'] ?></p>
+                                    </div>
+                                </label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
 
-                <!-- Kumuh Selection -->
-                <div class="kumuh-select">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-500">
-                            <i data-lucide="map" class="w-4 h-4"></i>
+                        <div id="desa-assignment" class="pt-8 border-t dark:border-slate-800">
+                            <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-4 tracking-widest ml-1">Penugasan Wilayah (Desa)</label>
+                            <div class="max-h-64 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                                <?php foreach($desa_list as $desa): ?>
+                                <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-all cursor-pointer group">
+                                    <input type="checkbox" name="desa_ids[]" value="<?= $desa['desa_id'] ?>" <?= in_array($desa['desa_id'], $user_desa) ? 'checked' : '' ?> class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500/20 border-slate-300">
+                                    <span class="ml-3 text-[11px] font-bold text-slate-600 dark:text-slate-400 group-hover:text-blue-600 uppercase tracking-tight transition-colors"><?= $desa['desa'] ?></span>
+                                </label>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
-                        <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Wilayah Tugas Wilayah Kumuh</label>
                     </div>
-                    <select name="desa_ids_kumuh[]" id="desa_kumuh" multiple placeholder="Pilih desa untuk tugas Kumuh..." class="w-full">
-                        <?php foreach($all_desa as $desa): ?>
-                            <option value="<?= $desa['desa_id'] ?>" <?= in_array($desa['desa_id'], $assigned_kumuh) ? 'selected' : '' ?>><?= $desa['desa_nama'] ?> (<?= $desa['desa_id'] ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
                 </div>
-            </div>
-            
-            <div class="mt-8 p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl flex items-start gap-3">
-                <i data-lucide="info" class="w-4 h-4 text-blue-600 shrink-0 mt-0.5"></i>
-                <p class="text-[10px] text-slate-500 dark:text-slate-500 font-medium leading-relaxed italic">Catatan: Jika user memiliki role dengan Scope "Global", wilayah penugasan di atas dapat dikosongkan karena user akan otomatis memiliki akses ke seluruh kabupaten.</p>
             </div>
         </div>
 
-        <!-- Tombol Aksi -->
-        <div class="flex items-center justify-end gap-6 pt-4">
-            <a href="<?= base_url('users') ?>" class="text-xs font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Batal</a>
-            <button type="submit" class="bg-blue-900 dark:bg-blue-700 text-white px-12 py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-blue-900/30 dark:shadow-none hover:bg-blue-800 dark:hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-3">
-                <i data-lucide="save" class="w-4 h-4"></i>
-                Perbarui Profil
+        <!-- Action Bar -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-8">
+            <div class="flex items-center gap-4 text-slate-400">
+                <i data-lucide="info" class="w-5 h-5"></i>
+                <p class="text-[10px] font-bold uppercase tracking-widest leading-relaxed max-w-md">Metadata perubahan akun akan dicatat dalam sistem log audit untuk keperluan monitoring keamanan.</p>
+            </div>
+            <button type="submit" class="group flex items-center space-x-8 bg-amber-500 hover:bg-amber-600 text-white pl-12 pr-6 py-6 rounded-[2.5rem] font-black shadow-2xl shadow-amber-500/20 transition-all active:scale-95 w-full md:w-auto">
+                <div class="flex flex-col text-right">
+                    <span class="text-[10px] uppercase tracking-[0.3em] opacity-60 mb-1">Simpan Perubahan</span>
+                    <span class="text-xl uppercase tracking-tighter">Perbarui Akun</span>
+                </div>
+                <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center group-hover:translate-x-2 transition-transform">
+                    <i data-lucide="save" class="w-6 h-6"></i>
+                </div>
             </button>
         </div>
     </form>
 </div>
 
-<!-- Tom Select JS -->
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+<style>
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+</style>
+
 <script>
-    const config = {
-        plugins: ['remove_button'],
-        create: false,
-        sortField: { field: "text", direction: "asc" }
-    };
-    new TomSelect("#desa_rtlh", config);
-    new TomSelect("#desa_kumuh", config);
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
 </script>
 <?= $this->endSection() ?>
