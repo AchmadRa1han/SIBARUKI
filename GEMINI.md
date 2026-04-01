@@ -188,7 +188,9 @@ Sistem ini didesain bukan sebagai *admin panel* kaku, melainkan *Dashboard Eksek
   - **Card Luar:** `rounded-[2rem]` (Melengkung elegan).
   - **Button/Small Card:** `rounded-xl` atau `rounded-lg`.
   - **Input Field:** `rounded-lg`.
-- **Shadows:** Gunakan bayangan lembut, contoh: `shadow-md shadow-blue-600/10`.
+- **Shadows (Penting):** Gunakan bayangan yang dalam tapi sangat lembut (soft & deep shadows).
+  - **Standard Card:** `shadow-xl shadow-slate-200/50` (Light) atau `shadow-2xl shadow-black/20` (Dark).
+  - **Accent Card:** Gunakan bayangan berwarna tipis, contoh: `shadow-xl shadow-blue-600/10`.
 - **Borders:** Hindari border hitam pekat. Gunakan `border-slate-100` (Light) atau `border-slate-800` (Dark).
 
 ### 6.4. Komponen & Interaksi

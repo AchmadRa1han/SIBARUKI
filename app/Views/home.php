@@ -87,7 +87,7 @@
                 ['aset', 'land-plot', 'cyan', 'Aset Tanah'],
             ];
             foreach($metrics as $m): ?>
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-500 group text-center flex flex-col items-center justify-center min-h-[220px]">
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:shadow-2xl hover:shadow-blue-600/10 hover:-translate-y-1 transition-all duration-500 group text-center flex flex-col items-center justify-center min-h-[220px]">
                 <div class="w-12 h-12 mx-auto rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-500 shadow-inner">
                     <i data-lucide="<?= $m[1] ?>" class="w-6 h-6" stroke-width="2.5"></i>
                 </div>
@@ -107,7 +107,7 @@
             </div>
             <div class="flex flex-wrap gap-2">
                 <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
-                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border border-white dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg hover:scale-105 active:scale-95" data-layer="<?= $l ?>">
+                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border border-white dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:scale-105 active:scale-95" data-layer="<?= $l ?>">
                     <?php 
                         $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
                         echo $labels[$l];
@@ -118,7 +118,7 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-6 lg:px-12">
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl">
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-300/50 dark:shadow-black/40">
                 <div id="publicMap" class="h-[600px] w-full rounded-[2rem] z-0 bg-slate-50 dark:bg-slate-950 border border-slate-50 dark:border-slate-800"></div>
             </div>
         </div>
