@@ -177,13 +177,22 @@
     let rot = 0;
 
     function parseWKT(wkt) {
-        if (!wkt || typeof wkt !== 'string' || typeof wellknown === 'undefined') return null;
+        if (!wkt || typeof wkt !== 'string') return null;
         try {
-            let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
-            let geojson = wellknown.parse(cleanWkt);
-            if (!geojson || geojson.type !== 'Point') return null;
-            return { lng: geojson.coordinates[0], lat: geojson.coordinates[1] };
+            // Try Regex fallback first (proven to work on detail page)
+            const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+            if (match) return { lng: parseFloat(match[1]), lat: parseFloat(match[2]) };
+
+            // Try wellknown if available
+            if (typeof wellknown !== 'undefined') {
+                let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
+                let geojson = wellknown.parse(cleanWkt);
+                if (geojson && geojson.type === 'Point') {
+                    return { lng: geojson.coordinates[0], lat: geojson.coordinates[1] };
+                }
+            }
         } catch(e) { return null; }
+        return null;
     }
 
     function initMap() {
