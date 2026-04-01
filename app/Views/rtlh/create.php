@@ -198,15 +198,22 @@
                     </div>
                     <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <?php 
-                            $struk = ['Pondasi', 'Kolom', 'Balok', 'Sloof', 'Rangka_Atap', 'Plafon', 'Jendela', 'Ventilasi'];
-                            foreach($struk as $s):
-                                $field = 'st_' . strtolower($s);
+                            $komponen = [
+                                'st_pondasi' => 'Pondasi', 'st_kolom' => 'Kolom', 'st_balok' => 'Balok', 'st_sloof' => 'Sloof', 
+                                'st_rangka_atap' => 'Rangka Atap', 'st_plafon' => 'Plafon', 'st_jendela' => 'Jendela', 'st_ventilasi' => 'Ventilasi',
+                                'mat_atap' => 'Material Atap', 'st_atap' => 'Kondisi Atap',
+                                'mat_dinding' => 'Material Dinding', 'st_dinding' => 'Kondisi Dinding',
+                                'mat_lantai' => 'Material Lantai', 'st_lantai' => 'Kondisi Lantai'
+                            ];
+                            foreach($komponen as $key => $label) : 
+                                $kategori = (str_starts_with($key, 'mat_')) ? 'MATERIAL_' . strtoupper(explode('_', $key)[1]) : 'KONDISI';
                         ?>
                         <div>
-                            <label class="block text-[8px] font-black text-slate-400 uppercase mb-1.5 tracking-widest ml-1"><?= str_replace('_', ' ', $s) ?></label>
-                            <select name="<?= $field ?>" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none text-[10px] font-bold">
-                                <?php if(isset($master['KONDISI'])): foreach($master['KONDISI'] as $k): ?>
-                                    <option value="<?= $k['id'] ?>"><?= $k['nama_pilihan'] ?></option>
+                            <label class="block text-[8px] font-black text-slate-400 uppercase mb-1.5 tracking-widest ml-1"><?= $label ?></label>
+                            <select name="<?= $key ?>" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none text-[10px] font-bold">
+                                <option value="">Pilih <?= (str_starts_with($key, 'mat_')) ? 'Material' : 'Kondisi' ?></option>
+                                <?php if(isset($master[$kategori])): foreach($master[$kategori] as $opt) : ?>
+                                    <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
                                 <?php endforeach; endif; ?>
                             </select>
                         </div>

@@ -737,20 +737,20 @@ class Rtlh extends BaseController
 
         // 3. Update Kondisi Fisik
         $dataKondisi = [
-            'st_pondasi' => $post['st_pondasi'] ?: null,
-            'st_kolom' => $post['st_kolom'] ?: null,
-            'st_balok' => $post['st_balok'] ?: null,
-            'st_sloof' => $post['st_sloof'] ?: null,
-            'st_rangka_atap' => $post['st_rangka_atap'] ?: null,
-            'st_plafon' => $post['st_plafon'] ?: null,
-            'st_jendela' => $post['st_jendela'] ?: null,
-            'st_ventilasi' => $post['st_ventilasi'] ?: null,
-            'mat_atap' => $post['mat_atap'] ?: null,
-            'st_atap' => $post['st_atap'] ?: null,
-            'mat_dinding' => $post['mat_dinding'] ?: null,
-            'st_dinding' => $post['st_dinding'] ?: null,
-            'mat_lantai' => $post['mat_lantai'] ?: null,
-            'st_lantai' => $post['st_lantai'] ?: null,
+            'st_pondasi' => ($post['st_pondasi'] ?? null) ?: null,
+            'st_kolom' => ($post['st_kolom'] ?? null) ?: null,
+            'st_balok' => ($post['st_balok'] ?? null) ?: null,
+            'st_sloof' => ($post['st_sloof'] ?? null) ?: null,
+            'st_rangka_atap' => ($post['st_rangka_atap'] ?? null) ?: null,
+            'st_plafon' => ($post['st_plafon'] ?? null) ?: null,
+            'st_jendela' => ($post['st_jendela'] ?? null) ?: null,
+            'st_ventilasi' => ($post['st_ventilasi'] ?? null) ?: null,
+            'mat_atap' => ($post['mat_atap'] ?? null) ?: null,
+            'st_atap' => ($post['st_atap'] ?? null) ?: null,
+            'mat_dinding' => ($post['mat_dinding'] ?? null) ?: null,
+            'st_dinding' => ($post['st_dinding'] ?? null) ?: null,
+            'mat_lantai' => ($post['mat_lantai'] ?? null) ?: null,
+            'st_lantai' => ($post['st_lantai'] ?? null) ?: null,
             'updated_at' => date('Y-m-d H:i:s')
         ];
         
