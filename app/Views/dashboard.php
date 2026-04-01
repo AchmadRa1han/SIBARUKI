@@ -15,27 +15,33 @@
     $greet = ($hour < 12) ? 'Selamat Pagi' : (($hour < 17) ? 'Selamat Siang' : 'Selamat Malam');
 ?>
 
-<div class="space-y-8 pb-12 animate-in fade-in duration-700">
+<div class="space-y-6 pb-12 animate-in fade-in duration-700">
     
     <!-- 1. HEADER -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-            <div class="flex items-center gap-3 mb-2">
-                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Command Center SIBARUKI v1.0</span>
+            <div class="flex items-center gap-2 mb-1.5 ml-1">
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></div>
+                <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Command Center SIBARUKI v1.0</span>
             </div>
-            <h1 class="text-3xl lg:text-4xl font-black tracking-tight text-blue-950 dark:text-white"><?= $greet ?>, <?= explode(' ', session()->get('username'))[0] ?>.</h1>
+            <h1 class="text-2xl lg:text-4xl font-black tracking-tighter text-blue-950 dark:text-white uppercase leading-none">
+                <?= $greet ?>, <span class="text-blue-600"><?= explode(' ', session()->get('username'))[0] ?>.</span>
+            </h1>
         </div>
-        <div class="flex items-center gap-3">
-            <div class="flex flex-col items-end mr-4">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><?= date('l') ?></span>
-                <span class="text-sm font-bold text-blue-900 dark:text-blue-400"><?= date('d F Y') ?></span>
+        <div class="flex items-center gap-3 bg-white dark:bg-slate-900 px-5 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+            <div class="flex flex-col items-end">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]"><?= date('l') ?></span>
+                <span class="text-xs font-black text-blue-950 dark:text-white"><?= date('d F Y') ?></span>
+            </div>
+            <div class="w-px h-6 bg-slate-100 dark:bg-slate-800"></div>
+            <div class="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
             </div>
         </div>
     </div>
 
     <!-- 2. METRICS GRID -->
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
         <?php 
         $metrics = [
             ['rtlh', 'home', 'amber', 'RTLH', base_url('rtlh')],
@@ -47,56 +53,70 @@
             ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
         ];
         foreach($metrics as $m): ?>
-        <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group block">
-            <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><i data-lucide="<?= $m[1] ?>" class="w-5 h-5"></i></div>
-            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1"><?= $m[3] ?></p>
-            <h3 class="text-xl font-black text-blue-950 dark:text-white"><?= number_format($rekap[$m[0]]) ?></h3>
+        <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-500 group block relative overflow-hidden">
+            <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-inner">
+                <i data-lucide="<?= $m[1] ?>" class="w-5 h-5" stroke-width="2"></i>
+            </div>
+            <p class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5"><?= $m[3] ?></p>
+            <h3 class="text-xl font-black text-blue-950 dark:text-white tracking-tighter"><?= number_format($rekap[$m[0]]) ?></h3>
         </a>
         <?php endforeach; ?>
     </div>
 
     <!-- 3. TACTICAL COMMAND MAP -->
-    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col transition-all duration-300">
-        <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/50 dark:bg-slate-800/30">
-            <div>
-                <h3 class="text-[10px] font-black text-blue-950 dark:text-blue-400 uppercase tracking-[0.2em] mb-1">Database Geospasial Terpadu</h3>
-                <div class="flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                    <span id="activeLayerLabel" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Memuat Peta...</span>
+    <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col transition-all duration-500 relative">
+        <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white dark:bg-slate-900 relative z-10">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                    <i data-lucide="map" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-blue-950 dark:text-white uppercase tracking-tight">Database Spasial Terpadu</h3>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div>
+                        <span id="activeLayerLabel" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Memuat...</span>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-1.5">
                 <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'] as $l): ?>
-                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border border-white dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-2" data-layer="<?= $l ?>">
-                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map'))))) ?>" class="w-3 h-3"></i> <?= $l == 'formal' ? 'PERUMAHAN' : strtoupper($l) ?>
+                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
+                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map'))))) ?>" class="w-3 h-3"></i> <?= strtoupper($l) ?>
                 </button>
                 <?php endforeach; ?>
             </div>
         </div>
-        <div id="tacticalMap" class="h-[65vh] w-full z-0 bg-slate-100 dark:bg-slate-950"></div>
+        <div id="tacticalMap" class="h-[55vh] lg:h-[65vh] w-full z-0 bg-slate-50 dark:bg-slate-950"></div>
     </div>
 
     <!-- 4. BOTTOM ANALYTICS -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-            <h3 class="text-[10px] font-black text-blue-950 dark:text-blue-400 uppercase tracking-widest mb-8">Status Kelayakan RTLH</h3>
-            <div id="conditionChart"></div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+            <h3 class="text-[9px] font-black text-blue-950 dark:text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+                <span class="w-6 h-[2px] bg-blue-600"></span> Analisis Kelayakan
+            </h3>
+            <div id="conditionChart" class="flex justify-center"></div>
         </div>
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-            <h3 class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-6 px-2">Kawasan Kumuh Prioritas</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                <i data-lucide="alert-triangle" class="w-32 h-32 text-rose-600"></i>
+            </div>
+            <h3 class="text-[9px] font-black text-rose-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                <span class="w-6 h-[2px] bg-rose-600"></span> Prioritas Kawasan Kumuh
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
                 <?php foreach($topKumuh as $k): ?>
-                <a href="<?= base_url('wilayah-kumuh/detail/' . $k['FID']) ?>" class="p-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-3xl transition-all group">
+                <a href="<?= base_url('wilayah-kumuh/detail/' . $k['FID']) ?>" class="p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl transition-all duration-500 group shadow-sm">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 flex items-center justify-center font-black text-sm group-hover:scale-110 transition-transform"><?= substr($k['Kelurahan'], 0, 1) ?></div>
+                        <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-base group-hover:scale-110 transition-all duration-500 shadow-lg shadow-rose-600/20"><?= substr($k['Kelurahan'], 0, 1) ?></div>
                         <div>
-                            <p class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight"><?= $k['Kelurahan'] ?></p>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest"><?= $k['Kawasan'] ?></p>
+                            <p class="text-xs font-black text-blue-950 dark:text-white uppercase tracking-tight"><?= $k['Kelurahan'] ?></p>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5"><?= $k['Kawasan'] ?: 'Kawasan Kumuh' ?></p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <span class="text-lg font-black text-rose-600 leading-none"><?= number_format($k['skor_kumuh'], 0) ?></span>
-                        <span class="text-[8px] font-bold text-slate-400 uppercase block">Skor</span>
+                        <p class="text-xl font-black text-rose-600 leading-none italic"><?= number_format($k['skor_kumuh'], 0) ?></p>
+                        <p class="text-[7px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Skor</p>
                     </div>
                 </a>
                 <?php endforeach; ?>
@@ -106,12 +126,11 @@
 </div>
 
 <style>
-    .layer-btn.active { background: #1e1b4b !important; color: white !important; border-color: #1e1b4b !important; box-shadow: 0 10px 15px -3px rgba(30, 27, 75, 0.4); }
-    .dark .layer-btn.active { background: #2563eb !important; border-color: #2563eb !important; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); }
-    .leaflet-popup-content-wrapper { border-radius: 1.5rem; padding: 0; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); border: none; }
-    .leaflet-popup-content { margin: 0; width: 240px !important; }
-    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; }
-    .custom-tooltip { background: rgba(30, 27, 75, 0.9) !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 900 !important; font-size: 8px !important; text-transform: uppercase !important; }
+    .layer-btn.active { background: #1e1b4b !important; color: white !important; border-color: #1e1b4b !important; box-shadow: 0 10px 20px -5px rgba(30, 27, 75, 0.4); transform: translateY(-1px); }
+    .dark .layer-btn.active { background: #2563eb !important; border-color: #2563eb !important; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4); }
+    .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2); border: none; }
+    .leaflet-popup-content { margin: 0; width: 200px !important; }
+    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
 </style>
 
 <script>
@@ -126,7 +145,7 @@
         const zoneCentralMeridian = 123 * (Math.PI / 180); 
         let x = easting - falseEasting, y = northing - falseNorthing;
         let M = y / k0, mu = M / (a * (1 - e * e / 4 - 3 * e * e * e * e / 64 - 5 * e * e * e * e * e * e / 256));
-        let phi1Rad = mu + (3 * e1sq / 2 - 27 * e1sq * e1sq * e1sq / 32) * Math.sin(2 * mu) + (21 * e1sq * e1sq / 16 - 55 * e1sq * e1sq * e1sq * e1sq / 32) * Math.sin(4 * mu) + (151 * e1sq * e1sq * e1sq / 96) * Math.sin(6 * mu);
+        let phi1Rad = mu + (3 * e1sq / 2 - 27 * e1sq * e1sq * e1sq / 32) * Math.sin(2 * mu) + (21 * e1sq * e1sq / 16 - 55 * e1sq * e1sq * e1sq / 32) * Math.sin(4 * mu) + (151 * e1sq * e1sq * e1sq / 96) * Math.sin(6 * mu);
         let N1 = a / Math.sqrt(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad)), T1 = Math.tan(phi1Rad) * Math.tan(phi1Rad), C1 = e1sq * Math.cos(phi1Rad) * Math.cos(phi1Rad), R1 = a * (1 - e * e) / Math.pow(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad), 1.5);
         let D = x / (N1 * k0);
         let lat = phi1Rad - (N1 * Math.tan(phi1Rad) / R1) * (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e1sq) * D * D * D * D / 24 + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e1sq - 3 * C1 * C1) * D * D * D * D * D * D / 720);
@@ -138,8 +157,6 @@
         if (!wkt || typeof wkt !== 'string' || typeof wellknown === 'undefined') return null;
         try {
             let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
-            
-            // --- HEALING LOGIC UNTUK DATA TERPOTONG ---
             if (cleanWkt.length >= 32760) {
                 const lastComma = cleanWkt.lastIndexOf(',');
                 if (lastComma > 0) {
@@ -149,7 +166,6 @@
                     cleanWkt += ')'.repeat(openParen - closeParen);
                 }
             }
-
             let geojson = wellknown.parse(cleanWkt);
             if (!geojson) return null;
             if (isUTM) {
@@ -181,9 +197,8 @@
     function initMap() {
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
         const isDark = document.documentElement.classList.contains('dark');
-        standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
-        satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-
+        standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
+        
         map = L.map('tacticalMap', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 11);
         L.control.zoom({ position: 'topright' }).addTo(map);
 
@@ -191,18 +206,14 @@
         activeDataGroup = L.featureGroup().addTo(map);
         kecLayerGroup = L.featureGroup().addTo(map);
 
-        const kecColorMap = {
-            '730701': '#1e1b4b', '730702': '#1e40af', '730703': '#2563eb', '730704': '#1d4ed8', 
-            '730705': '#0ea5e9', '730706': '#3b82f6', '730707': '#0891b2', '730708': '#4338ca', '730709': '#0369a1'
-        };
-        
-        spasialData.kecamatan.forEach(k => {
+        const kecColors = ['#1e1b4b', '#1e40af', '#2563eb', '#1d4ed8', '#0ea5e9'];
+        spasialData.kecamatan.forEach((k, idx) => {
             try {
                 const geojson = parseWKTUniversal(k.wkt);
                 if (geojson) {
                     L.geoJSON(geojson, { 
-                        style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColorMap[k.kecamatan_id] || '#2563eb', weight: 0.5, fillOpacity: isDark ? 0.6 : 0.5 } 
-                    }).addTo(kecLayerGroup).bindTooltip(`<div class="p-2"><p class="font-black uppercase text-[10px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
+                        style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.4 } 
+                    }).addTo(kecLayerGroup).bindTooltip(`<div class="p-1"><p class="font-black uppercase text-[8px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
                 }
             } catch (e) {}
         });
@@ -210,87 +221,52 @@
     }
 
     function switchLayer(type) {
-        try {
-            clusterGroup.clearLayers();
-            activeDataGroup.clearLayers();
-            
-            document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
-            document.getElementById('activeLayerLabel').innerText = `Database: ${type.toUpperCase()}`;
+        clusterGroup.clearLayers();
+        activeDataGroup.clearLayers();
+        document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
+        document.getElementById('activeLayerLabel').innerText = `Database: ${type.toUpperCase()}`;
 
-            const items = spasialData[type] || [];
-            const colorMap = { rtlh: '#f59e0b', formal: '#6366f1', aset: '#1e1b4b', arsinum: '#06b6d4', pisew: '#f97316', psu: '#3b82f6' };
+        const items = spasialData[type] || [];
+        const colorMap = { rtlh: '#f59e0b', formal: '#6366f1', aset: '#1e1b4b', arsinum: '#06b6d4', pisew: '#f97316', psu: '#3b82f6' };
 
-            items.forEach(item => {
-                try {
-                    let geojson = null;
-                    let lat = null, lon = null;
+        items.forEach(item => {
+            try {
+                let geojson = null;
+                let lat = null, lon = null;
+                if (item.latitude && item.longitude) { lat = parseFloat(item.latitude); lon = parseFloat(item.longitude); }
+                else if (item.coords) {
+                    let p = item.coords.toString().split(',');
+                    if (p.length === 2) { lat = healCoordinate(p[0], true); lon = healCoordinate(p[1], false); }
+                }
+                if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) { geojson = { type: 'Point', coordinates: [lon, lat] }; }
+                else if (item.wkt) { geojson = parseWKTUniversal(item.wkt, (type === 'psu')); }
+                if (!geojson) return;
 
-                    if (item.latitude && item.longitude) {
-                        lat = parseFloat(item.latitude);
-                        lon = parseFloat(item.longitude);
-                    } else if (item.coords) {
-                        let p = item.coords.toString().split(',');
-                        if (p.length === 2) {
-                            lat = healCoordinate(p[0], true);
-                            lon = healCoordinate(p[1], false);
-                        }
-                    }
+                const detailUrls = { rtlh: '<?= base_url("rtlh/detail") ?>', kumuh: '<?= base_url("wilayah-kumuh/detail") ?>', formal: '<?= base_url("perumahan-formal/detail") ?>', psu: '<?= base_url("psu/detail") ?>', aset: '<?= base_url("aset-tanah/detail") ?>', arsinum: '<?= base_url("arsinum/detail") ?>', pisew: '<?= base_url("pisew/detail") ?>' };
+                const popupContent = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[11px] font-black uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800"><a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-black uppercase tracking-widest rounded-lg transition-all">Detail</a></div>`;
 
-                    if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) {
-                        geojson = { type: 'Point', coordinates: [lon, lat] };
-                    } else if (item.wkt) {
-                        // Gunakan isUTM = true jika tipenya PSU
-                        geojson = parseWKTUniversal(item.wkt, (type === 'psu'));
-                    }
+                if (geojson.type === 'Point') { L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 7, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(clusterGroup); }
+                else { L.geoJSON(geojson, { style: { color: colorMap[type] || '#ef4444', weight: 3, fillOpacity: 0.5 } }).bindPopup(popupContent).addTo(activeDataGroup); }
+            } catch (e) {}
+        });
 
-                    if (!geojson) return;
-
-                    const detailUrls = {
-                        rtlh: '<?= base_url('rtlh/detail') ?>',
-                        kumuh: '<?= base_url('wilayah-kumuh/detail') ?>',
-                        formal: '<?= base_url('perumahan-formal/detail') ?>',
-                        psu: '<?= base_url('psu/detail') ?>',
-                        aset: '<?= base_url('aset-tanah/detail') ?>',
-                        arsinum: '<?= base_url('arsinum/detail') ?>',
-                        pisew: '<?= base_url('pisew/detail') ?>'
-                    };
-
-                    const popupContent = `
-                        <div class="bg-blue-950 text-white p-4 rounded-t-xl"><h5 class="text-xs font-black uppercase leading-tight">${item.name}</h5></div>
-                        <div class="p-4 bg-white dark:bg-slate-900 rounded-b-xl">
-                            <a href="${detailUrls[type]}/${item.id}" class="block w-full py-2.5 bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl shadow-lg">Lihat Detail Data</a>
-                        </div>`;
-
-                    if (geojson.type === 'Point') {
-                        L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 8, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(clusterGroup);
-                    } else {
-                        L.geoJSON(geojson, { style: { color: colorMap[type] || '#ef4444', weight: 3, fillOpacity: 0.5 } }).bindPopup(popupContent).addTo(activeDataGroup);
-                    }
-                } catch (e) {}
-            });
-
-            const bounds = L.latLngBounds();
-            let valid = false;
-            [clusterGroup, activeDataGroup].forEach(g => { if(g.getLayers().length > 0) { bounds.extend(g.getBounds()); valid = true; } });
-            
-            if (valid && bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
-            else if (kecLayerGroup.getLayers().length > 0) map.fitBounds(kecLayerGroup.getBounds(), { padding: [30, 30] });
-
-            kecLayerGroup.bringToBack();
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        } catch (err) { console.error("Switch Error:", err); }
+        const bounds = L.latLngBounds();
+        let valid = false;
+        [clusterGroup, activeDataGroup].forEach(g => { if(g.getLayers().length > 0) { bounds.extend(g.getBounds()); valid = true; } });
+        if (valid && bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
 
     function initChart() {
         const s = <?= json_encode($statusLayak) ?>;
         new ApexCharts(document.querySelector("#conditionChart"), {
             series: [parseInt(s.layak||0), parseInt(s.menuju_layak||0), parseInt(s.tidak_layak||0)],
-            chart: { type: 'donut', height: 320, fontFamily: 'Plus Jakarta Sans' },
+            chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
             labels: ['LAYAK', 'MENUJU LAYAK', 'TIDAK LAYAK'],
             colors: ['#10b981', '#f59e0b', '#ef4444'],
-            plotOptions: { pie: { donut: { size: '80%', labels: { show: true, total: { show: true, label: 'TOTAL', color: '#94a3b8' } } } } },
-            legend: { position: 'bottom' }
+            plotOptions: { pie: { donut: { size: '85%', labels: { show: true, total: { show: true, label: 'DATA', color: '#94a3b8', fontSize: '9px', fontWeight: 900 } } } } },
+            legend: { position: 'bottom', fontSize: '9px', fontWeight: 700 },
+            stroke: { show: false }
         }).render();
     }
 </script>
