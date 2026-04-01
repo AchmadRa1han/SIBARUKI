@@ -137,6 +137,7 @@
 <script>
     // Swiper Initialization
     document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
         const carouselCount = <?= is_array($carousel) ? count($carousel) : 0 ?>;
         new Swiper('.heroSwiper', {
             loop: carouselCount > 1,
