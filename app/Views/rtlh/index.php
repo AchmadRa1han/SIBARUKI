@@ -1,12 +1,12 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<!-- Leaflet Assets -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Leaflet Assets (Synced with Dashboard) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 
 <div class="space-y-6 pb-12">
@@ -139,8 +139,8 @@
                         </td>
                         <td class="px-6 py-3 text-center">
                             <div class="flex items-center justify-center gap-1.5">
-                                <?php if(!empty($item['lokasi_koordinat'])): ?>
-                                <button onclick="focusMapWKT('<?= $item['lokasi_koordinat'] ?>')" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Peta"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
+                                <?php if(!empty($item['wkt'])): ?>
+                                <button onclick="focusMapWKT('<?= $item['wkt'] ?>')" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Peta"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
                                 <a href="<?= base_url('rtlh/detail/'.$item['id_survei']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
                                 <?php if (has_permission('delete_rtlh')): ?>
@@ -174,77 +174,93 @@
 
 <script>
     let map;
+    let clusterGroup;
     let rot = 0;
 
     function parseWKT(wkt) {
         if (!wkt || typeof wkt !== 'string') return null;
         try {
-            // Try Regex fallback first (proven to work on detail page)
-            const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+            let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
+            const match = cleanWkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
             if (match) return { lng: parseFloat(match[1]), lat: parseFloat(match[2]) };
 
-            // Try wellknown if available
             if (typeof wellknown !== 'undefined') {
-                let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
                 let geojson = wellknown.parse(cleanWkt);
                 if (geojson && geojson.type === 'Point') {
                     return { lng: geojson.coordinates[0], lat: geojson.coordinates[1] };
                 }
             }
-        } catch(e) { return null; }
+        } catch(e) { console.error("Parse Error:", e); return null; }
         return null;
     }
 
     function initMap() {
-        if (typeof L === 'undefined' || typeof wellknown === 'undefined') { setTimeout(initMap, 100); return; }
-        try {
-            const isDark = document.documentElement.classList.contains('dark');
-            const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
-            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' });
+        // Tunggu sampai Leaflet dan plugin MarkerCluster tersedia
+        if (typeof L === 'undefined' || typeof L.markerClusterGroup === 'undefined' || typeof wellknown === 'undefined') { 
+            console.log("Waiting for Leaflet dependencies...");
+            setTimeout(initMap, 200); 
+            return; 
+        }
+        
+        console.log("All dependencies loaded. Initializing RTLH Map...");
+        const isDark = document.documentElement.classList.contains('dark');
+        const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' });
 
-            map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 13);
-            L.control.zoom({ position: 'topright' }).addTo(map);
+        map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 11);
+        L.control.zoom({ position: 'topright' }).addTo(map);
 
-            const LayerToggle = L.Control.extend({
-                onAdd: function(map) {
-                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
-                    btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
-                    const svgColor = isDark ? '#60a5fa' : '#2563eb';
-                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
-                    L.DomEvent.disableClickPropagation(btn);
-                    L.DomEvent.on(btn, 'click', function(e) {
-                        rot += 360;
-                        const svg = btn.querySelector('svg');
-                        svg.style.transform = `rotate(${rot}deg)`;
-                        setTimeout(() => {
-                            if (map.hasLayer(standard)) { map.removeLayer(standard); map.addLayer(satellite); btn.style.backgroundColor = '#2563eb'; svg.setAttribute('stroke', '#ffffff'); }
-                            else { map.removeLayer(satellite); map.addLayer(standard); btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; svg.setAttribute('stroke', svgColor); }
-                        }, 200);
-                    });
-                    return btn;
+        const LayerToggle = L.Control.extend({
+            onAdd: function(map) {
+                const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
+                const svgColor = isDark ? '#60a5fa' : '#2563eb';
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                L.DomEvent.disableClickPropagation(btn);
+                L.DomEvent.on(btn, 'click', function(e) {
+                    rot += 360;
+                    const svg = btn.querySelector('svg');
+                    svg.style.transform = `rotate(${rot}deg)`;
+                    setTimeout(() => {
+                        if (map.hasLayer(standard)) { map.removeLayer(standard); map.addLayer(satellite); btn.style.backgroundColor = '#2563eb'; svg.setAttribute('stroke', '#ffffff'); }
+                        else { map.removeLayer(satellite); map.addLayer(standard); btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; svg.setAttribute('stroke', svgColor); }
+                    }, 200);
+                });
+                return btn;
+            }
+        });
+        map.addControl(new LayerToggle({ position: 'topright' }));
+
+        clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
+        const rtlhData = <?= json_encode($rumah_all ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        console.log("RTLH Data received:", rtlhData.length, "items");
+
+        let markerCount = 0;
+        rtlhData.forEach(item => {
+            if (item.wkt) {
+                const coords = parseWKT(item.wkt);
+                if (coords && !isNaN(coords.lat) && !isNaN(coords.lng)) {
+                    const marker = L.circleMarker([coords.lat, coords.lng], { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
+                    marker.bindPopup(`
+                        <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-black uppercase tracking-widest text-blue-400 mb-1">RTLH</p><h5 class="text-[11px] font-black uppercase leading-tight">${item.pemilik || '-'}</h5></div>
+                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('rtlh/detail/') ?>/${item.id_survei}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-black uppercase tracking-widest rounded-lg transition-all">Detail</a></div>
+                    `);
+                    clusterGroup.addLayer(marker);
+                    markerCount++;
                 }
-            });
-            map.addControl(new LayerToggle({ position: 'topright' }));
-
-            const clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
-            const rtlhData = <?= json_encode($rumah_all ?? []) ?>;
-            rtlhData.forEach(item => {
-                if (item.lokasi_koordinat) {
-                    const coords = parseWKT(item.lokasi_koordinat);
-                    if (coords && !isNaN(coords.lat) && !isNaN(coords.lng)) {
-                        const marker = L.circleMarker([coords.lat, coords.lng], { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
-                        marker.bindPopup(`
-                            <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-black uppercase tracking-widest text-blue-400 mb-1">RTLH</p><h5 class="text-[11px] font-black uppercase leading-tight">${item.pemilik || '-'}</h5></div>
-                            <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('rtlh/detail/') ?>/${item.id_survei}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-black uppercase tracking-widest rounded-lg transition-all">Detail</a></div>
-                        `);
-                        clusterGroup.addLayer(marker);
-                    }
-                }
-            });
-            map.addLayer(clusterGroup);
-            if (rtlhData.length > 0 && clusterGroup.getLayers().length > 0) map.fitBounds(clusterGroup.getBounds().pad(0.1));
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        } catch(err) { console.error('Map Error:', err); }
+            }
+        });
+        
+        console.log("Markers created:", markerCount);
+        map.addLayer(clusterGroup);
+        if (markerCount > 0) {
+            try {
+                map.fitBounds(clusterGroup.getBounds().pad(0.1));
+            } catch(e) {
+                console.warn("Could not fit bounds:", e);
+            }
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function focusMapWKT(wkt) {
@@ -256,86 +272,14 @@
         }
     }
 
-    function confirmDelete(id, name) {
-        customConfirm('Hapus RTLH?', `Hapus data milik ${name}?`, 'danger').then(conf => {
-            if (conf) { const f = document.getElementById('delete-form'); f.action = `<?= base_url('rtlh/delete') ?>/${id}`; f.submit(); }
-        });
-    }
-
-    function submitWithScroll(el) {
-        const mc = document.getElementById('main-content');
-        if (mc) localStorage.setItem('rtlhScrollPos', mc.scrollTop);
-        const form = el.tagName === 'FORM' ? el : el.form;
-        if (form) form.submit();
-    }
-
-    const selectAll = document.getElementById('select-all');
-    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-    const bulkBar = document.getElementById('bulk-action-bar');
-    const selectedCount = document.getElementById('selected-count');
-
-    function updateBulkBar() {
-        const checked = document.querySelectorAll('.row-checkbox:checked');
-        if (checked.length > 0) { bulkBar.classList.remove('-translate-y-full'); selectedCount.innerText = `${checked.length} TERPILIH`; }
-        else { bulkBar.classList.add('-translate-y-full'); }
-    }
-
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            rowCheckboxes.forEach(cb => {
-                cb.checked = this.checked;
-                const row = cb.closest('tr');
-                if (this.checked) row.classList.add('bg-blue-50/50', 'dark:bg-blue-900/10');
-                else row.classList.remove('bg-blue-50/50', 'dark:bg-blue-900/10');
-            });
-            updateBulkBar();
-        });
-    }
-
-    rowCheckboxes.forEach(cb => {
-        cb.addEventListener('change', function() {
-            const row = this.closest('tr');
-            if (this.checked) row.classList.add('bg-blue-50/50', 'dark:bg-blue-900/10');
-            else row.classList.remove('bg-blue-50/50', 'dark:bg-blue-900/10');
-            const allChecked = document.querySelectorAll('.row-checkbox:checked').length === rowCheckboxes.length;
-            if(selectAll) selectAll.checked = allChecked;
-            updateBulkBar();
-        });
-    });
-
-    function clearSelection() {
-        if(selectAll) selectAll.checked = false;
-        rowCheckboxes.forEach(cb => { cb.checked = false; cb.closest('tr').classList.remove('bg-blue-50/50', 'dark:bg-blue-900/10'); });
-        updateBulkBar();
-    }
-
-    async function handleBulkDelete() {
-        const checked = document.querySelectorAll('.row-checkbox:checked');
-        const ids = Array.from(checked).map(cb => cb.value);
-        if (ids.length === 0) return;
-        const ok = await window.customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} data RTLH yang dipilih?`, 'danger');
-        if (ok) {
-            const formData = new FormData();
-            ids.forEach(id => formData.append('ids[]', id));
-            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
-            try {
-                const response = await fetch('<?= base_url('rtlh/bulk-delete') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                const result = await response.json();
-                if (result.status === 'success') { showToast(result.message, 'success'); setTimeout(() => window.location.reload(), 1000); }
-                else { showToast(result.message, 'error'); }
-            } catch (error) { showToast('Terjadi kesalahan sistem.', 'error'); }
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
         const mc = document.getElementById('main-content');
         if (mc) {
             const sp = localStorage.getItem('rtlhScrollPos');
             if (sp) { setTimeout(() => { mc.scrollTop = sp; localStorage.removeItem('rtlhScrollPos'); }, 150); }
         }
+        initMap();
     });
-
-    window.addEventListener('load', initMap);
 </script>
 
 <style>

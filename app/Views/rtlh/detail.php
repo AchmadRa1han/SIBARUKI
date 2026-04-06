@@ -407,7 +407,7 @@
 
     let map;
     function initMap() {
-        const coordsStr = "<?= $rumah['lokasi_koordinat'] ?>";
+        const coordsStr = "<?= $rumah['wkt'] ?? '' ?>";
         if (!coordsStr) {
             document.getElementById('coords-text').innerText = "KOORDINAT TIDAK TERSEDIA";
             return;
@@ -430,7 +430,7 @@
     }
 
     function focusMap() {
-        const coordsStr = "<?= $rumah['lokasi_koordinat'] ?>";
+        const coordsStr = "<?= $rumah['wkt'] ?? '' ?>";
         const match = coordsStr.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
         if (match) map.setView([parseFloat(match[2]), parseFloat(match[1])], 18, { animate: true });
     }

@@ -36,7 +36,7 @@ class Rtlh extends BaseController
         $perPage = $this->request->getGet('per_page') ?? 10;
         $status = $this->request->getGet('status') ?? 'Belum Menerima';
 
-        $query = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat, rtlh_penerima.nama_kepala_keluarga as pemilik')
+        $query = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt, rtlh_penerima.nama_kepala_keluarga as pemilik')
                                   ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left');
 
         if ($status !== 'semua') {
@@ -52,11 +52,25 @@ class Rtlh extends BaseController
 
         $rumah = $query->paginate($perPage, 'default');
 
-        // Data untuk Map (Semua yang punya koordinat)
-        $rumah_all = $this->rumahModel->select('rtlh_rumah.id_survei, rtlh_rumah.desa, ST_AsText(lokasi_koordinat) as lokasi_koordinat, rtlh_penerima.nama_kepala_keluarga as pemilik')
-                                      ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left')
-                                      ->where('lokasi_koordinat IS NOT NULL')
-                                      ->findAll();
+        // Data untuk Map (Semua yang punya koordinat) - Ambil data minimal saja
+        $db = \Config\Database::connect();
+        $rumah_all = $db->table('rtlh_rumah')
+                        ->select('id_survei, desa, ST_AsText(lokasi_koordinat) as wkt, nik_pemilik')
+                        ->where('lokasi_koordinat IS NOT NULL')
+                        ->where('lokasi_koordinat !=', '')
+                        ->limit(500)
+                        ->get()->getResultArray();
+
+        // Ambil nama pemilik secara terpisah untuk popup agar tidak membebani join
+        $niks = array_unique(array_column($rumah_all, 'nik_pemilik'));
+        $pemilikMap = [];
+        if (!empty($niks)) {
+            $penerima = $db->table('rtlh_penerima')->select('nik, nama_kepala_keluarga')->whereIn('nik', $niks)->get()->getResultArray();
+            foreach ($penerima as $p) $pemilikMap[$p['nik']] = $p['nama_kepala_keluarga'];
+        }
+        foreach ($rumah_all as &$r) {
+            $r['pemilik'] = $pemilikMap[$r['nik_pemilik']] ?? 'Pemilik Tidak Terdata';
+        }
 
         $data = [
             'title' => 'Data RTLH',
@@ -434,7 +448,7 @@ class Rtlh extends BaseController
     public function detail($id)
     {
         if (!has_permission('view_rtlh_detail')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
-        $rumah = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')->find($id);
+        $rumah = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
