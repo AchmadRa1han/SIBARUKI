@@ -2714,6 +2714,9 @@ video {
 .file\:font-black::file-selector-button {
   font-weight: 900;
 }
+.file\:font-bold::file-selector-button {
+  font-weight: 700;
+}
 .file\:uppercase::file-selector-button {
   text-transform: uppercase;
 }
