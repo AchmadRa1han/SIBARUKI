@@ -53,34 +53,34 @@
             ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
         ];
         foreach($metrics as $m): ?>
-        <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-500 group block relative overflow-hidden">
+        <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-500 group block relative overflow-hidden">
             <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-inner">
                 <i data-lucide="<?= $m[1] ?>" class="w-5 h-5" stroke-width="2"></i>
             </div>
-            <p class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5"><?= $m[3] ?></p>
-            <h3 class="text-xl font-black text-blue-950 dark:text-white tracking-tighter"><?= number_format($rekap[$m[0]]) ?></h3>
+            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-0.5"><?= $m[3] ?></p>
+            <h3 class="text-xl font-bold text-blue-950 dark:text-white tracking-tighter"><?= number_format($rekap[$m[0]]) ?></h3>
         </a>
         <?php endforeach; ?>
     </div>
 
     <!-- 3. TACTICAL COMMAND MAP -->
-    <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col transition-all duration-500 relative">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col transition-all duration-500 relative">
         <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white dark:bg-slate-900 relative z-10">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
                     <i data-lucide="map" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-black text-blue-950 dark:text-white uppercase tracking-tight">Database Spasial Terpadu</h3>
+                    <h3 class="text-base font-bold text-blue-950 dark:text-white uppercase tracking-tight">Database Spasial Terpadu</h3>
                     <div class="flex items-center gap-2 mt-0.5">
                         <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div>
-                        <span id="activeLayerLabel" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Memuat...</span>
+                        <span id="activeLayerLabel" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Memuat...</span>
                     </div>
                 </div>
             </div>
             <div class="flex flex-wrap gap-1.5">
                 <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'] as $l): ?>
-                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
+                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
                     <i data-lucide="<?= $l=='rtlh'?'home':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map'))))) ?>" class="w-3 h-3"></i> <?= strtoupper($l) ?>
                 </button>
                 <?php endforeach; ?>
@@ -91,32 +91,32 @@
 
     <!-- 4. BOTTOM ANALYTICS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-            <h3 class="text-[9px] font-black text-blue-950 dark:text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+            <h3 class="text-[9px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
                 <span class="w-6 h-[2px] bg-blue-600"></span> Analisis Kelayakan
             </h3>
             <div id="conditionChart" class="flex justify-center"></div>
         </div>
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
             <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
                 <i data-lucide="alert-triangle" class="w-32 h-32 text-rose-600"></i>
             </div>
-            <h3 class="text-[9px] font-black text-rose-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+            <h3 class="text-[9px] font-bold text-rose-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
                 <span class="w-6 h-[2px] bg-rose-600"></span> Prioritas Kawasan Kumuh
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
                 <?php foreach($topKumuh as $k): ?>
                 <a href="<?= base_url('wilayah-kumuh/detail/' . $k['FID']) ?>" class="p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl transition-all duration-500 group shadow-sm">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-base group-hover:scale-110 transition-all duration-500 shadow-lg shadow-rose-600/20"><?= substr($k['Kelurahan'], 0, 1) ?></div>
+                        <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold text-base group-hover:scale-110 transition-all duration-500 shadow-lg shadow-rose-600/20"><?= substr($k['Kelurahan'], 0, 1) ?></div>
                         <div>
-                            <p class="text-xs font-black text-blue-950 dark:text-white uppercase tracking-tight"><?= $k['Kelurahan'] ?></p>
+                            <p class="text-xs font-bold text-blue-950 dark:text-white uppercase tracking-tight"><?= $k['Kelurahan'] ?></p>
                             <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5"><?= $k['Kawasan'] ?: 'Kawasan Kumuh' ?></p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-xl font-black text-rose-600 leading-none italic"><?= number_format($k['skor_kumuh'], 0) ?></p>
-                        <p class="text-[7px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Skor</p>
+                        <p class="text-xl font-bold text-rose-600 leading-none italic"><?= number_format($k['skor_kumuh'], 0) ?></p>
+                        <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Skor</p>
                     </div>
                 </a>
                 <?php endforeach; ?>
