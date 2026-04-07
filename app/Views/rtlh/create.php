@@ -102,21 +102,25 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Pendidikan</label>
-                        <select name="pendidikan_id" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                        <select name="pendidikan_id" onchange="toggleLainnya(this, 'pendidikan_id_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
                             <option value="">Pilih Pendidikan</option>
                             <?php if(isset($master['PENDIDIKAN'])): foreach($master['PENDIDIKAN'] as $p): ?>
                                 <option value="<?= $p['id'] ?>"><?= $p['nama_pilihan'] ?></option>
                             <?php endforeach; endif; ?>
+                            <option value="lainnya">Lainnya...</option>
                         </select>
+                        <input type="text" name="pendidikan_id_manual" id="pendidikan_id_manual" placeholder="Sebutkan pendidikan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 dark:text-slate-200 outline-none transition-all font-bold text-sm animate-in fade-in slide-in-from-top-1">
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Pekerjaan</label>
-                        <select name="pekerjaan_id" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                        <select name="pekerjaan_id" onchange="toggleLainnya(this, 'pekerjaan_id_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
                             <option value="">Pilih Pekerjaan</option>
                             <?php if(isset($master['PEKERJAAN'])): foreach($master['PEKERJAAN'] as $p): ?>
                                 <option value="<?= $p['id'] ?>"><?= $p['nama_pilihan'] ?></option>
                             <?php endforeach; endif; ?>
+                            <option value="lainnya">Lainnya...</option>
                         </select>
+                        <input type="text" name="pekerjaan_id_manual" id="pekerjaan_id_manual" placeholder="Sebutkan pekerjaan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 dark:text-slate-200 outline-none transition-all font-bold text-sm animate-in fade-in slide-in-from-top-1">
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Penghasilan / Bulan</label>
@@ -210,12 +214,14 @@
                         ?>
                         <div>
                             <label class="block text-[8px] font-black text-slate-400 uppercase mb-1.5 tracking-widest ml-1"><?= $label ?></label>
-                            <select name="<?= $key ?>" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none text-[10px] font-bold">
+                            <select name="<?= $key ?>" onchange="toggleLainnya(this, '<?= $key ?>_manual')" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none text-[10px] font-bold">
                                 <option value="">Pilih <?= (str_starts_with($key, 'mat_')) ? 'Material' : 'Kondisi' ?></option>
                                 <?php if(isset($master[$kategori])): foreach($master[$kategori] as $opt) : ?>
                                     <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
                                 <?php endforeach; endif; ?>
+                                <option value="lainnya">Lainnya...</option>
                             </select>
+                            <input type="text" name="<?= $key ?>_manual" id="<?= $key ?>_manual" placeholder="Sebutkan <?= strtolower($label) ?>..." class="hidden w-full mt-1.5 p-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 dark:text-slate-200 outline-none transition-all font-bold text-[10px] animate-in fade-in slide-in-from-top-1">
                         </div>
                         <?php endforeach; ?>
                     </div>
@@ -363,6 +369,18 @@
                 updateMarker(pos.coords.latitude, pos.coords.longitude);
                 map.setZoom(18);
             }, () => alert('Gagal akses lokasi.'));
+        }
+    }
+
+    function toggleLainnya(select, inputId) {
+        const input = document.getElementById(inputId);
+        if (select.value === 'lainnya') {
+            input.classList.remove('hidden');
+            input.focus();
+            input.required = true;
+        } else {
+            input.classList.add('hidden');
+            input.required = false;
         }
     }
 

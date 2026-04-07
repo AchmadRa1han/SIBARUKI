@@ -620,46 +620,98 @@ class Rtlh extends BaseController
     public function store()
     {
         $db = \Config\Database::connect();
-        $db->transStart();
         $post = $this->request->getPost();
-        $nik = $post['nik'];
+        $nik = preg_replace('/[^0-9]/', '', $post['nik'] ?? '');
 
-        $this->penerimaModel->save([
-            'nik' => $nik,
-            'no_kk' => $post['no_kk'] ?? null,
-            'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null,
-        ]);
+        if (empty($nik)) return redirect()->back()->with('error', 'NIK wajib diisi.')->withInput();
+        if ($this->penerimaModel->find($nik)) return redirect()->back()->with('error', 'NIK sudah terdaftar dalam sistem.')->withInput();
 
-        $dataRumah = [
-            'nik_pemilik' => $nik,
-            'desa' => $post['desa'] ?? null,
-            'status_bantuan' => 'Belum Menerima'
-        ];
+        $db->transStart();
+        try {
+            // 1. Simpan Penerima
+            $this->penerimaModel->insert([
+                'nik' => $nik,
+                'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''),
+                'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null,
+                'tempat_lahir' => $post['tempat_lahir'] ?? null,
+                'tanggal_lahir' => $post['tanggal_lahir'] ?: null,
+                'jenis_kelamin' => $post['jenis_kelamin'] ?? 'L',
+                'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'),
+                'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'),
+                'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null,
+                'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? 0,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
-        // LOGIKA UPLOAD FOTO (STORE)
-        $uploadPath = FCPATH . 'uploads/rtlh/';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0777, true);
-        }
+            // 2. Simpan Rumah
+            $dataRumah = [
+                'nik_pemilik' => $nik,
+                'desa' => $post['desa'] ?? null,
+                'desa_id' => $post['desa_id'] ?? null,
+                'alamat_detail' => $post['alamat_detail'] ?? null,
+                'jenis_kawasan' => $post['jenis_kawasan'] ?? null,
+                'luas_rumah_m2' => $post['luas_rumah_m2'] ?? 0,
+                'luas_lahan_m2' => $post['luas_lahan_m2'] ?? 0,
+                'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? 0,
+                'kepemilikan_rumah' => $post['kepemilikan_rumah'] ?? null,
+                'sumber_penerangan' => $post['sumber_penerangan'] ?? null,
+                'sumber_air_minum' => $post['sumber_air_minum'] ?? null,
+                'jenis_jamban_kloset' => $post['jenis_jamban_kloset'] ?? null,
+                'status_bantuan' => 'Belum Menerima',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
 
-        foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
-            $img = $this->request->getFile($field);
-            if ($img && $img->isValid() && !$img->hasMoved()) {
-                $newName = $img->getRandomName();
-                $img->move($uploadPath, $newName);
-                $dataRumah[$field] = $newName;
+            // Handle Upload Foto
+            $uploadPath = FCPATH . 'uploads/rtlh/';
+            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+            foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
+                $img = $this->request->getFile($field);
+                if ($img && $img->isValid() && !$img->hasMoved()) {
+                    $newName = $img->getRandomName();
+                    $img->move($uploadPath, $newName);
+                    $dataRumah[$field] = $newName;
+                }
             }
+
+            $this->rumahModel->set($dataRumah);
+            if (!empty($post['lokasi_koordinat'])) {
+                $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
+            }
+            $this->rumahModel->insert();
+            $surveiId = $this->rumahModel->getInsertID();
+
+            // 3. Simpan Kondisi Fisik
+            $this->kondisiModel->insert([
+                'id_survei' => $surveiId,
+                'st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI'),
+                'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI'),
+                'st_balok' => $this->resolveMasterId('st_balok', $post, 'KONDISI'),
+                'st_sloof' => $this->resolveMasterId('st_sloof', $post, 'KONDISI'),
+                'st_rangka_atap' => $this->resolveMasterId('st_rangka_atap', $post, 'KONDISI'),
+                'st_plafon' => $this->resolveMasterId('st_plafon', $post, 'KONDISI'),
+                'st_jendela' => $this->resolveMasterId('st_jendela', $post, 'KONDISI'),
+                'st_ventilasi' => $this->resolveMasterId('st_ventilasi', $post, 'KONDISI'),
+                'mat_atap' => $this->resolveMasterId('mat_atap', $post, 'MATERIAL_ATAP'),
+                'st_atap' => $this->resolveMasterId('st_atap', $post, 'KONDISI'),
+                'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING'),
+                'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI'),
+                'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI'),
+                'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI'),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $db->transComplete();
+            $this->logActivity('Tambah', 'RTLH', "Menambah data RTLH baru NIK: $nik");
+            return redirect()->to('/rtlh')->with('success', 'Data RTLH berhasil ditambahkan.');
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage())->withInput();
         }
-
-        $this->rumahModel->set($dataRumah);
-        if (!empty($post['lokasi_koordinat'])) $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
-        $this->rumahModel->insert();
-        $surveiId = $this->rumahModel->getInsertID();
-
-        $this->kondisiModel->insert(['id_survei' => $surveiId]);
-        $db->transComplete();
-        $this->logActivity('Tambah', 'RTLH', "Menambah data RTLH NIK: $nik beserta foto dokumentasi");
-        return redirect()->to('/rtlh')->with('success', 'Data RTLH berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -698,8 +750,8 @@ class Rtlh extends BaseController
             'tanggal_lahir' => $post['tanggal_lahir'] ?? null,
             'jenis_kelamin' => $post['jenis_kelamin'] ?? null,
             'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null,
-            'pendidikan_id' => $post['pendidikan_id'] ?: null,
-            'pekerjaan_id' => $post['pekerjaan_id'] ?: null,
+            'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'),
+            'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'),
             'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null,
             'updated_at' => date('Y-m-d H:i:s')
         ];
@@ -757,20 +809,20 @@ class Rtlh extends BaseController
 
         // 3. Update Kondisi Fisik
         $dataKondisi = [
-            'st_pondasi' => ($post['st_pondasi'] ?? null) ?: null,
-            'st_kolom' => ($post['st_kolom'] ?? null) ?: null,
-            'st_balok' => ($post['st_balok'] ?? null) ?: null,
-            'st_sloof' => ($post['st_sloof'] ?? null) ?: null,
-            'st_rangka_atap' => ($post['st_rangka_atap'] ?? null) ?: null,
-            'st_plafon' => ($post['st_plafon'] ?? null) ?: null,
-            'st_jendela' => ($post['st_jendela'] ?? null) ?: null,
-            'st_ventilasi' => ($post['st_ventilasi'] ?? null) ?: null,
-            'mat_atap' => ($post['mat_atap'] ?? null) ?: null,
-            'st_atap' => ($post['st_atap'] ?? null) ?: null,
-            'mat_dinding' => ($post['mat_dinding'] ?? null) ?: null,
-            'st_dinding' => ($post['st_dinding'] ?? null) ?: null,
-            'mat_lantai' => ($post['mat_lantai'] ?? null) ?: null,
-            'st_lantai' => ($post['st_lantai'] ?? null) ?: null,
+            'st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI'),
+            'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI'),
+            'st_balok' => $this->resolveMasterId('st_balok', $post, 'KONDISI'),
+            'st_sloof' => $this->resolveMasterId('st_sloof', $post, 'KONDISI'),
+            'st_rangka_atap' => $this->resolveMasterId('st_rangka_atap', $post, 'KONDISI'),
+            'st_plafon' => $this->resolveMasterId('st_plafon', $post, 'KONDISI'),
+            'st_jendela' => $this->resolveMasterId('st_jendela', $post, 'KONDISI'),
+            'st_ventilasi' => $this->resolveMasterId('st_ventilasi', $post, 'KONDISI'),
+            'mat_atap' => $this->resolveMasterId('mat_atap', $post, 'MATERIAL_ATAP'),
+            'st_atap' => $this->resolveMasterId('st_atap', $post, 'KONDISI'),
+            'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING'),
+            'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI'),
+            'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI'),
+            'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI'),
             'updated_at' => date('Y-m-d H:i:s')
         ];
         
@@ -813,32 +865,24 @@ class Rtlh extends BaseController
         return redirect()->to('/rtlh')->with('success', 'Data berhasil dipindahkan ke Recycle Bin.');
     }
 
-    public function bulkDelete()
+    private function resolveMasterId($field, $post, $kategori)
     {
-        $ids = $this->request->getPost('ids');
-        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Pilih data dulu.']);
-        $db = \Config\Database::connect();
-        $db->transStart();
-        try {
-            foreach ($ids as $id) {
-                $rumah = $this->rumahModel->find($id);
-                if ($rumah) {
-                    $db->table('trash_data')->insert([
-                        'entity_type' => 'RTLH',
-                        'entity_id'   => $id,
-                        'data_json'   => json_encode(['rumah' => $rumah]),
-                        'deleted_by'  => session()->get('username'),
-                        'created_at'  => date('Y-m-d H:i:s')
-                    ]);
-                }
-                $db->table('rtlh_kondisi_rumah')->where('id_survei', $id)->delete();
-                $this->rumahModel->delete($id);
+        $val = $post[$field] ?? null;
+        if ($val === 'lainnya') {
+            $manualText = trim($post[$field . '_manual'] ?? '');
+            if (!empty($manualText)) {
+                $existing = $this->refModel->where('kategori', $kategori)
+                                          ->where('nama_pilihan', $manualText)
+                                          ->first();
+                if ($existing) return $existing['id'];
+                
+                $this->refModel->insert([
+                    'kategori' => $kategori,
+                    'nama_pilihan' => $manualText
+                ]);
+                return $this->refModel->getInsertID();
             }
-            $db->transComplete();
-            return $this->response->setJSON(['status' => 'success', 'message' => 'Data dipindahkan ke Recycle Bin.']);
-        } catch (\Exception $e) {
-            $db->transRollback();
-            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
         }
+        return $val ?: null;
     }
 }

@@ -251,20 +251,28 @@
                     </div>
                 </div>
                 <div class="p-6 space-y-6">
-                    <!-- Struktur Utama -->
+                    <!-- Struktur & Komponen Lainnya -->
                     <div>
                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <span class="w-4 h-[2px] bg-blue-600"></span> Struktur
+                            <span class="w-4 h-[2px] bg-blue-600"></span> Struktur & Komponen
                         </p>
-                        <div class="space-y-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-2">
                             <?php 
-                                $struk = ['Pondasi', 'Kolom', 'Balok', 'Sloof'];
-                                foreach($struk as $s):
-                                    $field = 'st_' . strtolower($s);
+                                $struk = [
+                                    'st_pondasi' => 'Pondasi', 
+                                    'st_kolom' => 'Kolom', 
+                                    'st_balok' => 'Balok', 
+                                    'st_sloof' => 'Sloof',
+                                    'st_rangka_atap' => 'Rangka Atap',
+                                    'st_plafon' => 'Plafon',
+                                    'st_jendela' => 'Jendela',
+                                    'st_ventilasi' => 'Ventilasi'
+                                ];
+                                foreach($struk as $field => $label):
                                     $val = $ref[$kondisi[$field] ?? ''] ?? 'N/A';
                             ?>
                             <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
-                                <span class="text-xs font-black text-slate-500 uppercase tracking-tighter"><?= $s ?></span>
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-tighter"><?= $label ?></span>
                                 <span class="px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase border <?= getStatusBadge($val) ?>"><?= $val ?></span>
                             </div>
                             <?php endforeach; ?>
