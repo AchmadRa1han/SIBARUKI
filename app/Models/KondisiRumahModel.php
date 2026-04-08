@@ -14,6 +14,6 @@ class KondisiRumahModel extends Model
         'id_survei', 'st_pondasi', 'st_kolom', 'st_balok', 'st_sloof', 
         'st_rangka_atap', 'st_plafon', 'st_jendela', 'st_ventilasi', 
         'mat_lantai', 'st_lantai', 'mat_dinding', 'st_dinding', 
-        'mat_atap', 'st_atap'
+        'mat_atap', 'st_atap', 'created_at', 'updated_at'
     ];
 }

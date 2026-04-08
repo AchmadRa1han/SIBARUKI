@@ -14,7 +14,8 @@ class RtlhPenerimaModel extends Model
     protected $allowedFields    = [
         'nik', 'no_kk', 'nama_kepala_keluarga', 'tempat_lahir', 
         'tanggal_lahir', 'jenis_kelamin', 'pendidikan_id', 
-        'pekerjaan_id', 'penghasilan_per_bulan', 'jumlah_anggota_keluarga'
+        'pekerjaan_id', 'penghasilan_per_bulan', 'jumlah_anggota_keluarga',
+        'created_at', 'updated_at'
     ];
 
     // Validasi dikosongkan agar dihandle secara manual di Controller

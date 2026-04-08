@@ -738,6 +738,9 @@ class Rtlh extends BaseController
         $post = $this->request->getPost();
         $nik = $rumahLama['nik_pemilik'];
 
+        $penerima = $this->penerimaModel->where('nik', $nik)->first();
+        $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
+
         try {
             $db->transException(true)->transStart();
 
@@ -749,8 +752,8 @@ class Rtlh extends BaseController
                 'tanggal_lahir' => $post['tanggal_lahir'] ?? null,
                 'jenis_kelamin' => $post['jenis_kelamin'] ?? null,
                 'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null,
-                'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'),
-                'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'),
+                'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN', $penerima['pendidikan_id'] ?? null),
+                'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN', $penerima['pekerjaan_id'] ?? null),
                 'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null
             ];
             $this->penerimaModel->update($nik, $dataPenerima);
@@ -803,20 +806,20 @@ class Rtlh extends BaseController
 
             // 3. Update Kondisi Fisik
             $dataKondisi = [
-                'st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI'),
-                'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI'),
-                'st_balok' => $this->resolveMasterId('st_balok', $post, 'KONDISI'),
-                'st_sloof' => $this->resolveMasterId('st_sloof', $post, 'KONDISI'),
-                'st_rangka_atap' => $this->resolveMasterId('st_rangka_atap', $post, 'KONDISI'),
-                'st_plafon' => $this->resolveMasterId('st_plafon', $post, 'KONDISI'),
-                'st_jendela' => $this->resolveMasterId('st_jendela', $post, 'KONDISI'),
-                'st_ventilasi' => $this->resolveMasterId('st_ventilasi', $post, 'KONDISI'),
-                'mat_atap' => $this->resolveMasterId('mat_atap', $post, 'MATERIAL_ATAP'),
-                'st_atap' => $this->resolveMasterId('st_atap', $post, 'KONDISI'),
-                'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING'),
-                'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI'),
-                'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI'),
-                'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI')
+                'st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI', $kondisi['st_pondasi'] ?? null),
+                'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI', $kondisi['st_kolom'] ?? null),
+                'st_balok' => $this->resolveMasterId('st_balok', $post, 'KONDISI', $kondisi['st_balok'] ?? null),
+                'st_sloof' => $this->resolveMasterId('st_sloof', $post, 'KONDISI', $kondisi['st_sloof'] ?? null),
+                'st_rangka_atap' => $this->resolveMasterId('st_rangka_atap', $post, 'KONDISI', $kondisi['st_rangka_atap'] ?? null),
+                'st_plafon' => $this->resolveMasterId('st_plafon', $post, 'KONDISI', $kondisi['st_plafon'] ?? null),
+                'st_jendela' => $this->resolveMasterId('st_jendela', $post, 'KONDISI', $kondisi['st_jendela'] ?? null),
+                'st_ventilasi' => $this->resolveMasterId('st_ventilasi', $post, 'KONDISI', $kondisi['st_ventilasi'] ?? null),
+                'mat_atap' => $this->resolveMasterId('mat_atap', $post, 'MATERIAL_ATAP', $kondisi['mat_atap'] ?? null),
+                'st_atap' => $this->resolveMasterId('st_atap', $post, 'KONDISI', $kondisi['st_atap'] ?? null),
+                'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING', $kondisi['mat_dinding'] ?? null),
+                'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI', $kondisi['st_dinding'] ?? null),
+                'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI', $kondisi['mat_lantai'] ?? null),
+                'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI', $kondisi['st_lantai'] ?? null)
             ];
             
             $existingKondisi = $this->kondisiModel->where('id_survei', $id)->first();
@@ -858,7 +861,7 @@ class Rtlh extends BaseController
         return redirect()->to('/rtlh')->with('success', 'Data berhasil dipindahkan ke Recycle Bin.');
     }
 
-    private function resolveMasterId($field, $post, $kategori)
+    private function resolveMasterId($field, $post, $kategori, $previousValue = null)
     {
         $val = $post[$field] ?? null;
         if ($val === 'lainnya') {
@@ -875,7 +878,8 @@ class Rtlh extends BaseController
                 ]);
                 return $this->refModel->getInsertID();
             }
+            return $previousValue; // Balik ke nilai lama jika manual kosong
         }
-        return $val ?: null;
+        return $val ?: $previousValue;
     }
 }
