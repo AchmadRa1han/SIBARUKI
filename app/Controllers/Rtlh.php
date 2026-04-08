@@ -752,8 +752,7 @@ class Rtlh extends BaseController
             'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null,
             'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'),
             'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'),
-            'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null,
-            'updated_at' => date('Y-m-d H:i:s')
+            'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null
         ];
         $this->penerimaModel->update($nik, $dataPenerima);
 
@@ -778,8 +777,7 @@ class Rtlh extends BaseController
             'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null,
             'bantuan_perumahan' => $post['bantuan_perumahan'] ?? null,
             'status_backlog' => $post['status_backlog'] ?? null,
-            'desil_nasional' => $post['desil_nasional'] ?? null,
-            'updated_at' => date('Y-m-d H:i:s')
+            'desil_nasional' => $post['desil_nasional'] ?? null
         ];
         
         if (!empty($post['lokasi_koordinat'])) {
@@ -822,8 +820,7 @@ class Rtlh extends BaseController
             'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING'),
             'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI'),
             'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI'),
-            'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI')
         ];
         
         $existingKondisi = $this->kondisiModel->where('id_survei', $id)->first();
