@@ -639,9 +639,7 @@ class Rtlh extends BaseController
                 'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'),
                 'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'),
                 'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null,
-                'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? 0,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? 0
             ]);
 
             // 2. Simpan Rumah
@@ -828,7 +826,6 @@ class Rtlh extends BaseController
             $this->kondisiModel->update($id, $dataKondisi);
         } else {
             $dataKondisi['id_survei'] = $id;
-            $dataKondisi['created_at'] = date('Y-m-d H:i:s');
             $this->kondisiModel->insert($dataKondisi);
         }
 
