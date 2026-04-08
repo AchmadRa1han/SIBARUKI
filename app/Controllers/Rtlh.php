@@ -738,105 +738,104 @@ class Rtlh extends BaseController
         $post = $this->request->getPost();
         $nik = $rumahLama['nik_pemilik'];
 
-        $db->transStart();
+        try {
+            $db->transException(true)->transStart();
 
-        // 1. Update Penerima
-        $dataPenerima = [
-            'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null,
-            'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''),
-            'tempat_lahir' => $post['tempat_lahir'] ?? null,
-            'tanggal_lahir' => $post['tanggal_lahir'] ?? null,
-            'jenis_kelamin' => $post['jenis_kelamin'] ?? null,
-            'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null,
-            'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'),
-            'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'),
-            'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null
-        ];
-        $this->penerimaModel->update($nik, $dataPenerima);
+            // 1. Update Penerima
+            $dataPenerima = [
+                'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null,
+                'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''),
+                'tempat_lahir' => $post['tempat_lahir'] ?? null,
+                'tanggal_lahir' => $post['tanggal_lahir'] ?? null,
+                'jenis_kelamin' => $post['jenis_kelamin'] ?? null,
+                'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null,
+                'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'),
+                'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'),
+                'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null
+            ];
+            $this->penerimaModel->update($nik, $dataPenerima);
 
-        // 2. Update Rumah
-        $dataRumah = [
-            'alamat_detail' => $post['alamat_detail'] ?? null,
-            'desa' => $post['desa'] ?? null,
-            'jenis_kawasan' => $post['jenis_kawasan'] ?? null,
-            'luas_rumah_m2' => $post['luas_rumah_m2'] ?? null,
-            'luas_lahan_m2' => $post['luas_lahan_m2'] ?? null,
-            'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? null,
-            'fungsi_ruang' => $post['fungsi_ruang'] ?? null,
-            'kepemilikan_rumah' => $post['kepemilikan_rumah'] ?? null,
-            'kepemilikan_tanah' => $post['kepemilikan_tanah'] ?? null,
-            'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? null,
-            'sumber_penerangan' => $post['sumber_penerangan'] ?? null,
-            'sumber_penerangan_detail' => $post['sumber_penerangan_detail'] ?? null,
-            'sumber_air_minum' => $post['sumber_air_minum'] ?? null,
-            'jarak_sam_ke_tpa_tinja' => $post['jarak_sam_ke_tpa_tinja'] ?? null,
-            'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? null,
-            'jenis_jamban_kloset' => $post['jenis_jamban_kloset'] ?? null,
-            'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null,
-            'bantuan_perumahan' => $post['bantuan_perumahan'] ?? null,
-            'status_backlog' => $post['status_backlog'] ?? null,
-            'desil_nasional' => $post['desil_nasional'] ?? null
-        ];
-        
-        if (!empty($post['lokasi_koordinat'])) {
-            $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
-        }
-
-        // LOGIKA UPLOAD FOTO (UPDATE)
-        $uploadPath = FCPATH . 'uploads/rtlh/';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0777, true);
-        }
-
-        foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
-            $img = $this->request->getFile($field);
-            if ($img && $img->isValid() && !$img->hasMoved()) {
-                // Hapus foto lama jika ada
-                if (!empty($rumahLama[$field]) && file_exists($uploadPath . $rumahLama[$field])) {
-                    unlink($uploadPath . $rumahLama[$field]);
-                }
-                $newName = $img->getRandomName();
-                $img->move($uploadPath, $newName);
-                $dataRumah[$field] = $newName;
+            // 2. Update Rumah
+            $dataRumah = [
+                'alamat_detail' => $post['alamat_detail'] ?? null,
+                'desa' => $post['desa'] ?? null,
+                'jenis_kawasan' => $post['jenis_kawasan'] ?? null,
+                'luas_rumah_m2' => $post['luas_rumah_m2'] ?? null,
+                'luas_lahan_m2' => $post['luas_lahan_m2'] ?? null,
+                'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? null,
+                'fungsi_ruang' => $post['fungsi_ruang'] ?? null,
+                'kepemilikan_rumah' => $post['kepemilikan_rumah'] ?? null,
+                'kepemilikan_tanah' => $post['kepemilikan_tanah'] ?? null,
+                'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? null,
+                'sumber_penerangan' => $post['sumber_penerangan'] ?? null,
+                'sumber_penerangan_detail' => $post['sumber_penerangan_detail'] ?? null,
+                'sumber_air_minum' => $post['sumber_air_minum'] ?? null,
+                'jarak_sam_ke_tpa_tinja' => $post['jarak_sam_ke_tpa_tinja'] ?? null,
+                'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? null,
+                'jenis_jamban_kloset' => $post['jenis_jamban_kloset'] ?? null,
+                'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null,
+                'bantuan_perumahan' => $post['bantuan_perumahan'] ?? null,
+                'status_backlog' => $post['status_backlog'] ?? null,
+                'desil_nasional' => $post['desil_nasional'] ?? null
+            ];
+            
+            if (!empty($post['lokasi_koordinat'])) {
+                $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
             }
+
+            // LOGIKA UPLOAD FOTO (UPDATE)
+            $uploadPath = FCPATH . 'uploads/rtlh/';
+            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+            foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
+                $img = $this->request->getFile($field);
+                if ($img && $img->isValid() && !$img->hasMoved()) {
+                    if (!empty($rumahLama[$field]) && file_exists($uploadPath . $rumahLama[$field])) {
+                        @unlink($uploadPath . $rumahLama[$field]);
+                    }
+                    $newName = $img->getRandomName();
+                    $img->move($uploadPath, $newName);
+                    $dataRumah[$field] = $newName;
+                }
+            }
+
+            $this->rumahModel->update($id, $dataRumah);
+
+            // 3. Update Kondisi Fisik
+            $dataKondisi = [
+                'st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI'),
+                'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI'),
+                'st_balok' => $this->resolveMasterId('st_balok', $post, 'KONDISI'),
+                'st_sloof' => $this->resolveMasterId('st_sloof', $post, 'KONDISI'),
+                'st_rangka_atap' => $this->resolveMasterId('st_rangka_atap', $post, 'KONDISI'),
+                'st_plafon' => $this->resolveMasterId('st_plafon', $post, 'KONDISI'),
+                'st_jendela' => $this->resolveMasterId('st_jendela', $post, 'KONDISI'),
+                'st_ventilasi' => $this->resolveMasterId('st_ventilasi', $post, 'KONDISI'),
+                'mat_atap' => $this->resolveMasterId('mat_atap', $post, 'MATERIAL_ATAP'),
+                'st_atap' => $this->resolveMasterId('st_atap', $post, 'KONDISI'),
+                'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING'),
+                'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI'),
+                'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI'),
+                'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI')
+            ];
+            
+            $existingKondisi = $this->kondisiModel->where('id_survei', $id)->first();
+            if ($existingKondisi) {
+                $this->kondisiModel->update($id, $dataKondisi);
+            } else {
+                $dataKondisi['id_survei'] = $id;
+                $this->kondisiModel->insert($dataKondisi);
+            }
+
+            $db->transComplete();
+            
+            $this->logActivity('Ubah', 'RTLH', "Memperbarui data RTLH ID: $id");
+            return redirect()->to('/rtlh/detail/' . $id)->with('success', 'Data RTLH berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return redirect()->back()->with('error', 'Gagal Simpan: ' . $e->getMessage())->withInput();
         }
-
-        $this->rumahModel->update($id, $dataRumah);
-
-        // 3. Update Kondisi Fisik
-        $dataKondisi = [
-            'st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI'),
-            'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI'),
-            'st_balok' => $this->resolveMasterId('st_balok', $post, 'KONDISI'),
-            'st_sloof' => $this->resolveMasterId('st_sloof', $post, 'KONDISI'),
-            'st_rangka_atap' => $this->resolveMasterId('st_rangka_atap', $post, 'KONDISI'),
-            'st_plafon' => $this->resolveMasterId('st_plafon', $post, 'KONDISI'),
-            'st_jendela' => $this->resolveMasterId('st_jendela', $post, 'KONDISI'),
-            'st_ventilasi' => $this->resolveMasterId('st_ventilasi', $post, 'KONDISI'),
-            'mat_atap' => $this->resolveMasterId('mat_atap', $post, 'MATERIAL_ATAP'),
-            'st_atap' => $this->resolveMasterId('st_atap', $post, 'KONDISI'),
-            'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING'),
-            'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI'),
-            'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI'),
-            'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI')
-        ];
-        
-        $existingKondisi = $this->kondisiModel->where('id_survei', $id)->first();
-        if ($existingKondisi) {
-            $this->kondisiModel->update($id, $dataKondisi);
-        } else {
-            $dataKondisi['id_survei'] = $id;
-            $this->kondisiModel->insert($dataKondisi);
-        }
-
-        $db->transComplete();
-
-        if ($db->transStatus() === false) {
-            return redirect()->back()->with('error', 'Gagal memperbarui data.');
-        }
-
-        $this->logActivity('Ubah', 'RTLH', "Memperbarui data RTLH Lengkap ID: $id");
-        return redirect()->to('/rtlh/detail/' . $id)->with('success', 'Data RTLH berhasil diperbarui.');
     }
 
     public function delete($id)
