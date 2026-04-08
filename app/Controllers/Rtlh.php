@@ -675,7 +675,7 @@ class Rtlh extends BaseController
             }
 
             $this->rumahModel->set($dataRumah);
-            if (!empty($post['lokasi_koordinat'])) {
+            if (!empty($post['lokasi_koordinat']) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $post['lokasi_koordinat'])) {
                 $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
             }
             $this->rumahModel->insert();
@@ -782,7 +782,7 @@ class Rtlh extends BaseController
                 'desil_nasional' => $post['desil_nasional'] ?? null
             ];
             
-            if (!empty($post['lokasi_koordinat'])) {
+            if (!empty($post['lokasi_koordinat']) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $post['lokasi_koordinat'])) {
                 $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
             }
 
