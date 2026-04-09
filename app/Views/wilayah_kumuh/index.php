@@ -21,9 +21,14 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all duration-300">
         <div class="absolute top-0 right-0 w-48 h-48 bg-rose-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
-        <div class="relative z-10">
-            <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Wilayah Kumuh</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium text-xs mt-1">Monitoring dan pemetaan kawasan permukiman kumuh Kabupaten Sinjai.</p>
+        <div class="relative z-10 flex items-center gap-4">
+            <a href="<?= base_url('dashboard') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Wilayah Kumuh</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-medium text-xs mt-1">Monitoring dan pemetaan kawasan permukiman kumuh Kabupaten Sinjai.</p>
+            </div>
         </div>
         <div class="flex flex-wrap items-center gap-2 relative z-10">
             <div id="debug-status" class="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100 dark:border-rose-800/50 shadow-sm">

@@ -19,15 +19,20 @@
     <!-- Header Action -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-48 h-48 bg-indigo-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
-        <div class="relative z-10 flex items-center gap-5">
-            <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
-                <i data-lucide="navigation" class="w-7 h-7"></i>
-            </div>
-            <div>
-                <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter"><?= $jalan['nama_jalan'] ?: 'RUAS TANPA NAMA' ?></h1>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">ID Referensi:</span>
-                    <span class="px-2 py-0.5 bg-blue-950 dark:bg-blue-800 text-white rounded-lg font-mono text-[10px] font-bold shadow-lg">#<?= str_pad($jalan['id_csv'] ?? $jalan['id'], 4, '0', STR_PAD_LEFT) ?></span>
+        <div class="relative z-10 flex items-center gap-4">
+            <a href="<?= base_url('psu') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
+                    <i data-lucide="navigation" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter"><?= $jalan['nama_jalan'] ?: 'RUAS TANPA NAMA' ?></h1>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">ID Referensi:</span>
+                        <span class="px-2 py-0.5 bg-blue-950 dark:bg-blue-800 text-white rounded-lg font-mono text-[10px] font-bold shadow-lg">#<?= str_pad($jalan['id_csv'] ?? $jalan['id'], 4, '0', STR_PAD_LEFT) ?></span>
+                    </div>
                 </div>
             </div>
         </div>

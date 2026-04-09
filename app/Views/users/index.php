@@ -13,9 +13,14 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-        <div class="relative z-10">
-            <h1 class="text-3xl md:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Otoritas Pengguna</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm mt-1">Kelola hak akses dan penugasan wilayah administratif petugas.</p>
+        <div class="relative z-10 flex items-center gap-4">
+            <a href="<?= base_url('dashboard') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Otoritas Pengguna</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-medium text-sm mt-1">Kelola hak akses dan penugasan wilayah administratif petugas.</p>
+            </div>
         </div>
         <div class="flex items-center gap-3 relative z-10">
             <?php if (has_permission('manage_users')): ?>

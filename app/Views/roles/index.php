@@ -3,9 +3,14 @@
 <?= $this->section('content') ?>
 <div class="p-6">
     <div class="flex justify-between items-center mb-8">
-        <div>
-            <h1 class="text-3xl font-black text-blue-950 uppercase tracking-tight">Manajemen Role</h1>
-            <p class="text-slate-500 text-sm mt-1">Kelola hak akses dan cakupan data pengguna sistem.</p>
+        <div class="relative z-10 flex items-center gap-4">
+            <a href="<?= base_url('dashboard') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div>
+                <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Manajemen Role</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Kelola hak akses dan cakupan data pengguna sistem.</p>
+            </div>
         </div>
         <a href="<?= base_url('roles/create') ?>" class="bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-900/20 active:scale-95">
             <i data-lucide="plus-circle" class="w-5 h-5"></i>

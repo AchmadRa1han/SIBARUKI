@@ -17,9 +17,14 @@
     </div>
 
     <div class="p-8 border-b dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/50">
-        <div>
-            <h1 class="text-2xl font-black text-blue-950 dark:text-white tracking-tight uppercase tracking-wider">Referensi Master</h1>
-            <p class="text-sm text-slate-400 dark:text-slate-500 font-medium">Kelola daftar kategori dan pilihan referensi sistem</p>
+        <div class="flex items-center gap-4">
+            <a href="<?= base_url('settings') ?>" class="p-3 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm border border-slate-100 dark:border-slate-800" title="Kembali ke Pengaturan">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-black text-blue-950 dark:text-white tracking-tight uppercase tracking-wider">Referensi Master</h1>
+                <p class="text-sm text-slate-400 dark:text-slate-500 font-medium">Kelola daftar kategori dan pilihan referensi sistem</p>
+            </div>
         </div>
         <a href="<?= base_url('ref-master/create') ?>" class="bg-blue-900 dark:bg-blue-700 hover:bg-blue-950 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-2xl transition-all flex items-center space-x-2 text-sm font-bold shadow-xl shadow-blue-900/20">
             <i data-lucide="plus-circle" class="w-5 h-5"></i>

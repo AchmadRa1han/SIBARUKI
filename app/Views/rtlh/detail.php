@@ -40,24 +40,29 @@
         <div class="absolute top-0 right-0 w-48 h-48 bg-blue-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
         
         <div class="flex flex-col md:flex-row md:items-center gap-6 relative z-10">
-            <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
-                <i data-lucide="user" class="w-8 h-8" stroke-width="2"></i>
-            </div>
-            <div>
-                <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <span class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-blue-100 dark:border-blue-900/50">
-                        SRV-<?= str_pad($rumah['id_survei'] ?? '0', 5, '0', STR_PAD_LEFT) ?>
-                    </span>
-                    <?php if (($rumah['status_bantuan'] ?? 'Belum Menerima') == 'Belum Menerima') : ?>
-                        <span class="px-3 py-1 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-rose-100 dark:border-rose-900/50">TARGET (RTLH)</span>
-                    <?php else: ?>
-                        <span class="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-emerald-100 dark:border-emerald-900/50">TUNTAS (RLH) - <?= $rumah['tahun_bansos'] ?></span>
-                    <?php endif; ?>
+            <a href="<?= base_url('rtlh') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div class="flex flex-col md:flex-row md:items-center gap-6">
+                <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                    <i data-lucide="user" class="w-8 h-8" stroke-width="2"></i>
                 </div>
-                <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white tracking-tighter uppercase mb-1"><?= $penerima['nama_kepala_keluarga'] ?? '-' ?></h1>
-                <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                    <i data-lucide="hash" class="w-3.5 h-3.5"></i> NIK: <?= $penerima['nik'] ?? '-' ?>
-                </p>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-blue-100 dark:border-blue-900/50">
+                            SRV-<?= str_pad($rumah['id_survei'] ?? '0', 5, '0', STR_PAD_LEFT) ?>
+                        </span>
+                        <?php if (($rumah['status_bantuan'] ?? 'Belum Menerima') == 'Belum Menerima') : ?>
+                            <span class="px-3 py-1 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-rose-100 dark:border-rose-900/50">TARGET (RTLH)</span>
+                        <?php else: ?>
+                            <span class="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-emerald-100 dark:border-emerald-900/50">TUNTAS (RLH) - <?= $rumah['tahun_bansos'] ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white tracking-tighter uppercase mb-1"><?= $penerima['nama_kepala_keluarga'] ?? '-' ?></h1>
+                    <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                        <i data-lucide="hash" class="w-3.5 h-3.5"></i> NIK: <?= $penerima['nik'] ?? '-' ?>
+                    </p>
+                </div>
             </div>
         </div>
 

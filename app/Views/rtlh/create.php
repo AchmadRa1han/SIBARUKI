@@ -15,9 +15,14 @@
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-48 h-48 bg-blue-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
-        <div class="relative z-10">
-            <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Input RTLH Terpadu</h1>
-            <p class="text-xs text-slate-400 dark:text-slate-500 font-medium mt-1">Lengkapi instrumen survei teknis atau gunakan fitur impor massal.</p>
+        <div class="relative z-10 flex items-center gap-4">
+            <a href="<?= base_url('rtlh') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Input RTLH Terpadu</h1>
+                <p class="text-xs text-slate-400 dark:text-slate-500 font-medium mt-1">Lengkapi instrumen survei teknis atau gunakan fitur impor massal.</p>
+            </div>
         </div>
         <div class="flex items-center gap-3 relative z-10">
             <a href="<?= base_url('rtlh') ?>" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95">Batal</a>

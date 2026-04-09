@@ -4,9 +4,14 @@
 <div class="space-y-10 pb-24">
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <h1 class="text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Pengaturan Sistem</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium mt-1">Pusat kendali konfigurasi, manajemen akses, dan pemeliharaan data.</p>
+        <div class="flex items-center gap-4">
+            <a href="<?= base_url('dashboard') ?>" class="p-3 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm border border-slate-100 dark:border-slate-800" title="Kembali ke Dashboard">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-blue-950 dark:text-white uppercase tracking-tight">Pengaturan Sistem</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-medium mt-1">Pusat kendali konfigurasi, manajemen akses, dan pemeliharaan data.</p>
+            </div>
         </div>
         <div class="flex items-center space-x-3 bg-blue-50 dark:bg-blue-900/20 px-6 py-3 rounded-2xl border border-blue-100 dark:border-blue-800">
             <i data-lucide="shield-check" class="w-5 h-5 text-blue-600"></i>

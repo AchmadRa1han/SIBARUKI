@@ -15,13 +15,18 @@
     <!-- Header Action -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-48 h-48 bg-amber-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
-        <div class="relative z-10 flex items-center gap-5">
-            <div class="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-amber-500/20">
-                <i data-lucide="edit-3" class="w-7 h-7"></i>
-            </div>
-            <div>
-                <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Edit Wilayah Kumuh</h1>
-                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Perbarui Parameter Kawasan <?= $kumuh['Kelurahan'] ?></p>
+        <div class="relative z-10 flex items-center gap-4">
+            <a href="<?= base_url('wilayah-kumuh') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-amber-500/20">
+                    <i data-lucide="edit-3" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Edit Wilayah Kumuh</h1>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Perbarui Parameter Kawasan <?= $kumuh['Kelurahan'] ?></p>
+                </div>
             </div>
         </div>
         <div class="flex items-center gap-3 relative z-10">
