@@ -164,6 +164,7 @@ class ComposerStaticInit657ac079313fab046eb8c29fe1d6992b
         'App\\Models\\RtlhHistoryModel' => __DIR__ . '/../..' . '/app/Models/RtlhHistoryModel.php',
         'App\\Models\\RtlhPenerimaModel' => __DIR__ . '/../..' . '/app/Models/RtlhPenerimaModel.php',
         'App\\Models\\RumahRtlhModel' => __DIR__ . '/../..' . '/app/Models/RumahRtlhModel.php',
+        'App\\Models\\SettingsModel' => __DIR__ . '/../..' . '/app/Models/SettingsModel.php',
         'App\\Models\\SysLogModel' => __DIR__ . '/../..' . '/app/Models/SysLogModel.php',
         'App\\Models\\UserDesaModel' => __DIR__ . '/../..' . '/app/Models/UserDesaModel.php',
         'App\\Models\\UserModel' => __DIR__ . '/../..' . '/app/Models/UserModel.php',

@@ -76,6 +76,7 @@ return array(
     'App\\Models\\RtlhHistoryModel' => $baseDir . '/app/Models/RtlhHistoryModel.php',
     'App\\Models\\RtlhPenerimaModel' => $baseDir . '/app/Models/RtlhPenerimaModel.php',
     'App\\Models\\RumahRtlhModel' => $baseDir . '/app/Models/RumahRtlhModel.php',
+    'App\\Models\\SettingsModel' => $baseDir . '/app/Models/SettingsModel.php',
     'App\\Models\\SysLogModel' => $baseDir . '/app/Models/SysLogModel.php',
     'App\\Models\\UserDesaModel' => $baseDir . '/app/Models/UserDesaModel.php',
     'App\\Models\\UserModel' => $baseDir . '/app/Models/UserModel.php',
