@@ -6,7 +6,7 @@
     <title><?= $title ?? 'SIBARUKI - Sistem Informasi Bantuan Rumah & Kawasan Permukiman' ?></title>
     <link rel="shortcut icon" type="image/png" href="<?= base_url('sinjai.png') ?>">
     <link rel="stylesheet" href="<?= base_url('css/app.css') ?>">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.407.0/dist/umd/lucide.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
@@ -65,16 +65,16 @@
                     <ul class="space-y-4">
                         <li>
                             <a href="https://www.instagram.com/disperkimtan.sinjai/" target="_blank" class="group flex items-center gap-3 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">
-                                <span class="w-7 h-7 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
-                                    <i data-lucide="instagram" class="w-3.5 h-3.5" stroke-width="3"></i>
+                                <span class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
+                                    <i data-lucide="instagram" class="w-4 h-4"></i>
                                 </span>
                                 Instagram DPKPP
                             </a>
                         </li>
                         <li>
                             <a href="https://dpkpp.sinjaikab.go.id/" target="_blank" class="group flex items-center gap-3 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">
-                                <span class="w-7 h-7 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
-                                    <i data-lucide="globe" class="w-3.5 h-3.5" stroke-width="3"></i>
+                                <span class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
+                                    <i data-lucide="globe" class="w-4 h-4"></i>
                                 </span>
                                 Website Resmi DPKPP
                             </a>
