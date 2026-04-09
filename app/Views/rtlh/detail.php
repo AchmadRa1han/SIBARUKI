@@ -191,6 +191,85 @@
                 </div>
             </div>
 
+            <!-- II.B BUKTI REALISASI PROGRAM (BEFORE-AFTER) -->
+            <?php if (!empty($realisasi)) : ?>
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm overflow-hidden transition-all duration-300">
+                <div class="p-6 border-b border-emerald-50 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/30 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-emerald-600/20">
+                            <i data-lucide="check-circle" class="w-4.5 h-4.5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[11px] font-bold text-emerald-900 dark:text-emerald-400 uppercase tracking-[0.2em]">Realisasi Program</h3>
+                            <p class="text-[9px] text-emerald-600/70 font-bold uppercase tracking-widest">Bukti Penyelesaian & Dokumentasi After</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 rounded-full text-[8px] font-bold uppercase tracking-widest">TUNTAS <?= $realisasi['tahun_anggaran'] ?></span>
+                </div>
+                <div class="p-8 space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Sumber Dana / Program</p>
+                            <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $realisasi['sumber_dana'] ?></p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lokasi Realisasi (GPS)</p>
+                            <p class="text-[10px] font-mono font-bold text-emerald-600 uppercase tracking-tighter italic"><?= $realisasi['wkt_realisasi'] ?: 'Sesuai Lokasi Awal' ?></p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Keterangan Pelaksanaan</p>
+                            <p class="text-xs font-medium text-slate-600 dark:text-slate-400 leading-relaxed"><?= $realisasi['keterangan'] ?></p>
+                        </div>
+                    </div>
+
+                    <!-- Before-After Gallery -->
+                    <div class="space-y-4 pt-4 border-t border-slate-50 dark:border-slate-800">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <i data-lucide="images" class="w-3.5 h-3.5"></i> Komparasi Visual
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Comparison Card 1: Depan -->
+                            <div class="bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <p class="text-[8px] font-bold text-center text-slate-400 uppercase mb-2">Tampak Depan</p>
+                                <div class="grid grid-cols-2 gap-1 overflow-hidden rounded-lg">
+                                    <div class="relative aspect-video bg-slate-200 dark:bg-slate-800">
+                                        <?php if(!empty($rumah['foto_depan'])): ?>
+                                            <img src="<?= base_url('uploads/rtlh/'.$rumah['foto_depan']) ?>" class="w-full h-full object-cover grayscale opacity-70">
+                                            <span class="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/50 text-white text-[6px] font-bold uppercase rounded">Before</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="relative aspect-video bg-emerald-100 dark:bg-emerald-900/20">
+                                        <?php if(!empty($realisasi['foto_setelah_depan'])): ?>
+                                            <img src="<?= base_url('uploads/rtlh/'.$realisasi['foto_setelah_depan']) ?>" class="w-full h-full object-cover">
+                                            <span class="absolute bottom-1 left-1 px-1.5 py-0.5 bg-emerald-600 text-white text-[6px] font-bold uppercase rounded">After</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Comparison Card 2: Samping -->
+                            <div class="bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <p class="text-[8px] font-bold text-center text-slate-400 uppercase mb-2">Tampak Samping</p>
+                                <div class="grid grid-cols-2 gap-1 overflow-hidden rounded-lg">
+                                    <div class="relative aspect-video bg-slate-200 dark:bg-slate-800">
+                                        <?php if(!empty($rumah['foto_samping'])): ?>
+                                            <img src="<?= base_url('uploads/rtlh/'.$rumah['foto_samping']) ?>" class="w-full h-full object-cover grayscale opacity-70">
+                                            <span class="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/50 text-white text-[6px] font-bold uppercase rounded">Before</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="relative aspect-video bg-emerald-100 dark:bg-emerald-900/20">
+                                        <?php if(!empty($realisasi['foto_setelah_samping'])): ?>
+                                            <img src="<?= base_url('uploads/rtlh/'.$realisasi['foto_setelah_samping']) ?>" class="w-full h-full object-cover">
+                                            <span class="absolute bottom-1 left-1 px-1.5 py-0.5 bg-emerald-600 text-white text-[6px] font-bold uppercase rounded">After</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- III. Dokumentasi Visual -->
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300 no-print">
                 <div class="p-6 border-b dark:border-slate-800 flex items-center gap-3">
@@ -360,20 +439,50 @@
             <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Konfirmasi penyelesaian program perbaikan.</p>
         </div>
 
-        <form action="<?= base_url('rtlh/mark-tuntas/' . $rumah['id_survei']) ?>" method="POST" class="space-y-4">
+        <form action="<?= base_url('rtlh/mark-tuntas/' . ($rumah['id_survei'] ?? '')) ?>" method="POST" enctype="multipart/form-data" class="space-y-4">
             <?= csrf_field() ?>
-            <div>
-                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Tahun Anggaran</label>
-                <input type="number" name="tahun_bansos" value="<?= date('Y') ?>" min="2000" max="2099" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Tahun Anggaran</label>
+                    <input type="number" name="tahun_bansos" value="<?= date('Y') ?>" min="2000" max="2099" class="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Nama Program</label>
+                    <input type="text" name="program_bansos" placeholder="Contoh: BSPS..." class="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                </div>
             </div>
+
             <div>
-                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Nama Program</label>
-                <input type="text" name="program_bansos" placeholder="Contoh: BSPS, APBD Kab..." class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Koordinat Realisasi (GPS)</label>
+                <div class="relative">
+                    <input type="text" name="lokasi_realisasi" id="lokasi_realisasi" value="<?= $rumah['lokasi_koordinat'] ?? '' ?>" class="w-full p-3 pl-10 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-mono font-bold text-emerald-600 outline-none">
+                    <i data-lucide="map-pin" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Dokumentasi Hasil (After)</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <?php foreach(['foto_setelah_depan' => 'Depan', 'foto_setelah_samping' => 'Samping', 'foto_setelah_dalam' => 'Dalam'] as $fkey => $flabel): ?>
+                    <div class="relative group h-20 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg flex flex-col items-center justify-center overflow-hidden">
+                        <input type="file" name="<?= $fkey ?>" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer">
+                        <i data-lucide="camera" class="w-4 h-4 text-slate-300"></i>
+                        <span class="text-[7px] font-bold text-slate-400 uppercase mt-1"><?= $flabel ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Keterangan Realisasi</label>
+                <textarea name="keterangan_realisasi" rows="2" class="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-bold outline-none" placeholder="Catatan hasil perbaikan..."></textarea>
             </div>
             
-            <div class="flex gap-2 pt-4">
-                <button type="button" onclick="closeModalTuntas()" class="flex-1 py-3 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors">Batal</button>
-                <button type="submit" class="flex-[2] py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-emerald-600/20 active:scale-95 transition-all">Konfirmasi</button>
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="closeModalTuntas()" class="flex-1 py-3 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest">Batal</button>
+                <button type="submit" class="flex-[2] py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Simpan Realisasi
+                </button>
             </div>
         </form>
     </div>

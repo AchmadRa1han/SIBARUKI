@@ -485,13 +485,22 @@ class Rtlh extends BaseController
         if (!has_permission('view_rtlh_detail')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
         $rumah = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        
+        $db = \Config\Database::connect();
         $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
+        $realisasi = $db->table('rtlh_bansos')
+                        ->select('*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
+                        ->where('id_survei', $id)
+                        ->orderBy('id', 'DESC')
+                        ->get()->getRowArray();
+
         return view('rtlh/detail', [
             'title' => 'Detail RTLH',
             'rumah' => $rumah,
             'kondisi' => $kondisi,
             'penerima' => $penerima,
+            'realisasi' => $realisasi,
             'ref' => $this->refModel->getAllMapped()
         ]);
     }
