@@ -183,11 +183,6 @@ class Rtlh extends BaseController
             return redirect()->back()->with('error', 'Gagal memproses realisasi: ' . $e->getMessage());
         }
     }
-        } catch (\Exception $e) {
-            $db->transRollback();
-            return redirect()->back()->with('error', 'Gagal memproses data: ' . $e->getMessage());
-        }
-    }
 
     public function importCsv()
     {

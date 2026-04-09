@@ -1,18 +1,18 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300 relative">
+<div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300 relative">
     <!-- Floating Bulk Action Bar -->
     <div id="bulk-action-bar" class="absolute top-0 left-0 right-0 z-50 bg-blue-950 text-white p-4 transform -translate-y-full transition-transform duration-300 flex items-center justify-between px-10">
         <div class="flex items-center gap-4">
-            <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-full text-[10px] font-black tracking-widest">0 TERPILIH</span>
+            <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest">0 TERPILIH</span>
             <p class="text-[10px] font-bold uppercase tracking-widest opacity-70">Aksi massal untuk referensi master</p>
         </div>
         <div class="flex items-center gap-3">
-            <button onclick="handleBulkDelete()" class="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+            <button onclick="handleBulkDelete()" class="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus Terpilih
             </button>
-            <button onclick="clearSelection()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Batal</button>
+            <button onclick="clearSelection()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">Batal</button>
         </div>
     </div>
 
@@ -22,7 +22,7 @@
                 <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
             <div>
-                <h1 class="text-2xl font-black text-blue-950 dark:text-white tracking-tight uppercase tracking-wider">Referensi Master</h1>
+                <h1 class="text-2xl font-bold text-blue-950 dark:text-white tracking-tight uppercase tracking-wider">Referensi Master</h1>
                 <p class="text-sm text-slate-400 dark:text-slate-500 font-medium">Kelola daftar kategori dan pilihan referensi sistem</p>
             </div>
         </div>
@@ -40,10 +40,10 @@
             </div>
         <?php endif; ?>
 
-        <div class="overflow-x-auto rounded-[1.5rem] border border-slate-100 dark:border-slate-800 mb-8 shadow-inner bg-slate-50/30 dark:bg-slate-950/50">
+        <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800 mb-8 shadow-inner bg-slate-50/30 dark:bg-slate-950/50">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-white dark:bg-slate-900 text-blue-950 dark:text-blue-400 uppercase text-[10px] font-black tracking-[0.15em] transition-colors duration-300">
+                    <tr class="bg-white dark:bg-slate-900 text-blue-950 dark:text-blue-400 uppercase text-[10px] font-bold tracking-[0.15em] transition-colors duration-300">
                         <th class="p-5 border-b border-slate-100 dark:border-slate-800 w-16 text-center">
                             <input type="checkbox" id="select-all" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-blue-950 focus:ring-blue-900/20 cursor-pointer transition-all">
                         </th>
@@ -61,11 +61,11 @@
                             </td>
                             <td class="p-5 font-mono text-[10px] font-bold text-slate-400 dark:text-slate-600">#<?= str_pad($row['id'], 3, '0', STR_PAD_LEFT) ?></td>
                             <td class="p-5">
-                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-700 transition-colors duration-300">
+                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border border-slate-200 dark:border-slate-700 transition-colors duration-300">
                                     <?= $row['kategori'] ?>
                                 </span>
                             </td>
-                            <td class="p-5 font-black text-slate-800 dark:text-slate-200 group-hover:text-blue-900 dark:group-hover:text-blue-400 transition-colors"><?= $row['nama_pilihan'] ?></td>
+                            <td class="p-5 font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-900 dark:group-hover:text-blue-400 transition-colors"><?= $row['nama_pilihan'] ?></td>
                             <td class="p-5">
                                 <div class="flex justify-center items-center space-x-3">
                                     <a href="<?= base_url('ref-master/edit/' . $row['id']) ?>" class="p-2 text-slate-400 dark:text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Edit Data">

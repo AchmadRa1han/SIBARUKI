@@ -4,7 +4,7 @@
 <div class="max-w-7xl mx-auto space-y-6 pb-32 text-slate-900 dark:text-slate-200">
     
     <!-- Breadcrumbs -->
-    <nav class="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 no-print">
+    <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <a href="<?= base_url('psu') ?>" class="hover:text-blue-600 transition-colors">PSU JALAN</a>
@@ -13,7 +13,7 @@
     </nav>
 
     <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-48 h-48 bg-blue-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
         <div class="relative z-10 flex items-center gap-4">
             <a href="<?= base_url('psu') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
@@ -24,13 +24,13 @@
                     <i data-lucide="plus" class="w-7 h-7"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Tambah PSU Jalan</h1>
+                    <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Tambah PSU Jalan</h1>
                     <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Input Inventaris Jaringan Jalan Baru</p>
                 </div>
             </div>
         </div>
         <div class="flex items-center gap-3 relative z-10">
-            <a href="<?= base_url('psu') ?>" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95">Batal</a>
+            <a href="<?= base_url('psu') ?>" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95">Batal</a>
         </div>
     </div>
 
@@ -43,14 +43,14 @@
                     <i data-lucide="file-up" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-black text-emerald-900 dark:text-emerald-400 uppercase tracking-tight">Import via CSV</h3>
+                    <h3 class="text-base font-bold text-emerald-900 dark:text-emerald-400 uppercase tracking-tight">Import via CSV</h3>
                     <p class="text-[9px] text-emerald-600/70 dark:text-emerald-500/50 font-bold uppercase tracking-[0.2em]">Unggah file koordinat jalan (WKT)</p>
                 </div>
             </div>
             <form action="<?= base_url('psu/import-csv') ?>" method="post" enctype="multipart/form-data" class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto">
                 <?= csrf_field() ?>
-                <input type="file" name="csv_file" accept=".csv" required class="block w-full text-[9px] text-emerald-900 dark:text-emerald-400 file:mr-4 file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-[9px] file:font-black file:uppercase file:tracking-widest file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer transition-all">
-                <button type="submit" class="w-full md:w-auto bg-emerald-900 dark:bg-emerald-600 text-white px-6 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-900/20 hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <input type="file" name="csv_file" accept=".csv" required class="block w-full text-[9px] text-emerald-900 dark:text-emerald-400 file:mr-4 file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-[9px] file:font-bold file:uppercase file:tracking-widest file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer transition-all">
+                <button type="submit" class="w-full md:w-auto bg-emerald-900 dark:bg-emerald-600 text-white px-6 py-2.5 rounded-lg text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-emerald-900/20 hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-2">
                     <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i> Impor
                 </button>
             </form>
@@ -60,34 +60,34 @@
     <!-- 2. FORM MANUAL -->
     <form action="<?= base_url('psu/store') ?>" method="post">
         <?= csrf_field() ?>
-        <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300">
             <div class="p-6 border-b dark:border-slate-800 bg-blue-50/30 dark:bg-blue-950/30 flex items-center gap-3">
                 <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg">
                     <i data-lucide="clipboard-list" class="w-4.5 h-4.5"></i>
                 </div>
                 <div>
-                    <h3 class="text-[11px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-[0.2em]">Atribut Jaringan Jalan</h3>
+                    <h3 class="text-[11px] font-bold text-blue-900 dark:text-blue-400 uppercase tracking-[0.2em]">Atribut Jaringan Jalan</h3>
                     <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Identitas & Koordinat Spasial</p>
                 </div>
             </div>
             <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="md:col-span-2">
-                    <label class="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nama Ruas Jalan</label>
-                    <input type="text" name="nama_jalan" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-black uppercase placeholder:opacity-30" placeholder="CONTOH: POROS SINJAI...">
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nama Ruas Jalan</label>
+                    <input type="text" name="nama_jalan" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase placeholder:opacity-30" placeholder="CONTOH: POROS SINJAI...">
                 </div>
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">ID CSV / Referensi</label>
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">ID CSV / Referensi</label>
                     <input type="text" name="id_csv" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono font-bold" placeholder="ID-001">
                 </div>
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nilai / Skor Kondisi</label>
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nilai / Skor Kondisi</label>
                     <input type="number" step="0.01" name="jalan" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="0.00">
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat WKT (LINESTRING)</label>
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat WKT (LINESTRING)</label>
                     <div class="relative">
                         <textarea name="wkt" rows="4" required class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs leading-relaxed" placeholder="LINESTRING(E N, E N, ...)"></textarea>
-                        <div class="absolute right-3 bottom-3 text-[8px] font-black text-slate-400 uppercase tracking-widest pointer-events-none">Sistem: UTM Zone 51S</div>
+                        <div class="absolute right-3 bottom-3 text-[8px] font-bold text-slate-400 uppercase tracking-widest pointer-events-none">Sistem: UTM Zone 51S</div>
                     </div>
                 </div>
             </div>
@@ -99,7 +99,7 @@
                 <i data-lucide="info" class="w-4 h-4"></i>
                 <p class="text-[9px] font-bold uppercase tracking-widest leading-relaxed max-w-md">Pastikan format WKT menggunakan sistem koordinat UTM Zone 51S agar terproyeksi dengan benar.</p>
             </div>
-            <button type="submit" class="group flex items-center space-x-6 bg-blue-600 hover:bg-blue-700 text-white pl-8 pr-4 py-4 rounded-[1.5rem] font-black shadow-xl shadow-blue-600/20 transition-all active:scale-95 w-full md:w-auto">
+            <button type="submit" class="group flex items-center space-x-6 bg-blue-600 hover:bg-blue-700 text-white pl-8 pr-4 py-4 rounded-xl font-bold shadow-xl shadow-blue-600/20 transition-all active:scale-95 w-full md:w-auto">
                 <div class="flex flex-col text-right">
                     <span class="text-[8px] uppercase tracking-[0.3em] opacity-60 mb-0.5">Konfirmasi Final</span>
                     <span class="text-base uppercase tracking-tighter">Simpan Ruas</span>

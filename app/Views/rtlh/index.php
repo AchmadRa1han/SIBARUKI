@@ -247,8 +247,8 @@
                 if (coords && !isNaN(coords.lat) && !isNaN(coords.lng)) {
                     const marker = L.circleMarker([coords.lat, coords.lng], { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
                     marker.bindPopup(`
-                        <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-black uppercase tracking-widest text-blue-400 mb-1">RTLH</p><h5 class="text-[11px] font-black uppercase leading-tight">${item.pemilik || '-'}</h5></div>
-                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('rtlh/detail/') ?>/${item.id_survei}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-black uppercase tracking-widest rounded-lg transition-all">Detail</a></div>
+                        <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-bold uppercase tracking-widest text-blue-400 mb-1">RTLH</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.pemilik || '-'}</h5></div>
+                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('rtlh/detail/') ?>/${item.id_survei}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>
                     `);
                     clusterGroup.addLayer(marker);
                     markerCount++;

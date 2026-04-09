@@ -17,29 +17,29 @@
         <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
             <div class="animate-in slide-in-from-left duration-1000">
                 <div class="flex items-center gap-3 mb-6">
-                    <span class="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-full shadow-lg shadow-blue-600/20">Official Portal</span>
+                    <span class="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-[0.3em] rounded-full shadow-lg shadow-blue-600/20">Official Portal</span>
                     <div class="flex items-center gap-2">
                         <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Live DB</span>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Live DB</span>
                     </div>
                 </div>
-                <h1 class="text-4xl lg:text-6xl font-black text-blue-950 dark:text-white leading-[1.05] mb-8 tracking-tighter uppercase">
+                <h1 class="text-4xl lg:text-6xl font-bold text-blue-950 dark:text-white leading-[1.05] mb-8 tracking-tighter uppercase">
                     Membangun <br/><span class="text-blue-600">Hunian Layak</span> <br/>Untuk Semua.
                 </h1>
                 <p class="text-lg text-slate-500 dark:text-slate-400 leading-relaxed mb-10 max-w-lg font-medium">
                     SIBARUKI adalah platform transparansi data perumahan dan permukiman Kabupaten Sinjai. Satu peta, sejuta informasi.
                 </p>
                 <div class="flex flex-wrap gap-4">
-                    <a href="#map" class="px-8 py-4 bg-blue-600 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5">
+                    <a href="#map" class="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5">
                         Jelajahi Peta <i data-lucide="map" class="w-4 h-4"></i>
                     </a>
-                    <a href="#summary" class="px-8 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-blue-950 dark:text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] shadow-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Statistik</a>
+                    <a href="#summary" class="px-8 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-blue-950 dark:text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] shadow-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Statistik</a>
                 </div>
             </div>
 
             <!-- Dynamic Carousel Section -->
             <div class="relative animate-in zoom-in duration-1000 hidden lg:block">
-                <div class="swiper heroSwiper rounded-[3rem] overflow-hidden shadow-2xl border-[8px] border-white dark:border-slate-900 bg-white dark:bg-slate-900">
+                <div class="swiper heroSwiper rounded-3xl overflow-hidden shadow-2xl border-[8px] border-white dark:border-slate-900 bg-white dark:bg-slate-900">
                     <div class="swiper-wrapper">
                         <?php if(!empty($carousel)): ?>
                             <?php foreach($carousel as $item): ?>
@@ -47,8 +47,8 @@
                                 <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-transparent to-transparent flex items-end p-12">
                                     <div class="max-w-sm">
-                                        <p class="text-blue-400 font-black uppercase tracking-[0.3em] text-[9px] mb-1.5">Dokumentasi</p>
-                                        <h4 class="text-white font-black uppercase tracking-tight text-xl leading-tight"><?= $item['caption'] ?></h4>
+                                        <p class="text-blue-400 font-bold uppercase tracking-[0.3em] text-[9px] mb-1.5">Dokumentasi</p>
+                                        <h4 class="text-white font-bold uppercase tracking-tight text-xl leading-tight"><?= $item['caption'] ?></h4>
                                     </div>
                                 </div>
                             </div>
@@ -57,7 +57,7 @@
                             <div class="swiper-slide relative h-[500px] flex items-center justify-center bg-slate-100 dark:bg-slate-800">
                                 <div class="text-center">
                                     <i data-lucide="image" class="w-10 h-10 text-slate-300 mx-auto mb-4"></i>
-                                    <p class="text-slate-400 font-black uppercase tracking-[0.3em] text-[9px]">Belum Ada Dokumentasi</p>
+                                    <p class="text-slate-400 font-bold uppercase tracking-[0.3em] text-[9px]">Belum Ada Dokumentasi</p>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -71,8 +71,8 @@
     <!-- 2. SUMMARY SECTION -->
     <section id="summary" class="py-24 bg-white dark:bg-slate-900/50 relative border-y border-slate-100 dark:border-slate-800/50">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 text-center mb-16">
-            <h2 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.5em] mb-4">Data Strategis</h2>
-            <h3 class="text-3xl lg:text-5xl font-black text-blue-950 dark:text-white uppercase tracking-tighter leading-none">Kabupaten Sinjai <br/><span class="text-slate-300 dark:text-slate-700 italic">Dalam Angka</span></h3>
+            <h2 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.5em] mb-4">Data Strategis</h2>
+            <h3 class="text-3xl lg:text-5xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter leading-none">Kabupaten Sinjai <br/><span class="text-slate-300 dark:text-slate-700 italic">Dalam Angka</span></h3>
         </div>
 
         <div class="max-w-[1400px] mx-auto px-6 lg:px-12 grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4">
@@ -87,12 +87,12 @@
                 ['aset', 'land-plot', 'cyan', 'Aset Tanah'],
             ];
             foreach($metrics as $m): ?>
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:shadow-2xl hover:shadow-blue-600/10 hover:-translate-y-1 transition-all duration-500 group text-center flex flex-col items-center justify-center min-h-[220px]">
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:shadow-2xl hover:shadow-blue-600/10 hover:-translate-y-1 transition-all duration-500 group text-center flex flex-col items-center justify-center min-h-[220px]">
                 <div class="w-12 h-12 mx-auto rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-500 shadow-inner">
                     <i data-lucide="<?= $m[1] ?>" class="w-6 h-6" stroke-width="2.5"></i>
                 </div>
-                <h4 class="text-3xl font-black text-blue-950 dark:text-white mb-2 tracking-tighter"><?= number_format($rekap[$m[0]] ?? 0) ?></h4>
-                <p class="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] leading-tight"><?= $m[3] ?></p>
+                <h4 class="text-3xl font-bold text-blue-950 dark:text-white mb-2 tracking-tighter"><?= number_format($rekap[$m[0]] ?? 0) ?></h4>
+                <p class="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] leading-tight"><?= $m[3] ?></p>
             </div>
             <?php endforeach; ?>
         </div>
@@ -102,12 +102,12 @@
     <section id="map" class="py-20 bg-slate-50 dark:bg-slate-950">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
-                <h2 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.5em] mb-4 border-l-4 border-blue-600 pl-4">Interaktif GIS</h2>
-                <h3 class="text-3xl lg:text-5xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">E-Peta SIBARUKI</h3>
+                <h2 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.5em] mb-4 border-l-4 border-blue-600 pl-4">Interaktif GIS</h2>
+                <h3 class="text-3xl lg:text-5xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">E-Peta SIBARUKI</h3>
             </div>
             <div class="flex flex-wrap gap-2">
                 <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
-                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border border-white dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:scale-105 active:scale-95" data-layer="<?= $l ?>">
+                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-6 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all border border-white dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:scale-105 active:scale-95" data-layer="<?= $l ?>">
                     <?php 
                         $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
                         echo $labels[$l];
@@ -118,8 +118,8 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-6 lg:px-12">
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-300/50 dark:shadow-black/40">
-                <div id="publicMap" class="h-[600px] w-full rounded-[2rem] z-0 bg-slate-50 dark:bg-slate-950 border border-slate-50 dark:border-slate-800"></div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-300/50 dark:shadow-black/40">
+                <div id="publicMap" class="h-[600px] w-full rounded-2xl z-0 bg-slate-50 dark:bg-slate-950 border border-slate-50 dark:border-slate-800"></div>
             </div>
         </div>
     </section>
@@ -219,7 +219,7 @@
             if (geojson) {
                 L.geoJSON(geojson, { 
                     style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.3 } 
-                }).addTo(kecLayerGroup).bindTooltip(`<div class="p-1"><p class="font-black uppercase text-[8px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
+                }).addTo(kecLayerGroup).bindTooltip(`<div class="p-1"><p class="font-bold uppercase text-[8px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
             }
         });
         kecLayerGroup.bringToBack();
@@ -247,7 +247,7 @@
                 else if (item.wkt) { geojson = parseWKTUniversal(item.wkt, (type === 'psu')); }
                 if (!geojson) return;
 
-                const popupContent = `<div class="bg-blue-950 text-white p-4 rounded-t-xl"><h5 class="text-[10px] font-black uppercase leading-tight">${item.name}</h5></div><div class="p-4 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Informasi Terverifikasi</p></div>`;
+                const popupContent = `<div class="bg-blue-950 text-white p-4 rounded-t-xl"><h5 class="text-[10px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-4 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Informasi Terverifikasi</p></div>`;
 
                 if (geojson.type === 'Point') { L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 6, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(clusterGroup); }
                 else { L.geoJSON(geojson, { style: { color: colorMap[type], weight: 2, fillOpacity: 0.4 } }).bindPopup(popupContent).addTo(activeDataGroup); }

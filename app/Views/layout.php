@@ -77,7 +77,7 @@
                     <a href="<?= base_url('/') ?>" class="sidebar-icon-box group/logo transition-all duration-300 hover:scale-105">
                         <img src="<?= base_url('sinjai.png') ?>" alt="Logo Sinjai" class="w-8 h-8 object-contain group-hover:rotate-6 transition-transform">
                     </a>
-                    <a href="<?= base_url('/') ?>" class="text-lg font-black text-white tracking-tight sidebar-text hover:text-blue-400 transition-colors uppercase">SIBARUKI</a>
+                    <a href="<?= base_url('/') ?>" class="text-lg font-bold text-white tracking-tight sidebar-text hover:text-blue-400 transition-colors uppercase">SIBARUKI</a>
                     <!-- Mobile Close -->
                     <button onclick="toggleMobileSidebar()" class="lg:hidden ml-auto mr-4 p-2.5 bg-slate-800/50 rounded-xl">
                         <i data-lucide="x" class="w-4.5 h-4.5"></i>
@@ -152,7 +152,7 @@
                         </div>
                     </div>
                     <div class="flex-grow min-w-0 sidebar-text">
-                        <p class="text-xs font-black text-white truncate"><?= session()->get('username') ?? 'User' ?></p>
+                        <p class="text-xs font-bold text-white truncate"><?= session()->get('username') ?? 'User' ?></p>
                         <p class="text-[8px] text-slate-500 truncate uppercase font-bold"><?= session()->get('instansi') ?? 'Dinas Perkim' ?></p>
                     </div>
                     <a href="<?= base_url('logout') ?>" class="mr-6 text-slate-500 hover:text-rose-500 sidebar-text transition-colors">
@@ -173,8 +173,8 @@
                     <div id="moon-icon" class="absolute inset-0 flex items-center justify-center transition-transform duration-500 translate-y-full"><i data-lucide="moon" class="w-4.5 h-4.5"></i></div>
                 </button>
                 <div class="hidden md:flex items-center space-x-2.5 group">
-                    <div class="text-right"><p class="text-xs font-black text-slate-800 dark:text-slate-200"><?= session()->get('username') ?></p><p class="text-[8px] text-slate-500 font-bold uppercase tracking-widest"><?= session()->get('role_name') ?></p></div>
-                    <div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center text-white font-black shadow-lg shadow-blue-900/20 uppercase text-xs"><?= substr(session()->get('username') ?? 'A', 0, 1) ?></div>
+                    <div class="text-right"><p class="text-xs font-bold text-slate-800 dark:text-slate-200"><?= session()->get('username') ?></p><p class="text-[8px] text-slate-500 font-bold uppercase tracking-widest"><?= session()->get('role_name') ?></p></div>
+                    <div class="w-9 h-9 rounded-xl bg-blue-900 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-900/20 uppercase text-xs"><?= substr(session()->get('username') ?? 'A', 0, 1) ?></div>
                 </div>
             </div>
         </header>
@@ -222,7 +222,7 @@
             const toast = document.createElement('div');
             const color = type === 'success' ? 'emerald' : 'rose';
             toast.className = `pointer-events-auto flex items-center gap-3 p-4 rounded-xl border-l-4 border-${color}-500 bg-white dark:bg-slate-900 shadow-xl transition-all duration-500 translate-x-full opacity-0`;
-            toast.innerHTML = `<div class="text-${color}-500"><i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5"></i></div><div class="flex-grow"><p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">${type==='success'?'Berhasil':'Peringatan'}</p><p class="text-xs font-bold text-slate-700 dark:text-slate-200">${message}</p></div>`;
+            toast.innerHTML = `<div class="text-${color}-500"><i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5"></i></div><div class="flex-grow"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">${type==='success'?'Berhasil':'Peringatan'}</p><p class="text-xs font-bold text-slate-700 dark:text-slate-200">${message}</p></div>`;
             container.appendChild(toast); lucide.createIcons();
             setTimeout(() => toast.classList.remove('translate-x-full', 'opacity-0'), 10);
             setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 500); }, 4000);

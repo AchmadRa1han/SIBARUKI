@@ -10,23 +10,23 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tight">Peta Wilayah Kumuh</h1>
+            <h1 class="text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tight">Peta Wilayah Kumuh</h1>
             <p class="text-slate-500 dark:text-slate-400 font-medium">Visualisasi geospasial sebaran kawasan kumuh Sinjai.</p>
         </div>
-        <div id="debug-status" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm">
+        <div id="debug-status" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-sm">
             Inisialisasi...
         </div>
     </div>
 
     <!-- Map Container -->
     <div class="relative group">
-        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur opacity-10 transition duration-1000"></div>
-        <div class="relative bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800">
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-10 transition duration-1000"></div>
+        <div class="relative bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800">
             <div id="map" class="w-full h-[75vh] z-10" style="min-height: 500px; background: #f8fafc;"></div>
 
             <!-- Floating Legend -->
             <div class="absolute bottom-6 left-6 z-[1000] bg-white/90 dark:bg-slate-950/90 backdrop-blur-md p-4 rounded-3xl shadow-2xl border border-white/20 dark:border-slate-800 w-52">
-                <h4 class="text-[9px] font-black text-blue-950 dark:text-white uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                <h4 class="text-[9px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                     <i data-lucide="layers" class="w-3 h-3 text-blue-600"></i> Legenda
                 </h4>
                 <div class="space-y-3">
@@ -47,7 +47,7 @@
 
             <!-- Info Card -->
             <div class="absolute top-6 left-6 z-[1000] hidden md:block">
-                <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-2xl border border-white/10 flex items-center gap-3">
+                <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl text-[9px] font-bold uppercase tracking-widest shadow-2xl border border-white/10 flex items-center gap-3">
                     <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></div>
                     Visualisasi Data Terkini
                 </div>
@@ -150,7 +150,7 @@
 
                             layer.bindPopup(`
                                 <div class="bg-slate-900 text-white p-4 rounded-t-xl">
-                                    <p class="text-[9px] font-black uppercase tracking-widest text-blue-400 mb-1">Wilayah Kumuh</p>
+                                    <p class="text-[9px] font-bold uppercase tracking-widest text-blue-400 mb-1">Wilayah Kumuh</p>
                                     <h5 class="text-xs font-bold truncate">${item.Kelurahan}</h5>
                                 </div>
                                 <div class="p-4 bg-white dark:bg-slate-900 space-y-3 rounded-b-xl border-t border-slate-100 dark:border-slate-800">
@@ -160,9 +160,9 @@
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-[9px] font-bold text-slate-400 uppercase">Skor Kumuh</span>
-                                        <span class="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 text-[10px] font-black">${item.skor_kumuh}</span>
+                                        <span class="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 text-[10px] font-bold">${item.skor_kumuh}</span>
                                     </div>
-                                    <a href="<?= base_url('wilayah-kumuh/detail/') ?>/${item.FID}" class="block w-full py-2 bg-blue-900 hover:bg-blue-950 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-xl transition-all mt-2">Lihat Detail</a>
+                                    <a href="<?= base_url('wilayah-kumuh/detail/') ?>/${item.FID}" class="block w-full py-2 bg-blue-900 hover:bg-blue-950 text-white text-center text-[9px] font-bold uppercase tracking-widest rounded-xl transition-all mt-2">Lihat Detail</a>
                                 </div>
                             `);
 
@@ -180,7 +180,7 @@
             // if (count > 0) {
             //     map.fitBounds(geoJsonGroup.getBounds());
             //     debug.innerHTML = "✅ " + count + " Kawasan Terpetakan";
-            //     debug.className = "bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm";
+            //     debug.className = "bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-sm";
             // } else {
             //     debug.innerHTML = "⚠️ Data WKT Tidak Valid";
             // }
@@ -188,7 +188,7 @@
             // Tampilan tetap fokus pada Sinjai Utara sesuai setView awal (Zoom 14)
             if (count > 0) {
                 debug.innerHTML = "✅ " + count + " Kawasan Terpetakan";
-                debug.className = "bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm";
+                debug.className = "bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-sm";
             } else {
                 debug.innerHTML = "⚠️ Data WKT Tidak Valid";
             }

@@ -24,7 +24,7 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white">
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white">
         
         <!-- LEFT SIDE: BRANDING -->
         <div class="w-full md:w-5/12 bg-blue-950 p-10 flex flex-col justify-between relative overflow-hidden">
@@ -36,7 +36,7 @@
                     <div class="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/10">
                         <i data-lucide="shield-check" class="text-white w-3.5 h-3.5"></i>
                     </div>
-                    <span class="text-white text-[10px] font-black uppercase tracking-[0.3em]">Official Portal</span>
+                    <span class="text-white text-[10px] font-bold uppercase tracking-[0.3em]">Official Portal</span>
                 </div>
 
                 <div class="text-center md:text-left mt-4">
@@ -45,7 +45,7 @@
                         <img src="<?= base_url('sinjai.png') ?>" alt="Logo Sinjai" 
                             class="w-28 h-28 object-contain relative z-10 animate-float drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-transform duration-700 group-hover:scale-110">
                     </div>
-                    <h1 class="text-3xl font-black text-white tracking-tighter mb-2">SIBARUKI</h1>
+                    <h1 class="text-3xl font-bold text-white tracking-tighter mb-2">SIBARUKI</h1>
                     <p class="text-blue-200/60 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
                        Sama - samaki Bangun <br>Perumahan & Permukiman<br>Kabupaten Sinjai
                     </p>
@@ -54,7 +54,7 @@
 
             <div class="relative z-10 pt-8 md:pt-0">
                 <div class="flex flex-col gap-1">
-                    <p class="text-white/30 text-[8px] font-black uppercase tracking-[0.4em]">&copy; 2026 DINAS PERKIM</p>
+                    <p class="text-white/30 text-[8px] font-bold uppercase tracking-[0.4em]">&copy; 2026 DINAS PERKIM</p>
                     <div class="flex items-center gap-2">
                         <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                         <span class="text-blue-300/40 text-[7px] font-bold uppercase tracking-widest">Sistem Aktif</span>
@@ -67,7 +67,7 @@
         <div class="w-full md:w-7/12 p-8 md:p-14 flex flex-col justify-center bg-white relative">
             <div class="max-w-sm mx-auto w-full">
                 <div class="mb-8 text-center md:text-left">
-                    <h2 class="text-2xl font-black text-blue-950 tracking-tight mb-1">Selamat Datang</h2>
+                    <h2 class="text-2xl font-bold text-blue-950 tracking-tight mb-1">Selamat Datang</h2>
                     <p class="text-slate-400 text-xs font-medium">Otentikasi kredensial dashboard Anda.</p>
                 </div>
 
@@ -82,7 +82,7 @@
                     <?= csrf_field() ?>
                     
                     <div class="space-y-1.5">
-                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Username</label>
+                        <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Username</label>
                         <div class="relative group">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <i data-lucide="user" class="w-5 h-5 text-slate-300 group-focus-within:text-blue-950 transition-colors"></i>
@@ -94,7 +94,7 @@
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                        <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
                         <div class="relative group">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <i data-lucide="lock" class="w-5 h-5 text-slate-300 group-focus-within:text-blue-950 transition-colors"></i>
@@ -107,18 +107,18 @@
 
                     <div class="pt-4 space-y-4">
                         <button type="submit" 
-                            class="w-full py-4 bg-blue-950 text-white text-sm font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-blue-900/20 hover:bg-black hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center">
+                            class="w-full py-4 bg-blue-950 text-white text-sm font-bold uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-blue-900/20 hover:bg-black hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center">
                             Login
                         </button>
                         <a href="<?= base_url('/') ?>" 
-                            class="w-full py-4 bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
+                            class="w-full py-4 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
                             <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
                             Kembali ke Beranda
                         </a>
                     </div>
                 </form>
 
-                <div class="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-slate-300">
+                <div class="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-slate-300">
                     <a href="#" class="hover:text-blue-600 transition-colors">Masalah Akses?</a>
                     <span>v2.0.4</span>
                 </div>

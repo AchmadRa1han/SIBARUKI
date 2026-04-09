@@ -308,7 +308,7 @@
                     <i data-lucide="info" class="w-4 h-4"></i>
                     <p class="text-[9px] font-bold uppercase tracking-widest leading-relaxed">Verifikasi seluruh data survei sebelum melakukan konfirmasi penyimpanan final.</p>
                 </div>
-                <button type="submit" class="group flex items-center space-x-6 bg-blue-600 hover:bg-blue-700 text-white pl-8 pr-4 py-4 rounded-[1.5rem] font-bold shadow-xl shadow-blue-600/20 transition-all active:scale-95 w-full md:w-auto">
+                <button type="submit" class="group flex items-center space-x-6 bg-blue-600 hover:bg-blue-700 text-white pl-8 pr-4 py-4 rounded-xl font-bold shadow-xl shadow-blue-600/20 transition-all active:scale-95 w-full md:w-auto">
                     <div class="flex flex-col text-right">
                         <span class="text-[8px] uppercase tracking-[0.3em] opacity-60 mb-0.5">Konfirmasi Final</span>
                         <span class="text-base uppercase tracking-tighter">Simpan Laporan</span>

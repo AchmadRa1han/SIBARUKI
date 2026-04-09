@@ -8,7 +8,7 @@
 <div class="max-w-7xl mx-auto space-y-6 pb-12 text-slate-900 dark:text-slate-200">
     
     <!-- Breadcrumbs -->
-    <nav class="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 no-print">
+    <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <a href="<?= base_url('wilayah-kumuh') ?>" class="hover:text-blue-600 transition-colors">Wilayah Kumuh</a>
@@ -17,7 +17,7 @@
     </nav>
 
     <!-- Header Action -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-48 h-48 bg-rose-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
         <div class="relative z-10 flex items-center gap-4">
             <a href="<?= base_url('wilayah-kumuh') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
@@ -28,14 +28,14 @@
                     <i data-lucide="layers" class="w-7 h-7"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter leading-tight"><?= $kumuh['Kelurahan'] ?></h1>
+                    <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter leading-tight"><?= $kumuh['Kelurahan'] ?></h1>
                     <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">Kecamatan <?= $kumuh['Kecamatan'] ?></p>
                 </div>
             </div>
         </div>
         <div class="flex items-center gap-2 relative z-10">
             <?php if (has_permission('edit_kumuh')) : ?>
-            <a href="<?= base_url('wilayah-kumuh/edit/' . $kumuh['FID']) ?>" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2">
+            <a href="<?= base_url('wilayah-kumuh/edit/' . $kumuh['FID']) ?>" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2">
                 <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
             </a>
             <?php endif; ?>
@@ -49,19 +49,19 @@
         <!-- Sidebar Info -->
         <div class="space-y-6">
             <!-- Skor Kumuh -->
-            <div class="bg-rose-600 p-8 rounded-[2rem] text-white shadow-xl shadow-rose-900/20 relative overflow-hidden group">
+            <div class="bg-rose-600 p-8 rounded-2xl text-white shadow-xl shadow-rose-900/20 relative overflow-hidden group">
                 <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
                     <i data-lucide="trending-up" class="w-40 h-40"></i>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-rose-100 mb-2">Total Skor Kekumuhan</p>
+                    <p class="text-[9px] font-bold uppercase tracking-[0.3em] text-rose-100 mb-2">Total Skor Kekumuhan</p>
                     <div class="flex items-baseline gap-2">
-                        <span class="text-5xl font-black italic"><?= $kumuh['skor_kumuh'] ?></span>
+                        <span class="text-5xl font-bold italic"><?= $kumuh['skor_kumuh'] ?></span>
                         <span class="text-xs font-bold uppercase opacity-60">Poin</span>
                     </div>
                     <div class="mt-6 pt-6 border-t border-white/10">
                         <p class="text-[9px] font-bold text-rose-100 uppercase tracking-widest">Status Kerawanan</p>
-                        <p class="text-sm font-black uppercase mt-1">
+                        <p class="text-sm font-bold uppercase mt-1">
                             <?php if($kumuh['skor_kumuh'] >= 60): ?>Sangat Berat
                             <?php elseif($kumuh['skor_kumuh'] >= 40): ?>Sedang
                             <?php else: ?>Ringan<?php endif; ?>
@@ -71,30 +71,30 @@
             </div>
 
             <!-- Atribut Wilayah -->
-            <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-sm border border-slate-100 dark:border-slate-800 transition-all duration-300">
-                <h3 class="text-[10px] font-black text-blue-950 dark:text-white uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 transition-all duration-300">
+                <h3 class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
                     <span class="w-8 h-[2px] bg-blue-600"></span> Identitas Administrasi
                 </h3>
                 <div class="space-y-8">
                     <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nama Kawasan</p>
-                        <p class="text-sm font-black text-slate-700 dark:text-white uppercase leading-relaxed"><?= $kumuh['Kawasan'] ?: '-' ?></p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Kawasan</p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase leading-relaxed"><?= $kumuh['Kawasan'] ?: '-' ?></p>
                     </div>
                     <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Luas Delineasi</p>
-                        <p class="text-xl font-black text-blue-600 italic"><?= number_format($kumuh['Luas_kumuh'], 2) ?><span class="text-xs ml-1 opacity-60">Ha</span></p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Luas Delineasi</p>
+                        <p class="text-xl font-bold text-blue-600 italic"><?= number_format($kumuh['Luas_kumuh'], 2) ?><span class="text-xs ml-1 opacity-60">Ha</span></p>
                     </div>
                     <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Kode RT / RW</p>
-                        <p class="text-sm font-black text-slate-700 dark:text-white uppercase"><?= $kumuh['Kode_RT_RW'] ?: '-' ?></p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kode RT / RW</p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $kumuh['Kode_RT_RW'] ?: '-' ?></p>
                     </div>
                     <div class="pt-6 border-t dark:border-slate-800 grid grid-cols-2 gap-4">
                         <div>
-                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Kode Kel.</p>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kode Kel.</p>
                             <p class="text-[11px] font-mono font-bold text-slate-600 dark:text-slate-400"><?= $kumuh['Kode_Kel'] ?></p>
                         </div>
                         <div>
-                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Kode Kec.</p>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kode Kec.</p>
                             <p class="text-[11px] font-mono font-bold text-slate-600 dark:text-slate-400"><?= $kumuh['Kode_Kec'] ?></p>
                         </div>
                     </div>
@@ -104,13 +104,13 @@
 
         <!-- Main Map Content -->
         <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 relative group lg:h-[650px]">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 relative group lg:h-[650px]">
                 <div id="map" class="w-full h-full z-10" style="background: #f8fafc;"></div>
                 
                 <div class="absolute top-6 left-6 z-[1000] flex items-center gap-3">
                     <div class="bg-blue-950/90 backdrop-blur-xl text-white px-4 py-2 rounded-xl shadow-2xl border border-white/10 flex items-center gap-3">
                         <div class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping"></div>
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em]">Visualisasi Spasial</span>
+                        <span class="text-[9px] font-bold uppercase tracking-[0.2em]">Visualisasi Spasial</span>
                     </div>
                 </div>
 
@@ -122,27 +122,27 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Dokumen Dasar Hukum</p>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Dokumen Dasar Hukum</p>
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-blue-600">
                             <i data-lucide="file-text" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">No. SK Penetapan</p>
-                            <p class="text-sm font-black text-blue-950 dark:text-white uppercase"><?= $kumuh['Sk_Kumuh'] ?: 'BELUM TERDAFTAR' ?></p>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">No. SK Penetapan</p>
+                            <p class="text-sm font-bold text-blue-950 dark:text-white uppercase"><?= $kumuh['Sk_Kumuh'] ?: 'BELUM TERDAFTAR' ?></p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Verifikasi Informasi</p>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Verifikasi Informasi</p>
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-emerald-600">
                             <i data-lucide="database" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Sumber Basis Data</p>
-                            <p class="text-sm font-black text-blue-950 dark:text-white uppercase"><?= $kumuh['Sumber_data'] ?: '-' ?></p>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Sumber Basis Data</p>
+                            <p class="text-sm font-bold text-blue-950 dark:text-white uppercase"><?= $kumuh['Sumber_data'] ?: '-' ?></p>
                         </div>
                     </div>
                 </div>

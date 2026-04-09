@@ -11,33 +11,33 @@
 <div class="space-y-6 pb-12 text-slate-900 dark:text-slate-200">
     
     <!-- Breadcrumbs -->
-    <nav class="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 no-print">
+    <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <span class="text-blue-600">Perumahan Formal</span>
     </nav>
 
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all duration-300">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all duration-300">
         <div class="absolute top-0 right-0 w-48 h-48 bg-blue-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
         <div class="relative z-10 flex items-center gap-4">
             <a href="<?= base_url('dashboard') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
             <div>
-                <h1 class="text-2xl md:text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Perumahan Formal</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Perumahan Formal</h1>
                 <p class="text-slate-500 dark:text-slate-400 font-medium text-xs mt-1">Pemetaan sebaran perumahan formal Kabupaten Sinjai.</p>
             </div>
         </div>
         <div class="flex flex-wrap items-center gap-2 relative z-10">
-            <div class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-800/50 shadow-sm">
+            <div class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-blue-100 dark:border-blue-800/50 shadow-sm">
                 <?= number_format($total_perumahan ?? 0) ?> Lokasi
             </div>
-            <a href="<?= base_url('perumahan-formal/export-excel') ?>" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition-all active:scale-95 flex items-center gap-2 shadow-sm">
+            <a href="<?= base_url('perumahan-formal/export-excel') ?>" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-emerald-100 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition-all active:scale-95 flex items-center gap-2 shadow-sm">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
             </a>
             <?php if (has_permission('create_rtlh')): ?>
-            <a href="<?= base_url('perumahan-formal/create') ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95 flex items-center gap-2 group">
+            <a href="<?= base_url('perumahan-formal/create') ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95 flex items-center gap-2 group">
                 <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform"></i> Tambah Data
             </a>
             <?php endif; ?>
@@ -46,10 +46,10 @@
 
     <!-- Map Section -->
     <div class="relative">
-        <div class="bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden shadow-md border border-slate-100 dark:border-slate-800">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-100 dark:border-slate-800">
             <div id="map" class="w-full h-[450px] z-10" style="background: #ececec;"></div>
             <div class="absolute top-6 left-6 z-[1000] hidden md:block">
-                <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-2xl border border-white/10 flex items-center gap-3">
+                <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] shadow-2xl border border-white/10 flex items-center gap-3">
                     <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></div>
                     Database Geospasial Perumahan
                 </div>
@@ -62,13 +62,13 @@
         <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 w-full lg:w-auto">
                 <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full md:w-auto">
-                    <button class="px-4 py-2 bg-white dark:bg-slate-700 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">Daftar Perumahan</button>
+                    <button class="px-4 py-2 bg-white dark:bg-slate-700 text-blue-600 rounded-lg text-[9px] font-bold uppercase tracking-widest shadow-sm">Daftar Perumahan</button>
                 </div>
             </div>
 
             <form action="<?= base_url('perumahan-formal') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
                 <div class="relative w-full md:w-28">
-                    <select name="per_page" onchange="submitWithScroll(this)" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none">
+                    <select name="per_page" onchange="submitWithScroll(this)" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none">
                         <?php foreach([5, 10, 25, 50, 100] as $p): ?>
                             <option value="<?= $p ?>" <?= ($perPage ?? 10) == $p ? 'selected' : '' ?>><?= $p ?> Baris</option>
                         <?php endforeach; ?>
@@ -77,7 +77,7 @@
                 </div>
 
                 <div class="relative w-full md:w-64">
-                    <input type="text" name="keyword" value="<?= $keyword ?? '' ?>" placeholder="Cari nama/pengembang..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-black uppercase px-3 py-2 pl-10 focus:ring-2 focus:ring-blue-500 transition-all">
+                    <input type="text" name="keyword" value="<?= $keyword ?? '' ?>" placeholder="Cari nama/pengembang..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 pl-10 focus:ring-2 focus:ring-blue-500 transition-all">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
                 </div>
             </form>
@@ -85,18 +85,18 @@
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
         <!-- Floating Bulk Action Bar -->
         <div id="bulk-action-bar" class="absolute top-0 left-0 right-0 z-50 bg-blue-950 text-white p-4 transform -translate-y-full transition-transform duration-500 flex items-center justify-between px-8">
             <div class="flex items-center gap-4">
-                <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-lg text-[9px] font-black tracking-widest shadow-lg shadow-blue-600/20">0 TERPILIH</span>
+                <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-lg text-[9px] font-bold tracking-widest shadow-lg shadow-blue-600/20">0 TERPILIH</span>
                 <p class="text-[9px] font-bold uppercase tracking-widest opacity-70 hidden md:block">Aksi massal tersedia</p>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="handleBulkDelete()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-rose-600/20">
+                <button onclick="handleBulkDelete()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-rose-600/20">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus
                 </button>
-                <button onclick="clearSelection()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all active:scale-95">Batal</button>
+                <button onclick="clearSelection()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all active:scale-95">Batal</button>
             </div>
         </div>
 
@@ -106,7 +106,7 @@
                     <i data-lucide="database" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h3 class="text-sm font-black text-blue-950 dark:text-white uppercase tracking-tight">Data Induk Perumahan</h3>
+                    <h3 class="text-sm font-bold text-blue-950 dark:text-white uppercase tracking-tight">Data Induk Perumahan</h3>
                     <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Monitoring Sektor Perumahan Formal</p>
                 </div>
             </div>
@@ -115,7 +115,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse table-fixed">
                 <thead>
-                    <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                    <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                         <th class="px-6 py-4 w-16 text-center">
                             <input type="checkbox" id="select-all" class="w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
                         </th>
@@ -133,19 +133,19 @@
                             <input type="checkbox" name="ids[]" value="<?= $item['id'] ?>" class="row-checkbox w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
                         </td>
                         <td class="px-4 py-3">
-                            <span class="font-black text-blue-950 dark:text-white uppercase truncate block text-xs mb-0.5"><?= $item['nama_perumahan'] ?></span>
+                            <span class="font-bold text-blue-950 dark:text-white uppercase truncate block text-xs mb-0.5"><?= $item['nama_perumahan'] ?></span>
                             <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Kawasan Permukiman Formal</span>
                         </td>
                         <td class="px-4 py-3">
-                            <span class="font-black text-slate-700 dark:text-slate-200 uppercase tracking-tight"><?= $item['pengembang'] ?></span>
+                            <span class="font-bold text-slate-700 dark:text-slate-200 uppercase tracking-tight"><?= $item['pengembang'] ?></span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg font-black text-[9px]">
+                            <span class="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg font-bold text-[9px]">
                                 <?= $item['tahun_pembangunan'] ?>
                             </span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="font-black text-slate-700 dark:text-slate-300"><?= number_format($item['luas_kawasan_ha'], 2) ?> Ha</span>
+                            <span class="font-bold text-slate-700 dark:text-slate-300"><?= number_format($item['luas_kawasan_ha'], 2) ?> Ha</span>
                         </td>
                         <td class="px-6 py-3 text-center">
                             <div class="flex items-center justify-center gap-1.5">
@@ -164,7 +164,7 @@
                             <td colspan="6" class="px-8 py-16 text-center">
                                 <div class="flex flex-col items-center justify-center opacity-40">
                                     <i data-lucide="package-search" class="w-12 h-12 mb-3"></i>
-                                    <p class="font-black uppercase text-[9px] tracking-[0.3em]">Data Tidak Ditemukan</p>
+                                    <p class="font-bold uppercase text-[9px] tracking-[0.3em]">Data Tidak Ditemukan</p>
                                 </div>
                             </td>
                         </tr>
@@ -224,8 +224,8 @@
                     const coords = [parseFloat(item.latitude), parseFloat(item.longitude)];
                     const marker = L.circleMarker(coords, { radius: 8, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
                     marker.bindPopup(`
-                        <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-black uppercase tracking-widest text-blue-400 mb-1">Perumahan</p><h5 class="text-[11px] font-black uppercase leading-tight">${item.nama_perumahan}</h5></div>
-                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700 dark:text-slate-300">🏢 ${item.pengembang}</p><a href="<?= base_url('perumahan-formal/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-black uppercase tracking-widest rounded-lg transition-all">Detail</a></div>
+                        <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-bold uppercase tracking-widest text-blue-400 mb-1">Perumahan</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.nama_perumahan}</h5></div>
+                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700 dark:text-slate-300">🏢 ${item.pengembang}</p><a href="<?= base_url('perumahan-formal/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>
                     `);
                     clusterGroup.addLayer(marker);
                 }

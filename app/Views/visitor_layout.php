@@ -29,7 +29,7 @@
         <div class="max-w-7xl mx-auto px-6 lg:px-12 w-full flex items-center justify-between">
             <div class="flex items-center gap-3 group cursor-pointer">
                 <img src="<?= base_url('sinjai.png') ?>" alt="Logo" class="w-8 h-8 group-hover:scale-110 transition-transform">
-                <span class="text-lg font-black tracking-tighter text-blue-950 dark:text-white uppercase">SIBARUKI</span>
+                <span class="text-lg font-bold tracking-tighter text-blue-950 dark:text-white uppercase">SIBARUKI</span>
             </div>
 
             <div class="flex items-center gap-4">
@@ -39,11 +39,11 @@
                 </button>
                 
                 <?php if (session()->get('isLoggedIn')): ?>
-                <a href="<?= base_url('dashboard') ?>" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex items-center gap-2">
+                <a href="<?= base_url('dashboard') ?>" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex items-center gap-2">
                     <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard
                 </a>
                 <?php else: ?>
-                <a href="<?= base_url('login') ?>" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95">
+                <a href="<?= base_url('login') ?>" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95">
                     Login Akses
                 </a>
                 <?php endif; ?>
@@ -61,7 +61,7 @@
         <div class="max-w-7xl mx-auto px-6 lg:px-12">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
                 <div>
-                    <h4 class="text-[9px] font-black uppercase tracking-[0.3em] mb-6 text-blue-600 dark:text-blue-400">Tautan Cepat</h4>
+                    <h4 class="text-[9px] font-bold uppercase tracking-[0.3em] mb-6 text-blue-600 dark:text-blue-400">Tautan Cepat</h4>
                     <ul class="space-y-4">
                         <li>
                             <a href="https://www.instagram.com/disperkimtan.sinjai/" target="_blank" class="group flex items-center gap-3 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">
@@ -83,13 +83,13 @@
                 </div>
 
                 <div>
-                    <h4 class="text-[9px] font-black uppercase tracking-[0.3em] mb-6 text-blue-600 dark:text-blue-400">Kantor Pelayanan</h4>
+                    <h4 class="text-[9px] font-bold uppercase tracking-[0.3em] mb-6 text-blue-600 dark:text-blue-400">Kantor Pelayanan</h4>
                     <div class="flex gap-4">
                         <span class="flex-shrink-0 w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/30 text-blue-600 flex items-center justify-center">
                             <i data-lucide="map-pin" class="w-4.5 h-4.5" stroke-width="2.5"></i>
                         </span>
                         <div>
-                            <p class="text-sm font-black text-blue-950 dark:text-white uppercase mb-1">Alamat Utama</p>
+                            <p class="text-sm font-bold text-blue-950 dark:text-white uppercase mb-1">Alamat Utama</p>
                             <p class="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
                                 Jl. Persatuan Raya No. 116, Kel. Biringere<br>
                                 Kec. Sinjai Utara, Kab. Sinjai, 92611
@@ -100,10 +100,10 @@
             </div>
 
             <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center md:text-left">
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center md:text-left">
                     &copy; <?= date('Y') ?> SIBARUKI v1.0 <span class="mx-2 opacity-20">|</span> Pemkab Sinjai
                 </p>
-                <div class="flex gap-4 text-[9px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest">
+                <div class="flex gap-4 text-[9px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest">
                     SIBARUKI • Sinjai
                 </div>
             </div>

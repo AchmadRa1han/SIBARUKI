@@ -7,37 +7,37 @@
             <i data-lucide="chevron-left" class="w-4 h-4 text-blue-900"></i>
             Kembali ke Daftar
         </a>
-        <h1 class="text-3xl font-black text-blue-950 uppercase tracking-tight">Tambah Role Baru</h1>
+        <h1 class="text-3xl font-bold text-blue-950 uppercase tracking-tight">Tambah Role Baru</h1>
         <p class="text-slate-500 text-sm mt-1">Tentukan hak akses dan cakupan wilayah untuk role baru ini.</p>
     </div>
 
     <form action="<?= base_url('roles/store') ?>" method="POST">
         <div class="space-y-8">
             <!-- Informasi Dasar -->
-            <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                <h3 class="text-blue-900 font-black uppercase text-[10px] tracking-widest mb-6 border-b border-slate-50 pb-4 flex items-center gap-2">
+            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
+                <h3 class="text-blue-900 font-bold uppercase text-[10px] tracking-widest mb-6 border-b border-slate-50 pb-4 flex items-center gap-2">
                     <i data-lucide="info" class="w-3.5 h-3.5"></i>
                     Informasi Dasar
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Nama Role</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nama Role</label>
                         <input type="text" name="role_name" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-blue-900/10 focus:border-blue-900 outline-none transition-all font-bold text-slate-700 placeholder:font-medium" placeholder="Contoh: Verifikator Lapangan" required>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Cakupan Data (Scope)</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cakupan Data (Scope)</label>
                         <div class="grid grid-cols-2 gap-4">
                             <label class="cursor-pointer group">
                                 <input type="radio" name="scope" value="global" class="hidden peer" checked>
                                 <div class="p-4 rounded-2xl border-2 border-slate-50 group-hover:border-blue-900/20 peer-checked:border-blue-900 peer-checked:bg-blue-50 transition-all text-center">
-                                    <span class="block text-xs font-black uppercase tracking-widest text-slate-400 peer-checked:text-blue-900">Global</span>
+                                    <span class="block text-xs font-bold uppercase tracking-widest text-slate-400 peer-checked:text-blue-900">Global</span>
                                     <span class="block text-[9px] text-slate-400 mt-1 peer-checked:text-blue-700 font-bold uppercase">Seluruh Kabupaten</span>
                                 </div>
                             </label>
                             <label class="cursor-pointer group">
                                 <input type="radio" name="scope" value="local" class="hidden peer">
                                 <div class="p-4 rounded-2xl border-2 border-slate-50 group-hover:border-blue-900/20 peer-checked:border-blue-900 peer-checked:bg-blue-50 transition-all text-center">
-                                    <span class="block text-xs font-black uppercase tracking-widest text-slate-400 peer-checked:text-blue-900">Local</span>
+                                    <span class="block text-xs font-bold uppercase tracking-widest text-slate-400 peer-checked:text-blue-900">Local</span>
                                     <span class="block text-[9px] text-slate-400 mt-1 peer-checked:text-blue-700 font-bold uppercase">Wilayah Tugas</span>
                                 </div>
                             </label>
@@ -47,9 +47,9 @@
             </div>
 
             <!-- Permission Matrix -->
-            <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                 <div class="p-8 border-b border-slate-50">
-                    <h3 class="text-blue-900 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
+                    <h3 class="text-blue-900 font-bold uppercase text-[10px] tracking-widest flex items-center gap-2">
                         <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                         Matriks Hak Akses (Permissions)
                     </h3>
@@ -58,7 +58,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 text-blue-900 uppercase text-[10px] font-black tracking-widest">
+                            <tr class="bg-slate-50 text-blue-900 uppercase text-[10px] font-bold tracking-widest">
                                 <th class="p-6 border-b border-slate-100">Modul / Fitur</th>
                                 <th class="p-6 border-b border-slate-100 text-center">Lihat (View)</th>
                                 <th class="p-6 border-b border-slate-100 text-center">Tambah (Create)</th>
@@ -75,7 +75,7 @@
                                             <i data-lucide="home" class="w-4 h-4"></i>
                                         </div>
                                         <div>
-                                            <p class="text-xs font-black text-slate-800 uppercase tracking-tight">Data RTLH</p>
+                                            <p class="text-xs font-bold text-slate-800 uppercase tracking-tight">Data RTLH</p>
                                             <p class="text-[9px] text-slate-400 font-medium italic">Data rumah tidak layak huni</p>
                                         </div>
                                     </div>
@@ -104,7 +104,7 @@
                                             <i data-lucide="map" class="w-4 h-4"></i>
                                         </div>
                                         <div>
-                                            <p class="text-xs font-black text-slate-800 uppercase tracking-tight">Wilayah Kumuh</p>
+                                            <p class="text-xs font-bold text-slate-800 uppercase tracking-tight">Wilayah Kumuh</p>
                                             <p class="text-[9px] text-slate-400 font-medium italic">Data kawasan kumuh kabupaten</p>
                                         </div>
                                     </div>
@@ -133,7 +133,7 @@
                                             <i data-lucide="users" class="w-4 h-4"></i>
                                         </div>
                                         <div>
-                                            <p class="text-xs font-black text-slate-800 uppercase tracking-tight">Manajemen User</p>
+                                            <p class="text-xs font-bold text-slate-800 uppercase tracking-tight">Manajemen User</p>
                                             <p class="text-[9px] text-slate-400 font-medium italic">Kelola akun dan petugas</p>
                                         </div>
                                     </div>
@@ -159,7 +159,7 @@
 
                 <!-- Bagian Izin Lainnya -->
                 <div class="p-8 bg-slate-50/50">
-                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                         <i data-lucide="settings" class="w-3.5 h-3.5"></i>
                         Izin Sistem & Manajemen Lainnya
                     </h4>
@@ -171,7 +171,7 @@
                         ?>
                             <label class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-slate-100 hover:border-blue-900/20 cursor-pointer transition-all group">
                                 <input type="checkbox" name="permissions[]" value="<?= $p['id'] ?>" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-blue-900 focus:ring-blue-900/20 cursor-pointer">
-                                <span class="text-[10px] font-black text-slate-600 group-hover:text-blue-900 uppercase tracking-widest">
+                                <span class="text-[10px] font-bold text-slate-600 group-hover:text-blue-900 uppercase tracking-widest">
                                     <?= strtoupper(str_replace('_', ' ', $p['permission_name'])) ?>
                                 </span>
                             </label>
@@ -185,7 +185,7 @@
 
             <!-- Tombol Aksi -->
             <div class="flex gap-4">
-                <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-900/20 transition-all active:scale-95 uppercase tracking-widest flex items-center justify-center gap-3">
+                <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-5 rounded-2xl shadow-xl shadow-blue-900/20 transition-all active:scale-95 uppercase tracking-widest flex items-center justify-center gap-3">
                     <i data-lucide="save" class="w-5 h-5"></i>
                     SIMPAN ROLE
                 </button>

@@ -22,16 +22,16 @@
         <div>
             <div class="flex items-center gap-2 mb-1.5 ml-1">
                 <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></div>
-                <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Command Center SIBARUKI v1.0</span>
+                <span class="text-[9px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Command Center SIBARUKI v1.0</span>
             </div>
-            <h1 class="text-2xl lg:text-4xl font-black tracking-tighter text-blue-950 dark:text-white uppercase leading-none">
+            <h1 class="text-2xl lg:text-4xl font-bold tracking-tighter text-blue-950 dark:text-white uppercase leading-none">
                 <?= $greet ?>, <span class="text-blue-600"><?= explode(' ', session()->get('username'))[0] ?>.</span>
             </h1>
         </div>
         <div class="flex items-center gap-3 bg-white dark:bg-slate-900 px-5 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
             <div class="flex flex-col items-end">
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]"><?= date('l') ?></span>
-                <span class="text-xs font-black text-blue-950 dark:text-white"><?= date('d F Y') ?></span>
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]"><?= date('l') ?></span>
+                <span class="text-xs font-bold text-blue-950 dark:text-white"><?= date('d F Y') ?></span>
             </div>
             <div class="w-px h-6 bg-slate-100 dark:bg-slate-800"></div>
             <div class="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600">
@@ -213,7 +213,7 @@
                 if (geojson) {
                     L.geoJSON(geojson, { 
                         style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.4 } 
-                    }).addTo(kecLayerGroup).bindTooltip(`<div class="p-1"><p class="font-black uppercase text-[8px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
+                    }).addTo(kecLayerGroup).bindTooltip(`<div class="p-1"><p class="font-bold uppercase text-[8px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
                 }
             } catch (e) {}
         });
@@ -244,7 +244,7 @@
                 if (!geojson) return;
 
                 const detailUrls = { rtlh: '<?= base_url("rtlh/detail") ?>', kumuh: '<?= base_url("wilayah-kumuh/detail") ?>', formal: '<?= base_url("perumahan-formal/detail") ?>', psu: '<?= base_url("psu/detail") ?>', aset: '<?= base_url("aset-tanah/detail") ?>', arsinum: '<?= base_url("arsinum/detail") ?>', pisew: '<?= base_url("pisew/detail") ?>' };
-                const popupContent = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[11px] font-black uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800"><a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-black uppercase tracking-widest rounded-lg transition-all">Detail</a></div>`;
+                const popupContent = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[11px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800"><a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>`;
 
                 if (geojson.type === 'Point') { L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 7, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(clusterGroup); }
                 else { L.geoJSON(geojson, { style: { color: colorMap[type] || '#ef4444', weight: 3, fillOpacity: 0.5 } }).bindPopup(popupContent).addTo(activeDataGroup); }

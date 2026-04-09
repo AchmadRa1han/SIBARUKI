@@ -310,7 +310,7 @@
                     <i data-lucide="info" class="w-4 h-4"></i>
                     <p class="text-[9px] font-bold uppercase tracking-widest leading-relaxed">Pembaruan data akan dicatat dalam log audit sistem untuk monitoring histori.</p>
                 </div>
-                <button type="submit" class="group flex items-center space-x-6 bg-amber-500 hover:bg-amber-600 text-white pl-8 pr-4 py-4 rounded-[1.5rem] font-bold shadow-xl shadow-amber-500/20 transition-all active:scale-95 w-full md:w-auto">
+                <button type="submit" class="group flex items-center space-x-6 bg-amber-500 hover:bg-amber-600 text-white pl-8 pr-4 py-4 rounded-xl font-bold shadow-xl shadow-amber-500/20 transition-all active:scale-95 w-full md:w-auto">
                     <div class="flex flex-col text-right">
                         <span class="text-[8px] uppercase tracking-[0.3em] opacity-60 mb-0.5">Simpan Perubahan</span>
                         <span class="text-base uppercase tracking-tighter">Perbarui Laporan</span>
