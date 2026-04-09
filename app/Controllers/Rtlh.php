@@ -87,8 +87,10 @@ class Rtlh extends BaseController
     }
     public function markTuntas($id)
     {
-        $tahun = $this->request->getPost('tahun_bansos') ?? date('Y');
-        $program = $this->request->getPost('program_bansos');
+        $post = $this->request->getPost();
+        $tahun = $post['tahun_bansos'] ?? date('Y');
+        $program = $post['program_bansos'];
+        $koordinat = $post['lokasi_realisasi'] ?? null;
 
         if (!$id) return redirect()->back()->with('error', 'ID Survei tidak valid.');
 
@@ -112,6 +114,8 @@ class Rtlh extends BaseController
         $db->transStart();
         try {
             $now = date('Y-m-d H:i:s');
+            
+            // 1. Update Tabel Utama
             $db->table('rtlh_rumah')->where('id_survei', $id)->update([
                 'status_bantuan' => 'Sudah Menerima',
                 'tahun_bansos' => $tahun,
@@ -119,18 +123,44 @@ class Rtlh extends BaseController
                 'updated_at' => $now
             ]);
 
-            $db->table('rtlh_bansos')->insert([
+            // 2. Persiapkan Data Realisasi
+            $dataBansos = [
                 'id_survei' => $id,
                 'nik' => $rumah['nik_pemilik'],
                 'nama_penerima' => $penerima['nama_kepala_keluarga'] ?? 'Unknown',
                 'desa' => $rumah['desa'],
                 'tahun_anggaran' => $tahun,
                 'sumber_dana' => $program ?: 'Bansos RTLH',
-                'keterangan' => 'Ditandai tuntas dari modul RTLH',
+                'keterangan' => $post['keterangan_realisasi'] ?? 'Ditandai tuntas dari modul RTLH',
                 'created_at' => $now,
                 'updated_at' => $now
-            ]);
+            ];
 
+            // Handle Upload Foto After
+            $uploadPath = FCPATH . 'uploads/rtlh/';
+            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+            foreach(['foto_setelah_depan', 'foto_setelah_samping', 'foto_setelah_dalam'] as $field) {
+                $img = $this->request->getFile($field);
+                if ($img && $img->isValid() && !$img->hasMoved()) {
+                    $newName = 'AFTER_' . $img->getRandomName();
+                    $img->move($uploadPath, $newName);
+                    $dataBansos[$field] = $newName;
+                }
+            }
+
+            // Simpan Realisasi
+            $this->bansosModel->insert($dataBansos);
+            $bansosId = $this->bansosModel->getInsertID();
+
+            // Simpan Koordinat Realisasi jika ada
+            if (!empty($koordinat) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $koordinat)) {
+                $db->table('rtlh_bansos')->where('id', $bansosId)
+                   ->set('lokasi_realisasi', "ST_GeomFromText('{$koordinat}')", false)
+                   ->update();
+            }
+
+            // 3. Simpan History Perubahan
             $db->table('rtlh_history_perubahan')->insert([
                 'id_survei' => $id,
                 'nik' => $rumah['nik_pemilik'],
@@ -138,7 +168,7 @@ class Rtlh extends BaseController
                 'sumber_bantuan' => $program ?: 'Bansos RTLH',
                 'tahun_anggaran' => $tahun,
                 'data_sebelum' => json_encode($snapshotSebelum),
-                'keterangan' => 'Transformasi RTLH ke RLH',
+                'keterangan' => 'Transformasi RTLH ke RLH (Realisasi)',
                 'created_at' => $now,
                 'updated_at' => $now
             ]);
@@ -146,8 +176,13 @@ class Rtlh extends BaseController
             $db->transComplete();
             if ($db->transStatus() === false) throw new \Exception('Database Error');
 
-            $this->logActivity('Tuntas Bansos', 'RTLH', "Menandai rumah ID $id telah menerima bansos tahun $tahun");
-            return redirect()->to('/rtlh?status=Sudah Menerima')->with('success', "Data berhasil ditandai sebagai Tuntas (RLH). Silakan cek tab 'Tuntas RLH'.");
+            $this->logActivity('Tuntas Bansos', 'RTLH', "Realisasi bantuan ID $id tahun $tahun berhasil dicatat");
+            return redirect()->to('/rtlh?status=Sudah Menerima')->with('success', "Realisasi Program berhasil dicatat. Foto Before-After tersedia di halaman detail.");
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return redirect()->back()->with('error', 'Gagal memproses realisasi: ' . $e->getMessage());
+        }
+    }
         } catch (\Exception $e) {
             $db->transRollback();
             return redirect()->back()->with('error', 'Gagal memproses data: ' . $e->getMessage());
