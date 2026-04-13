@@ -133,24 +133,6 @@
                             <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Infrastruktur PSU Kabupaten Sinjai</span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <?php if (!empty($item['foto_before'])): ?>
-                                <img src="<?= base_url('uploads/psu/' . $item['foto_before']) ?>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700 mx-auto shadow-sm">
-                            <?php else: ?>
-                                <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center mx-auto opacity-40">
-                                    <i data-lucide="image" class="w-4 h-4 text-slate-400"></i>
-                                </div>
-                            <?php endif; ?>
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            <?php if (!empty($item['foto_after'])): ?>
-                                <img src="<?= base_url('uploads/psu/' . $item['foto_after']) ?>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700 mx-auto shadow-sm">
-                            <?php else: ?>
-                                <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center mx-auto opacity-40">
-                                    <i data-lucide="image" class="w-4 h-4 text-slate-400"></i>
-                                </div>
-                            <?php endif; ?>
-                        </td>
-                        <td class="px-4 py-3 text-center">
                             <span class="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-lg font-mono font-bold text-[9px] border border-slate-200 dark:border-slate-700">
                                 <?= $item['id_csv'] ?>
                             </span>

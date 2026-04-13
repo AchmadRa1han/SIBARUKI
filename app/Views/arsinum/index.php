@@ -151,15 +151,6 @@
                             <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Pelaksana: <?= $item['pelaksana'] ?: '-' ?></span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <?php if (!empty($item['foto'])): ?>
-                                <img src="<?= base_url('uploads/arsinum/' . $item['foto']) ?>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700 mx-auto shadow-sm">
-                            <?php else: ?>
-                                <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center mx-auto opacity-40">
-                                    <i data-lucide="image" class="w-4 h-4 text-slate-400"></i>
-                                </div>
-                            <?php endif; ?>
-                        </td>
-                        <td class="px-4 py-3 text-center">
                             <span class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg font-bold text-[9px] border border-blue-100 dark:border-blue-800 shadow-sm uppercase">
                                 <?= $item['volume'] ?>
                             </span>
