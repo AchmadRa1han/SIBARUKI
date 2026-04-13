@@ -197,6 +197,17 @@ class Pisew extends BaseController
     public function store()
     {
         $data = $this->request->getPost();
+
+        // Handle Foto
+        $img = $this->request->getFile('foto');
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            $uploadPath = FCPATH . 'uploads/pisew/';
+            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+            $newName = $img->getRandomName();
+            $img->move($uploadPath, $newName);
+            $data['foto'] = $newName;
+        }
+
         $this->pisewModel->insert($data);
         $this->logActivity('Tambah', 'PISEW', "Menambah data PISEW: {$data['jenis_pekerjaan']}", $this->formatLogData($data));
         return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil ditambahkan.');
@@ -213,6 +224,23 @@ class Pisew extends BaseController
     {
         $oldData = $this->pisewModel->find($id);
         $newData = $this->request->getPost();
+
+        // Handle Foto
+        $img = $this->request->getFile('foto');
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            $uploadPath = FCPATH . 'uploads/pisew/';
+            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+            
+            // Hapus foto lama jika ada
+            if (!empty($oldData['foto']) && file_exists($uploadPath . $oldData['foto'])) {
+                unlink($uploadPath . $oldData['foto']);
+            }
+            
+            $newName = $img->getRandomName();
+            $img->move($uploadPath, $newName);
+            $newData['foto'] = $newName;
+        }
+
         $this->pisewModel->update($id, $newData);
         
         $diff = $this->generateDiff($oldData, $newData);
@@ -225,6 +253,12 @@ class Pisew extends BaseController
     {
         $data = $this->pisewModel->find($id);
         if ($data) {
+            // Hapus foto fisik
+            if (!empty($data['foto'])) {
+                $filePath = FCPATH . 'uploads/pisew/' . $data['foto'];
+                if (file_exists($filePath)) unlink($filePath);
+            }
+
             $db = \Config\Database::connect();
             $db->table('trash_data')->insert([
                 'entity_type' => 'PISEW',

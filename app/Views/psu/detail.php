@@ -87,21 +87,52 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Peta (Visualisasi) -->
-        <div class="lg:col-span-8">
-            <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 relative group aspect-video lg:aspect-auto lg:h-[600px]">
+        <div class="lg:col-span-8 space-y-6">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 relative group aspect-video lg:aspect-auto lg:h-[500px]">
                 <div id="map" class="w-full h-full z-10" style="background: #f8fafc;"></div>
-                
-                <div class="absolute top-6 left-6 z-[1000] flex flex-col gap-2">
-                    <div class="bg-blue-950/90 backdrop-blur-xl text-white px-4 py-2 rounded-xl shadow-2xl border border-white/10 flex items-center gap-3">
-                        <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></div>
-                        <span class="text-[9px] font-bold uppercase tracking-[0.2em]">Visualisasi Geospasial</span>
+                <div class="absolute top-6 left-6 z-[1000] bg-blue-950/90 backdrop-blur-xl text-white px-4 py-2 rounded-xl shadow-2xl border border-white/10 flex items-center gap-3">
+                    <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></div>
+                    <span class="text-[9px] font-bold uppercase tracking-[0.2em]">Visualisasi Geospasial</span>
+                </div>
+            </div>
+
+            <!-- Dokumentasi Before After -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.3em] mb-4 flex items-center gap-3">
+                        <span class="w-8 h-[2px] bg-rose-500"></span> Kondisi Sebelum
+                    </h3>
+                    <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative">
+                        <?php if (!empty($jalan['foto_before'])): ?>
+                            <img src="<?= base_url('uploads/psu/' . $jalan['foto_before']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <a href="<?= base_url('uploads/psu/' . $jalan['foto_before']) ?>" target="_blank" class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i data-lucide="maximize" class="w-6 h-6 text-white"></i>
+                            </a>
+                        <?php else: ?>
+                            <div class="text-center p-8">
+                                <i data-lucide="image-off" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Foto tidak tersedia</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
-
-                <div class="absolute bottom-6 right-6 z-[1000]">
-                    <button onclick="map.fitBounds(pathLayer.getBounds(), {padding:[50,50]})" class="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-2xl text-blue-600 hover:scale-110 active:scale-95 transition-all border border-slate-100 dark:border-slate-800">
-                        <i data-lucide="maximize" class="w-5 h-5"></i>
-                    </button>
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.3em] mb-4 flex items-center gap-3">
+                        <span class="w-8 h-[2px] bg-emerald-500"></span> Kondisi Sesudah
+                    </h3>
+                    <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative">
+                        <?php if (!empty($jalan['foto_after'])): ?>
+                            <img src="<?= base_url('uploads/psu/' . $jalan['foto_after']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <a href="<?= base_url('uploads/psu/' . $jalan['foto_after']) ?>" target="_blank" class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i data-lucide="maximize" class="w-6 h-6 text-white"></i>
+                            </a>
+                        <?php else: ?>
+                            <div class="text-center p-8">
+                                <i data-lucide="image-off" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Foto tidak tersedia</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>

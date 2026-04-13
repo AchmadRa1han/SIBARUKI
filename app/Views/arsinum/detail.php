@@ -101,6 +101,27 @@
 
         <!-- Right Column: Peta & Log -->
         <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.3em] mb-4 flex items-center gap-3">
+                    <span class="w-8 h-[2px] bg-indigo-500"></span> Dokumentasi
+                </h3>
+                <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative">
+                    <?php if (!empty($item['foto'])): ?>
+                        <img src="<?= base_url('uploads/arsinum/' . $item['foto']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <a href="<?= base_url('uploads/arsinum/' . $item['foto']) ?>" target="_blank" class="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
+                                <i data-lucide="maximize" class="w-5 h-5"></i>
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center p-8">
+                            <i data-lucide="image-off" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Foto tidak tersedia</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
             <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 aspect-square relative group">
                 <div id="map-detail" class="w-full h-full z-10"></div>
                 <div class="absolute top-4 left-4 z-[1000] bg-blue-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 shadow-2xl text-[8px] font-bold uppercase tracking-widest text-white flex items-center gap-2">

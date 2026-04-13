@@ -117,6 +117,8 @@
                             <input type="checkbox" id="select-all" class="w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
                         </th>
                         <th class="px-4 py-4 w-64">Nama Ruas Jalan</th>
+                        <th class="px-4 py-4 w-24 text-center text-[8px]">Before</th>
+                        <th class="px-4 py-4 w-24 text-center text-[8px]">After</th>
                         <th class="px-4 py-4 w-32 text-center">ID Inventaris</th>
                         <th class="px-4 py-4 w-40">Nilai Aset</th>
                         <th class="px-6 py-4 text-center w-40">Aksi</th>
@@ -131,6 +133,24 @@
                         <td class="px-4 py-3">
                             <span class="font-bold text-blue-950 dark:text-white uppercase truncate block text-xs mb-0.5"><?= $item['nama_jalan'] ?: 'Tanpa Nama Ruas' ?></span>
                             <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Infrastruktur PSU Kabupaten Sinjai</span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <?php if (!empty($item['foto_before'])): ?>
+                                <img src="<?= base_url('uploads/psu/' . $item['foto_before']) ?>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700 mx-auto shadow-sm">
+                            <?php else: ?>
+                                <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center mx-auto opacity-40">
+                                    <i data-lucide="image" class="w-4 h-4 text-slate-400"></i>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <?php if (!empty($item['foto_after'])): ?>
+                                <img src="<?= base_url('uploads/psu/' . $item['foto_after']) ?>" class="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700 mx-auto shadow-sm">
+                            <?php else: ?>
+                                <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center mx-auto opacity-40">
+                                    <i data-lucide="image" class="w-4 h-4 text-slate-400"></i>
+                                </div>
+                            <?php endif; ?>
                         </td>
                         <td class="px-4 py-3 text-center">
                             <span class="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-lg font-mono font-bold text-[9px] border border-slate-200 dark:border-slate-700">

@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <form action="<?= base_url('arsinum/update/' . $item['id']) ?>" method="post">
+    <form action="<?= base_url('arsinum/update/' . $item['id']) ?>" method="post" enctype="multipart/form-data">
         <?= csrf_field() ?>
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300">
             <div class="p-6 border-b dark:border-slate-800 bg-blue-50/30 dark:bg-blue-950/30 flex items-center gap-3">
@@ -74,9 +74,23 @@
                     <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Pelaksana / Kontraktor</label>
                     <input type="text" name="pelaksana" value="<?= old('pelaksana', $item['pelaksana']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
                 </div>
-                <div class="md:col-span-2">
+                <div>
                     <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat (Lat, Long)</label>
                     <input type="text" name="koordinat" value="<?= old('koordinat', $item['koordinat']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Ganti Foto Dokumentasi</label>
+                    <div class="relative group">
+                        <input type="file" name="foto" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_preview')">
+                        <div id="foto_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-amber-500 group-hover:bg-amber-50/5">
+                            <?php if (!empty($item['foto'])): ?>
+                                <img src="<?= base_url('uploads/arsinum/' . $item['foto']) ?>" class="w-full h-full object-cover">
+                            <?php else: ?>
+                                <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
+                                <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto Baru</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

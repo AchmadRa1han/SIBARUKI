@@ -12,7 +12,7 @@ class ArsinumModel extends Model
     protected $returnType       = 'array';
     protected $allowedFields    = [
         'jenis_pekerjaan', 'volume', 'kecamatan', 'desa', 
-        'pelaksana', 'anggaran', 'sumber_dana', 'koordinat', 'tahun'
+        'pelaksana', 'anggaran', 'sumber_dana', 'koordinat', 'tahun', 'foto'
     ];
 
     protected $useTimestamps = true;

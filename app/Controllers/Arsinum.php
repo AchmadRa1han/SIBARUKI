@@ -183,6 +183,17 @@ class Arsinum extends BaseController
     public function store()
     {
         $data = $this->request->getPost();
+        
+        // Handle Foto
+        $img = $this->request->getFile('foto');
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            $uploadPath = FCPATH . 'uploads/arsinum/';
+            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+            $newName = $img->getRandomName();
+            $img->move($uploadPath, $newName);
+            $data['foto'] = $newName;
+        }
+
         $this->arsinumModel->insert($data);
         $this->logActivity('Tambah', 'Arsinum', "Menambah data Arsinum: {$data['jenis_pekerjaan']}", $this->formatLogData($data));
         return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil ditambahkan.');
@@ -199,6 +210,23 @@ class Arsinum extends BaseController
     {
         $oldData = $this->arsinumModel->find($id);
         $newData = $this->request->getPost();
+        
+        // Handle Foto
+        $img = $this->request->getFile('foto');
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            $uploadPath = FCPATH . 'uploads/arsinum/';
+            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+            
+            // Hapus foto lama jika ada
+            if (!empty($oldData['foto']) && file_exists($uploadPath . $oldData['foto'])) {
+                unlink($uploadPath . $oldData['foto']);
+            }
+            
+            $newName = $img->getRandomName();
+            $img->move($uploadPath, $newName);
+            $newData['foto'] = $newName;
+        }
+
         $this->arsinumModel->update($id, $newData);
         
         $diff = $this->generateDiff($oldData, $newData);
@@ -211,6 +239,12 @@ class Arsinum extends BaseController
     {
         $data = $this->arsinumModel->find($id);
         if ($data) {
+            // Hapus foto fisik
+            if (!empty($data['foto'])) {
+                $filePath = FCPATH . 'uploads/arsinum/' . $data['foto'];
+                if (file_exists($filePath)) unlink($filePath);
+            }
+
             $this->arsinumModel->delete($id);
             $this->logActivity('Hapus', 'Arsinum', "Menghapus data Arsinum: " . ($data['jenis_pekerjaan'] ?? 'Unknown'), $this->formatLogData($data));
         }

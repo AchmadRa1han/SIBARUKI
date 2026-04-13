@@ -185,6 +185,20 @@ class Psu extends BaseController
         if (!$this->validate($rules)) return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
 
         $data = $this->request->getPost();
+
+        // Handle Foto Before & After
+        $uploadPath = FCPATH . 'uploads/psu/';
+        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+        foreach (['foto_before', 'foto_after'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                $newName = $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $data[$field] = $newName;
+            }
+        }
+
         $this->jalanModel->insert($data);
         
         $this->logActivity('Tambah', 'PSU Jalan', 'Menambah jaringan jalan: ' . $data['nama_jalan'], $this->formatLogData($data));
@@ -217,6 +231,24 @@ class Psu extends BaseController
 
         $oldData = $this->jalanModel->find($id);
         $newData = $this->request->getPost();
+
+        // Handle Foto Before & After
+        $uploadPath = FCPATH . 'uploads/psu/';
+        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+        foreach (['foto_before', 'foto_after'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                // Hapus foto lama jika ada
+                if (!empty($oldData[$field]) && file_exists($uploadPath . $oldData[$field])) {
+                    unlink($uploadPath . $oldData[$field]);
+                }
+                
+                $newName = $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $newData[$field] = $newName;
+            }
+        }
         
         $this->jalanModel->update($id, $newData);
         
@@ -232,6 +264,14 @@ class Psu extends BaseController
 
         $data = $this->jalanModel->find($id);
         if ($data) {
+            // Hapus foto fisik
+            foreach (['foto_before', 'foto_after'] as $f) {
+                if (!empty($data[$f])) {
+                    $filePath = FCPATH . 'uploads/psu/' . $data[$f];
+                    if (file_exists($filePath)) unlink($filePath);
+                }
+            }
+
             $db = \Config\Database::connect();
             $db->table('trash_data')->insert([
                 'entity_type' => 'PSU_JALAN',

@@ -58,7 +58,7 @@
     </div>
 
     <!-- 2. FORM MANUAL -->
-    <form action="<?= base_url('psu/store') ?>" method="post">
+    <form action="<?= base_url('psu/store') ?>" method="post" enctype="multipart/form-data">
         <?= csrf_field() ?>
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300">
             <div class="p-6 border-b dark:border-slate-800 bg-blue-50/30 dark:bg-blue-950/30 flex items-center gap-3">
@@ -90,6 +90,28 @@
                         <div class="absolute right-3 bottom-3 text-[8px] font-bold text-slate-400 uppercase tracking-widest pointer-events-none">Sistem: UTM Zone 51S</div>
                     </div>
                 </div>
+
+                <!-- Dokumentasi Before After -->
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Foto Sebelum (Before)</label>
+                    <div class="relative group">
+                        <input type="file" name="foto_before" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'before_preview')">
+                        <div id="before_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-rose-500 group-hover:bg-rose-50/5">
+                            <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
+                            <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto Kondisi Lama</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Foto Sesudah (After)</label>
+                    <div class="relative group">
+                        <input type="file" name="foto_after" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'after_preview')">
+                        <div id="after_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-emerald-500 group-hover:bg-emerald-50/5">
+                            <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
+                            <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto Kondisi Baru</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -97,7 +119,7 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-4">
             <div class="flex items-center gap-3 text-slate-400">
                 <i data-lucide="info" class="w-4 h-4"></i>
-                <p class="text-[9px] font-bold uppercase tracking-widest leading-relaxed max-w-md">Pastikan format WKT menggunakan sistem koordinat UTM Zone 51S agar terproyeksi dengan benar.</p>
+                <p class="text-[9px] font-bold uppercase tracking-widest leading-relaxed max-w-md">Pastikan seluruh data teknis dan dokumentasi visual telah divalidasi sebelum melakukan penyimpanan.</p>
             </div>
             <button type="submit" class="group flex items-center space-x-6 bg-blue-600 hover:bg-blue-700 text-white pl-8 pr-4 py-4 rounded-xl font-bold shadow-xl shadow-blue-600/20 transition-all active:scale-95 w-full md:w-auto">
                 <div class="flex flex-col text-right">
@@ -113,6 +135,19 @@
 </div>
 
 <script>
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                preview.classList.remove('border-dashed');
+                preview.classList.add('border-solid', 'border-blue-500');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     });
