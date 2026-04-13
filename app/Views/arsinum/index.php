@@ -311,6 +311,8 @@
             cb.addEventListener('change', function() {
                 this.closest('tr').classList.toggle('bg-blue-50/50', this.checked);
                 this.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked);
+                const allChecked = document.querySelectorAll('.row-checkbox:checked').length === rowCheckboxes.length;
+                if(selectAll) selectAll.checked = allChecked;
                 updateBulkBar();
             });
         });

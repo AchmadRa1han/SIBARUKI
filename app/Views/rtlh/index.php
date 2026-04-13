@@ -277,7 +277,83 @@
         }
     }
 
+    function submitWithScroll(select) {
+        const mc = document.getElementById('main-content');
+        if (mc) localStorage.setItem('rtlhScrollPos', mc.scrollTop);
+        select.form.submit();
+    }
+
+    // --- Bulk Action Logic ---
+    function updateBulkBar() {
+        const bulkBar = document.getElementById('bulk-action-bar');
+        const countDisplay = document.getElementById('selected-count');
+        const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+        if (checkedCount > 0) {
+            bulkBar.classList.remove('-translate-y-full');
+            countDisplay.innerText = `${checkedCount} TERPILIH`;
+        } else {
+            bulkBar.classList.add('-translate-y-full');
+        }
+    }
+
+    function clearSelection() {
+        const selectAll = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        if (selectAll) selectAll.checked = false;
+        checkboxes.forEach(cb => cb.checked = false);
+        updateBulkBar();
+    }
+
+    function handleBulkDelete() {
+        const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+        if (ids.length === 0) return;
+
+        customConfirm('Hapus Masal?', `Yakin ingin menghapus ${ids.length} data terpilih?`, 'danger').then(conf => {
+            if (conf) {
+                const f = document.getElementById('delete-form');
+                f.action = `<?= base_url('rtlh/bulk-delete') ?>`;
+                // Append IDs as hidden inputs
+                ids.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = id;
+                    f.appendChild(input);
+                });
+                f.submit();
+            }
+        });
+    }
+
+    function confirmDelete(id, name) {
+        customConfirm('Hapus Data?', `Hapus data milik ${name}?`, 'danger').then(conf => {
+            if (conf) {
+                const f = document.getElementById('delete-form');
+                f.action = `<?= base_url('rtlh/delete') ?>/${id}`;
+                f.submit();
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+        const selectAll = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+
+        if (selectAll) {
+            selectAll.addEventListener('change', (e) => {
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+                updateBulkBar();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const allChecked = Array.from(checkboxes).every(c => c.checked);
+                if (selectAll) selectAll.checked = allChecked;
+                updateBulkBar();
+            });
+        });
+
         const mc = document.getElementById('main-content');
         if (mc) {
             const sp = localStorage.getItem('rtlhScrollPos');

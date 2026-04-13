@@ -283,6 +283,14 @@
         submitWithScroll(f);
     }
 
+    function updateBulkBar() {
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const bulkBar = document.getElementById('bulk-action-bar');
+        const selectedCount = document.getElementById('selected-count');
+        if (checked.length > 0) { bulkBar.classList.remove('-translate-y-full'); selectedCount.innerText = `${checked.length} TERPILIH`; }
+        else { bulkBar.classList.add('-translate-y-full'); }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const mc = document.getElementById('main-content');
         if (mc) {
@@ -305,9 +313,12 @@
             cb.addEventListener('change', function() {
                 this.closest('tr').classList.toggle('bg-blue-50/50', this.checked);
                 this.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked);
+                const allChecked = document.querySelectorAll('.row-checkbox:checked').length === rowCheckboxes.length;
+                if(selectAll) selectAll.checked = allChecked;
                 updateBulkBar();
             });
         });
+        initMap();
     });
 
     async function handleBulkDelete() {
