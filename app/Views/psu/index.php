@@ -117,8 +117,6 @@
                             <input type="checkbox" id="select-all" class="w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
                         </th>
                         <th class="px-4 py-4 w-64">Nama Ruas Jalan</th>
-                        <th class="px-4 py-4 w-24 text-center text-[8px]">Before</th>
-                        <th class="px-4 py-4 w-24 text-center text-[8px]">After</th>
                         <th class="px-4 py-4 w-32 text-center">ID Inventaris</th>
                         <th class="px-4 py-4 w-40">Nilai Aset</th>
                         <th class="px-6 py-4 text-center w-40">Aksi</th>

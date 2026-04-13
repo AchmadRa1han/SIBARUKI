@@ -135,7 +135,6 @@
                         <th class="px-4 py-4 w-64 cursor-pointer hover:text-blue-600 transition-colors" onclick="applySort('jenis_pekerjaan')">
                             Jenis Pekerjaan
                         </th>
-                        <th class="px-4 py-4 w-32 text-center text-xs">Dokumentasi</th>
                         <th class="px-4 py-4 w-32 text-center">Volume</th>
                         <th class="px-4 py-4 w-56">Wilayah Administratif</th>
                         <th class="px-6 py-4 text-center w-40">Aksi</th>
