@@ -127,3 +127,4 @@ _modules/*
 /phpunit*.xml
 node_modules/
 package-lock.json
+pull.sh
