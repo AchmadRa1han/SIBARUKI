@@ -73,17 +73,44 @@ class BansosRtlh extends BaseController
         $desa = $this->request->getPost('desa');
         $tahun = $this->request->getPost('tahun_anggaran');
         $sumber = $this->request->getPost('sumber_dana');
+        $koordinat = $this->request->getPost('lokasi_realisasi');
 
-        // 1. Simpan ke tabel bansos
-        $this->bansosModel->insert([
+        // 1. Persiapkan Data Realisasi
+        $dataBansos = [
             'id_survei' => $id_survei ?: null,
             'nik' => $nik,
             'nama_penerima' => $nama,
             'desa' => $desa,
             'tahun_anggaran' => $tahun,
             'sumber_dana' => $sumber,
-            'keterangan' => $this->request->getPost('keterangan')
-        ]);
+            'keterangan' => $this->request->getPost('keterangan'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        // Handle Upload Foto After
+        $uploadPath = FCPATH . 'uploads/rtlh/';
+        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+        foreach(['foto_setelah_depan', 'foto_setelah_samping', 'foto_setelah_dalam'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                $newName = 'AFTER_' . $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $dataBansos[$field] = $newName;
+            }
+        }
+
+        // Simpan ke tabel bansos
+        $this->bansosModel->insert($dataBansos);
+        $bansosId = $this->bansosModel->getInsertID();
+
+        // Simpan Koordinat Realisasi jika ada (POINT WKT)
+        if (!empty($koordinat) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $koordinat)) {
+            $db->table('rtlh_bansos')->where('id', $bansosId)
+               ->set('lokasi_realisasi', "ST_GeomFromText('{$koordinat}')", false)
+               ->update();
+        }
 
         // 2. Jika terhubung ke data survei RTLH, update statusnya otomatis
         $targetId = $id_survei;
@@ -109,7 +136,8 @@ class BansosRtlh extends BaseController
                 $db->table('rtlh_rumah')->where('id_survei', $targetId)->update([
                     'status_bantuan' => 'Sudah Menerima',
                     'tahun_bansos' => $tahun,
-                    'bantuan_perumahan' => $sumber
+                    'bantuan_perumahan' => $sumber,
+                    'updated_at' => date('Y-m-d H:i:s')
                 ]);
 
                 // Save to History
@@ -120,7 +148,9 @@ class BansosRtlh extends BaseController
                     'sumber_bantuan' => $sumber,
                     'tahun_anggaran' => $tahun,
                     'data_sebelum' => json_encode($snapshot),
-                    'keterangan' => 'Transformasi via Modul Bansos'
+                    'keterangan' => 'Transformasi via Modul Bansos',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
                 ]);
             }
         }
