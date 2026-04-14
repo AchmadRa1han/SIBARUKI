@@ -74,7 +74,7 @@
     </section>
 
     <!-- 2. SUMMARY & INSIGHT SECTION -->
-    <section id="summary" class="py-16 bg-white dark:bg-slate-900/50 relative border-y border-slate-100 dark:border-slate-800/50 overflow-hidden">
+    <section id="summary" class="scroll-mt-20 py-16 bg-white dark:bg-slate-900/50 relative border-y border-slate-100 dark:border-slate-800/50 overflow-hidden">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div class="lg:col-span-4 reveal">
                 <div class="h-full flex flex-col justify-center">
@@ -125,7 +125,7 @@
     </section>
 
     <!-- 3. MAP SECTION -->
-    <section id="map" class="py-16 bg-slate-50 dark:bg-slate-950">
+    <section id="map" class="scroll-mt-20 py-16 bg-slate-50 dark:bg-slate-950">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 reveal">
             <div>
                 <h2 class="text-[9px] font-black text-blue-600 uppercase tracking-[0.4em] mb-3">Interaktif GIS</h2>
