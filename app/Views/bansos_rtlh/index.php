@@ -113,11 +113,12 @@
                         </td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-1.5">
+                                <a href="<?= base_url('bansos-rtlh/detail/'.$item['id']) ?>" class="p-2 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-600 hover:text-white transition-all shadow-sm border border-emerald-100 dark:border-emerald-900" title="Detail Realisasi"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
                                 <?php if($item['id_survei']): ?>
                                 <a href="<?= base_url('rtlh/detail/'.$item['id_survei']) ?>" class="p-2 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-blue-100 dark:border-blue-900" title="Profil RTLH"><i data-lucide="home" class="w-3.5 h-3.5"></i></a>
                                 <?php endif; ?>
                                 <?php if (has_permission('delete_rtlh')): ?>
-                                <button onclick="confirmDelete(<?= $item['id'] ?>, '<?= addslashes($item['nama_penerima']) ?>')" class="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="confirmDelete(<?= $item['id'] ?>, '<?= addslashes($item['nama_penerima']) ?>')" class="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all active:scale-95 flex items-center gap-2"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
                             </div>
                         </td>

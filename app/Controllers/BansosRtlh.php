@@ -88,14 +88,15 @@ class BansosRtlh extends BaseController
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        // Handle Upload Foto After
+        // Handle Upload Foto Before & After
         $uploadPath = FCPATH . 'uploads/rtlh/';
         if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
 
-        foreach(['foto_setelah_depan', 'foto_setelah_samping', 'foto_setelah_dalam'] as $field) {
+        foreach(['foto_before', 'foto_after'] as $field) {
             $img = $this->request->getFile($field);
             if ($img && $img->isValid() && !$img->hasMoved()) {
-                $newName = 'AFTER_' . $img->getRandomName();
+                $prefix = strtoupper(str_replace('foto_', '', $field));
+                $newName = $prefix . '_' . $img->getRandomName();
                 $img->move($uploadPath, $newName);
                 $dataBansos[$field] = $newName;
             }
@@ -120,7 +121,7 @@ class BansosRtlh extends BaseController
         }
 
         if ($targetId) {
-            // Capture Snapshot Sebelum (Gunakan ST_AsText agar tidak error json_encode)
+            // Capture Snapshot Sebelum
             $rumahData = $db->table('rtlh_rumah')
                             ->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')
                             ->where('id_survei', $targetId)
@@ -132,7 +133,7 @@ class BansosRtlh extends BaseController
 
                 $snapshot = ['rumah' => $rumahData, 'kondisi' => $kondisi, 'penerima' => $penerima];
 
-                // Update Status menggunakan Query Builder agar lebih pasti
+                // Update Status RTLH
                 $db->table('rtlh_rumah')->where('id_survei', $targetId)->update([
                     'status_bantuan' => 'Sudah Menerima',
                     'tahun_bansos' => $tahun,
@@ -164,6 +165,28 @@ class BansosRtlh extends BaseController
         $this->logActivity('Input Bansos', 'Bansos', "Menginput realisasi bansos untuk $nama ($nik)");
 
         return redirect()->to('/bansos-rtlh')->with('success', 'Data realisasi bansos berhasil disimpan dan status RTLH diperbarui.');
+    }
+
+    public function detail($id)
+    {
+        $db = \Config\Database::connect();
+        $bansos = $db->table('rtlh_bansos')
+                     ->select('rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
+                     ->where('id', $id)
+                     ->get()->getRowArray();
+
+        if (!$bansos) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+
+        $rumah = null;
+        if ($bansos['id_survei']) {
+            $rumah = $this->rumahModel->find($bansos['id_survei']);
+        }
+
+        return view('bansos_rtlh/detail', [
+            'title' => 'Detail Realisasi Bansos',
+            'bansos' => $bansos,
+            'rumah' => $rumah
+        ]);
     }
 
     public function delete($id)

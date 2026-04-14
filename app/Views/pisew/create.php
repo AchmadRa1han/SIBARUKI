@@ -101,15 +101,28 @@
                 </div>
                 <div>
                     <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat (Lat, Long)</label>
-                    <input type="text" name="koordinat" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-mono text-xs" placeholder="-5.123, 120.123">
+                    <div id="map-picker" class="w-full h-48 rounded-xl border border-slate-200 dark:border-slate-800 mb-2 z-10"></div>
+                    <input type="text" name="koordinat" id="koordinat" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-mono text-xs" placeholder="-5.123, 120.123">
                 </div>
-                <div>
-                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Foto Dokumentasi</label>
-                    <div class="relative group">
-                        <input type="file" name="foto" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_preview')">
-                        <div id="foto_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-indigo-600 group-hover:bg-indigo-50/5">
-                            <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
-                            <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto</span>
+                <div class="grid grid-cols-2 gap-4 md:col-span-2">
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Foto Before (0%)</label>
+                        <div class="relative group">
+                            <input type="file" name="foto_before" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_before_preview')">
+                            <div id="foto_before_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-indigo-600 group-hover:bg-indigo-50/5">
+                                <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
+                                <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto Before</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Foto After (100%)</label>
+                        <div class="relative group">
+                            <input type="file" name="foto_after" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_after_preview')">
+                            <div id="foto_after_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-indigo-600 group-hover:bg-indigo-50/5">
+                                <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
+                                <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto After</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -135,7 +148,51 @@
     </form>
 </div>
 
+<!-- Leaflet Assets -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+    let map, marker;
+
+    function initMap() {
+        if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
+        
+        const isDark = document.documentElement.classList.contains('dark');
+        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CartoDB' 
+        });
+        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: '&copy; Google'
+        });
+
+        map = L.map('map-picker', { 
+            zoomControl: false, 
+            layers: [googleSat] 
+        }).setView([-5.1245, 120.2536], 13);
+
+        L.control.layers({
+            "Default View": cartoDB,
+            "Satellite View": googleSat
+        }, null, { position: 'topright' }).addTo(map);
+        
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        map.on('click', (e) => updateMarker(e.latlng.lat, e.latlng.lng));
+    }
+
+    function updateMarker(lat, lng) {
+        if (marker) marker.setLatLng([lat, lng]);
+        else marker = L.marker([lat, lng], { draggable: true }).addTo(map).on('dragend', (e) => updateInput(e.target.getLatLng().lat, e.target.getLatLng().lng));
+        updateInput(lat, lng);
+    }
+
+    function updateInput(lat, lng) {
+        document.getElementById('koordinat').value = `${lat.toFixed(8)}, ${lng.toFixed(8)}`;
+    }
+
     function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
         if (input.files && input.files[0]) {
@@ -151,6 +208,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
+        initMap();
     });
 </script>
 <?= $this->endSection() ?>

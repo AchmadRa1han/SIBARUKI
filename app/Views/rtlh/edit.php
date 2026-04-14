@@ -345,11 +345,30 @@
 
     function initMapPicker() {
         if (typeof L === 'undefined') { setTimeout(initMapPicker, 100); return; }
-        const tiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri' });
+        
+        const isDark = document.documentElement.classList.contains('dark');
+        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CartoDB' 
+        });
+        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: '&copy; Google'
+        });
+
         const initialWkt = document.getElementById('lokasi_koordinat').value;
         const coords = parseWKT(initialWkt);
         
-        map = L.map('map-picker', { zoomControl: false, layers: [tiles] }).setView(coords ? [coords.lat, coords.lng] : [-5.1245, 120.2536], coords ? 18 : 15);
+        map = L.map('map-picker', { 
+            zoomControl: false, 
+            layers: [googleSat] 
+        }).setView(coords ? [coords.lat, coords.lng] : [-5.1245, 120.2536], coords ? 18 : 15);
+
+        L.control.layers({
+            "Default View": cartoDB,
+            "Satellite View": googleSat
+        }, null, { position: 'topright' }).addTo(map);
+        
         L.control.zoom({ position: 'topright' }).addTo(map);
 
         if (coords) {

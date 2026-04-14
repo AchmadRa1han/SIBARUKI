@@ -12,7 +12,7 @@ class PisewModel extends Model
     protected $returnType       = 'array';
     protected $allowedFields    = [
         'jenis_pekerjaan', 'lokasi_desa', 'kecamatan', 'pelaksana', 
-        'anggaran', 'sumber_dana', 'tahun', 'koordinat', 'foto'
+        'anggaran', 'sumber_dana', 'tahun', 'koordinat', 'foto_before', 'foto_after'
     ];
 
     protected $useTimestamps = true;

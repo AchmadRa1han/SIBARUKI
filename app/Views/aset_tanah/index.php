@@ -208,32 +208,26 @@
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
         try {
             const isDark = document.documentElement.classList.contains('dark');
-            const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
-            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' });
-
-            map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 13);
-            L.control.zoom({ position: 'topright' }).addTo(map);
-
-            const LayerToggle = L.Control.extend({
-                onAdd: function(map) {
-                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
-                    btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
-                    const svgColor = isDark ? '#60a5fa' : '#2563eb';
-                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
-                    L.DomEvent.disableClickPropagation(btn);
-                    L.DomEvent.on(btn, 'click', function(e) {
-                        rot += 360;
-                        const svg = btn.querySelector('svg');
-                        svg.style.transform = `rotate(${rot}deg)`;
-                        setTimeout(() => {
-                            if (map.hasLayer(standard)) { map.removeLayer(standard); map.addLayer(satellite); btn.style.backgroundColor = '#2563eb'; svg.setAttribute('stroke', '#ffffff'); }
-                            else { map.removeLayer(satellite); map.addLayer(standard); btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; svg.setAttribute('stroke', svgColor); }
-                        }, 200);
-                    });
-                    return btn;
-                }
+            const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+                attribution: '&copy; CartoDB' 
             });
-            map.addControl(new LayerToggle({ position: 'topright' }));
+            const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3'],
+                attribution: '&copy; Google'
+            });
+
+            map = L.map('map', { 
+                zoomControl: false, 
+                layers: [googleSat] 
+            }).setView([-5.1245, 120.2536], 13);
+
+            L.control.layers({
+                "Default View": cartoDB,
+                "Satellite View": googleSat
+            }, null, { position: 'topright' }).addTo(map);
+
+            L.control.zoom({ position: 'topright' }).addTo(map);
 
             clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
             const asetData = <?= json_encode($aset_all ?? []) ?>;

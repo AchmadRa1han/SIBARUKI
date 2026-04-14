@@ -77,19 +77,36 @@
                 </div>
                 <div>
                     <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat (Lat, Long)</label>
-                    <input type="text" name="koordinat" value="<?= old('koordinat', $item['koordinat']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs">
+                    <div id="map-picker" class="w-full h-48 rounded-xl border border-slate-200 dark:border-slate-800 mb-2 z-10"></div>
+                    <input type="text" name="koordinat" id="koordinat" value="<?= old('koordinat', $item['koordinat']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs">
                 </div>
-                <div>
-                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Ganti Foto Dokumentasi</label>
-                    <div class="relative group">
-                        <input type="file" name="foto" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_preview')">
-                        <div id="foto_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-amber-500 group-hover:bg-amber-50/5">
-                            <?php if (!empty($item['foto'])): ?>
-                                <img src="<?= base_url('uploads/pisew/' . $item['foto']) ?>" class="w-full h-full object-cover">
-                            <?php else: ?>
-                                <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
-                                <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto Baru</span>
-                            <?php endif; ?>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Foto Before (0%)</label>
+                        <div class="relative group">
+                            <input type="file" name="foto_before" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_before_preview')">
+                            <div id="foto_before_preview" class="w-full h-48 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-amber-500 group-hover:bg-amber-50/5">
+                                <?php if (!empty($item['foto_before'])): ?>
+                                    <img src="<?= base_url('uploads/pisew/' . $item['foto_before']) ?>" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
+                                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto Before</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Foto After (100%)</label>
+                        <div class="relative group">
+                            <input type="file" name="foto_after" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_after_preview')">
+                            <div id="foto_after_preview" class="w-full h-48 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-amber-500 group-hover:bg-amber-50/5">
+                                <?php if (!empty($item['foto_after'])): ?>
+                                    <img src="<?= base_url('uploads/pisew/' . $item['foto_after']) ?>" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
+                                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto After</span>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,7 +132,58 @@
     </form>
 </div>
 
+<!-- Leaflet Assets -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+    let map, marker;
+
+    function initMap() {
+        if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
+        
+        const isDark = document.documentElement.classList.contains('dark');
+        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CartoDB' 
+        });
+        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: '&copy; Google'
+        });
+
+        const initialCoords = '<?= $item['koordinat'] ?>'.split(',').map(c => parseFloat(c.trim()));
+        const hasCoords = initialCoords.length === 2 && !isNaN(initialCoords[0]);
+
+        map = L.map('map-picker', { 
+            zoomControl: false, 
+            layers: [googleSat] 
+        }).setView(hasCoords ? initialCoords : [-5.1245, 120.2536], 13);
+
+        L.control.layers({
+            "Default View": cartoDB,
+            "Satellite View": googleSat
+        }, null, { position: 'topright' }).addTo(map);
+        
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        if (hasCoords) {
+            marker = L.marker(initialCoords, { draggable: true }).addTo(map).on('dragend', (e) => updateInput(e.target.getLatLng().lat, e.target.getLatLng().lng));
+        }
+
+        map.on('click', (e) => updateMarker(e.latlng.lat, e.latlng.lng));
+    }
+
+    function updateMarker(lat, lng) {
+        if (marker) marker.setLatLng([lat, lng]);
+        else marker = L.marker([lat, lng], { draggable: true }).addTo(map).on('dragend', (e) => updateInput(e.target.getLatLng().lat, e.target.getLatLng().lng));
+        updateInput(lat, lng);
+    }
+
+    function updateInput(lat, lng) {
+        document.getElementById('koordinat').value = `${lat.toFixed(8)}, ${lng.toFixed(8)}`;
+    }
+
     function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
         if (input.files && input.files[0]) {
@@ -131,6 +199,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
+        initMap();
     });
 </script>
 <?= $this->endSection() ?>

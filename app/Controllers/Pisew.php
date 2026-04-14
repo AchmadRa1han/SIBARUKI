@@ -198,14 +198,17 @@ class Pisew extends BaseController
     {
         $data = $this->request->getPost();
 
-        // Handle Foto
-        $img = $this->request->getFile('foto');
-        if ($img && $img->isValid() && !$img->hasMoved()) {
-            $uploadPath = FCPATH . 'uploads/pisew/';
-            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
-            $newName = $img->getRandomName();
-            $img->move($uploadPath, $newName);
-            $data['foto'] = $newName;
+        // Handle Foto Before & After
+        $uploadPath = FCPATH . 'uploads/pisew/';
+        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+        foreach (['foto_before', 'foto_after'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                $newName = $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $data[$field] = $newName;
+            }
         }
 
         $this->pisewModel->insert($data);
@@ -225,20 +228,22 @@ class Pisew extends BaseController
         $oldData = $this->pisewModel->find($id);
         $newData = $this->request->getPost();
 
-        // Handle Foto
-        $img = $this->request->getFile('foto');
-        if ($img && $img->isValid() && !$img->hasMoved()) {
-            $uploadPath = FCPATH . 'uploads/pisew/';
-            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
-            
-            // Hapus foto lama jika ada
-            if (!empty($oldData['foto']) && file_exists($uploadPath . $oldData['foto'])) {
-                unlink($uploadPath . $oldData['foto']);
+        // Handle Foto Before & After
+        $uploadPath = FCPATH . 'uploads/pisew/';
+        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+        
+        foreach (['foto_before', 'foto_after'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                // Hapus foto lama jika ada
+                if (!empty($oldData[$field]) && file_exists($uploadPath . $oldData[$field])) {
+                    unlink($uploadPath . $oldData[$field]);
+                }
+                
+                $newName = $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $newData[$field] = $newName;
             }
-            
-            $newName = $img->getRandomName();
-            $img->move($uploadPath, $newName);
-            $newData['foto'] = $newName;
         }
 
         $this->pisewModel->update($id, $newData);
@@ -254,9 +259,12 @@ class Pisew extends BaseController
         $data = $this->pisewModel->find($id);
         if ($data) {
             // Hapus foto fisik
-            if (!empty($data['foto'])) {
-                $filePath = FCPATH . 'uploads/pisew/' . $data['foto'];
-                if (file_exists($filePath)) unlink($filePath);
+            $uploadPath = FCPATH . 'uploads/pisew/';
+            foreach (['foto_before', 'foto_after', 'foto'] as $f) {
+                if (!empty($data[$f])) {
+                    $filePath = $uploadPath . $data[$f];
+                    if (file_exists($filePath)) unlink($filePath);
+                }
             }
 
             $db = \Config\Database::connect();

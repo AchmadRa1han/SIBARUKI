@@ -217,9 +217,22 @@
         if (typeof L === 'undefined' || typeof L.markerClusterGroup !== 'function') return;
         try {
             const isDark = document.documentElement.classList.contains('dark');
-            const tiles = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
+            const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+                attribution: '&copy; CartoDB' 
+            });
+            const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3'],
+                attribution: '&copy; Google'
+            });
             
-            map = L.map('publicMap', { zoomControl: false, layers: [tiles] }).setView([-5.1245, 120.2536], 11);
+            map = L.map('publicMap', { zoomControl: false, layers: [cartoDB] }).setView([-5.1245, 120.2536], 11);
+            
+            L.control.layers({
+                "Default View": cartoDB,
+                "Satellite View": googleSat
+            }, null, { position: 'topright' }).addTo(map);
+
             L.control.zoom({ position: 'topright' }).addTo(map);
 
             clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 }).addTo(map);

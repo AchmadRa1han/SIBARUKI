@@ -184,24 +184,28 @@ class Arsinum extends BaseController
     {
         $data = $this->request->getPost();
         
-        // Handle Foto
-        $img = $this->request->getFile('foto');
-        if ($img && $img->isValid() && !$img->hasMoved()) {
-            $uploadPath = FCPATH . 'uploads/arsinum/';
-            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
-            $newName = $img->getRandomName();
-            $img->move($uploadPath, $newName);
-            $data['foto'] = $newName;
+        // Handle Foto Before & After
+        $uploadPath = FCPATH . 'uploads/arsinum/';
+        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+        foreach(['foto_before', 'foto_after'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                $newName = strtoupper($field) . '_' . $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $data[$field] = $newName;
+            }
         }
 
         $this->arsinumModel->insert($data);
-        $this->logActivity('Tambah', 'Arsinum', "Menambah data Arsinum: {$data['jenis_pekerjaan']}", $this->formatLogData($data));
+        $this->logActivity('Tambah', 'Arsinum', "Menambah data Arsinum: {$data['jenis_pekerjaan']}");
         return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $data['item'] = $this->arsinumModel->find($id);
+        if (!$data['item']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         $data['title'] = 'Edit Arsinum';
         return view('arsinum/edit', $data);
     }
@@ -209,28 +213,30 @@ class Arsinum extends BaseController
     public function update($id)
     {
         $oldData = $this->arsinumModel->find($id);
+        if (!$oldData) return redirect()->back()->with('error', 'Data tidak ditemukan.');
+
         $newData = $this->request->getPost();
         
-        // Handle Foto
-        $img = $this->request->getFile('foto');
-        if ($img && $img->isValid() && !$img->hasMoved()) {
-            $uploadPath = FCPATH . 'uploads/arsinum/';
-            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
-            
-            // Hapus foto lama jika ada
-            if (!empty($oldData['foto']) && file_exists($uploadPath . $oldData['foto'])) {
-                unlink($uploadPath . $oldData['foto']);
+        // Handle Foto Before & After
+        $uploadPath = FCPATH . 'uploads/arsinum/';
+        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+        foreach(['foto_before', 'foto_after'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                // Hapus foto lama jika ada
+                if (!empty($oldData[$field]) && file_exists($uploadPath . $oldData[$field])) {
+                    unlink($uploadPath . $oldData[$field]);
+                }
+                
+                $newName = strtoupper($field) . '_' . $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $newData[$field] = $newName;
             }
-            
-            $newName = $img->getRandomName();
-            $img->move($uploadPath, $newName);
-            $newData['foto'] = $newName;
         }
 
         $this->arsinumModel->update($id, $newData);
-        
-        $diff = $this->generateDiff($oldData, $newData);
-        $this->logActivity('Ubah', 'Arsinum', "Memperbarui data Arsinum: " . ($oldData['jenis_pekerjaan'] ?? 'Unknown'), $diff);
+        $this->logActivity('Ubah', 'Arsinum', "Memperbarui data Arsinum: " . ($oldData['jenis_pekerjaan'] ?? 'Unknown'));
         
         return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil diperbarui.');
     }
@@ -240,13 +246,15 @@ class Arsinum extends BaseController
         $data = $this->arsinumModel->find($id);
         if ($data) {
             // Hapus foto fisik
-            if (!empty($data['foto'])) {
-                $filePath = FCPATH . 'uploads/arsinum/' . $data['foto'];
-                if (file_exists($filePath)) unlink($filePath);
+            $uploadPath = FCPATH . 'uploads/arsinum/';
+            foreach(['foto_before', 'foto_after'] as $field) {
+                if (!empty($data[$field]) && file_exists($uploadPath . $data[$field])) {
+                    unlink($uploadPath . $data[$field]);
+                }
             }
 
             $this->arsinumModel->delete($id);
-            $this->logActivity('Hapus', 'Arsinum', "Menghapus data Arsinum: " . ($data['jenis_pekerjaan'] ?? 'Unknown'), $this->formatLogData($data));
+            $this->logActivity('Hapus', 'Arsinum', "Menghapus data Arsinum: " . ($data['jenis_pekerjaan'] ?? 'Unknown'));
         }
         return redirect()->to('/arsinum')->with('success', 'Data Arsinum berhasil dihapus.');
     }

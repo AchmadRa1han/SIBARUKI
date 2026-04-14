@@ -88,25 +88,36 @@
                 </div>
             </div>
 
-            <!-- Dokumentasi After -->
+            <!-- Dokumentasi Realisasi -->
             <div class="space-y-6">
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                    <span class="w-8 h-[2px] bg-slate-200 dark:bg-slate-800"></span> Dokumentasi Setelah Perbaikan (After)
+                    <span class="w-8 h-[2px] bg-slate-200 dark:bg-slate-800"></span> Dokumentasi Realisasi (Before & After)
                 </p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <?php foreach(['foto_setelah_depan' => 'Tampak Depan', 'foto_setelah_samping' => 'Tampak Samping', 'foto_setelah_dalam' => 'Bagian Dalam'] as $fkey => $flabel): ?>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-3">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1"><?= $flabel ?></label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Foto Kondisi Awal (Before)</label>
                         <div class="relative group aspect-video bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
-                            <input type="file" name="<?= $fkey ?>" accept="image/*" onchange="previewFile(this, 'preview-<?= $fkey ?>')" class="absolute inset-0 opacity-0 z-10 cursor-pointer">
-                            <div id="placeholder-<?= $fkey ?>" class="flex flex-col items-center justify-center">
+                            <input type="file" name="foto_before" accept="image/*" onchange="previewFile(this, 'preview-foto_before')" class="absolute inset-0 opacity-0 z-10 cursor-pointer">
+                            <div id="placeholder-foto_before" class="flex flex-col items-center justify-center">
                                 <i data-lucide="camera" class="w-6 h-6 text-slate-300 mb-2"></i>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">Pilih Foto</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Pilih Foto Sebelum</span>
                             </div>
-                            <img id="preview-<?= $fkey ?>" class="absolute inset-0 w-full h-full object-cover hidden">
+                            <img id="preview-foto_before" class="absolute inset-0 w-full h-full object-cover hidden">
+                        </div>
+                        <p class="text-[8px] text-slate-400 italic ml-1">*Jika dihubungkan ke data survei, sistem akan otomatis mengambil foto dari database RTLH.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Foto Hasil Perbaikan (After)</label>
+                        <div class="relative group aspect-video bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
+                            <input type="file" name="foto_after" accept="image/*" onchange="previewFile(this, 'preview-foto_after')" class="absolute inset-0 opacity-0 z-10 cursor-pointer">
+                            <div id="placeholder-foto_after" class="flex flex-col items-center justify-center">
+                                <i data-lucide="camera" class="w-6 h-6 text-slate-300 mb-2"></i>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Pilih Foto Sesudah</span>
+                            </div>
+                            <img id="preview-foto_after" class="absolute inset-0 w-full h-full object-cover hidden">
                         </div>
                     </div>
-                    <?php endforeach; ?>
                 </div>
             </div>
 
@@ -178,20 +189,30 @@
     // Map Initialization
     let map, marker;
     function initMap() {
-        const defaultLat = -5.2012; // Sinjai
-        const defaultLng = 120.2012;
+        const defaultLat = -5.1245; 
+        const defaultLng = 120.2536;
 
         const isDark = document.documentElement.classList.contains('dark');
-        const tiles = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; Sibaruki'
+        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CartoDB' 
+        });
+        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: '&copy; Google'
         });
 
         map = L.map('map', {
             center: [defaultLat, defaultLng],
-            zoom: 13,
-            layers: [tiles],
+            zoom: 11,
+            layers: [cartoDB],
             zoomControl: false
         });
+
+        L.control.layers({
+            "Default View": cartoDB,
+            "Satellite View": googleSat
+        }, null, { position: 'topright' }).addTo(map);
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 

@@ -98,30 +98,69 @@
                     </div>
                 </div>
             </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 transition-all duration-300">
+                <h3 class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                    <span class="w-8 h-[2px] bg-amber-500"></span> Dokumentasi Pekerjaan
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Kondisi Awal (Before)</p>
+                        <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative shadow-md">
+                            <?php if (!empty($item['foto_before'])): ?>
+                                <img src="<?= base_url('uploads/pisew/' . $item['foto_before']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <a href="<?= base_url('uploads/pisew/' . $item['foto_before']) ?>" target="_blank" class="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
+                                        <i data-lucide="maximize" class="w-5 h-5"></i>
+                                    </a>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center p-8">
+                                    <i data-lucide="image-off" class="w-8 h-8 text-slate-300 mx-auto mb-3"></i>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Belum Ada Foto</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Kondisi Akhir (After)</p>
+                        <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative shadow-md">
+                            <?php if (!empty($item['foto_after'])): ?>
+                                <img src="<?= base_url('uploads/pisew/' . $item['foto_after']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <a href="<?= base_url('uploads/pisew/' . $item['foto_after']) ?>" target="_blank" class="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
+                                        <i data-lucide="maximize" class="w-5 h-5"></i>
+                                    </a>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center p-8">
+                                    <i data-lucide="image-off" class="w-8 h-8 text-slate-300 mx-auto mb-3"></i>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Belum Ada Foto</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Right Column: Peta & Log -->
         <div class="space-y-6">
+            <?php if (!empty($item['foto'])): ?>
             <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
                 <h3 class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.3em] mb-4 flex items-center gap-3">
-                    <span class="w-8 h-[2px] bg-indigo-500"></span> Dokumentasi
+                    <span class="w-8 h-[2px] bg-indigo-500"></span> Foto Utama (Legacy)
                 </h3>
                 <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative">
-                    <?php if (!empty($item['foto'])): ?>
-                        <img src="<?= base_url('uploads/pisew/' . $item['foto']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <a href="<?= base_url('uploads/pisew/' . $item['foto']) ?>" target="_blank" class="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
-                                <i data-lucide="maximize" class="w-5 h-5"></i>
-                            </a>
-                        </div>
-                    <?php else: ?>
-                        <div class="text-center p-8">
-                            <i data-lucide="image-off" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Foto tidak tersedia</p>
-                        </div>
-                    <?php endif; ?>
+                    <img src="<?= base_url('uploads/pisew/' . $item['foto']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <a href="<?= base_url('uploads/pisew/' . $item['foto']) ?>" target="_blank" class="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
+                            <i data-lucide="maximize" class="w-5 h-5"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
+            <?php endif; ?>
 
             <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 aspect-square relative group">
                 <div id="map-detail" class="w-full h-full z-10"></div>
@@ -175,11 +214,22 @@
         if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) return;
 
         const isDark = document.documentElement.classList.contains('dark');
-        const tileUrl = isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CartoDB' 
+        });
+        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: '&copy; Google'
+        });
 
-        const map = L.map('map-detail', { zoomControl: false, dragging: true, scrollWheelZoom: false }).setView(coords, 17);
-        L.tileLayer(tileUrl, { attribution: '&copy; Sibaruki' }).addTo(map);
+        const map = L.map('map-detail', { zoomControl: false, dragging: true, scrollWheelZoom: false, layers: [googleSat] }).setView(coords, 17);
         
+        L.control.layers({
+            "Default View": cartoDB,
+            "Satellite View": googleSat
+        }, null, { position: 'topright' }).addTo(map);
+
         const markerIcon = L.divIcon({
             className: 'custom-marker',
             html: `<div class="w-8 h-8 bg-indigo-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center animate-bounce-slow"><div class="w-2 h-2 bg-white rounded-full"></div></div>`,

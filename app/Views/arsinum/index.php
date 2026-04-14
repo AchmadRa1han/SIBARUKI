@@ -206,7 +206,11 @@
         try {
             const isDark = document.documentElement.classList.contains('dark');
             const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
-            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' });
+            const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google'
+            });
 
             map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 11);
             L.control.zoom({ position: 'topright' }).addTo(map);
@@ -223,8 +227,18 @@
                         const svg = btn.querySelector('svg');
                         svg.style.transform = `rotate(${rot}deg)`;
                         setTimeout(() => {
-                            if (map.hasLayer(standard)) { map.removeLayer(standard); map.addLayer(satellite); btn.style.backgroundColor = '#2563eb'; svg.setAttribute('stroke', '#ffffff'); }
-                            else { map.removeLayer(satellite); map.addLayer(standard); btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; svg.setAttribute('stroke', svgColor); }
+                            if (map.hasLayer(standard)) { 
+                                map.removeLayer(standard); 
+                                map.addLayer(googleSat); 
+                                btn.style.backgroundColor = '#2563eb'; 
+                                svg.setAttribute('stroke', '#ffffff'); 
+                            }
+                            else { 
+                                map.removeLayer(googleSat); 
+                                map.addLayer(standard); 
+                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
+                                svg.setAttribute('stroke', svgColor); 
+                            }
                         }, 200);
                     });
                     return btn;

@@ -68,61 +68,26 @@
 
         try {
             const isDark = document.documentElement.classList.contains('dark');
-            const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
-            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-
-            const savedLayer = localStorage.getItem('activeMapLayer') || 'Peta Standar';
-            const initialLayer = (savedLayer === 'Satelit') ? satellite : standard;
+            const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+                attribution: '&copy; CartoDB' 
+            });
+            const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3'],
+                attribution: '&copy; Google'
+            });
 
             const map = L.map('map', { 
                 zoomControl: false, 
-                layers: [initialLayer] 
+                layers: [googleSat] 
             }).setView([-5.1245, 120.2536], 14); // Set Fokus Kota Sinjai
-            
-            // --- CUSTOM MOBILE FRIENDLY LAYER CONTROL ---
-            const layerToggleBtn = L.DomUtil.create('div', 'leaflet-bar leaflet-control custom-layer-control');
-            const initialIcon = (savedLayer === 'Satelit') ? 'satellite' : 'map';
-            
-            layerToggleBtn.innerHTML = `
-                <button id="btn-layer-toggle" class="bg-white dark:bg-slate-900 w-12 h-12 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center active:scale-90 transition-all duration-500 overflow-hidden group">
-                    <div id="icon-container" class="transition-transform duration-500">
-                        <i id="layer-icon" data-lucide="${initialIcon}" class="w-6 h-6 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-all"></i>
-                    </div>
-                </button>
-            `;
-            
-            map.addControl(new (L.Control.extend({
-                options: { position: 'topright' },
-                onAdd: function() { return layerToggleBtn; }
-            }))());
+
+            L.control.layers({
+                "Default View": cartoDB,
+                "Satellite View": googleSat
+            }, null, { position: 'topright' }).addTo(map);
 
             if (typeof lucide !== 'undefined') lucide.createIcons();
-
-            let currentRotation = 0;
-            document.getElementById('btn-layer-toggle').addEventListener('click', function() {
-                const iconContainer = document.getElementById('icon-container');
-                const btn = this;
-                
-                // Animasi Putar Terus Menerus
-                currentRotation += 360;
-                iconContainer.style.transform = `rotate(${currentRotation}deg)`;
-                
-                setTimeout(() => {
-                    if (map.hasLayer(standard)) {
-                        map.removeLayer(standard);
-                        map.addLayer(satellite);
-                        btn.innerHTML = `<div id="icon-container" style="transform: rotate(${currentRotation}deg); transition: transform 500ms;"><i data-lucide="satellite" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i></div>`;
-                        localStorage.setItem('activeMapLayer', 'Satelit');
-                    } else {
-                        map.removeLayer(satellite);
-                        map.addLayer(standard);
-                        btn.innerHTML = `<div id="icon-container" style="transform: rotate(${currentRotation}deg); transition: transform 500ms;"><i data-lucide="map" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i></div>`;
-                        localStorage.setItem('activeMapLayer', 'Peta Standar');
-                    }
-                    lucide.createIcons();
-                }, 250);
-            });
-            // --- END CUSTOM CONTROL ---
 
             L.control.zoom({ position: 'topright' }).addTo(map);
 

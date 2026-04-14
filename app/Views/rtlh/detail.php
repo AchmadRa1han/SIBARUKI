@@ -58,9 +58,9 @@
                             <span class="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-emerald-100 dark:border-emerald-900/50">TUNTAS (RLH) - <?= $rumah['tahun_bansos'] ?></span>
                         <?php endif; ?>
                     </div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white tracking-tighter uppercase mb-1"><?= $penerima['nama_kepala_keluarga'] ?? '-' ?></h1>
+                    <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white tracking-tighter uppercase mb-1"><?= $penerima['nama_kepala_keluarga'] ?? 'DATA TIDAK DITEMUKAN' ?></h1>
                     <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                        <i data-lucide="hash" class="w-3.5 h-3.5"></i> NIK: <?= $penerima['nik'] ?? '-' ?>
+                        <i data-lucide="hash" class="w-3.5 h-3.5"></i> NIK: <?= $rumah['nik_pemilik'] ?? '-' ?>
                     </p>
                 </div>
             </div>
@@ -543,10 +543,27 @@
         document.getElementById('coords-text').innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
+        
         const isDark = document.documentElement.classList.contains('dark');
-        const tiles = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
+        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CartoDB' 
+        });
+        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: '&copy; Google'
+        });
 
-        map = L.map('map-detail', { zoomControl: false, layers: [tiles] }).setView([lat, lng], 17);
+        map = L.map('map-detail', { 
+            zoomControl: false, 
+            layers: [cartoDB] 
+        }).setView([lat, lng], 17);
+
+        L.control.layers({
+            "Default View": cartoDB,
+            "Satellite View": googleSat
+        }, null, { position: 'topright' }).addTo(map);
+
         L.marker([lat, lng]).addTo(map);
         setTimeout(() => map.invalidateSize(), 500);
     }
