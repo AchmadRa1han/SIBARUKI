@@ -126,26 +126,26 @@
 
     <!-- 3. MAP SECTION -->
     <section id="map" class="scroll-mt-20 py-16 bg-slate-50 dark:bg-slate-950">
-        <div class="max-w-7xl mx-auto px-6 lg:px-12 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 reveal">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 mb-10 reveal">
             <div>
                 <h2 class="text-[9px] font-black text-blue-600 uppercase tracking-[0.4em] mb-3">Interaktif GIS</h2>
                 <h3 class="text-3xl lg:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">E-Peta SIBARUKI</h3>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
-                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-5 py-2.5 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all border border-white dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md" data-layer="<?= $l ?>">
-                    <?php 
-                        $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
-                        echo $labels[$l];
-                    ?>
-                </button>
-                <?php endforeach; ?>
             </div>
         </div>
 
         <div class="max-w-7xl mx-auto px-6 lg:px-12 reveal">
             <div class="bg-white dark:bg-slate-900 p-3 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl relative">
-                <div id="publicMap" class="h-[550px] w-full rounded-[1.8rem] z-0 bg-slate-100 dark:bg-slate-950 border border-slate-50 dark:border-slate-800 overflow-hidden shadow-inner"></div>
+                <div class="absolute top-8 right-8 z-[1001] flex flex-col gap-2">
+                    <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
+                    <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg" data-layer="<?= $l ?>">
+                        <?php 
+                            $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
+                            echo $labels[$l];
+                        ?>
+                    </button>
+                    <?php endforeach; ?>
+                </div>
+                <div id="publicMap" class="h-[600px] w-full rounded-[1.8rem] z-0 bg-slate-100 dark:bg-slate-950 border border-slate-50 dark:border-slate-800 overflow-hidden shadow-inner"></div>
                 <div id="map-error" class="absolute inset-3 rounded-[1.8rem] bg-white dark:bg-slate-900 flex flex-col items-center justify-center z-[1001] hidden">
                     <i data-lucide="alert-triangle" class="w-12 h-12 text-amber-500 mb-4"></i>
                     <p class="text-sm font-bold text-slate-500 uppercase tracking-widest text-center px-8">Maaf, modul peta geospasial gagal dimuat.<br/>Pastikan koneksi internet aktif.</p>
@@ -228,10 +228,38 @@
             
             map = L.map('publicMap', { zoomControl: false, layers: [cartoDB] }).setView([-5.1245, 120.2536], 11);
             
-            L.control.layers({
-                "Default View": cartoDB,
-                "Satellite View": googleSat
-            }, null, { position: 'topright' }).addTo(map);
+            let rot = 0;
+            const LayerToggle = L.Control.extend({
+                onAdd: function(map) {
+                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                    btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const svgColor = isDark ? '#60a5fa' : '#2563eb';
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                    L.DomEvent.disableClickPropagation(btn);
+                    L.DomEvent.on(btn, 'click', function(e) {
+                        rot += 360;
+                        const svg = btn.querySelector('svg');
+                        svg.style.transform = `rotate(${rot}deg)`;
+                        setTimeout(() => {
+                            if (map.hasLayer(cartoDB)) { 
+                                map.removeLayer(cartoDB); 
+                                map.addLayer(googleSat); 
+                                btn.style.backgroundColor = '#2563eb'; 
+                                svg.setAttribute('stroke', '#ffffff'); 
+                            }
+                            else { 
+                                map.removeLayer(googleSat); 
+                                map.addLayer(cartoDB); 
+                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
+                                svg.setAttribute('stroke', svgColor); 
+                            }
+                        }, 200);
+                    });
+                    return btn;
+                }
+            });
+            map.addControl(new LayerToggle({ position: 'topright' }));
 
             L.control.zoom({ position: 'topright' }).addTo(map);
 
