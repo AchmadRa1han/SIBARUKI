@@ -9,73 +9,97 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 
-<div class="relative overflow-hidden text-slate-900 dark:text-slate-200">
+<div class="relative overflow-hidden text-slate-900 dark:text-slate-200 bg-slate-50 dark:bg-slate-950">
     
+    <!-- Animated Background Decor -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
     <!-- 1. HERO SECTION -->
-    <section id="hero" class="relative min-h-[85vh] flex items-center pt-20 pb-8">
-        <div class="absolute inset-0 bg-slate-50 dark:bg-slate-950"></div>
-        <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-            <div class="animate-in slide-in-from-left duration-1000">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-[0.3em] rounded-full shadow-lg shadow-blue-600/20">Official Portal</span>
+    <section id="hero" class="relative min-h-screen flex items-center pt-20 pb-8">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+            <div class="reveal-stagger">
+                <div class="flex items-center gap-3 mb-8 reveal-item">
+                    <span class="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-[0.3em] rounded-full shadow-xl shadow-blue-600/20">Official Portal</span>
                     <div class="flex items-center gap-2">
-                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Live DB</span>
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Realtime Data</span>
                     </div>
                 </div>
-                <h1 class="text-4xl lg:text-6xl font-bold text-blue-950 dark:text-white leading-[1.05] mb-8 tracking-tighter uppercase">
-                    Membangun <br/><span class="text-blue-600">Hunian Layak</span> <br/>Untuk Semua.
+                <h1 class="text-5xl lg:text-7xl font-bold text-blue-950 dark:text-white leading-[0.95] mb-8 tracking-tighter uppercase reveal-item">
+                    Membangun <br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Hunian Layak</span> <br/>
+                    Untuk Semua.
                 </h1>
-                <p class="text-lg text-slate-500 dark:text-slate-400 leading-relaxed mb-10 max-w-lg font-medium">
-                    SIBARUKI adalah platform transparansi data perumahan dan permukiman Kabupaten Sinjai. Satu peta, sejuta informasi.
+                <p class="text-xl text-slate-500 dark:text-slate-400 leading-relaxed mb-12 max-w-lg font-medium reveal-item">
+                    Platform transparansi data perumahan dan permukiman Kabupaten Sinjai. Mengintegrasikan data spasial untuk perencanaan yang presisi.
                 </p>
-                <div class="flex flex-wrap gap-4">
-                    <a href="#map" class="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5">
-                        Jelajahi Peta <i data-lucide="map" class="w-4 h-4"></i>
+                <div class="flex flex-wrap gap-5 reveal-item">
+                    <a href="#map" class="px-10 py-5 bg-blue-600 text-white rounded-[2rem] font-bold uppercase tracking-[0.2em] text-[11px] shadow-2xl shadow-blue-600/40 hover:scale-105 hover:rotate-1 active:scale-95 transition-all flex items-center gap-3 group">
+                        Jelajahi Peta 
+                        <i data-lucide="map" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
                     </a>
-                    <a href="#summary" class="px-8 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-blue-950 dark:text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] shadow-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Statistik</a>
+                    <a href="#summary" class="px-10 py-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-blue-950 dark:text-white rounded-[2rem] font-bold uppercase tracking-[0.2em] text-[11px] shadow-xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-y-1 transition-all">
+                        Statistik
+                    </a>
                 </div>
             </div>
 
-            <!-- Dynamic Carousel Section -->
-            <div class="relative animate-in zoom-in duration-1000 hidden lg:block">
-                <div class="swiper heroSwiper rounded-3xl overflow-hidden shadow-2xl border-[8px] border-white dark:border-slate-900 bg-white dark:bg-slate-900">
+            <!-- Enhanced Hero Media -->
+            <div class="relative reveal hidden lg:block">
+                <div class="absolute inset-0 bg-blue-600/20 rounded-[3rem] blur-3xl -rotate-6 scale-95"></div>
+                <div class="swiper heroSwiper rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-white dark:border-slate-900 bg-white dark:bg-slate-900 relative z-10">
                     <div class="swiper-wrapper">
                         <?php if(!empty($carousel)): ?>
                             <?php foreach($carousel as $item): ?>
-                            <div class="swiper-slide relative h-[500px]">
-                                <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover">
-                                <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-transparent to-transparent flex items-end p-12">
-                                    <div class="max-w-sm">
-                                        <p class="text-blue-400 font-bold uppercase tracking-[0.3em] text-[9px] mb-1.5">Dokumentasi</p>
-                                        <h4 class="text-white font-bold uppercase tracking-tight text-xl leading-tight"><?= $item['caption'] ?></h4>
+                            <div class="swiper-slide relative h-[550px] group">
+                                <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/20 to-transparent flex items-end p-12">
+                                    <div class="max-w-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-700">
+                                        <p class="text-blue-400 font-bold uppercase tracking-[0.3em] text-[9px] mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-700">Dokumentasi</p>
+                                        <h4 class="text-white font-bold uppercase tracking-tight text-2xl leading-tight"><?= $item['caption'] ?></h4>
                                     </div>
                                 </div>
                             </div>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <div class="swiper-slide relative h-[500px] flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                            <div class="swiper-slide relative h-[550px] flex items-center justify-center bg-slate-100 dark:bg-slate-800">
                                 <div class="text-center">
-                                    <i data-lucide="image" class="w-10 h-10 text-slate-300 mx-auto mb-4"></i>
-                                    <p class="text-slate-400 font-bold uppercase tracking-[0.3em] text-[9px]">Belum Ada Dokumentasi</p>
+                                    <i data-lucide="image" class="w-12 h-12 text-slate-300 mx-auto mb-4 animate-bounce"></i>
+                                    <p class="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">Database Siap Sajikan Visual</p>
                                 </div>
                             </div>
                         <?php endif; ?>
                     </div>
-                    <div class="swiper-pagination"></div>
+                    <div class="swiper-pagination !bottom-8"></div>
+                </div>
+                
+                <!-- Floating Card UI -->
+                <div class="absolute -bottom-10 -left-10 bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 z-20 animate-float hidden xl:block">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white">
+                            <i data-lucide="check-circle" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Data Terverifikasi</p>
+                            <p class="text-sm font-bold text-blue-950 dark:text-white uppercase tracking-tighter">100% Validasi Lapangan</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 2. SUMMARY SECTION -->
-    <section id="summary" class="py-24 bg-white dark:bg-slate-900/50 relative border-y border-slate-100 dark:border-slate-800/50">
-        <div class="max-w-7xl mx-auto px-6 lg:px-12 text-center mb-16">
-            <h2 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.5em] mb-4">Data Strategis</h2>
-            <h3 class="text-3xl lg:text-5xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter leading-none">Kabupaten Sinjai <br/><span class="text-slate-300 dark:text-slate-700 italic">Dalam Angka</span></h3>
+    <!-- 2. SUMMARY SECTION (STATISTICS) -->
+    <section id="summary" class="py-32 bg-white dark:bg-slate-900/50 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 text-center mb-20 reveal">
+            <h2 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.5em] mb-6">Infrastruktur Strategis</h2>
+            <h3 class="text-4xl lg:text-6xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter leading-none">Kabupaten Sinjai <br/><span class="text-slate-300 dark:text-slate-700 italic">Dalam Angka</span></h3>
         </div>
 
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-12 grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4">
+        <div class="max-w-[1600px] mx-auto px-6 lg:px-12 grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-6">
             <?php 
             $metrics = [
                 ['rtlh', 'home', 'amber', 'Rumah Tak Layak'],
@@ -86,40 +110,58 @@
                 ['pisew', 'hard-hat', 'orange', 'PISEW'],
                 ['aset', 'land-plot', 'cyan', 'Aset Tanah'],
             ];
-            foreach($metrics as $m): ?>
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:shadow-2xl hover:shadow-blue-600/10 hover:-translate-y-1 transition-all duration-500 group text-center flex flex-col items-center justify-center min-h-[220px]">
-                <div class="w-12 h-12 mx-auto rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-500 shadow-inner">
-                    <i data-lucide="<?= $m[1] ?>" class="w-6 h-6" stroke-width="2.5"></i>
+            foreach($metrics as $idx => $m): ?>
+            <div class="reveal group" style="transition-delay: <?= $idx * 100 ?>ms">
+                <div class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:shadow-2xl hover:shadow-blue-600/10 hover:-translate-y-2 transition-all duration-500 text-center flex flex-col items-center justify-center min-h-[260px] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-125 transition-transform duration-700 pointer-events-none">
+                        <i data-lucide="<?= $m[1] ?>" class="w-32 h-32"></i>
+                    </div>
+                    <div class="w-14 h-14 mx-auto rounded-2xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-8 group-hover:rotate-[360deg] transition-all duration-1000 shadow-inner">
+                        <i data-lucide="<?= $m[1] ?>" class="w-7 h-7" stroke-width="2.5"></i>
+                    </div>
+                    <h4 class="text-4xl font-bold text-blue-950 dark:text-white mb-3 tracking-tighter count-up" data-target="<?= $rekap[$m[0]] ?? 0 ?>">0</h4>
+                    <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] leading-tight"><?= $m[3] ?></p>
                 </div>
-                <h4 class="text-3xl font-bold text-blue-950 dark:text-white mb-2 tracking-tighter"><?= number_format($rekap[$m[0]] ?? 0) ?></h4>
-                <p class="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] leading-tight"><?= $m[3] ?></p>
             </div>
             <?php endforeach; ?>
         </div>
     </section>
 
     <!-- 3. MAP SECTION -->
-    <section id="map" class="py-20 bg-slate-50 dark:bg-slate-950">
-        <div class="max-w-7xl mx-auto px-6 lg:px-12 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div>
-                <h2 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.5em] mb-4 border-l-4 border-blue-600 pl-4">Interaktif GIS</h2>
-                <h3 class="text-3xl lg:text-5xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">E-Peta SIBARUKI</h3>
+    <section id="map" class="py-24 bg-slate-50 dark:bg-slate-950 relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10 reveal">
+            <div class="max-w-2xl">
+                <h2 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.5em] mb-6 border-l-4 border-blue-600 pl-6">Sistem Informasi Geografis</h2>
+                <h3 class="text-4xl lg:text-6xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">E-Peta Interaktif</h3>
+                <p class="mt-6 text-slate-500 dark:text-slate-400 font-medium">Visualisasi sebaran infrastruktur dan hunian secara komprehensif di seluruh wilayah Kabupaten Sinjai.</p>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-3">
                 <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
-                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-6 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all border border-white dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:scale-105 active:scale-95" data-layer="<?= $l ?>">
-                    <?php 
-                        $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
-                        echo $labels[$l];
-                    ?>
+                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.1em] transition-all border border-white dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:scale-105 hover:bg-blue-600 hover:text-white group" data-layer="<?= $l ?>">
+                    <span class="flex items-center gap-2">
+                        <?php 
+                            $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
+                            echo $labels[$l];
+                        ?>
+                    </span>
                 </button>
                 <?php endforeach; ?>
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6 lg:px-12">
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-300/50 dark:shadow-black/40">
-                <div id="publicMap" class="h-[600px] w-full rounded-2xl z-0 bg-slate-50 dark:bg-slate-950 border border-slate-50 dark:border-slate-800"></div>
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 reveal">
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-300/50 dark:shadow-black/60 relative group">
+                <div class="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 rounded-[3rem] pointer-events-none"></div>
+                <div id="publicMap" class="h-[650px] w-full rounded-[2.5rem] z-0 bg-slate-100 dark:bg-slate-950 border border-slate-50 dark:border-slate-800 overflow-hidden shadow-inner"></div>
+                
+                <!-- Floating Map Overlay -->
+                <div class="absolute bottom-12 right-12 z-[1000] bg-blue-950/90 backdrop-blur-xl text-white px-6 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4 transition-all hover:scale-105">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
+                    <div>
+                        <p class="text-[8px] font-bold text-blue-300 uppercase tracking-widest">Status Engine</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest">Active Geospasial Node</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -127,27 +169,92 @@
 </div>
 
 <style>
-    .layer-btn.active { background: #1e1b4b !important; color: white !important; border-color: #1e1b4b !important; box-shadow: 0 15px 30px -10px rgba(30, 27, 75, 0.4); }
-    .dark .layer-btn.active { background: #2563eb !important; border-color: #2563eb !important; box-shadow: 0 15px 30px -10px rgba(37, 99, 235, 0.4); }
-    .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); border: none; }
-    .leaflet-popup-content { margin: 0; width: 200px !important; }
-    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
+    /* Custom Animations */
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    .animate-float { animation: float 6s infinite ease-in-out; }
+
+    /* Reveal Classes */
+    .reveal { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.22, 1, 0.36, 1); }
+    .reveal.active { opacity: 1; transform: translateY(0); }
+
+    .reveal-stagger .reveal-item { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+    .reveal-stagger.active .reveal-item { opacity: 1; transform: translateY(0); }
+    .reveal-stagger.active .reveal-item:nth-child(1) { transition-delay: 100ms; }
+    .reveal-stagger.active .reveal-item:nth-child(2) { transition-delay: 300ms; }
+    .reveal-stagger.active .reveal-item:nth-child(3) { transition-delay: 500ms; }
+    .reveal-stagger.active .reveal-item:nth-child(4) { transition-delay: 700ms; }
+
+    /* Buttons */
+    .layer-btn.active { background: #1e1b4b !important; color: white !important; border-color: #1e1b4b !important; box-shadow: 0 20px 40px -10px rgba(30, 27, 75, 0.5); }
+    .dark .layer-btn.active { background: #2563eb !important; border-color: #2563eb !important; box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.5); }
+
+    /* Leaflet Enhancements */
+    .leaflet-popup-content-wrapper { border-radius: 1.5rem; padding: 0; overflow: hidden; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); }
+    .leaflet-popup-content { margin: 0; width: 220px !important; }
+    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.95); color: white; font-weight: 900; font-size: 11px; border: 2px solid rgba(255,255,255,0.1); backdrop-blur: 10px; }
 </style>
 
 <script>
-    // Swiper Initialization
+    // Reveal Observer Logic
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    // Counter Up Animation
+    function animateCounter(el) {
+        const target = parseInt(el.getAttribute('data-target'));
+        let count = 0;
+        const duration = 2000; // 2 seconds
+        const increment = target / (duration / 16);
+        
+        const updateCount = () => {
+            if (count < target) {
+                count += increment;
+                el.innerText = Math.ceil(count).toLocaleString();
+                requestAnimationFrame(updateCount);
+            } else {
+                el.innerText = target.toLocaleString();
+            }
+        };
+        updateCount();
+    }
+
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+                animateCounter(entry.target);
+                entry.target.classList.add('counted');
+            }
+        });
+    }, { threshold: 0.5 });
+
     document.addEventListener('DOMContentLoaded', () => {
+        // Init Reveal
+        document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => revealObserver.observe(el));
+        
+        // Init Counters
+        document.querySelectorAll('.count-up').forEach(el => counterObserver.observe(el));
+
         if (typeof lucide !== 'undefined') lucide.createIcons();
+        
         const carouselCount = <?= is_array($carousel) ? count($carousel) : 0 ?>;
         new Swiper('.heroSwiper', {
             loop: carouselCount > 1,
             effect: 'fade',
-            autoplay: carouselCount > 1 ? { delay: 5000 } : false,
+            fadeEffect: { crossFade: true },
+            autoplay: carouselCount > 1 ? { delay: 6000, disableOnInteraction: false } : false,
             pagination: { el: '.swiper-pagination', clickable: true },
         });
         
         initMap();
-        setTimeout(() => switchLayer('rtlh'), 800);
+        setTimeout(() => switchLayer('rtlh'), 1200);
     });
 
     const spasialData = <?= json_encode($spasial) ?>;
@@ -218,7 +325,7 @@
             const geojson = parseWKTUniversal(k.wkt);
             if (geojson) {
                 L.geoJSON(geojson, { 
-                    style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.3 } 
+                    style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.25 } 
                 }).addTo(kecLayerGroup).bindTooltip(`<div class="p-1"><p class="font-bold uppercase text-[8px] text-white">${k.desa_nama}</p></div>`, { sticky: true, className: 'custom-tooltip' });
             }
         });
