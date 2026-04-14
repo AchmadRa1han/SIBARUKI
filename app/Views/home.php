@@ -1,7 +1,7 @@
 <?= $this->extend('visitor_layout') ?>
 
 <?= $this->section('content') ?>
-<!-- External Assets for Map -->
+<!-- Leaflet & GIS Assets -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
@@ -11,10 +11,10 @@
 
 <div class="relative overflow-hidden text-slate-900 dark:text-slate-200 bg-slate-50 dark:bg-slate-950">
     
-    <!-- Animated Background Decor - Subtle -->
-    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-50">
-        <div class="absolute top-[-5%] left-[-5%] w-[30%] h-[30%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
-        <div class="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+    <!-- Subtle Background Decor -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-30">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
     </div>
 
     <!-- 1. HERO SECTION -->
@@ -37,14 +37,14 @@
                     Satu platform terintegrasi untuk visualisasi dan manajemen data perumahan Kabupaten Sinjai secara transparan dan akuntabel.
                 </p>
                 <div class="flex flex-wrap gap-4 reveal-item">
-                    <a href="#map" class="px-8 py-3.5 bg-blue-600 text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5">
+                    <a href="#map" class="px-8 py-3.5 bg-blue-600 text-white rounded-xl font-bold uppercase tracking-[0.15em] text-[10px] shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5">
                         Jelajahi Peta <i data-lucide="map" class="w-3.5 h-3.5"></i>
                     </a>
-                    <a href="#summary" class="px-8 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-blue-950 dark:text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-sm hover:bg-slate-50 transition-all">Statistik</a>
+                    <a href="#summary" class="px-8 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-blue-950 dark:text-white rounded-xl font-bold uppercase tracking-[0.15em] text-[10px] shadow-sm hover:bg-slate-50 transition-all">Statistik</a>
                 </div>
             </div>
 
-            <!-- Compact Carousel with Backdrop Blur Text -->
+            <!-- Carousel with Refined Overlay -->
             <div class="relative reveal hidden lg:block">
                 <div class="swiper heroSwiper rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-slate-900 bg-white dark:bg-slate-900 relative z-10">
                     <div class="swiper-wrapper">
@@ -52,10 +52,10 @@
                             <?php foreach($carousel as $item): ?>
                             <div class="swiper-slide relative h-[420px]">
                                 <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover">
-                                <!-- Backdrop Blur Overlay -->
-                                <div class="absolute inset-x-6 bottom-6 p-6 bg-blue-950/40 backdrop-blur-md rounded-2xl border border-white/10">
-                                    <p class="text-blue-300 font-bold uppercase tracking-[0.3em] text-[8px] mb-1">Dokumentasi Lapangan</p>
-                                    <h4 class="text-white font-bold uppercase tracking-tight text-base leading-tight"><?= $item['caption'] ?></h4>
+                                <!-- Refined Full-Width Bottom Overlay -->
+                                <div class="absolute inset-x-0 bottom-0 p-8 bg-blue-950/30 backdrop-blur-sm border-t border-white/5">
+                                    <p class="text-blue-300 font-bold uppercase tracking-[0.3em] text-[8px] mb-1.5">Dokumentasi</p>
+                                    <h4 class="text-white font-bold uppercase tracking-tight text-lg leading-tight"><?= $item['caption'] ?></h4>
                                 </div>
                             </div>
                             <?php endforeach; ?>
@@ -68,41 +68,33 @@
                             </div>
                         <?php endif; ?>
                     </div>
-                    <div class="swiper-pagination !bottom-4"></div>
+                    <div class="swiper-pagination !bottom-2"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 2. SUMMARY & CREATIVE SECTION (Fixing sc3.png empty space) -->
+    <!-- 2. SUMMARY & INSIGHT SECTION -->
     <section id="summary" class="py-16 bg-white dark:bg-slate-900/50 relative border-y border-slate-100 dark:border-slate-800/50 overflow-hidden">
-        <!-- Floating creative elements to fill empty space -->
-        <div class="absolute left-0 top-0 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl -ml-32 -mt-32"></div>
-        <div class="absolute right-0 bottom-0 w-64 h-64 bg-indigo-600/5 rounded-full blur-3xl -mr-32 -mb-32"></div>
-
         <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <!-- Left Info (Creative Fill) -->
             <div class="lg:col-span-4 reveal">
                 <div class="h-full flex flex-col justify-center">
                     <h2 class="text-[9px] font-black text-blue-600 uppercase tracking-[0.5em] mb-4">Dashboard Statistik</h2>
                     <h3 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter mb-6 leading-tight">Data Presisi <br/>Untuk Kebijakan <br/>Yang Tepat.</h3>
                     <p class="text-xs text-slate-500 font-medium leading-relaxed mb-8">Informasi yang disajikan merupakan hasil sinkronisasi data lapangan yang diverifikasi secara berkala oleh tim teknis SIBARUKI.</p>
-                    
-                    <!-- Creative Element: Quick Stats Grid -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
-                            <p class="text-[18px] font-bold text-blue-600">100%</p>
+                            <p class="text-xl font-bold text-blue-600">100%</p>
                             <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Validasi</p>
                         </div>
                         <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
-                            <p class="text-[18px] font-bold text-emerald-500">Live</p>
+                            <p class="text-xl font-bold text-emerald-500">Live</p>
                             <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Update</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Metrics (Optimized Size) -->
             <div class="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <?php 
                 $metrics = [
@@ -118,7 +110,7 @@
                 foreach($metrics as $idx => $m): ?>
                 <div class="reveal" style="transition-delay: <?= $idx * 50 ?>ms">
                     <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center justify-center min-h-[160px] group overflow-hidden relative">
-                        <div class="absolute top-0 right-0 p-2 opacity-[0.03] group-hover:scale-150 transition-transform duration-700">
+                        <div class="absolute top-0 right-0 p-2 opacity-[0.03] group-hover:scale-150 transition-transform duration-700 pointer-events-none">
                             <i data-lucide="<?= $m[1] ?>" class="w-16 h-16"></i>
                         </div>
                         <div class="w-10 h-10 mx-auto rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 shadow-inner">
@@ -155,8 +147,7 @@
         <div class="max-w-7xl mx-auto px-6 lg:px-12 reveal">
             <div class="bg-white dark:bg-slate-900 p-3 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl relative">
                 <div id="publicMap" class="h-[550px] w-full rounded-[1.8rem] z-0 bg-slate-100 dark:bg-slate-950 border border-slate-50 dark:border-slate-800 overflow-hidden shadow-inner"></div>
-                <!-- Fixed Map Placeholder if failed to load -->
-                <div id="map-error" class="absolute inset-3 rounded-[1.8rem] bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center z-10 hidden">
+                <div id="map-error" class="absolute inset-3 rounded-[1.8rem] bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center z-[1001] hidden">
                     <i data-lucide="alert-triangle" class="w-12 h-12 text-amber-500 mb-4"></i>
                     <p class="text-sm font-bold text-slate-500 uppercase tracking-widest">Gagal memuat peta interaktif</p>
                     <button onclick="window.location.reload()" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest">Muat Ulang</button>
@@ -182,9 +173,11 @@
 
     .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0; overflow: hidden; border: none; }
     .leaflet-popup-content { margin: 0; width: 200px !important; }
+    .swiper-pagination-bullet-active { background: #2563eb !important; }
 </style>
 
 <script>
+    // --- GIS Logic (Improved Stability) ---
     const spasialData = <?= json_encode($spasial) ?>;
     let map, clusterGroup, kecLayerGroup, activeDataGroup;
 
@@ -205,7 +198,6 @@
 
     function initMap() {
         if (typeof L === 'undefined') { 
-            console.error("Leaflet not loaded");
             document.getElementById('map-error').classList.remove('hidden');
             return; 
         }
@@ -235,8 +227,11 @@
             }
             kecLayerGroup.bringToBack();
             switchLayer('rtlh');
+            
+            // Invalidate size once to fix gray area
+            setTimeout(() => map.invalidateSize(), 500);
         } catch(e) { 
-            console.error("Init Map Error:", e); 
+            console.error(e);
             document.getElementById('map-error').classList.remove('hidden');
         }
     }
@@ -280,6 +275,7 @@
         if (valid && bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
 
+    // --- Interaction & Animation (Observers) ---
     document.addEventListener('DOMContentLoaded', () => {
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
@@ -290,8 +286,10 @@
                 if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
                     const target = parseInt(entry.target.getAttribute('data-target'));
                     let count = 0;
+                    const duration = 2000;
+                    const increment = target / (duration / 16);
                     const update = () => {
-                        if (count < target) { count += target / 100; entry.target.innerText = Math.ceil(count).toLocaleString(); requestAnimationFrame(update); }
+                        if (count < target) { count += increment; entry.target.innerText = Math.ceil(count).toLocaleString(); requestAnimationFrame(update); }
                         else { entry.target.innerText = target.toLocaleString(); }
                     };
                     update();
@@ -309,7 +307,7 @@
             pagination: { el: '.swiper-pagination', clickable: true },
         });
         
-        setTimeout(initMap, 800);
+        setTimeout(initMap, 1000);
     });
 </script>
 <?= $this->endSection() ?>
