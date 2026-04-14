@@ -6,12 +6,12 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 
 <div class="relative overflow-hidden text-slate-900 dark:text-slate-200 bg-slate-50 dark:bg-slate-950">
     
-    <!-- Background Decor -->
+    <!-- Animated Background Decor -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-20">
         <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
@@ -149,7 +149,7 @@
                 <div id="publicMap" class="h-[550px] w-full rounded-[1.8rem] z-0 bg-slate-100 dark:bg-slate-950 border border-slate-50 dark:border-slate-800 overflow-hidden shadow-inner"></div>
                 <div id="map-error" class="absolute inset-3 rounded-[1.8rem] bg-white dark:bg-slate-900 flex flex-col items-center justify-center z-[1001] hidden">
                     <i data-lucide="alert-triangle" class="w-12 h-12 text-amber-500 mb-4"></i>
-                    <p class="text-sm font-bold text-slate-500 uppercase tracking-widest text-center px-8">Maaf, modul peta geospasial gagal dimuat.<br/>Pastikan koneksi internet aktif dan library Leaflet tersedia.</p>
+                    <p class="text-sm font-bold text-slate-500 uppercase tracking-widest text-center px-8">Maaf, modul peta geospasial gagal dimuat.<br/>Pastikan koneksi internet aktif.</p>
                     <button onclick="window.location.reload()" class="mt-6 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-blue-600/20">Muat Ulang Halaman</button>
                 </div>
             </div>
@@ -177,7 +177,7 @@
 </style>
 
 <script>
-    // --- GIS Logic (Improved Stability & Fixed Double Init) ---
+    // --- GIS Logic (Improved Stability & Fixed MarkerCluster) ---
     const spasialData = <?= json_encode($spasial) ?>;
     let map = null, clusterGroup, kecLayerGroup, activeDataGroup;
 
@@ -249,8 +249,17 @@
         items.forEach(item => {
             try {
                 let geojson = null;
-                if (item.latitude && item.longitude) { geojson = { type: 'Point', coordinates: [parseFloat(item.longitude), parseFloat(item.latitude)] }; }
-                else if (item.wkt && typeof wellknown !== 'undefined') {
+                // --- COORDINATE HEALING LOGIC ---
+                if (item.latitude && item.longitude) { 
+                    geojson = { type: 'Point', coordinates: [parseFloat(item.longitude), parseFloat(item.latitude)] }; 
+                } else if (item.coords) {
+                    const parts = item.coords.toString().split(',');
+                    if (parts.length === 2) {
+                        const lat = parseFloat(parts[0].trim());
+                        const lng = parseFloat(parts[1].trim());
+                        if (!isNaN(lat) && !isNaN(lng)) geojson = { type: 'Point', coordinates: [lng, lat] };
+                    }
+                } else if (item.wkt && typeof wellknown !== 'undefined') {
                     geojson = wellknown.parse(item.wkt);
                     if (geojson && type === 'psu') {
                         const convert = (c) => (typeof c[0] === 'number') ? (([la, lo] = utmToLatLng(c[0], c[1])), [lo, la]) : c.map(convert);
@@ -259,12 +268,22 @@
                 }
                 if (!geojson) return;
 
-                const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Informasi Terverifikasi</p></div>`;
+                // --- DYNAMIC COLOR FOR KUMUH ---
+                let markerColor = colorMap[type];
+                let layerStyle = { color: markerColor, weight: 2, fillOpacity: 0.4 };
+                
+                if (type === 'kumuh' && item.skor_kumuh) {
+                    const skor = parseFloat(item.skor_kumuh);
+                    markerColor = skor >= 60 ? '#e11d48' : (skor >= 40 ? '#f97316' : '#f59e0b');
+                    layerStyle = { color: markerColor, fillColor: markerColor, weight: 2, fillOpacity: 0.6 };
+                }
+
+                const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${type==='kumuh' ? 'Skor: ' + item.skor_kumuh : 'Informasi Terverifikasi'}</p></div>`;
 
                 if (geojson.type === 'Point') {
-                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 5, fillColor: colorMap[type], color: '#fff', weight: 1.5, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
+                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 5, fillColor: markerColor, color: '#fff', weight: 1.5, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
                 } else {
-                    L.geoJSON(geojson, { style: { color: colorMap[type], weight: 2, fillOpacity: 0.4 } }).bindPopup(popup).addTo(activeDataGroup);
+                    L.geoJSON(geojson, { style: layerStyle }).bindPopup(popup).addTo(activeDataGroup);
                 }
             } catch (e) {}
         });
@@ -275,7 +294,6 @@
         if (valid && bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
 
-    // --- Interaction & Animation (Observers) ---
     document.addEventListener('DOMContentLoaded', () => {
         // Animation Logic
         const revealObserver = new IntersectionObserver((entries) => {
@@ -315,7 +333,7 @@
             if (typeof L !== 'undefined' && typeof L.markerClusterGroup === 'function' && typeof wellknown !== 'undefined') {
                 initMap();
                 clearInterval(checkLibrary);
-            } else if (attempts > 25) { // 5 seconds timeout
+            } else if (attempts > 30) { // 6 seconds timeout
                 clearInterval(checkLibrary);
                 console.error("Library load timeout");
                 document.getElementById('map-error').classList.remove('hidden');
