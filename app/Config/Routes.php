@@ -114,6 +114,7 @@ $routes->group('bansos-rtlh', function($routes) {
     $routes->get('/', 'BansosRtlh::index');
     $routes->get('create', 'BansosRtlh::create');
     $routes->post('store', 'BansosRtlh::store');
+    $routes->get('detail/(:num)', 'BansosRtlh::detail/$1');
     $routes->post('delete/(:num)', 'BansosRtlh::delete/$1');
 });
 
