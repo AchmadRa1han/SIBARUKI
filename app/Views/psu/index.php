@@ -176,10 +176,50 @@
 <form id="delete-form" action="" method="post" class="hidden"><?= csrf_field() ?></form>
 
 <script>
+    // UTM ZONE 51S CONVERTER (SINJAI)
+    function utmToLatLng(easting, northing) {
+        const a = 6378137, f = 1 / 298.257223563;
+        const b = a * (1 - f), e = Math.sqrt(1 - (b * b) / (a * a)), e1sq = (e * e) / (1 - e * e);
+        const k0 = 0.9996, falseEasting = 500000, falseNorthing = 10000000;
+        const zoneCentralMeridian = 123 * (Math.PI / 180); 
+        let x = easting - falseEasting, y = northing - falseNorthing;
+        let M = y / k0, mu = M / (a * (1 - e * e / 4 - 3 * e * e * e * e / 64 - 5 * e * e * e * e * e * e / 256));
+        let phi1Rad = mu + (3 * e1sq / 2 - 27 * e1sq * e1sq * e1sq / 32) * Math.sin(2 * mu) + (21 * e1sq * e1sq / 16 - 55 * e1sq * e1sq * e1sq / 32) * Math.sin(4 * mu) + (151 * e1sq * e1sq * e1sq / 96) * Math.sin(6 * mu);
+        let N1 = a / Math.sqrt(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad)), T1 = Math.tan(phi1Rad) * Math.tan(phi1Rad), C1 = e1sq * Math.cos(phi1Rad) * Math.cos(phi1Rad), R1 = a * (1 - e * e) / Math.pow(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad), 1.5);
+        let D = x / (N1 * k0);
+        let lat = phi1Rad - (N1 * Math.tan(phi1Rad) / R1) * (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e1sq) * D * D * D * D / 24 + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e1sq - 3 * C1 * C1) * D * D * D * D * D * D / 720);
+        let lon = zoneCentralMeridian + (D - (1 + 2 * T1 + C1) * D * D * D / 6 + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * e1sq + 24 * T1 * T1) * D * D * D * D * D / 120) / Math.cos(phi1Rad);
+        return [lat * (180 / Math.PI), lon * (180 / Math.PI)];
+    }
+
+    function parseWKT(wkt) {
+        if (!wkt || typeof wkt !== 'string') return null;
+        try {
+            const cleanWkt = wkt.toUpperCase().trim();
+            if (cleanWkt.includes('LINESTRING')) {
+                const match = cleanWkt.match(/\(([^()]+)\)/);
+                if (!match || !match[1]) return null;
+                return match[1].split(',').map(pair => {
+                    const parts = pair.trim().split(/\s+/);
+                    if (parts.length >= 2) return utmToLatLng(parseFloat(parts[0]), parseFloat(parts[1]));
+                    return null;
+                }).filter(p => p !== null);
+            }
+        } catch(e) { console.error('WKT Parse Error:', e); }
+        return null;
+    }
+
     let map;
     let rot = 0;
     const psuData = <?= json_encode($jalan_all ?? []) ?>;
-...
+
+    function initMap() {
+        if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
+        try {
+            const isDark = document.documentElement.classList.contains('dark');
+            const standard = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; Sibaruki' });
+            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' });
+
             map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 13);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
@@ -190,7 +230,21 @@
                     const svgColor = isDark ? '#60a5fa' : '#2563eb';
                     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
                     L.DomEvent.disableClickPropagation(btn);
-...
+                    L.DomEvent.on(btn, 'click', function(e) {
+                        rot += 360;
+                        const svg = btn.querySelector('svg');
+                        svg.style.transform = `rotate(${rot}deg)`;
+                        setTimeout(() => {
+                            if (map.hasLayer(standard)) { map.removeLayer(standard); map.addLayer(satellite); btn.style.backgroundColor = '#2563eb'; svg.setAttribute('stroke', '#ffffff'); }
+                            else { map.removeLayer(satellite); map.addLayer(standard); btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; svg.setAttribute('stroke', svgColor); }
+                        }, 200);
+                    });
+                    return btn;
+                }
+            });
+            map.addControl(new LayerToggle({ position: 'topright' }));
+
+            let allPoints = [];
             if (Array.isArray(psuData)) {
                 psuData.forEach(item => {
                     const coords = parseWKT(item.wkt);
@@ -204,7 +258,26 @@
                     }
                 });
             }
-...
+            if (allPoints.length > 0) map.fitBounds(L.polyline(allPoints).getBounds(), { padding: [50, 50] });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        } catch(err) { console.error('Map Init Error:', err); }
+    }
+
+    function focusOnWkt(wkt) {
+        const coords = parseWKT(wkt);
+        if (coords && coords.length > 0) {
+            map.fitBounds(L.polyline(coords).getBounds(), { padding: [100, 100], maxZoom: 18 });
+            const mc = document.getElementById('main-content');
+            if (mc) mc.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function confirmDelete(id, name) {
+        customConfirm('Hapus Data?', `Apakah Anda yakin ingin menghapus ruas jalan "${name}"?`, 'danger').then(conf => {
+            if (conf) { document.getElementById('delete-form').action = `<?= base_url('psu/delete') ?>/${id}`; document.getElementById('delete-form').submit(); }
+        });
+    }
+
     function submitWithScroll(el) {
         const mc = document.getElementById('main-content');
         if (mc) localStorage.setItem('psuScrollPos', mc.scrollTop);
@@ -253,7 +326,23 @@
     }
 
     async function handleBulkDelete() {
-...
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const ids = Array.from(checked).map(cb => cb.value);
+        const ok = await window.customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} data jalan yang dipilih?`, 'danger');
+        if (ok) {
+            const formData = new FormData();
+            ids.forEach(id => formData.append('ids[]', id));
+            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+            try {
+                const response = await fetch('<?= base_url('psu/bulk-delete') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const result = await response.json();
+                if (result.status === 'success') { showToast(result.message, 'success'); setTimeout(() => window.location.reload(), 1000); }
+                else { showToast(result.message, 'error'); }
+            } catch (error) { showToast('Terjadi kesalahan sistem.', 'error'); }
+        }
+    }
+
+    window.addEventListener('load', initMap);
 </script>
 
 <style>
