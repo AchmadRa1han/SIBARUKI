@@ -1,17 +1,17 @@
 <?= $this->extend('visitor_layout') ?>
 
 <?= $this->section('content') ?>
-<!-- Leaflet & GIS Assets -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.js"></script>
+<!-- GIS Assets - Using robust CDNs -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 
 <div class="relative overflow-hidden text-slate-900 dark:text-slate-200 bg-slate-50 dark:bg-slate-950">
     
-    <!-- Animated Background Decor -->
+    <!-- Background Decor -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-20">
         <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
@@ -52,8 +52,7 @@
                             <?php foreach($carousel as $item): ?>
                             <div class="swiper-slide relative h-[420px]">
                                 <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover">
-                                <!-- Refined Bottom-Only Full-Width Overlay -->
-                                <div class="absolute inset-x-0 bottom-0 p-6 bg-black/40 backdrop-blur-[1px] border-t border-white/10">
+                                <div class="absolute inset-x-0 bottom-0 p-6 bg-black/25 backdrop-blur-[1px] border-t border-white/10">
                                     <p class="text-blue-400 font-black uppercase tracking-[0.3em] text-[10px] mb-1">Dokumentasi</p>
                                     <h4 class="text-white font-black uppercase tracking-tight text-lg leading-tight drop-shadow-[0_2px_3px_rgba(0,0,0,1)]"><?= $item['caption'] ?></h4>
                                 </div>
@@ -174,10 +173,27 @@
     .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0; overflow: hidden; border: none; }
     .leaflet-popup-content { margin: 0; width: 200px !important; }
     .swiper-pagination-bullet-active { background: #2563eb !important; }
+
+    /* Custom Tooltip Styles for Desa Names */
+    .custom-tooltip {
+        background: rgba(15, 23, 42, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+        color: white !important;
+        font-weight: 800 !important;
+        font-size: 9px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+        padding: 4px 8px !important;
+    }
+    .leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before {
+        border: none !important;
+    }
 </style>
 
 <script>
-    // --- GIS Logic (Improved Stability & Fixed MarkerCluster) ---
+    // --- GIS Logic (Improved Stability) ---
     const spasialData = <?= json_encode($spasial) ?>;
     let map = null, clusterGroup, kecLayerGroup, activeDataGroup;
 
@@ -197,12 +213,8 @@
     }
 
     function initMap() {
-        if (map) return; // Prevent double init
-        if (typeof L === 'undefined' || typeof L.markerClusterGroup !== 'function') { 
-            console.error("Leaflet Plugins Missing");
-            document.getElementById('map-error').classList.remove('hidden');
-            return; 
-        }
+        if (map) return;
+        if (typeof L === 'undefined' || typeof L.markerClusterGroup !== 'function') return;
         try {
             const isDark = document.documentElement.classList.contains('dark');
             const tiles = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
@@ -222,7 +234,7 @@
                         if (geojson) {
                             L.geoJSON(geojson, { 
                                 style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.15 } 
-                            }).addTo(kecLayerGroup).bindTooltip(`<p class="font-bold uppercase text-[8px] text-white">${k.desa_nama}</p>`, { sticky: true });
+                            }).addTo(kecLayerGroup).bindTooltip(`<p class="font-bold uppercase text-[8px] text-white">${k.desa_nama}</p>`, { sticky: true, className: 'custom-tooltip' });
                         }
                     } catch(e) {}
                 });
@@ -230,10 +242,7 @@
             kecLayerGroup.bringToBack();
             switchLayer('rtlh');
             setTimeout(() => map.invalidateSize(), 500);
-        } catch(e) { 
-            console.error("GIS Error:", e);
-            document.getElementById('map-error').classList.remove('hidden');
-        }
+        } catch(e) { console.error(e); }
     }
 
     function switchLayer(type) {
@@ -249,7 +258,7 @@
         items.forEach(item => {
             try {
                 let geojson = null;
-                // --- COORDINATE HEALING LOGIC ---
+                // COORDINATE HEALING
                 if (item.latitude && item.longitude) { 
                     geojson = { type: 'Point', coordinates: [parseFloat(item.longitude), parseFloat(item.latitude)] }; 
                 } else if (item.coords) {
@@ -268,10 +277,9 @@
                 }
                 if (!geojson) return;
 
-                // --- DYNAMIC COLOR FOR KUMUH ---
+                // DYNAMIC COLOR FOR KUMUH
                 let markerColor = colorMap[type];
                 let layerStyle = { color: markerColor, weight: 2, fillOpacity: 0.4 };
-                
                 if (type === 'kumuh' && item.skor_kumuh) {
                     const skor = parseFloat(item.skor_kumuh);
                     markerColor = skor >= 60 ? '#e11d48' : (skor >= 40 ? '#f97316' : '#f59e0b');
@@ -295,7 +303,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Animation Logic
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
         }, { threshold: 0.1 });
@@ -305,8 +312,7 @@
                 if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
                     const target = parseInt(entry.target.getAttribute('data-target'));
                     let count = 0;
-                    const duration = 2000;
-                    const increment = target / 100;
+                    const increment = Math.max(1, target / 100);
                     const update = () => {
                         if (count < target) { count += increment; entry.target.innerText = Math.ceil(count).toLocaleString(); requestAnimationFrame(update); }
                         else { entry.target.innerText = target.toLocaleString(); }
@@ -319,23 +325,17 @@
 
         document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => revealObserver.observe(el));
         document.querySelectorAll('.count-up').forEach(el => counterObserver.observe(el));
-        if (typeof lucide !== 'undefined') lucide.createIcons();
         
-        new Swiper('.heroSwiper', {
-            loop: true, effect: 'fade', autoplay: { delay: 5000 },
-            pagination: { el: '.swiper-pagination', clickable: true },
-        });
+        new Swiper('.heroSwiper', { loop: true, effect: 'fade', autoplay: { delay: 5000 }, pagination: { el: '.swiper-pagination', clickable: true } });
         
-        // --- SAFE INIT GIS ---
         let attempts = 0;
         const checkLibrary = setInterval(() => {
             attempts++;
             if (typeof L !== 'undefined' && typeof L.markerClusterGroup === 'function' && typeof wellknown !== 'undefined') {
                 initMap();
                 clearInterval(checkLibrary);
-            } else if (attempts > 30) { // 6 seconds timeout
+            } else if (attempts > 30) {
                 clearInterval(checkLibrary);
-                console.error("Library load timeout");
                 document.getElementById('map-error').classList.remove('hidden');
             }
         }, 200);
