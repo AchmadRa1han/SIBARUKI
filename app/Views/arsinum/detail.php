@@ -107,26 +107,6 @@
                 </h3>
                 
                 <div class="space-y-4">
-                    <!-- Before Photo -->
-                    <div class="space-y-2">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest ml-1">Kondisi Awal (Before)</p>
-                        <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative">
-                            <?php if (!empty($item['foto_before'])): ?>
-                                <img src="<?= base_url('uploads/arsinum/' . $item['foto_before']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                                <div class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <a href="<?= base_url('uploads/arsinum/' . $item['foto_before']) ?>" target="_blank" class="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
-                                        <i data-lucide="maximize" class="w-5 h-5"></i>
-                                    </a>
-                                </div>
-                            <?php else: ?>
-                                <div class="text-center p-4">
-                                    <i data-lucide="image-off" class="w-8 h-8 text-slate-300 mx-auto mb-2 opacity-50"></i>
-                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Belum Ada Foto</p>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
                     <!-- After Photo -->
                     <div class="space-y-2">
                         <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest ml-1">Hasil Pekerjaan (After)</p>

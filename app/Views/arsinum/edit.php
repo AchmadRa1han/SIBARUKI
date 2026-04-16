@@ -78,30 +78,16 @@
                     <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat (Lat, Long)</label>
                     <input type="text" name="koordinat" value="<?= old('koordinat', $item['koordinat']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs">
                 </div>
-                <div class="md:col-span-1">
-                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Ganti Foto Sebelum (Before)</label>
-                    <div class="relative group">
-                        <input type="file" name="foto_before" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_before_preview')">
-                        <div id="foto_before_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-amber-500 group-hover:bg-amber-50/5">
-                            <?php if (!empty($item['foto_before'])): ?>
-                                <img src="<?= base_url('uploads/arsinum/' . $item['foto_before']) ?>" class="w-full h-full object-cover">
-                            <?php else: ?>
-                                <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
-                                <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto Before Baru</span>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="md:col-span-1">
-                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Ganti Foto Sesudah (After)</label>
+                <div class="md:col-span-2">
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Ganti Dokumentasi Foto (After)</label>
                     <div class="relative group">
                         <input type="file" name="foto_after" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" onchange="previewImage(this, 'foto_after_preview')">
-                        <div id="foto_after_preview" class="w-full h-32 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-amber-500 group-hover:bg-amber-50/5">
+                        <div id="foto_after_preview" class="w-full h-48 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-amber-500 group-hover:bg-amber-50/5">
                             <?php if (!empty($item['foto_after'])): ?>
                                 <img src="<?= base_url('uploads/arsinum/' . $item['foto_after']) ?>" class="w-full h-full object-cover">
                             <?php else: ?>
-                                <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mb-1.5"></i>
-                                <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto After Baru</span>
+                                <i data-lucide="image-plus" class="w-8 h-8 text-slate-300 mb-1.5"></i>
+                                <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Unggah Foto After Baru</span>
                             <?php endif; ?>
                         </div>
                     </div>

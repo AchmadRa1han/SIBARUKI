@@ -188,7 +188,7 @@ class Arsinum extends BaseController
         $uploadPath = FCPATH . 'uploads/arsinum/';
         if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
 
-        foreach(['foto_before', 'foto_after'] as $field) {
+        foreach(['foto_after'] as $field) {
             $img = $this->request->getFile($field);
             if ($img && $img->isValid() && !$img->hasMoved()) {
                 $newName = strtoupper($field) . '_' . $img->getRandomName();
@@ -221,7 +221,7 @@ class Arsinum extends BaseController
         $uploadPath = FCPATH . 'uploads/arsinum/';
         if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
 
-        foreach(['foto_before', 'foto_after'] as $field) {
+        foreach(['foto_after'] as $field) {
             $img = $this->request->getFile($field);
             if ($img && $img->isValid() && !$img->hasMoved()) {
                 // Hapus foto lama jika ada
@@ -247,7 +247,7 @@ class Arsinum extends BaseController
         if ($data) {
             // Hapus foto fisik
             $uploadPath = FCPATH . 'uploads/arsinum/';
-            foreach(['foto_before', 'foto_after'] as $field) {
+            foreach(['foto_after'] as $field) {
                 if (!empty($data[$field]) && file_exists($uploadPath . $data[$field])) {
                     unlink($uploadPath . $data[$field]);
                 }
