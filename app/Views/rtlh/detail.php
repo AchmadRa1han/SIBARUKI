@@ -458,13 +458,12 @@
             </div>
 
             <div>
-                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Koordinat Realisasi (GPS)</label>
-                <div class="relative">
-                    <input type="text" name="lokasi_realisasi" id="lokasi_realisasi" value="<?= $rumah['lokasi_koordinat'] ?? '' ?>" class="w-full p-3 pl-10 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-mono font-bold text-emerald-600 outline-none">
-                    <i data-lucide="map-pin" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                </div>
+               <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Koordinat Realisasi (GPS)</label>
+               <div class="relative">
+                   <input type="text" name="lokasi_realisasi" id="lokasi_realisasi" value="<?= $rumah['wkt'] ?? '' ?>" class="w-full p-3 pl-10 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-mono font-bold text-emerald-600 outline-none">
+                   <i data-lucide="map-pin" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+               </div>
             </div>
-
             <div class="space-y-3">
                 <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Dokumentasi Hasil (After)</label>
                 <div class="grid grid-cols-3 gap-2">

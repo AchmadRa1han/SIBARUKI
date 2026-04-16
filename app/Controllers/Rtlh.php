@@ -96,7 +96,7 @@ class Rtlh extends BaseController
 
         $db = \Config\Database::connect();
         $rumah = $db->table('rtlh_rumah')
-                    ->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')
+                    ->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat_text')
                     ->where('id_survei', $id)
                     ->get()->getRowArray();
 
@@ -132,11 +132,12 @@ class Rtlh extends BaseController
                 'tahun_anggaran' => $tahun,
                 'sumber_dana' => $program ?: 'Bansos RTLH',
                 'keterangan' => $post['keterangan_realisasi'] ?? 'Ditandai tuntas dari modul RTLH',
+                'foto_before' => $rumah['foto_depan'] ?? null, // Ambil foto depan lama sebagai bukti awal
                 'created_at' => $now,
                 'updated_at' => $now
             ];
 
-            // Handle Upload Foto After
+            // Handle Upload Foto After (3 Posisi)
             $uploadPath = FCPATH . 'uploads/rtlh/';
             if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
 
@@ -146,6 +147,11 @@ class Rtlh extends BaseController
                     $newName = 'AFTER_' . $img->getRandomName();
                     $img->move($uploadPath, $newName);
                     $dataBansos[$field] = $newName;
+                    
+                    // Fallback untuk foto_after (kolom tunggal) ambil yang depan
+                    if ($field === 'foto_setelah_depan') {
+                        $dataBansos['foto_after'] = $newName;
+                    }
                 }
             }
 
