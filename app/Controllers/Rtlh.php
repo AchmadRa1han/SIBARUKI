@@ -900,6 +900,60 @@ class Rtlh extends BaseController
         return redirect()->to('/rtlh')->with('success', 'Data berhasil dipindahkan ke Recycle Bin.');
     }
 
+    public function bulkDelete()
+    {
+        $ids = $this->request->getPost('ids');
+        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            foreach ($ids as $id) {
+                // Get all related data (Personal, Rumah, Kondisi)
+                $penerima = $this->penerimaModel->find($id);
+                if (!$penerima) continue;
+
+                $rumah = $this->rumahModel->where('nik_pemilik', $penerima['nik'])->first();
+                $kondisi = $rumah ? $this->kondisiModel->find($rumah['id_survei']) : null;
+
+                $fullData = [
+                    'penerima' => $penerima,
+                    'rumah'    => $rumah,
+                    'kondisi'  => $kondisi
+                ];
+
+                // Move to Trash
+                $db->table('trash_data')->insert([
+                    'entity_type' => 'RTLH',
+                    'entity_id'   => $penerima['nik'],
+                    'data_json'   => json_encode($fullData),
+                    'deleted_by'  => session()->get('username'),
+                    'created_at'  => date('Y-m-d H:i:s')
+                ]);
+
+                // Delete child data first
+                if ($rumah) {
+                    if ($kondisi) $this->kondisiModel->delete($rumah['id_survei']);
+                    $this->rumahModel->delete($rumah['id_survei']);
+                }
+                
+                // Delete parent
+                $this->penerimaModel->delete($id);
+            }
+
+            $db->transComplete();
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
+
+            $this->logActivity('Hapus Massal', 'RTLH', "Menghapus " . count($ids) . " data RTLH ke Recycle Bin");
+
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dipindahkan ke Recycle Bin.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
     private function resolveMasterId($field, $post, $kategori, $previousValue = null)
     {
         $val = $post[$field] ?? null;
