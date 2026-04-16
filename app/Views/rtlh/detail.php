@@ -468,10 +468,12 @@
                 <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Dokumentasi Hasil (After)</label>
                 <div class="grid grid-cols-3 gap-2">
                     <?php foreach(['foto_setelah_depan' => 'Depan', 'foto_setelah_samping' => 'Samping', 'foto_setelah_dalam' => 'Dalam'] as $fkey => $flabel): ?>
-                    <div class="relative group h-20 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg flex flex-col items-center justify-center overflow-hidden">
-                        <input type="file" name="<?= $fkey ?>" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer">
-                        <i data-lucide="camera" class="w-4 h-4 text-slate-300"></i>
-                        <span class="text-[7px] font-bold text-slate-400 uppercase mt-1"><?= $flabel ?></span>
+                    <div id="preview_<?= $fkey ?>" class="relative group h-20 bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg flex flex-col items-center justify-center overflow-hidden transition-all">
+                        <input type="file" name="<?= $fkey ?>" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="previewTuntasImage(this, 'preview_<?= $fkey ?>')">
+                        <div class="flex flex-col items-center justify-center p-2 text-center pointer-events-none">
+                            <i data-lucide="camera" class="w-4 h-4 text-slate-300 mb-1"></i>
+                            <span class="text-[7px] font-bold text-slate-400 uppercase leading-tight"><?= $flabel ?></span>
+                        </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -499,6 +501,27 @@
         const modal = document.getElementById('modal-tuntas');
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+    }
+
+    function previewTuntasImage(input, previewId) {
+        const container = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Hapus konten lama
+                container.innerHTML = `
+                    <input type="file" name="${input.name}" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="previewTuntasImage(this, '${previewId}')">
+                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i data-lucide="refresh-cw" class="w-5 h-5 text-white"></i>
+                    </div>
+                `;
+                lucide.createIcons();
+                container.classList.remove('border-dashed');
+                container.classList.add('border-solid', 'border-emerald-500');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
     function closeModalTuntas() {
