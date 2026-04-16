@@ -8,18 +8,23 @@ class DropFotoBeforeFromArsinum extends Migration
 {
     public function up()
     {
-        $this->forge->dropColumn('arsinum', 'foto_before');
+        // Hanya hapus jika kolomnya memang ada (Robust check)
+        if ($this->db->fieldExists('foto_before', 'arsinum')) {
+            $this->forge->dropColumn('arsinum', 'foto_before');
+        }
     }
 
     public function down()
     {
-        $this->forge->addColumn('arsinum', [
-            'foto_before' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
-                'null' => true,
-                'after' => 'tahun'
-            ],
-        ]);
+        if (!$this->db->fieldExists('foto_before', 'arsinum')) {
+            $this->forge->addColumn('arsinum', [
+                'foto_before' => [
+                    'type' => 'VARCHAR',
+                    'constraint' => 255,
+                    'null' => true,
+                    'after' => 'tahun'
+                ],
+            ]);
+        }
     }
 }
