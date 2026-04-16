@@ -909,13 +909,17 @@ class Rtlh extends BaseController
         $db->transStart();
 
         try {
+            $deletedCount = 0;
             foreach ($ids as $id) {
-                // Get all related data (Personal, Rumah, Kondisi)
-                $penerima = $this->penerimaModel->find($id);
-                if (!$penerima) continue;
+                // 1. Cari Rumah dulu karena ID yang dikirim adalah id_survei
+                $rumah = $this->rumahModel->find($id);
+                if (!$rumah) continue;
 
-                $rumah = $this->rumahModel->where('nik_pemilik', $penerima['nik'])->first();
-                $kondisi = $rumah ? $this->kondisiModel->find($rumah['id_survei']) : null;
+                // 2. Cari Penerima berdasarkan nik_pemilik di rumah
+                $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
+                
+                // 3. Cari Kondisi berdasarkan id_survei
+                $kondisi = $this->kondisiModel->find($id);
 
                 $fullData = [
                     'penerima' => $penerima,
@@ -923,31 +927,33 @@ class Rtlh extends BaseController
                     'kondisi'  => $kondisi
                 ];
 
-                // Move to Trash
+                // 4. Pindahkan ke Trash
                 $db->table('trash_data')->insert([
                     'entity_type' => 'RTLH',
-                    'entity_id'   => $penerima['nik'],
+                    'entity_id'   => $rumah['nik_pemilik'],
                     'data_json'   => json_encode($fullData),
                     'deleted_by'  => session()->get('username'),
                     'created_at'  => date('Y-m-d H:i:s')
                 ]);
 
-                // Delete child data first
-                if ($rumah) {
-                    if ($kondisi) $this->kondisiModel->delete($rumah['id_survei']);
-                    $this->rumahModel->delete($rumah['id_survei']);
-                }
+                // 5. Hapus Kondisi & Rumah (Child)
+                $this->kondisiModel->delete($id);
+                $this->rumahModel->delete($id);
                 
-                // Delete parent
-                $this->penerimaModel->delete($id);
+                // 6. Hapus Penerima (Parent) - Opsional, jika satu NIK hanya untuk satu rumah
+                if ($penerima) {
+                    $this->penerimaModel->delete($penerima['nik']);
+                }
+
+                $deletedCount++;
             }
 
             $db->transComplete();
-            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal ke database.');
 
-            $this->logActivity('Hapus Massal', 'RTLH', "Menghapus " . count($ids) . " data RTLH ke Recycle Bin");
+            $this->logActivity('Hapus Massal', 'RTLH', "Menghapus $deletedCount data RTLH ke Recycle Bin");
 
-            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dipindahkan ke Recycle Bin.']);
+            return $this->response->setJSON(['status' => 'success', 'message' => $deletedCount . ' data berhasil dipindahkan ke Recycle Bin.']);
         } catch (\Exception $e) {
             $db->transRollback();
             return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
