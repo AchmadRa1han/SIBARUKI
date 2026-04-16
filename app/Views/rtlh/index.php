@@ -324,25 +324,37 @@
         updateBulkBar();
     }
 
-    function handleBulkDelete() {
-        const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+    async function handleBulkDelete() {
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const ids = Array.from(checked).map(cb => cb.value);
         if (ids.length === 0) return;
 
-        customConfirm('Hapus Masal?', `Yakin ingin menghapus ${ids.length} data terpilih?`, 'danger').then(conf => {
-            if (conf) {
-                const f = document.getElementById('delete-form');
-                f.action = `<?= base_url('rtlh/bulk-delete') ?>`;
-                // Append IDs as hidden inputs
-                ids.forEach(id => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'ids[]';
-                    input.value = id;
-                    f.appendChild(input);
+        const ok = await window.customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} data RTLH terpilih ke Recycle Bin?`, 'danger');
+        if (ok) {
+            const formData = new FormData();
+            ids.forEach(id => formData.append('ids[]', id));
+            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+
+            try {
+                const response = await fetch('<?= base_url('rtlh/bulk-delete') ?>', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
-                f.submit();
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast(result.message, 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Terjadi kesalahan sistem.', 'error');
             }
-        });
+        }
     }
 
     function confirmDelete(id, name) {
