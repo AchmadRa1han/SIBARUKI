@@ -630,6 +630,9 @@ video {
 .left-6 {
   left: 1.5rem;
 }
+.left-8 {
+  left: 2rem;
+}
 .left-\[-10\%\] {
   left: -10%;
 }
@@ -644,9 +647,6 @@ video {
 }
 .right-6 {
   right: 1.5rem;
-}
-.right-8 {
-  right: 2rem;
 }
 .right-\[-10\%\] {
   right: -10%;
