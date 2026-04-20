@@ -280,7 +280,7 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <?php 
-                            $fotos = ['foto_depan' => 'Tampak Depan', 'foto_samping' => 'Tampak Samping', 'foto_belakang' => 'Tampak Belakang', 'foto_dalam' => 'Bagian Dalam'];
+                            $fotos = ['foto_depan' => 'Tampak Depan', 'foto_samping' => 'Tampak Samping Kiri', 'foto_belakang' => 'Tampak Belakang', 'foto_dalam' => 'Tampak Samping Kanan'];
                             foreach($fotos as $f_key => $f_label):
                         ?>
                         <div class="space-y-2">
