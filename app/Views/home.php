@@ -212,6 +212,20 @@
         return [lat * (180 / Math.PI), lon * (180 / Math.PI)];
     }
 
+    function healCoordinate(val, isLat) {
+        if (!val) return null;
+        let s = val.toString().replace(/[ "]/g, '').replace(/,/g, '.');
+        let digits = s.replace(/[^0-9-]/g, '');
+        if (digits.length > 3) {
+            let dotPos = digits.startsWith('-') ? 2 : 3;
+            // Additional check for Sinjai area (Lat roughly -5, Lng 120)
+            if (isLat && digits.startsWith('-5')) dotPos = 2;
+            else if (!isLat && digits.startsWith('120')) dotPos = 3;
+            return parseFloat(digits.substring(0, dotPos) + '.' + digits.substring(dotPos));
+        }
+        return parseFloat(s);
+    }
+
     function initMap() {
         if (map) return;
         if (typeof L === 'undefined' || typeof L.markerClusterGroup !== 'function') return;
@@ -297,56 +311,21 @@
         document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
 
         const items = spasialData[type] || [];
-        const colorMap = { rtlh: '#f59e0b', kumuh: '#ef4444', formal: '#6366f1', psu: '#10b981', arsinum: '#3b82f6', pisew: '#f97316', aset: '#06b6d4' };
-
-        // Helper to clean messy coordinates from various sources
-        const cleanCoords = (str) => {
-            if (!str) return null;
-            let s = str.toString().trim();
-            
-            // Fallback: If it's already a simple "lat, lng" with one comma and optional space
-            if (/^-?\d+\.?\d*,\s?-?\d+\.?\d*$/.test(s)) {
-                const p = s.split(',').map(v => parseFloat(v.trim()));
-                if (p.length === 2 && !isNaN(p[0]) && !isNaN(p[1])) {
-                    // Basic swap logic: if first number > 50, it's likely Longitude
-                    return (Math.abs(p[0]) > 50) ? [p[0], p[1]] : [p[1], p[0]];
-                }
-            }
-
-            // Complex healing for messy data like -5.253.531
-            let cleaned = s.replace(/[^0-9.,-]/g, '');
-            const parts = cleaned.split(',');
-            if (parts.length !== 2) return null;
-            
-            const fixDots = (val) => {
-                let v = val.trim();
-                if (!v) return NaN;
-                if ((v.match(/\./g) || []).length === 1) return parseFloat(v);
-                let firstDot = v.indexOf('.');
-                if (firstDot === -1) return parseFloat(v);
-                let head = v.substring(0, firstDot + 1);
-                let tail = v.substring(firstDot + 1).replace(/\./g, '');
-                return parseFloat(head + tail);
-            };
-
-            const p1 = fixDots(parts[0]);
-            const p2 = fixDots(parts[1]);
-            if (isNaN(p1) || isNaN(p2)) return null;
-
-            // Sinjai is roughly Lat -5, Lng 120
-            // Return [lng, lat]
-            return (Math.abs(p1) > 50) ? [p1, p2] : [p2, p1];
-        };
+        const colorMap = { rtlh: '#f59e0b', kumuh: '#ef4444', formal: '#6366f1', psu: '#10b981', arsinum: '#3b82f6', pisew: '#f97316', aset: '#1e1b4b' };
+        const detailUrls = { rtlh: '<?= base_url("rtlh/detail") ?>', kumuh: '<?= base_url("wilayah-kumuh/detail") ?>', formal: '<?= base_url("perumahan-formal/detail") ?>', psu: '<?= base_url("psu/detail") ?>', aset: '<?= base_url("aset-tanah/detail") ?>', arsinum: '<?= base_url("arsinum/detail") ?>', pisew: '<?= base_url("pisew/detail") ?>' };
 
         items.forEach(item => {
             try {
                 let geojson = null;
-                // COORDINATE HEALING
-                if (item.latitude && item.longitude) { 
-                    geojson = { type: 'Point', coordinates: [parseFloat(item.longitude), parseFloat(item.latitude)] }; 
-                } else if (item.coords) {
-                    const c = cleanCoords(item.coords);
-                    if (c) geojson = { type: 'Point', coordinates: c };
+                let lat = null, lon = null;
+                if (item.latitude && item.longitude) { lat = parseFloat(item.latitude); lon = parseFloat(item.longitude); }
+                else if (item.coords) {
+                    let p = item.coords.toString().split(',');
+                    if (p.length === 2) { lat = healCoordinate(p[0], true); lon = healCoordinate(p[1], false); }
+                }
+
+                if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) { 
+                    geojson = { type: 'Point', coordinates: [lon, lat] }; 
                 } else if (item.wkt && typeof wellknown !== 'undefined') {
                     geojson = wellknown.parse(item.wkt);
                     if (geojson && type === 'psu') {
@@ -356,25 +335,22 @@
                 }
                 if (!geojson) return;
 
-                // DYNAMIC COLOR FOR KUMUH
-                let markerColor = colorMap[type];
-                let layerStyle = { color: markerColor, weight: 2, fillOpacity: 0.4 };
+                let markerColor = colorMap[type] || '#ef4444';
+                let layerStyle = { color: markerColor, weight: 3, fillOpacity: 0.5 };
                 if (type === 'kumuh' && item.skor_kumuh) {
                     const skor = parseFloat(item.skor_kumuh);
                     markerColor = skor >= 60 ? '#e11d48' : (skor >= 40 ? '#f97316' : '#f59e0b');
                     layerStyle = { color: markerColor, fillColor: markerColor, weight: 2, fillOpacity: 0.6 };
                 }
 
-                let popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${type==='kumuh' ? 'Skor: ' + item.skor_kumuh : (item.no_sertifikat ? 'No: ' + item.no_sertifikat : 'Informasi Terverifikasi')}</p></div>`;
+                const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">${type==='kumuh' ? 'Skor: ' + item.skor_kumuh : (item.no_sertifikat ? 'No: ' + item.no_sertifikat : 'Informasi Terverifikasi')}</p><a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>`;
 
                 if (geojson.type === 'Point') {
-                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 6, fillColor: markerColor, color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
+                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 7, fillColor: markerColor, color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
                 } else {
                     L.geoJSON(geojson, { style: layerStyle }).bindPopup(popup).addTo(activeDataGroup);
                 }
-            } catch (e) {
-                console.error("Error adding marker for layer " + type, e);
-            }
+            } catch (e) {}
         });
 
         const bounds = L.latLngBounds();
