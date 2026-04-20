@@ -655,10 +655,16 @@ class Rtlh extends BaseController
         $db = \Config\Database::connect();
         $master = [];
         foreach ($this->refModel->findAll() as $ref) $master[$ref['kategori']][] = $ref;
+        
+        $allDesa = $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
+        $desaList = array_map(function($d) {
+            return ['desa' => $d['desa_nama'], 'desa_id' => $d['desa_id']];
+        }, $allDesa);
+
         return view('rtlh/create', [
             'title' => 'Tambah RTLH',
             'master' => $master,
-            'all_desa' => $db->table('kode_desa')->get()->getResultArray()
+            'desa_list' => $desaList
         ]);
     }
 
@@ -764,13 +770,19 @@ class Rtlh extends BaseController
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         $master = [];
         foreach ($this->refModel->findAll() as $ref) $master[$ref['kategori']][] = $ref;
+
+        $allDesa = $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
+        $desaList = array_map(function($d) {
+            return ['desa' => $d['desa_nama'], 'desa_id' => $d['desa_id']];
+        }, $allDesa);
+
         return view('rtlh/edit', [
             'title' => 'Edit RTLH',
             'rumah' => $rumah,
             'penerima' => $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first(),
             'kondisi' => $this->kondisiModel->where('id_survei', $id)->first(),
             'master' => $master,
-            'all_desa' => $db->table('kode_desa')->get()->getResultArray()
+            'desa_list' => $desaList
         ]);
     }
 

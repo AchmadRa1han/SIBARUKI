@@ -138,7 +138,13 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Desa / Kelurahan</label>
-                        <input type="text" name="desa" value="<?= old('desa', $rumah['desa']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
+                        <select name="desa" id="desa-select" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="">Pilih Desa</option>
+                            <?php if(isset($desa_list)): foreach($desa_list as $d): ?>
+                                <option value="<?= $d['desa'] ?>" data-id="<?= $d['desa_id'] ?>" <?= (old('desa', $rumah['desa']) == $d['desa']) ? 'selected' : '' ?>><?= $d['desa'] ?></option>
+                            <?php endforeach; endif; ?>
+                        </select>
+                        <input type="hidden" name="desa_id" id="desa_id_input" value="<?= old('desa_id', $rumah['desa_id']) ?>">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Jenis Kawasan</label>
@@ -334,6 +340,15 @@
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
         setTimeout(initMapPicker, 500);
+
+        const desaSelect = document.getElementById('desa-select');
+        const desaIdInput = document.getElementById('desa_id_input');
+        if (desaSelect && desaIdInput) {
+            desaSelect.addEventListener('change', () => {
+                const selected = desaSelect.options[desaSelect.selectedIndex];
+                desaIdInput.value = selected.getAttribute('data-id') || '';
+            });
+        }
     });
 
     function parseWKT(wkt) {
