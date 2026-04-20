@@ -35,7 +35,7 @@ class Home extends BaseController
         $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt')->limit(100)->get()->getResultArray();
         $mapArsinum = $db->table('arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords')->get()->getResultArray();
         $mapPisew = $db->table('pisew')->select('id, jenis_pekerjaan as name, koordinat as coords')->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
-        $mapAset = $db->table('aset_tanah')->select('id, nama_pemilik as name, koordinat as coords')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
+        $mapAset = $db->table('aset_tanah')->select('id, nama_pemilik as name, no_sertifikat, koordinat as coords')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
 
         $data = [
             'title'   => 'Selamat Datang di SIBARUKI Sinjai',

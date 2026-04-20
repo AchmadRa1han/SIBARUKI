@@ -302,24 +302,40 @@
         // Helper to clean messy coordinates from various sources
         const cleanCoords = (str) => {
             if (!str) return null;
-            // Remove everything except numbers, dots, commas, and minus signs
-            let cleaned = str.toString().replace(/[^0-9.,-]/g, '');
-            // Handle multiple dots in one number (e.g. -5.253.531 -> -5.253531)
+            let s = str.toString().trim();
+            
+            // Fallback: If it's already a simple "lat, lng" with one comma and optional space
+            if (/^-?\d+\.?\d*,\s?-?\d+\.?\d*$/.test(s)) {
+                const p = s.split(',').map(v => parseFloat(v.trim()));
+                if (p.length === 2 && !isNaN(p[0]) && !isNaN(p[1])) {
+                    // Basic swap logic: if first number > 50, it's likely Longitude
+                    return (Math.abs(p[0]) > 50) ? [p[0], p[1]] : [p[1], p[0]];
+                }
+            }
+
+            // Complex healing for messy data like -5.253.531
+            let cleaned = s.replace(/[^0-9.,-]/g, '');
             const parts = cleaned.split(',');
             if (parts.length !== 2) return null;
             
             const fixDots = (val) => {
-                let s = val.trim();
-                let firstDot = s.indexOf('.');
-                if (firstDot === -1) return parseFloat(s);
-                let head = s.substring(0, firstDot + 1);
-                let tail = s.substring(firstDot + 1).replace(/\./g, '');
+                let v = val.trim();
+                if (!v) return NaN;
+                if ((v.match(/\./g) || []).length === 1) return parseFloat(v);
+                let firstDot = v.indexOf('.');
+                if (firstDot === -1) return parseFloat(v);
+                let head = v.substring(0, firstDot + 1);
+                let tail = v.substring(firstDot + 1).replace(/\./g, '');
                 return parseFloat(head + tail);
             };
 
-            const lat = fixDots(parts[0]);
-            const lng = fixDots(parts[1]);
-            return (!isNaN(lat) && !isNaN(lng)) ? [lng, lat] : null;
+            const p1 = fixDots(parts[0]);
+            const p2 = fixDots(parts[1]);
+            if (isNaN(p1) || isNaN(p2)) return null;
+
+            // Sinjai is roughly Lat -5, Lng 120
+            // Return [lng, lat]
+            return (Math.abs(p1) > 50) ? [p1, p2] : [p2, p1];
         };
 
         items.forEach(item => {
@@ -349,14 +365,16 @@
                     layerStyle = { color: markerColor, fillColor: markerColor, weight: 2, fillOpacity: 0.6 };
                 }
 
-                const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${type==='kumuh' ? 'Skor: ' + item.skor_kumuh : 'Informasi Terverifikasi'}</p></div>`;
+                let popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${type==='kumuh' ? 'Skor: ' + item.skor_kumuh : (item.no_sertifikat ? 'No: ' + item.no_sertifikat : 'Informasi Terverifikasi')}</p></div>`;
 
                 if (geojson.type === 'Point') {
-                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 5, fillColor: markerColor, color: '#fff', weight: 1.5, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
+                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 6, fillColor: markerColor, color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
                 } else {
                     L.geoJSON(geojson, { style: layerStyle }).bindPopup(popup).addTo(activeDataGroup);
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error("Error adding marker for layer " + type, e);
+            }
         });
 
         const bounds = L.latLngBounds();
