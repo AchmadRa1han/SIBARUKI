@@ -29,7 +29,6 @@
                         <th class="p-4 border-b">Pemilik</th>
                         <th class="p-4 border-b">Desa / Alamat</th>
                         <th class="p-4 border-b">Luas Rumah</th>
-                        <th class="p-4 border-b">Penghuni</th>
                         <th class="p-4 border-b text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -43,7 +42,6 @@
                                 <p class="text-xs text-gray-500 truncate w-48"><?= $row['alamat_detail'] ?></p>
                             </td>
                             <td class="p-4"><?= $row['luas_rumah_m2'] ?> m²</td>
-                            <td class="p-4"><?= $row['jumlah_penghuni_jiwa'] ?> Jiwa</td>
                             <td class="p-4">
                                 <div class="flex justify-center space-x-2">
                                     <a href="<?= base_url('profil-rumah/edit/' . $row['id_survei']) ?>" class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Edit">

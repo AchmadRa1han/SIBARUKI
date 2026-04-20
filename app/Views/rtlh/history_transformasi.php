@@ -98,10 +98,6 @@
                                     <p class="text-[10px] font-bold text-blue-600 dark:text-blue-400 italic"><?= $rumahSeb['luas_rumah_m2'] ?? '0' ?> m² / <?= $rumahSeb['luas_lahan_m2'] ?? '0' ?> m²</p>
                                 </div>
                                 <div>
-                                    <p class="text-[7px] font-bold text-slate-400 uppercase mb-0.5 tracking-widest">Penghuni</p>
-                                    <p class="text-[10px] font-bold text-slate-700 dark:text-white uppercase"><?= $rumahSeb['jumlah_penghuni_jiwa'] ?? '0' ?> Jiwa</p>
-                                </div>
-                                <div>
                                     <p class="text-[7px] font-bold text-slate-400 uppercase mb-0.5 tracking-widest">Air Minum</p>
                                     <p class="text-[10px] font-bold text-slate-700 dark:text-white uppercase truncate"><?= $rumahSeb['sumber_air_minum'] ?? 'N/A' ?></p>
                                 </div>
