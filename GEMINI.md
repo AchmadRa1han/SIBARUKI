@@ -81,7 +81,6 @@ Data RTLH wajib dipecah menjadi 3 tabel untuk memastikan normalisasi data person
 - `bantuan_perumahan` (VARCHAR)
 - `jenis_kawasan`, `fungsi_ruang` (VARCHAR)
 - `luas_rumah_m2`, `luas_lahan_m2` (FLOAT)
-- `jumlah_penghuni_jiwa` (INT)
 - `sumber_air_minum`, `jarak_sam_ke_tpa_tinja` (VARCHAR)
 - `kamar_mandi_dan_jamban`, `jenis_jamban_kloset`, `jenis_tpa_tinja` (VARCHAR)
 - `lokasi_koordinat` (GEOMETRY - *WKT POINT*)
