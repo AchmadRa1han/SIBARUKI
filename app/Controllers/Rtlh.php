@@ -217,7 +217,6 @@ class Rtlh extends BaseController
             'fungsi_ruang'         => ['fungsi ruang'],
             'luas_rumah_m2'        => ['*luas rumah (m2)', 'luas rumah (m2)'],
             'luas_lahan_m2'        => ['luah lahan (m2)', 'luas lahan (m2)'],
-            'jumlah_penghuni_jiwa' => ['*jumlah penghuni (jiwa)', 'jumlah penghuni (jiwa)'],
             'pendidikan_id'        => ['*pendidikan', 'pendidikan'],
             'pekerjaan_id'         => ['*pekerjaan', 'pekerjaan'],
             'penghasilan_per_bulan'=> ['*penghasilan perbulan', 'penghasilan perbulan'],
@@ -563,7 +562,7 @@ class Rtlh extends BaseController
             'PENDIDIKAN', 'PEKERJAAN', 'PENGHASILAN', 'JML ANGGOTA KELUARGA',
             'ALAMAT', 'DESA', 'JENIS KAWASAN', 'FUNGSI RUANG', 'KEPEMILIKAN RUMAH', 'ASET DI LOKASI LAIN', 
             'KEPEMILIKAN TANAH', 'SUMBER PENERANGAN', 'DETAIL PENERANGAN', 'BANTUAN PERUMAHAN', 
-            'LUAS RUMAH', 'LUAS LAHAN', 'JML PENGHUNI', 'SUMBER AIR MINUM', 'JARAK SAM KE TPA', 
+            'LUAS RUMAH', 'LUAS LAHAN', 'SUMBER AIR MINUM', 'JARAK SAM KE TPA', 
             'KM DAN JAMBAN', 'JENIS KLOSET', 'JENIS TPA TINJA',
             'ST PONDASI', 'ST KOLOM', 'ST BALOK', 'ST SLOOF', 'ST RANGKA ATAP', 'ST PLAFON', 
             'ST JENDELA', 'ST VENTILASI', 'MAT LANTAI', 'ST LANTAI', 'MAT DINDING', 'ST DINDING', 
@@ -602,33 +601,32 @@ class Rtlh extends BaseController
             $sheet->setCellValue('U' . $rowNum, $row['bantuan_perumahan']);
             $sheet->setCellValue('V' . $rowNum, $row['luas_rumah_m2']);
             $sheet->setCellValue('W' . $rowNum, $row['luas_lahan_m2']);
-            $sheet->setCellValue('X' . $rowNum, $row['jumlah_penghuni_jiwa']);
-            $sheet->setCellValue('Y' . $rowNum, $row['sumber_air_minum']);
-            $sheet->setCellValue('Z' . $rowNum, $row['jarak_sam_ke_tpa_tinja']);
-            $sheet->setCellValue('AA' . $rowNum, $row['kamar_mandi_dan_jamban']);
-            $sheet->setCellValue('AB' . $rowNum, $row['jenis_jamban_kloset']);
-            $sheet->setCellValue('AC' . $rowNum, $row['jenis_tpa_tinja']);
+            $sheet->setCellValue('X' . $rowNum, $row['sumber_air_minum']);
+            $sheet->setCellValue('Y' . $rowNum, $row['jarak_sam_ke_tpa_tinja']);
+            $sheet->setCellValue('Z' . $rowNum, $row['kamar_mandi_dan_jamban']);
+            $sheet->setCellValue('AA' . $rowNum, $row['jenis_jamban_kloset']);
+            $sheet->setCellValue('AB' . $rowNum, $row['jenis_tpa_tinja']);
             
-            $sheet->setCellValue('AD' . $rowNum, $refMap[$row['st_pondasi']] ?? '-');
-            $sheet->setCellValue('AE' . $rowNum, $refMap[$row['st_kolom']] ?? '-');
-            $sheet->setCellValue('AF' . $rowNum, $refMap[$row['st_balok']] ?? '-');
-            $sheet->setCellValue('AG' . $rowNum, $refMap[$row['st_sloof']] ?? '-');
-            $sheet->setCellValue('AH' . $rowNum, $refMap[$row['st_rangka_atap']] ?? '-');
-            $sheet->setCellValue('AI' . $rowNum, $refMap[$row['st_plafon']] ?? '-');
-            $sheet->setCellValue('AJ' . $rowNum, $refMap[$row['st_jendela']] ?? '-');
-            $sheet->setCellValue('AK' . $rowNum, $refMap[$row['st_ventilasi']] ?? '-');
-            $sheet->setCellValue('AL' . $rowNum, $refMap[$row['mat_lantai']] ?? '-');
-            $sheet->setCellValue('AM' . $rowNum, $refMap[$row['st_lantai']] ?? '-');
-            $sheet->setCellValue('AN' . $rowNum, $refMap[$row['mat_dinding']] ?? '-');
-            $sheet->setCellValue('AO' . $rowNum, $refMap[$row['st_dinding']] ?? '-');
-            $sheet->setCellValue('AP' . $rowNum, $refMap[$row['mat_atap']] ?? '-');
-            $sheet->setCellValue('AQ' . $rowNum, $refMap[$row['st_atap']] ?? '-');
+            $sheet->setCellValue('AC' . $rowNum, $refMap[$row['st_pondasi']] ?? '-');
+            $sheet->setCellValue('AD' . $rowNum, $refMap[$row['st_kolom']] ?? '-');
+            $sheet->setCellValue('AE' . $rowNum, $refMap[$row['st_balok']] ?? '-');
+            $sheet->setCellValue('AF' . $rowNum, $refMap[$row['st_sloof']] ?? '-');
+            $sheet->setCellValue('AG' . $rowNum, $refMap[$row['st_rangka_atap']] ?? '-');
+            $sheet->setCellValue('AH' . $rowNum, $refMap[$row['st_plafon']] ?? '-');
+            $sheet->setCellValue('AI' . $rowNum, $refMap[$row['st_jendela']] ?? '-');
+            $sheet->setCellValue('AJ' . $rowNum, $refMap[$row['st_ventilasi']] ?? '-');
+            $sheet->setCellValue('AK' . $rowNum, $refMap[$row['mat_lantai']] ?? '-');
+            $sheet->setCellValue('AL' . $rowNum, $refMap[$row['st_lantai']] ?? '-');
+            $sheet->setCellValue('AM' . $rowNum, $refMap[$row['mat_dinding']] ?? '-');
+            $sheet->setCellValue('AN' . $rowNum, $refMap[$row['st_dinding']] ?? '-');
+            $sheet->setCellValue('AO' . $rowNum, $refMap[$row['mat_atap']] ?? '-');
+            $sheet->setCellValue('AP' . $rowNum, $refMap[$row['st_atap']] ?? '-');
             
-            $sheet->setCellValue('AR' . $rowNum, $row['status_bantuan']);
-            $sheet->setCellValue('AS' . $rowNum, $row['tahun_bansos']);
-            $sheet->setCellValue('AT' . $rowNum, $row['status_backlog']);
-            $sheet->setCellValue('AU' . $rowNum, $row['desil_nasional']);
-            $sheet->setCellValue('AV' . $rowNum, $row['wkt_text']);
+            $sheet->setCellValue('AQ' . $rowNum, $row['status_bantuan']);
+            $sheet->setCellValue('AR' . $rowNum, $row['tahun_bansos']);
+            $sheet->setCellValue('AS' . $rowNum, $row['status_backlog']);
+            $sheet->setCellValue('AT' . $rowNum, $row['desil_nasional']);
+            $sheet->setCellValue('AU' . $rowNum, $row['wkt_text']);
             
             $rowNum++;
         }

@@ -112,7 +112,6 @@ class ImportRtlh extends BaseCommand
                 'fungsi_ruang' => trim($row[21]),
                 'luas_rumah_m2' => (float)str_replace(['M', ' '], '', $row[36]),
                 'luas_lahan_m2' => (float)str_replace(['M', ' '], '', $row[37]),
-                'jumlah_penghuni_jiwa' => (int)$row[38],
                 'sumber_air_minum' => trim($row[39]),
                 'jarak_sam_ke_tpa_tinja' => trim($row[40]),
                 'kamar_mandi_dan_jamban' => trim($row[41]),
