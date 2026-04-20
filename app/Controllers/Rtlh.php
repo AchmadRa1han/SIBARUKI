@@ -418,7 +418,6 @@ class Rtlh extends BaseController
                     'bantuan_perumahan' => $getVal('bantuan_perumahan'),
                     'luas_rumah_m2' => preg_replace('/[^0-9.]/', '', $getVal('luas_rumah_m2') ?? '0'),
                     'luas_lahan_m2' => preg_replace('/[^0-9.]/', '', $getVal('luas_lahan_m2') ?? '0'),
-                    'jumlah_penghuni_jiwa' => (int) preg_replace('/[^0-9]/', '', $getVal('jumlah_penghuni_jiwa') ?? '0'),
                     'sumber_air_minum' => $getVal('sumber_air_minum'),
                     'jarak_sam_ke_tpa_tinja' => $getVal('jarak_sam_ke_tpa_tinja'),
                     'kamar_mandi_dan_jamban' => $getVal('kamar_mandi_dan_jamban'),
