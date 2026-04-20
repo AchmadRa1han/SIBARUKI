@@ -135,9 +135,9 @@
 
         <div class="max-w-7xl mx-auto px-6 lg:px-12 reveal">
             <div class="bg-white dark:bg-slate-900 p-3 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl relative">
-                <div class="absolute top-8 right-8 z-[1001] flex flex-col gap-2">
+                <div class="absolute top-8 left-8 z-[1001] flex flex-col gap-2">
                     <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
-                    <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg" data-layer="<?= $l ?>">
+                    <button type="button" onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg" data-layer="<?= $l ?>">
                         <?php 
                             $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
                             echo $labels[$l];
@@ -299,6 +299,29 @@
         const items = spasialData[type] || [];
         const colorMap = { rtlh: '#f59e0b', kumuh: '#ef4444', formal: '#6366f1', psu: '#10b981', arsinum: '#3b82f6', pisew: '#f97316', aset: '#06b6d4' };
 
+        // Helper to clean messy coordinates from various sources
+        const cleanCoords = (str) => {
+            if (!str) return null;
+            // Remove everything except numbers, dots, commas, and minus signs
+            let cleaned = str.toString().replace(/[^0-9.,-]/g, '');
+            // Handle multiple dots in one number (e.g. -5.253.531 -> -5.253531)
+            const parts = cleaned.split(',');
+            if (parts.length !== 2) return null;
+            
+            const fixDots = (val) => {
+                let s = val.trim();
+                let firstDot = s.indexOf('.');
+                if (firstDot === -1) return parseFloat(s);
+                let head = s.substring(0, firstDot + 1);
+                let tail = s.substring(firstDot + 1).replace(/\./g, '');
+                return parseFloat(head + tail);
+            };
+
+            const lat = fixDots(parts[0]);
+            const lng = fixDots(parts[1]);
+            return (!isNaN(lat) && !isNaN(lng)) ? [lng, lat] : null;
+        };
+
         items.forEach(item => {
             try {
                 let geojson = null;
@@ -306,12 +329,8 @@
                 if (item.latitude && item.longitude) { 
                     geojson = { type: 'Point', coordinates: [parseFloat(item.longitude), parseFloat(item.latitude)] }; 
                 } else if (item.coords) {
-                    const parts = item.coords.toString().split(',');
-                    if (parts.length === 2) {
-                        const lat = parseFloat(parts[0].trim());
-                        const lng = parseFloat(parts[1].trim());
-                        if (!isNaN(lat) && !isNaN(lng)) geojson = { type: 'Point', coordinates: [lng, lat] };
-                    }
+                    const c = cleanCoords(item.coords);
+                    if (c) geojson = { type: 'Point', coordinates: c };
                 } else if (item.wkt && typeof wellknown !== 'undefined') {
                     geojson = wellknown.parse(item.wkt);
                     if (geojson && type === 'psu') {
