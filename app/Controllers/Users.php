@@ -70,10 +70,15 @@ class Users extends BaseController
         if (!has_permission('create_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
 
         $db = \Config\Database::connect();
+        $allDesa = $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
+        $desaList = array_map(function($d) {
+            return ['desa' => $d['desa_nama'], 'desa_id' => $d['desa_id']];
+        }, $allDesa);
+
         $data = [
             'title' => 'Tambah Pengguna Baru',
             'roles' => $this->roleModel->findAll(),
-            'all_desa' => $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray()
+            'desa_list' => $desaList
         ];
 
         return view('users/create', $data);
@@ -128,13 +133,18 @@ class Users extends BaseController
         $kumuhDesa = $this->userDesaModel->where(['user_id' => $id, 'category' => 'kumuh'])->findAll();
         $assignedKumuh = array_column($kumuhDesa, 'desa_id');
 
+        $allDesa = $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
+        $desaList = array_map(function($d) {
+            return ['desa' => $d['desa_nama'], 'desa_id' => $d['desa_id']];
+        }, $allDesa);
+
         $data = [
             'title'             => 'Edit Pengguna',
             'user'              => $user,
             'roles'             => $this->roleModel->findAll(),
             'assigned_rtlh'     => $assignedRtlh,
             'assigned_kumuh'    => $assignedKumuh,
-            'all_desa'          => $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray()
+            'desa_list'         => $desaList
         ];
 
         return view('users/edit', $data);
