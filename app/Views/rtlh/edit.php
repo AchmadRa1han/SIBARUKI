@@ -148,7 +148,23 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Jenis Kawasan</label>
-                        <input type="text" name="jenis_kawasan" value="<?= old('jenis_kawasan', $rumah['jenis_kawasan']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
+                        <?php 
+                            $val = old('jenis_kawasan', $rumah['jenis_kawasan']);
+                            $isLainnya = !empty($val);
+                            if(isset($master['JENIS_KAWASAN'])) {
+                                foreach($master['JENIS_KAWASAN'] as $opt) {
+                                    if ($val == $opt['id'] || $val == $opt['nama_pilihan']) { $isLainnya = false; break; }
+                                }
+                            }
+                        ?>
+                        <select name="jenis_kawasan" onchange="toggleLainnya(this, 'jenis_kawasan_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="">Pilih Jenis Kawasan</option>
+                            <?php if(isset($master['JENIS_KAWASAN'])): foreach($master['JENIS_KAWASAN'] as $opt): ?>
+                                <option value="<?= $opt['id'] ?>" <?= ($val == $opt['id'] || $val == $opt['nama_pilihan']) ? 'selected' : '' ?>><?= $opt['nama_pilihan'] ?></option>
+                            <?php endforeach; endif; ?>
+                            <option value="lainnya" <?= $isLainnya ? 'selected' : '' ?>>Lainnya...</option>
+                        </select>
+                        <input type="text" name="jenis_kawasan_manual" id="jenis_kawasan_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan kawasan..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                     </div>
                     <div class="bg-indigo-50 dark:bg-indigo-950/30 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/50">
                         <label class="block text-[8px] font-bold text-indigo-900 dark:text-indigo-400 uppercase mb-2 tracking-widest ml-1">Luas Rumah (m²)</label>
@@ -164,11 +180,43 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Kepemilikan Rumah</label>
-                        <input type="text" name="kepemilikan_rumah" value="<?= old('kepemilikan_rumah', $rumah['kepemilikan_rumah']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
+                        <?php 
+                            $val = old('kepemilikan_rumah', $rumah['kepemilikan_rumah']);
+                            $isLainnya = !empty($val);
+                            if(isset($master['KEPEMILIKAN_RUMAH'])) {
+                                foreach($master['KEPEMILIKAN_RUMAH'] as $opt) {
+                                    if ($val == $opt['id'] || $val == $opt['nama_pilihan']) { $isLainnya = false; break; }
+                                }
+                            }
+                        ?>
+                        <select name="kepemilikan_rumah" onchange="toggleLainnya(this, 'kepemilikan_rumah_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="">Pilih Kepemilikan</option>
+                            <?php if(isset($master['KEPEMILIKAN_RUMAH'])): foreach($master['KEPEMILIKAN_RUMAH'] as $opt): ?>
+                                <option value="<?= $opt['id'] ?>" <?= ($val == $opt['id'] || $val == $opt['nama_pilihan']) ? 'selected' : '' ?>><?= $opt['nama_pilihan'] ?></option>
+                            <?php endforeach; endif; ?>
+                            <option value="lainnya" <?= $isLainnya ? 'selected' : '' ?>>Lainnya...</option>
+                        </select>
+                        <input type="text" name="kepemilikan_rumah_manual" id="kepemilikan_rumah_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan kepemilikan..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Kepemilikan Tanah</label>
-                        <input type="text" name="kepemilikan_tanah" value="<?= old('kepemilikan_tanah', $rumah['kepemilikan_tanah']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
+                        <?php 
+                            $val = old('kepemilikan_tanah', $rumah['kepemilikan_tanah']);
+                            $isLainnya = !empty($val);
+                            if(isset($master['KEPEMILIKAN_TANAH'])) {
+                                foreach($master['KEPEMILIKAN_TANAH'] as $opt) {
+                                    if ($val == $opt['id'] || $val == $opt['nama_pilihan']) { $isLainnya = false; break; }
+                                }
+                            }
+                        ?>
+                        <select name="kepemilikan_tanah" onchange="toggleLainnya(this, 'kepemilikan_tanah_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="">Pilih Kepemilikan</option>
+                            <?php if(isset($master['KEPEMILIKAN_TANAH'])): foreach($master['KEPEMILIKAN_TANAH'] as $opt): ?>
+                                <option value="<?= $opt['id'] ?>" <?= ($val == $opt['id'] || $val == $opt['nama_pilihan']) ? 'selected' : '' ?>><?= $opt['nama_pilihan'] ?></option>
+                            <?php endforeach; endif; ?>
+                            <option value="lainnya" <?= $isLainnya ? 'selected' : '' ?>>Lainnya...</option>
+                        </select>
+                        <input type="text" name="kepemilikan_tanah_manual" id="kepemilikan_tanah_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan kepemilikan..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Status Backlog</label>
@@ -266,15 +314,63 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Sumber Air Minum</label>
-                            <input type="text" name="sumber_air_minum" value="<?= old('sumber_air_minum', $rumah['sumber_air_minum']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                            <?php 
+                                $val = old('sumber_air_minum', $rumah['sumber_air_minum']);
+                                $isLainnya = !empty($val);
+                                if(isset($master['SUMBER_AIR_MINUM'])) {
+                                    foreach($master['SUMBER_AIR_MINUM'] as $opt) {
+                                        if ($val == $opt['id'] || $val == $opt['nama_pilihan']) { $isLainnya = false; break; }
+                                    }
+                                }
+                            ?>
+                            <select name="sumber_air_minum" onchange="toggleLainnya(this, 'sumber_air_minum_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
+                                <option value="">Pilih Sumber Air</option>
+                                <?php if(isset($master['SUMBER_AIR_MINUM'])): foreach($master['SUMBER_AIR_MINUM'] as $opt): ?>
+                                    <option value="<?= $opt['id'] ?>" <?= ($val == $opt['id'] || $val == $opt['nama_pilihan']) ? 'selected' : '' ?>><?= $opt['nama_pilihan'] ?></option>
+                                <?php endforeach; endif; ?>
+                                <option value="lainnya" <?= $isLainnya ? 'selected' : '' ?>>Lainnya...</option>
+                            </select>
+                            <input type="text" name="sumber_air_minum_manual" id="sumber_air_minum_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan sumber air..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                         </div>
                         <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Penerangan</label>
-                            <input type="text" name="sumber_penerangan" value="<?= old('sumber_penerangan', $rumah['sumber_penerangan']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                            <?php 
+                                $val = old('sumber_penerangan', $rumah['sumber_penerangan']);
+                                $isLainnya = !empty($val);
+                                if(isset($master['SUMBER_PENERANGAN'])) {
+                                    foreach($master['SUMBER_PENERANGAN'] as $opt) {
+                                        if ($val == $opt['id'] || $val == $opt['nama_pilihan']) { $isLainnya = false; break; }
+                                    }
+                                }
+                            ?>
+                            <select name="sumber_penerangan" onchange="toggleLainnya(this, 'sumber_penerangan_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
+                                <option value="">Pilih Penerangan</option>
+                                <?php if(isset($master['SUMBER_PENERANGAN'])): foreach($master['SUMBER_PENERANGAN'] as $opt): ?>
+                                    <option value="<?= $opt['id'] ?>" <?= ($val == $opt['id'] || $val == $opt['nama_pilihan']) ? 'selected' : '' ?>><?= $opt['nama_pilihan'] ?></option>
+                                <?php endforeach; endif; ?>
+                                <option value="lainnya" <?= $isLainnya ? 'selected' : '' ?>>Lainnya...</option>
+                            </select>
+                            <input type="text" name="sumber_penerangan_manual" id="sumber_penerangan_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan penerangan..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Sanitasi</label>
-                            <input type="text" name="jenis_jamban_kloset" value="<?= old('jenis_jamban_kloset', $rumah['jenis_jamban_kloset']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Sanitasi (Jamban)</label>
+                            <?php 
+                                $val = old('jenis_jamban_kloset', $rumah['jenis_jamban_kloset']);
+                                $isLainnya = !empty($val);
+                                if(isset($master['JENIS_JAMBAN'])) {
+                                    foreach($master['JENIS_JAMBAN'] as $opt) {
+                                        if ($val == $opt['id'] || $val == $opt['nama_pilihan']) { $isLainnya = false; break; }
+                                    }
+                                }
+                            ?>
+                            <select name="jenis_jamban_kloset" onchange="toggleLainnya(this, 'jenis_jamban_kloset_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
+                                <option value="">Pilih Sanitasi</option>
+                                <?php if(isset($master['JENIS_JAMBAN'])): foreach($master['JENIS_JAMBAN'] as $opt): ?>
+                                    <option value="<?= $opt['id'] ?>" <?= ($val == $opt['id'] || $val == $opt['nama_pilihan']) ? 'selected' : '' ?>><?= $opt['nama_pilihan'] ?></option>
+                                <?php endforeach; endif; ?>
+                                <option value="lainnya" <?= $isLainnya ? 'selected' : '' ?>>Lainnya...</option>
+                            </select>
+                            <input type="text" name="jenis_jamban_kloset_manual" id="jenis_jamban_kloset_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan sanitasi..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                         </div>
                     </div>
 

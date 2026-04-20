@@ -167,15 +167,15 @@
                     </div>
                     <div>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jenis Kawasan</p>
-                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['jenis_kawasan'] ?? '-' ?></p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['jenis_kawasan']] ?? $rumah['jenis_kawasan'] ?? '-' ?></p>
                     </div>
                     <div>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kepemilikan Rumah</p>
-                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['kepemilikan_rumah'] ?? '-' ?></p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['kepemilikan_rumah']] ?? $rumah['kepemilikan_rumah'] ?? '-' ?></p>
                     </div>
                     <div>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kepemilikan Tanah</p>
-                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['kepemilikan_tanah'] ?? '-' ?></p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['kepemilikan_tanah']] ?? $rumah['kepemilikan_tanah'] ?? '-' ?></p>
                     </div>
                     <div class="bg-blue-600 p-5 rounded-2xl text-white shadow-lg shadow-blue-600/10">
                         <p class="text-[8px] font-bold text-blue-100 uppercase mb-1 tracking-[0.2em]">Luas Rumah</p>
@@ -290,9 +290,9 @@
                     <?php 
                         $fotos = [
                             'foto_depan' => 'Tampak Depan',
-                            'foto_samping' => 'Tampak Samping',
+                            'foto_samping' => 'Tampak Samping Kiri',
                             'foto_belakang' => 'Tampak Belakang',
-                            'foto_dalam' => 'Bagian Dalam'
+                            'foto_dalam' => 'Tampak Samping Kanan'
                         ];
                         foreach($fotos as $f_key => $f_label):
                             $photoPath = !empty($rumah[$f_key]) && file_exists(FCPATH . 'uploads/rtlh/' . $rumah[$f_key]) 
@@ -398,11 +398,11 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
                                 <p class="text-[7px] font-bold text-slate-400 uppercase mb-1">Air Minum</p>
-                                <p class="text-[9px] font-bold text-slate-700 dark:text-white uppercase leading-tight"><?= $rumah['sumber_air_minum'] ?? '-' ?></p>
+                                <p class="text-[9px] font-bold text-slate-700 dark:text-white uppercase leading-tight"><?= $ref[$rumah['sumber_air_minum']] ?? $rumah['sumber_air_minum'] ?? '-' ?></p>
                             </div>
                             <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
                                 <p class="text-[7px] font-bold text-slate-400 uppercase mb-1">Penerangan</p>
-                                <p class="text-[9px] font-bold text-slate-700 dark:text-white uppercase leading-tight"><?= $rumah['sumber_penerangan'] ?? '-' ?></p>
+                                <p class="text-[9px] font-bold text-slate-700 dark:text-white uppercase leading-tight"><?= $ref[$rumah['sumber_penerangan']] ?? $rumah['sumber_penerangan'] ?? '-' ?></p>
                             </div>
                         </div>
                     </div>

@@ -166,7 +166,14 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Jenis Kawasan</label>
-                        <input type="text" name="jenis_kawasan" placeholder="Kawasan Lindung..." class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold placeholder:opacity-30">
+                        <select name="jenis_kawasan" onchange="toggleLainnya(this, 'jenis_kawasan_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="">Pilih Jenis Kawasan</option>
+                            <?php if(isset($master['JENIS_KAWASAN'])): foreach($master['JENIS_KAWASAN'] as $opt): ?>
+                                <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
+                            <?php endforeach; endif; ?>
+                            <option value="lainnya">Lainnya...</option>
+                        </select>
+                        <input type="text" name="jenis_kawasan_manual" id="jenis_kawasan_manual" placeholder="Sebutkan kawasan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                     </div>
                     <div class="bg-indigo-50 dark:bg-indigo-950/30 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/50">
                         <label class="block text-[8px] font-bold text-indigo-900 dark:text-indigo-400 uppercase mb-2 tracking-widest ml-1">Luas Rumah (m²)</label>
@@ -178,11 +185,14 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Kepemilikan Rumah</label>
-                        <select name="kepemilikan_rumah" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
-                            <option value="Milik Sendiri">Milik Sendiri</option>
-                            <option value="Sewa / Kontrak">Sewa / Kontrak</option>
-                            <option value="Milik Orang Lain">Milik Orang Lain</option>
+                        <select name="kepemilikan_rumah" onchange="toggleLainnya(this, 'kepemilikan_rumah_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="">Pilih Kepemilikan</option>
+                            <?php if(isset($master['KEPEMILIKAN_RUMAH'])): foreach($master['KEPEMILIKAN_RUMAH'] as $opt): ?>
+                                <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
+                            <?php endforeach; endif; ?>
+                            <option value="lainnya">Lainnya...</option>
                         </select>
+                        <input type="text" name="kepemilikan_rumah_manual" id="kepemilikan_rumah_manual" placeholder="Sebutkan kepemilikan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                     </div>
                 </div>
             </div>
@@ -266,15 +276,36 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Sumber Air Minum</label>
-                            <input type="text" name="sumber_air_minum" placeholder="EX: Sumur Gali..." class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                            <select name="sumber_air_minum" onchange="toggleLainnya(this, 'sumber_air_minum_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
+                                <option value="">Pilih Sumber Air</option>
+                                <?php if(isset($master['SUMBER_AIR_MINUM'])): foreach($master['SUMBER_AIR_MINUM'] as $opt): ?>
+                                    <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
+                                <?php endforeach; endif; ?>
+                                <option value="lainnya">Lainnya...</option>
+                            </select>
+                            <input type="text" name="sumber_air_minum_manual" id="sumber_air_minum_manual" placeholder="Sebutkan sumber air..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                         </div>
                         <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Penerangan</label>
-                            <input type="text" name="sumber_penerangan" placeholder="EX: PLN 450W..." class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                            <select name="sumber_penerangan" onchange="toggleLainnya(this, 'sumber_penerangan_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
+                                <option value="">Pilih Penerangan</option>
+                                <?php if(isset($master['SUMBER_PENERANGAN'])): foreach($master['SUMBER_PENERANGAN'] as $opt): ?>
+                                    <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
+                                <?php endforeach; endif; ?>
+                                <option value="lainnya">Lainnya...</option>
+                            </select>
+                            <input type="text" name="sumber_penerangan_manual" id="sumber_penerangan_manual" placeholder="Sebutkan penerangan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Sanitasi</label>
-                            <input type="text" name="jenis_jamban_kloset" placeholder="EX: Leher Angsa..." class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Sanitasi (Jamban)</label>
+                            <select name="jenis_jamban_kloset" onchange="toggleLainnya(this, 'jenis_jamban_kloset_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
+                                <option value="">Pilih Sanitasi</option>
+                                <?php if(isset($master['JENIS_JAMBAN'])): foreach($master['JENIS_JAMBAN'] as $opt): ?>
+                                    <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
+                                <?php endforeach; endif; ?>
+                                <option value="lainnya">Lainnya...</option>
+                            </select>
+                            <input type="text" name="jenis_jamban_kloset_manual" id="jenis_jamban_kloset_manual" placeholder="Sebutkan sanitasi..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                         </div>
                     </div>
 

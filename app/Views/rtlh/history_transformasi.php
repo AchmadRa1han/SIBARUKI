@@ -99,11 +99,11 @@
                                 </div>
                                 <div>
                                     <p class="text-[7px] font-bold text-slate-400 uppercase mb-0.5 tracking-widest">Air Minum</p>
-                                    <p class="text-[10px] font-bold text-slate-700 dark:text-white uppercase truncate"><?= $rumahSeb['sumber_air_minum'] ?? 'N/A' ?></p>
+                                    <p class="text-[10px] font-bold text-slate-700 dark:text-white uppercase truncate"><?= $ref[$rumahSeb['sumber_air_minum'] ?? ''] ?? $rumahSeb['sumber_air_minum'] ?? 'N/A' ?></p>
                                 </div>
                                 <div>
                                     <p class="text-[7px] font-bold text-slate-400 uppercase mb-0.5 tracking-widest">Sanitasi</p>
-                                    <p class="text-[10px] font-bold text-slate-700 dark:text-white uppercase truncate"><?= $rumahSeb['kamar_mandi_dan_jamban'] ?? 'N/A' ?></p>
+                                    <p class="text-[10px] font-bold text-slate-700 dark:text-white uppercase truncate"><?= $ref[$rumahSeb['jenis_jamban_kloset'] ?? ''] ?? $rumahSeb['jenis_jamban_kloset'] ?? 'N/A' ?></p>
                                 </div>
                             </div>
                         </div>
