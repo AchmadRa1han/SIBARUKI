@@ -148,23 +148,6 @@
     .leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before {
         border: none !important;
     }
-    </style>
-    /* Custom Tooltip Styles */
-    .custom-tooltip {
-        background: rgba(15, 23, 42, 0.9) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 8px !important;
-        color: white !important;
-        font-weight: 800 !important;
-        font-size: 9px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
-        padding: 4px 8px !important;
-    }
-    .leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before {
-        border: none !important;
-    }
 </style>
 
 <script>

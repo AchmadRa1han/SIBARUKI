@@ -39,6 +39,7 @@ class Home extends BaseController
 
         $data = [
             'title'   => 'Selamat Datang di SIBARUKI Sinjai',
+            'isLoggedIn' => session()->get('user_id') ? true : false,
             'carousel' => $carousel,
             'rekap'   => [
                 'rtlh'    => $totalRtlh,
@@ -62,6 +63,49 @@ class Home extends BaseController
         ];
 
         return view('home', $data);
+    }
+
+    /**
+     * Pencarian NIK Publik
+     */
+    public function searchNik()
+    {
+        $nik = $this->request->getVar('nik');
+        if (!$nik) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'NIK tidak boleh kosong']);
+        }
+
+        // Bersihkan NIK
+        $nik = preg_replace('/[^0-9]/', '', $nik);
+        if (!$nik) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Format NIK tidak valid']);
+        }
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('rtlh_penerima p');
+        $builder->select('p.nama_kepala_keluarga, p.nik, r.desa, r.alamat_detail, r.status_bantuan, r.id_survei, ST_AsText(r.lokasi_koordinat) as wkt');
+        $builder->join('rtlh_rumah r', 'p.nik = r.nik_pemilik');
+        $builder->where('p.nik', $nik);
+        
+        try {
+            $data = $builder->get()->getRowArray();
+            if ($data) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'data'   => $data
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan saat mengakses database.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'not_found',
+            'message' => 'NIK tidak terdaftar'
+        ]);
     }
 
     /**

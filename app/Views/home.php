@@ -127,14 +127,46 @@
     <!-- 3. MAP SECTION -->
     <section id="map" class="scroll-mt-20 py-16 bg-slate-50 dark:bg-slate-950">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 mb-10 reveal">
-            <div>
-                <h2 class="text-[9px] font-black text-blue-600 uppercase tracking-[0.4em] mb-3">Interaktif GIS</h2>
-                <h3 class="text-3xl lg:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">E-Peta SIBARUKI</h3>
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h2 class="text-[9px] font-black text-blue-600 uppercase tracking-[0.4em] mb-3">Interaktif GIS</h2>
+                    <h3 class="text-3xl lg:text-4xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">E-Peta SIBARUKI</h3>
+                </div>
+                
+                <!-- Search Bar NIK -->
+                <div class="w-full md:w-96">
+                    <form id="searchNikForm" class="relative group">
+                        <input type="text" id="nikInput" placeholder="Cek NIK Penerima RTLH..." 
+                            class="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl focus:ring-2 focus:ring-blue-600 outline-none transition-all text-sm font-bold uppercase tracking-wider placeholder:text-slate-400 placeholder:normal-case"
+                            maxlength="16" required>
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                        </div>
+                        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
         <div class="max-w-7xl mx-auto px-6 lg:px-12 reveal">
-            <div class="bg-white dark:bg-slate-900 p-3 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl relative">
+            <div class="bg-white dark:bg-slate-900 p-3 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl relative overflow-hidden">
+                <!-- Search Result Floating Card -->
+                <div id="searchResultCard" class="absolute top-8 right-8 z-[1002] w-72 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[2rem] shadow-2xl transform translate-x-[120%] transition-transform duration-500 overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-2 py-1 bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest rounded-lg">Hasil Pencarian</span>
+                            <button onclick="closeSearchResult()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div id="searchResultContent">
+                            <!-- Content injected via JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <div class="absolute top-8 left-8 z-[1001] flex flex-col gap-2">
                     <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
                     <button type="button" onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg" data-layer="<?= $l ?>">
@@ -195,6 +227,7 @@
 <script>
     // --- GIS Logic (Improved Stability) ---
     const spasialData = <?= json_encode($spasial) ?>;
+    const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
     let map = null, clusterGroup, kecLayerGroup, activeDataGroup;
 
     function utmToLatLng(easting, northing) {
@@ -343,7 +376,8 @@
                     layerStyle = { color: markerColor, fillColor: markerColor, weight: 2, fillOpacity: 0.6 };
                 }
 
-                const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">${type==='kumuh' ? 'Skor: ' + item.skor_kumuh : (item.no_sertifikat ? 'No: ' + item.no_sertifikat : 'Informasi Terverifikasi')}</p><a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>`;
+                const detailLink = isLoggedIn ? `<a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a>` : '';
+                const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest ${isLoggedIn ? 'mb-2' : ''}">${type==='kumuh' ? 'Skor: ' + item.skor_kumuh : (item.no_sertifikat ? 'No: ' + item.no_sertifikat : 'Informasi Terverifikasi')}</p>${detailLink}</div>`;
 
                 if (geojson.type === 'Point') {
                     L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 7, fillColor: markerColor, color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
@@ -358,6 +392,115 @@
         [clusterGroup, activeDataGroup].forEach(g => { if(g.getLayers().length > 0) { bounds.extend(g.getBounds()); valid = true; } });
         if (valid && bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
+
+    // --- Search NIK Logic ---
+    function closeSearchResult() {
+        const card = document.getElementById('searchResultCard');
+        card.style.transform = 'translateX(120%)';
+        setTimeout(() => card.classList.add('translate-x-[120%]'), 10);
+    }
+
+    document.getElementById('searchNikForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const nik = document.getElementById('nikInput').value;
+        const btn = this.querySelector('button[type="submit"]');
+        const content = document.getElementById('searchResultContent');
+        const card = document.getElementById('searchResultCard');
+
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>';
+        lucide.createIcons();
+
+        try {
+            const response = await fetch(`<?= base_url('search-nik') ?>?nik=${nik}`);
+            const text = await response.text();
+            
+            let res;
+            try {
+                res = JSON.parse(text);
+            } catch (e) {
+                console.error("Server Response:", text);
+                throw new Error("Respon server tidak valid. Silakan coba lagi.");
+            }
+
+            // Selalu tampilkan card jika ada respon (success/not_found/error)
+            card.classList.remove('translate-x-[120%]');
+            card.style.transform = 'translateX(0)';
+
+            if (res.status === 'success') {
+                const d = res.data;
+                content.innerHTML = `
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nama Kepala Keluarga</p>
+                            <p class="text-sm font-black text-blue-950 dark:text-white uppercase">${d.nama_kepala_keluarga}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa</p>
+                                <p class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">${d.desa}</p>
+                            </div>
+                            <div>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
+                                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold rounded-full uppercase">${d.status_bantuan}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Alamat</p>
+                            <p class="text-[10px] font-medium text-slate-500 leading-tight">${d.alamat_detail || '-'}</p>
+                        </div>
+                        ${isLoggedIn ? `<a href="<?= base_url('rtlh/detail') ?>/${d.id_survei}" class="block w-full py-3 bg-blue-600 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all">Lihat Detail Lengkap</a>` : ''}
+                    </div>
+                `;
+
+                // Map Interaction
+                if (d.wkt && map) {
+                    const geojson = wellknown.parse(d.wkt);
+                    if (geojson && geojson.type === 'Point') {
+                        const coords = [geojson.coordinates[1], geojson.coordinates[0]];
+                        map.flyTo(coords, 18, { duration: 2 });
+                        
+                        // Add temporary highlight marker
+                        const highlight = L.circleMarker(coords, {
+                            radius: 12,
+                            fillColor: '#2563eb',
+                            color: '#fff',
+                            weight: 3,
+                            fillOpacity: 0.4
+                        }).addTo(map);
+
+                        const popupContent = `<div class="p-3">
+                            <p class="text-[8px] font-bold text-blue-600 uppercase mb-1">Lokasi Rumah</p>
+                            <p class="text-xs font-black uppercase text-slate-900">${d.nama_kepala_keluarga}</p>
+                        </div>`;
+                        
+                        highlight.bindPopup(popupContent).openPopup();
+                        
+                        // Remove highlight after some time or when card closed
+                        document.querySelector('[onclick="closeSearchResult()"]').addEventListener('click', () => {
+                            map.removeLayer(highlight);
+                        }, { once: true });
+                    }
+                }
+            } else {
+                content.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-600 dark:text-slate-400 leading-relaxed">${res.message}</p>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="arrow-right" class="w-4 h-4"></i>';
+            lucide.createIcons();
+        }
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
         const revealObserver = new IntersectionObserver((entries) => {
