@@ -136,7 +136,7 @@
                     </div>
                     <div>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Penghasilan / Bulan</p>
-                        <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-lg text-xs font-bold border border-emerald-100 dark:border-emerald-900"><?= $penerima['penghasilan_per_bulan'] ?? '-' ?></span>
+                        <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-lg text-xs font-bold border border-emerald-100 dark:border-emerald-900"><?= $ref[$penerima['penghasilan_per_bulan']] ?? $penerima['penghasilan_per_bulan'] ?? '-' ?></span>
                     </div>
                     <div>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jml Anggota Keluarga</p>

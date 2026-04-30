@@ -391,7 +391,7 @@ class Rtlh extends BaseController
                     'jenis_kelamin' => (stripos($getVal('jenis_kelamin') ?? '', 'PEREMPUAN') !== false) ? 'P' : 'L',
                     'pendidikan_id' => $findId('PENDIDIKAN', $getVal('pendidikan_id')),
                     'pekerjaan_id' => $findId('PEKERJAAN', $getVal('pekerjaan_id')),
-                    'penghasilan_per_bulan' => $getVal('penghasilan_per_bulan'),
+                    'penghasilan_per_bulan' => $findId('PENGHASILAN', $getVal('penghasilan_per_bulan')) ?: $getVal('penghasilan_per_bulan'),
                     'jumlah_anggota_keluarga' => (int) preg_replace('/[^0-9]/', '', $getVal('jumlah_anggota_keluarga') ?? '0'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
@@ -686,7 +686,7 @@ class Rtlh extends BaseController
                 'jenis_kelamin' => $post['jenis_kelamin'] ?? 'L',
                 'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'),
                 'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'),
-                'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null,
+                'penghasilan_per_bulan' => $this->resolveMasterId('penghasilan_per_bulan', $post, 'PENGHASILAN'),
                 'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? 0
             ]);
 
@@ -808,7 +808,7 @@ class Rtlh extends BaseController
                 'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null,
                 'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN', $penerima['pendidikan_id'] ?? null),
                 'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN', $penerima['pekerjaan_id'] ?? null),
-                'penghasilan_per_bulan' => $post['penghasilan_per_bulan'] ?? null
+                'penghasilan_per_bulan' => $this->resolveMasterId('penghasilan_per_bulan', $post, 'PENGHASILAN', $penerima['penghasilan_per_bulan'] ?? null)
             ];
             $this->penerimaModel->update($nik, $dataPenerima);
 

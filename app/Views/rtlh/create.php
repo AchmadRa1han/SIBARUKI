@@ -129,7 +129,14 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Penghasilan / Bulan</label>
-                        <input type="text" name="penghasilan_per_bulan" placeholder="Contoh: Rp 1.500.000" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold placeholder:opacity-30">
+                        <select name="penghasilan_per_bulan" onchange="toggleLainnya(this, 'penghasilan_per_bulan_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="">Pilih Penghasilan</option>
+                            <?php if(isset($master['PENGHASILAN'])): foreach($master['PENGHASILAN'] as $p): ?>
+                                <option value="<?= $p['id'] ?>"><?= $p['nama_pilihan'] ?></option>
+                            <?php endforeach; endif; ?>
+                            <option value="lainnya">Lainnya...</option>
+                        </select>
+                        <input type="text" name="penghasilan_per_bulan_manual" id="penghasilan_per_bulan_manual" placeholder="Sebutkan penghasilan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 dark:text-slate-200 outline-none transition-all font-bold text-sm animate-in fade-in slide-in-from-top-1">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Jml Anggota Keluarga</label>
