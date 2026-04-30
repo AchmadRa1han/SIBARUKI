@@ -168,10 +168,10 @@
                 </div>
 
                 <div class="absolute top-8 left-8 z-[1001] flex flex-col gap-2">
-                    <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
+                    <?php foreach(['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
                     <button type="button" onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg" data-layer="<?= $l ?>">
                         <?php 
-                            $labels = ['rtlh'=>'RTLH', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
+                            $labels = ['rtlh'=>'RTLH', 'bansos'=>'Bansos', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
                             echo $labels[$l];
                         ?>
                     </button>
@@ -206,7 +206,6 @@
     .leaflet-popup-content { margin: 0; width: 200px !important; }
     .swiper-pagination-bullet-active { background: #2563eb !important; }
 
-    /* Custom Tooltip Styles for Desa Names */
     .custom-tooltip {
         background: rgba(15, 23, 42, 0.9) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -251,7 +250,6 @@
         let digits = s.replace(/[^0-9-]/g, '');
         if (digits.length > 3) {
             let dotPos = digits.startsWith('-') ? 2 : 3;
-            // Additional check for Sinjai area (Lat roughly -5, Lng 120)
             if (isLat && digits.startsWith('-5')) dotPos = 2;
             else if (!isLat && digits.startsWith('120')) dotPos = 3;
             return parseFloat(digits.substring(0, dotPos) + '.' + digits.substring(dotPos));
@@ -344,8 +342,8 @@
         document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
 
         const items = spasialData[type] || [];
-        const colorMap = { rtlh: '#f59e0b', kumuh: '#ef4444', formal: '#6366f1', psu: '#10b981', arsinum: '#3b82f6', pisew: '#f97316', aset: '#1e1b4b' };
-        const detailUrls = { rtlh: '<?= base_url("rtlh/detail") ?>', kumuh: '<?= base_url("wilayah-kumuh/detail") ?>', formal: '<?= base_url("perumahan-formal/detail") ?>', psu: '<?= base_url("psu/detail") ?>', aset: '<?= base_url("aset-tanah/detail") ?>', arsinum: '<?= base_url("arsinum/detail") ?>', pisew: '<?= base_url("pisew/detail") ?>' };
+        const colorMap = { rtlh: '#f59e0b', bansos: '#10b981', kumuh: '#ef4444', formal: '#6366f1', psu: '#3b82f6', arsinum: '#06b6d4', pisew: '#f97316', aset: '#1e1b4b' };
+        const detailUrls = { rtlh: '<?= base_url("rtlh/detail") ?>', bansos: '<?= base_url("bansos-rtlh/detail") ?>', kumuh: '<?= base_url("wilayah-kumuh/detail") ?>', formal: '<?= base_url("perumahan-formal/detail") ?>', psu: '<?= base_url("psu/detail") ?>', aset: '<?= base_url("aset-tanah/detail") ?>', arsinum: '<?= base_url("arsinum/detail") ?>', pisew: '<?= base_url("pisew/detail") ?>' };
 
         items.forEach(item => {
             try {
@@ -376,8 +374,30 @@
                     layerStyle = { color: markerColor, fillColor: markerColor, weight: 2, fillOpacity: 0.6 };
                 }
 
-                const detailLink = isLoggedIn ? `<a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a>` : '';
-                const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800"><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest ${isLoggedIn ? 'mb-2' : ''}">${type==='kumuh' ? 'Skor: ' + item.skor_kumuh : (item.no_sertifikat ? 'No: ' + item.no_sertifikat : 'Informasi Terverifikasi')}</p>${detailLink}</div>`;
+                let detailsHtml = '';
+                if (type === 'kumuh') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luasan: ${item.Luas_kumuh || '-'} Ha</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">RT/RW: ${item.Kode_RT_RW || '-'}</p>`;
+                } else if (type === 'aset') {
+                    const year = item.tgl_terbit ? new Date(item.tgl_terbit).getFullYear() : '-';
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luasan: ${item.luas_m2 || '-'} m²</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${year}</p>`;
+                } else if (type === 'arsinum') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran: Rp ${item.anggaran ? parseInt(item.anggaran).toLocaleString('id-ID') : '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
+                } else if (type === 'psu') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran/Nilai: Rp ${item.nilai ? parseInt(item.nilai).toLocaleString('id-ID') : '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pnjg/Luas (ID): ${item.id_csv || '-'}</p>`;
+                } else if (type === 'formal') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-2">Status: Aman</p>`;
+                } else if (type === 'rtlh' || type === 'bansos') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status: ${type === 'rtlh' ? 'Belum Menerima' : 'Sudah Menerima'}</p>`;
+                } else {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
+                }
+
+                const detailLink = `<a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 hover:bg-blue-800 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail Lengkap</a>`;
+                const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800">${detailsHtml}${detailLink}</div>`;
 
                 if (geojson.type === 'Point') {
                     L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 7, fillColor: markerColor, color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
@@ -423,7 +443,6 @@
                 throw new Error("Respon server tidak valid. Silakan coba lagi.");
             }
 
-            // Selalu tampilkan card jika ada respon (success/not_found/error)
             card.classList.remove('translate-x-[120%]');
             card.style.transform = 'translateX(0)';
 
@@ -453,14 +472,12 @@
                     </div>
                 `;
 
-                // Map Interaction
                 if (d.wkt && map) {
                     const geojson = wellknown.parse(d.wkt);
                     if (geojson && geojson.type === 'Point') {
                         const coords = [geojson.coordinates[1], geojson.coordinates[0]];
                         map.flyTo(coords, 18, { duration: 2 });
                         
-                        // Add temporary highlight marker
                         const highlight = L.circleMarker(coords, {
                             radius: 12,
                             fillColor: '#2563eb',
@@ -476,7 +493,6 @@
                         
                         highlight.bindPopup(popupContent).openPopup();
                         
-                        // Remove highlight after some time or when card closed
                         document.querySelector('[onclick="closeSearchResult()"]').addEventListener('click', () => {
                             map.removeLayer(highlight);
                         }, { once: true });

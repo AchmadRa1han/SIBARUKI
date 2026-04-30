@@ -79,9 +79,9 @@
                 </div>
             </div>
             <div class="flex flex-wrap gap-1.5">
-                <?php foreach(['rtlh', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'] as $l): ?>
+                <?php foreach(['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'] as $l): ?>
                 <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
-                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map'))))) ?>" class="w-3 h-3"></i> <?= strtoupper($l) ?>
+                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'check-circle':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= strtoupper($l) ?>
                 </button>
                 <?php endforeach; ?>
             </div>
@@ -132,7 +132,6 @@
     .leaflet-popup-content { margin: 0; width: 200px !important; }
     .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
 
-    /* Custom Tooltip Styles */
     .custom-tooltip {
         background: rgba(15, 23, 42, 0.9) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -174,15 +173,6 @@
         if (!wkt || typeof wkt !== 'string' || typeof wellknown === 'undefined') return null;
         try {
             let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
-            if (cleanWkt.length >= 32760) {
-                const lastComma = cleanWkt.lastIndexOf(',');
-                if (lastComma > 0) {
-                    cleanWkt = cleanWkt.substring(0, lastComma);
-                    const openParen = (cleanWkt.match(/\(/g) || []).length;
-                    const closeParen = (cleanWkt.match(/\)/g) || []).length;
-                    cleanWkt += ')'.repeat(openParen - closeParen);
-                }
-            }
             let geojson = wellknown.parse(cleanWkt);
             if (!geojson) return null;
             if (isUTM) {
@@ -245,7 +235,8 @@
         document.getElementById('activeLayerLabel').innerText = `Database: ${type.toUpperCase()}`;
 
         const items = spasialData[type] || [];
-        const colorMap = { rtlh: '#f59e0b', formal: '#6366f1', aset: '#1e1b4b', arsinum: '#06b6d4', pisew: '#f97316', psu: '#3b82f6' };
+        const colorMap = { rtlh: '#f59e0b', bansos: '#10b981', kumuh: '#ef4444', formal: '#6366f1', psu: '#3b82f6', arsinum: '#06b6d4', pisew: '#f97316', aset: '#1e1b4b' };
+        const detailUrls = { rtlh: '<?= base_url("rtlh/detail") ?>', bansos: '<?= base_url("bansos-rtlh/detail") ?>', kumuh: '<?= base_url("wilayah-kumuh/detail") ?>', formal: '<?= base_url("perumahan-formal/detail") ?>', psu: '<?= base_url("psu/detail") ?>', aset: '<?= base_url("aset-tanah/detail") ?>', arsinum: '<?= base_url("arsinum/detail") ?>', pisew: '<?= base_url("pisew/detail") ?>' };
 
         items.forEach(item => {
             try {
@@ -260,10 +251,31 @@
                 else if (item.wkt) { geojson = parseWKTUniversal(item.wkt, (type === 'psu')); }
                 if (!geojson) return;
 
-                const detailUrls = { rtlh: '<?= base_url("rtlh/detail") ?>', kumuh: '<?= base_url("wilayah-kumuh/detail") ?>', formal: '<?= base_url("perumahan-formal/detail") ?>', psu: '<?= base_url("psu/detail") ?>', aset: '<?= base_url("aset-tanah/detail") ?>', arsinum: '<?= base_url("arsinum/detail") ?>', pisew: '<?= base_url("pisew/detail") ?>' };
-                const popupContent = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[11px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800"><a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>`;
+                let detailsHtml = '';
+                if (type === 'kumuh') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luasan: ${item.Luas_kumuh || '-'} Ha</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">RT/RW: ${item.Kode_RT_RW || '-'}</p>`;
+                } else if (type === 'aset') {
+                    const year = item.tgl_terbit ? new Date(item.tgl_terbit).getFullYear() : '-';
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luasan: ${item.luas_m2 || '-'} m²</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${year}</p>`;
+                } else if (type === 'arsinum') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran: Rp ${item.anggaran ? parseInt(item.anggaran).toLocaleString('id-ID') : '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
+                } else if (type === 'psu') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran/Nilai: Rp ${item.nilai ? parseInt(item.nilai).toLocaleString('id-ID') : '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pnjg/Luas (ID): ${item.id_csv || '-'}</p>`;
+                } else if (type === 'formal') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-2">Status: Aman</p>`;
+                } else if (type === 'rtlh' || type === 'bansos') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status: ${type === 'rtlh' ? 'Belum Menerima' : 'Sudah Menerima'}</p>`;
+                } else {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
+                }
 
-                if (geojson.type === 'Point') { L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 7, fillColor: colorMap[type], color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(clusterGroup); }
+                const popupContent = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[11px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800">${detailsHtml}<a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>`;
+
+                if (geojson.type === 'Point') { L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 7, fillColor: colorMap[type] || '#ef4444', color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popupContent).addTo(clusterGroup); }
                 else { L.geoJSON(geojson, { style: { color: colorMap[type] || '#ef4444', weight: 3, fillOpacity: 0.5 } }).bindPopup(popupContent).addTo(activeDataGroup); }
             } catch (e) {}
         });
