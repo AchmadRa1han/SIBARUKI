@@ -194,4 +194,90 @@ class BansosRtlh extends BaseController
         $this->bansosModel->delete($id);
         return redirect()->to('/bansos-rtlh')->with('success', 'Data bansos berhasil dihapus.');
     }
+
+    public function edit($id)
+    {
+        $db = \Config\Database::connect();
+        $bansos = $db->table('rtlh_bansos')
+                     ->select('rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
+                     ->where('id', $id)
+                     ->get()->getRowArray();
+
+        if (!$bansos) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+
+        // Data RTLH untuk pilihan dropdown (jika ingin mengubah link)
+        $rtlh = $this->rumahModel->select('rtlh_rumah.id_survei, rtlh_rumah.desa, rtlh_penerima.nama_kepala_keluarga, rtlh_penerima.nik')
+                                ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik')
+                                ->findAll();
+
+        return view('bansos_rtlh/edit', [
+            'title' => 'Edit Realisasi Bansos',
+            'bansos' => $bansos,
+            'rtlh' => $rtlh
+        ]);
+    }
+
+    public function update($id)
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $oldData = $this->bansosModel->find($id);
+        if (!$oldData) return redirect()->back()->with('error', 'Data tidak ditemukan.');
+
+        $id_survei = $this->request->getPost('id_survei');
+        $nik = $this->request->getPost('nik');
+        $nama = $this->request->getPost('nama_penerima');
+        $desa = $this->request->getPost('desa');
+        $tahun = $this->request->getPost('tahun_anggaran');
+        $sumber = $this->request->getPost('sumber_dana');
+        $koordinat = $this->request->getPost('lokasi_realisasi');
+
+        $dataBansos = [
+            'id_survei' => $id_survei ?: null,
+            'nik' => $nik,
+            'nama_penerima' => $nama,
+            'desa' => $desa,
+            'tahun_anggaran' => $tahun,
+            'sumber_dana' => $sumber,
+            'keterangan' => $this->request->getPost('keterangan'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        // Handle Upload Foto
+        $uploadPath = FCPATH . 'uploads/rtlh/';
+        foreach(['foto_before', 'foto_after'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                // Hapus foto lama
+                if (!empty($oldData[$field]) && file_exists($uploadPath . $oldData[$field])) {
+                    unlink($uploadPath . $oldData[$field]);
+                }
+                
+                $prefix = strtoupper(str_replace('foto_', '', $field));
+                $newName = $prefix . '_' . $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $dataBansos[$field] = $newName;
+            }
+        }
+
+        $this->bansosModel->update($id, $dataBansos);
+
+        // Update Koordinat Realisasi (POINT WKT)
+        if (!empty($koordinat) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $koordinat)) {
+            $db->table('rtlh_bansos')->where('id', $id)
+               ->set('lokasi_realisasi', "ST_GeomFromText('{$koordinat}')", false)
+               ->update();
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === FALSE) {
+            return redirect()->back()->with('error', 'Gagal memperbarui data bansos.');
+        }
+
+        $this->logActivity('Ubah Bansos', 'Bansos', "Memperbarui data bansos untuk $nama ($nik)");
+
+        return redirect()->to('/bansos-rtlh/detail/' . $id)->with('success', 'Data bansos berhasil diperbarui.');
+    }
 }
