@@ -68,7 +68,7 @@
                 </div>
                 <span class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Tipe Struktur</span>
             </div>
-            <h3 class="text-xl font-bold text-blue-950 dark:text-white tracking-tight mb-1 relative z-10 uppercase">LineString</h3>
+            <h3 class="text-xl font-bold text-blue-950 dark:text-white tracking-tight mb-1 relative z-10 uppercase">Point</h3>
             <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest relative z-10">Format Geospasial WKT</p>
         </div>
 
@@ -105,9 +105,6 @@
                     <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative">
                         <?php if (!empty($jalan['foto_before'])): ?>
                             <img src="<?= base_url('uploads/psu/' . $jalan['foto_before']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                            <a href="<?= base_url('uploads/psu/' . $jalan['foto_before']) ?>" target="_blank" class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <i data-lucide="maximize" class="w-6 h-6 text-white"></i>
-                            </a>
                         <?php else: ?>
                             <div class="text-center p-8">
                                 <i data-lucide="image-off" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
@@ -123,9 +120,6 @@
                     <div class="aspect-video bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex items-center justify-center group relative">
                         <?php if (!empty($jalan['foto_after'])): ?>
                             <img src="<?= base_url('uploads/psu/' . $jalan['foto_after']) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                            <a href="<?= base_url('uploads/psu/' . $jalan['foto_after']) ?>" target="_blank" class="absolute inset-0 bg-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <i data-lucide="maximize" class="w-6 h-6 text-white"></i>
-                            </a>
                         <?php else: ?>
                             <div class="text-center p-8">
                                 <i data-lucide="image-off" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
@@ -180,65 +174,26 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Kartu Sistem Log -->
-            <div class="bg-slate-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden group transition-all hover:bg-slate-950">
-                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
-                    <i data-lucide="info" class="w-40 h-40"></i>
-                </div>
-                <h4 class="text-[9px] font-bold uppercase tracking-[0.3em] text-blue-400 mb-6 flex items-center gap-2">
-                    Audit Log Geospasial
-                </h4>
-                <div class="space-y-4 relative z-10">
-                    <div class="flex justify-between items-center text-[9px]">
-                        <span class="font-bold text-slate-500 uppercase tracking-widest">Entry Date</span>
-                        <span class="font-bold text-slate-300 tracking-wider"><?= date('d/m/y H:i', strtotime($jalan['created_at'])) ?></span>
-                    </div>
-                    <div class="flex justify-between items-center text-[9px]">
-                        <span class="font-bold text-slate-500 uppercase tracking-widest">Last Update</span>
-                        <span class="font-bold text-blue-400 tracking-wider"><?= date('d/m/y H:i', strtotime($jalan['updated_at'])) ?></span>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- UTM ZONE 51S CONVERTER (SINJAI) ---
-    function utmToLatLng(easting, northing) {
-        const a = 6378137, f = 1 / 298.257223563;
-        const b = a * (1 - f), e = Math.sqrt(1 - (b * b) / (a * a)), e1sq = (e * e) / (1 - e * e);
-        const k0 = 0.9996, falseEasting = 500000, falseNorthing = 10000000;
-        const zoneCentralMeridian = 123 * (Math.PI / 180); 
-        let x = easting - falseEasting, y = northing - falseNorthing;
-        let M = y / k0, mu = M / (a * (1 - e * e / 4 - 3 * e * e * e * e / 64 - 5 * e * e * e * e * e * e / 256));
-        let phi1Rad = mu + (3 * e1sq / 2 - 27 * e1sq * e1sq * e1sq / 32) * Math.sin(2 * mu) + (21 * e1sq * e1sq / 16 - 55 * e1sq * e1sq * e1sq / 32) * Math.sin(4 * mu) + (151 * e1sq * e1sq * e1sq / 96) * Math.sin(6 * mu);
-        let N1 = a / Math.sqrt(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad)), T1 = Math.tan(phi1Rad) * Math.tan(phi1Rad), C1 = e1sq * Math.cos(phi1Rad) * Math.cos(phi1Rad), R1 = a * (1 - e * e) / Math.pow(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad), 1.5);
-        let D = x / (N1 * k0);
-        let lat = phi1Rad - (N1 * Math.tan(phi1Rad) / R1) * (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e1sq) * D * D * D * D / 24 + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e1sq - 3 * C1 * C1) * D * D * D * D * D * D / 720);
-        let lon = zoneCentralMeridian + (D - (1 + 2 * T1 + C1) * D * D * D / 6 + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * e1sq + 24 * T1 * T1) * D * D * D * D * D / 120) / Math.cos(phi1Rad);
-        return [lat * (180 / Math.PI), lon * (180 / Math.PI)];
-    }
-
     function parseWKT(wkt) {
         if (!wkt || typeof wkt !== 'string') return null;
         try {
             const cleanWkt = wkt.toUpperCase().trim();
-            if (cleanWkt.includes('LINESTRING')) {
+            if (cleanWkt.includes('POINT')) {
                 const match = cleanWkt.match(/\(([^()]+)\)/);
                 if (!match || !match[1]) return null;
-                return match[1].split(',').map(pair => {
-                    const parts = pair.trim().split(/\s+/);
-                    if (parts.length >= 2) return utmToLatLng(parseFloat(parts[0]), parseFloat(parts[1]));
-                    return null;
-                }).filter(p => p !== null);
+                const parts = match[1].trim().split(/\s+/);
+                return [parseFloat(parts[1]), parseFloat(parts[0])]; // lat, lng
             }
         } catch(e) { console.error('WKT Parse Error:', e); }
         return null;
     }
 
-    let map, pathLayer;
+    let map, pointLayer;
     function initMap() {
         if (typeof L === 'undefined') { setTimeout(initMap, 200); return; }
         const mapContainer = document.getElementById('map');
@@ -253,10 +208,9 @@
             map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 13);
             L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-            if (coords && coords.length > 0) {
-                pathLayer = L.polyline(coords, { color: '#2563eb', weight: 6, opacity: 1, lineCap: 'round', lineJoin: 'round' }).addTo(map);
-                L.polyline(coords, { color: '#60a5fa', weight: 10, opacity: 0.2, lineCap: 'round' }).addTo(map);
-                map.fitBounds(pathLayer.getBounds(), { padding: [80, 80], animate: true, duration: 1.5 });
+            if (coords) {
+                pointLayer = L.circleMarker(coords, { radius: 10, fillColor: '#2563eb', color: '#fff', weight: 3, fillOpacity: 0.8 }).addTo(map);
+                map.setView(coords, 16);
             }
             if (typeof lucide !== 'undefined') lucide.createIcons();
             setTimeout(() => { map.invalidateSize(); }, 500);
@@ -270,11 +224,4 @@
 
     window.addEventListener('load', initMap);
 </script>
-
-<style>
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-</style>
 <?= $this->endSection() ?>

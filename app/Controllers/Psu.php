@@ -120,7 +120,7 @@ class Psu extends BaseController
 
                 /* 
                    Struktur CSV Jaringan Jalan:
-                   Index 0: WKT
+                   Index 0: WKT (Diharapkan POINT)
                    Index 1: Id
                    Index 2: nama_jalan
                    Index 3: jalan

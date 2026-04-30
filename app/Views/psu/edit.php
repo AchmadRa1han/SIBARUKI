@@ -59,12 +59,104 @@
                     <input type="number" step="0.01" name="jalan" value="<?= old('jalan', $jalan['jalan']) ?>" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold">
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat WKT (Well-Known Text)</label>
-                    <div class="relative">
-                        <textarea name="wkt" rows="5" required class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs leading-relaxed"><?= old('wkt', $jalan['wkt']) ?></textarea>
-                        <div class="absolute right-3 bottom-3 text-[8px] font-bold text-slate-400 uppercase tracking-widest pointer-events-none">Tipe: LINESTRING</div>
+                    <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat Lokasi (Map Picker)</label>
+                    <div class="rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner mb-4">
+                        <div id="map" class="w-full h-72 z-10"></div>
                     </div>
+                    <input type="text" name="wkt" id="wkt" value="<?= old('wkt', $jalan['wkt']) ?>" required readonly class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs" placeholder="POINT(lng lat)">
                 </div>
+
+                <script>
+                    let map, marker;
+                    function initMap() {
+                        let lat = -5.1245; 
+                        let lng = 120.2536;
+
+                        const wkt = "<?= old('wkt', $jalan['wkt']) ?>";
+                        if (wkt && wkt.includes('POINT')) {
+                            const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+                            if (match) {
+                                lng = parseFloat(match[1]);
+                                lat = parseFloat(match[2]);
+                            }
+                        }
+
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+                            attribution: '&copy; CartoDB' 
+                        });
+                        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                            maxZoom: 20,
+                            subdomains:['mt0','mt1','mt2','mt3'],
+                            attribution: '&copy; Google'
+                        });
+
+                        map = L.map('map', {
+                            center: [lat, lng],
+                            zoom: 16,
+                            layers: [cartoDB],
+                            zoomControl: false
+                        });
+
+                        let rot = 0;
+                        const LayerToggle = L.Control.extend({
+                            onAdd: function(map) {
+                                const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                                btn.type = 'button';
+                                btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
+                                const isDark = document.documentElement.classList.contains('dark');
+                                const svgColor = isDark ? '#60a5fa' : '#2563eb';
+                                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                                L.DomEvent.disableClickPropagation(btn);
+                                L.DomEvent.on(btn, 'click', function(e) {
+                                    L.DomEvent.stopPropagation(e);
+                                    L.DomEvent.preventDefault(e);
+                                    rot += 360;
+                                    const svg = btn.querySelector('svg');
+                                    svg.style.transform = `rotate(${rot}deg)`;
+                                    setTimeout(() => {
+                                        if (map.hasLayer(cartoDB)) { 
+                                            map.removeLayer(cartoDB); 
+                                            map.addLayer(googleSat); 
+                                            btn.style.backgroundColor = '#2563eb'; 
+                                            svg.setAttribute('stroke', '#ffffff'); 
+                                        }
+                                        else { 
+                                            map.removeLayer(googleSat); 
+                                            map.addLayer(cartoDB); 
+                                            btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
+                                            svg.setAttribute('stroke', svgColor); 
+                                        }
+                                    }, 200);
+                                });
+                                return btn;
+                            }
+                        });
+                        map.addControl(new LayerToggle({ position: 'topright' }));
+
+                        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+                        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+                        marker.on('dragend', function (e) {
+                            const latlng = marker.getLatLng();
+                            updateCoords(latlng.lat, latlng.lng);
+                        });
+
+                        map.on('click', function (e) {
+                            marker.setLatLng(e.latlng);
+                            updateCoords(e.latlng.lat, e.latlng.lng);
+                        });
+                    }
+
+                    function updateCoords(lat, lng) {
+                        document.getElementById('wkt').value = `POINT(${lng} ${lat})`;
+                    }
+
+                    window.addEventListener('load', initMap);
+                </script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+                <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
                 <!-- Ganti Dokumentasi Before After -->
                 <div>
