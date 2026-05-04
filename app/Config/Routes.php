@@ -121,6 +121,12 @@ $routes->group('bansos-rtlh', function($routes) {
     $routes->post('delete/(:num)', 'BansosRtlh::delete/$1');
 });
 
+// Modul Data Umum Perumahan
+$routes->group('data-perumahan', function($routes) {
+    $routes->get('/', 'DataPerumahan::index');
+    $routes->post('update', 'DataPerumahan::update');
+});
+
 // SISTEM & PENGATURAN
 $routes->group('roles', function($routes) {
     $routes->get('/', 'Roles::index');
