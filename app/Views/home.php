@@ -97,6 +97,9 @@
             <div class="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <?php 
                 $metrics = [
+                    ['rumah', 'home', 'blue', 'Total Rumah'],
+                    ['rlh', 'check-circle', 'emerald', 'Rumah Layak'],
+                    ['backlog', 'alert-triangle', 'rose', 'Backlog'],
                     ['rtlh', 'home', 'amber', 'RTLH'],
                     ['kumuh', 'map-pin', 'rose', 'Kumuh'],
                     ['formal', 'building-2', 'indigo', 'Formal'],
@@ -389,9 +392,10 @@
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran/Nilai: Rp ${item.nilai ? parseInt(item.nilai).toLocaleString('id-ID') : '-'}</p>
                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pnjg/Luas (ID): ${item.id_csv || '-'}</p>`;
                 } else if (type === 'formal') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-2">Status: Aman</p>`;
+                    detailsHtml = `<p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
                 } else if (type === 'rtlh' || type === 'bansos') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status: ${type === 'rtlh' ? 'Belum Menerima' : 'Sudah Menerima'}</p>`;
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa: ${item.desa || '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status: ${type === 'rtlh' ? 'Belum Menerima' : 'Sudah Menerima'}</p>`;
                 } else {
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
                 }

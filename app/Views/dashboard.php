@@ -41,10 +41,13 @@
     </div>
 
     <!-- 2. METRICS GRID -->
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         <?php 
         $metrics = [
-            ['rtlh', 'home', 'amber', 'RTLH', base_url('rtlh')],
+            ['rumah', 'home', 'blue', 'TOTAL RUMAH', base_url('data-perumahan')],
+            ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('data-perumahan')],
+            ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('data-perumahan')],
+            ['rtlh', 'home', 'amber', 'RTLH (SASARAN)', base_url('rtlh')],
             ['kumuh', 'map-pin', 'rose', 'KUMUH', base_url('wilayah-kumuh')],
             ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],
             ['psu', 'route', 'slate', 'PSU', base_url('psu')],
@@ -266,9 +269,10 @@
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran/Nilai: Rp ${item.nilai ? parseInt(item.nilai).toLocaleString('id-ID') : '-'}</p>
                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pnjg/Luas (ID): ${item.id_csv || '-'}</p>`;
                 } else if (type === 'formal') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-2">Status: Aman</p>`;
+                    detailsHtml = `<p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
                 } else if (type === 'rtlh' || type === 'bansos') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status: ${type === 'rtlh' ? 'Belum Menerima' : 'Sudah Menerima'}</p>`;
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa: ${item.desa || '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status: ${type === 'rtlh' ? 'Belum Menerima' : 'Sudah Menerima'}</p>`;
                 } else {
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
                 }

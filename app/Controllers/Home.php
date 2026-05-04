@@ -27,9 +27,22 @@ class Home extends BaseController
         $totalPisew = $db->table('pisew')->countAllResults();
         $totalAset = $db->table('aset_tanah')->countAllResults();
 
+        // Data Umum Perumahan (Backlog dll)
+        $dataUmum = $db->table('data_perumahan')
+                       ->select('SUM(jumlah_rumah) as total_rumah, SUM(jumlah_rlh) as total_rlh, SUM(jumlah_backlog) as total_backlog')
+                       ->get()->getRowArray();
+        $totalRumah = $dataUmum['total_rumah'] ?? 0;
+        $totalRLH = $dataUmum['total_rlh'] ?? 0;
+        $totalBacklog = $dataUmum['total_backlog'] ?? 0;
+
         // Data Spasial Publik (Limit untuk performa)
         $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
-        $mapRtlh = $db->table('rtlh_rumah')->select('id_survei as id, desa as name, ST_AsText(lokasi_koordinat) as wkt')->where('lokasi_koordinat IS NOT NULL')->where('lokasi_koordinat !=', '')->limit(200)->get()->getResultArray();
+        $mapRtlh = $db->table('rtlh_rumah')
+                       ->select('rtlh_rumah.id_survei as id, rtlh_penerima.nama_kepala_keluarga as name, rtlh_rumah.desa, ST_AsText(rtlh_rumah.lokasi_koordinat) as wkt')
+                       ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left')
+                       ->where('rtlh_rumah.lokasi_koordinat IS NOT NULL')
+                       ->where('rtlh_rumah.lokasi_koordinat !=', '')
+                       ->limit(200)->get()->getResultArray();
         $mapKumuh = $db->table('wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt, skor_kumuh, Luas_kumuh, Kode_RT_RW')->where('WKT IS NOT NULL')->get()->getResultArray();
         $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude')->get()->getResultArray();
         $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt, jalan as nilai, id_csv')->limit(100)->get()->getResultArray();
@@ -192,9 +205,10 @@ class Home extends BaseController
 
         // Markers RTLH (Tipe: POINT/GEOMETRY -> WAJIB ST_AsText)
         $mapRtlh = $db->table('rtlh_rumah')
-            ->select('id_survei as id, desa as name, ST_AsText(lokasi_koordinat) as wkt, "rtlh" as type')
-            ->where('lokasi_koordinat IS NOT NULL')
-            ->where('lokasi_koordinat !=', '')
+            ->select('rtlh_rumah.id_survei as id, rtlh_penerima.nama_kepala_keluarga as name, rtlh_rumah.desa, ST_AsText(rtlh_rumah.lokasi_koordinat) as wkt, "rtlh" as type')
+            ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left')
+            ->where('rtlh_rumah.lokasi_koordinat IS NOT NULL')
+            ->where('rtlh_rumah.lokasi_koordinat !=', '')
             ->limit(100)->get()->getResultArray();
 
         // Markers Kumuh (Tipe: LONGTEXT -> Ambil Langsung)
@@ -220,7 +234,7 @@ class Home extends BaseController
             ->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
 
         // Markers Bansos
-        $mapBansos = $db->table('rtlh_bansos')->select('id, nama_penerima as name, ST_AsText(lokasi_realisasi) as wkt, "bansos" as type')
+        $mapBansos = $db->table('rtlh_bansos')->select('id, nama_penerima as name, desa, ST_AsText(lokasi_realisasi) as wkt, "bansos" as type')
             ->where('lokasi_realisasi IS NOT NULL')->get()->getResultArray();
 
         // --- 4. DATA LAINNYA ---
