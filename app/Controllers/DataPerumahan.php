@@ -66,6 +66,7 @@ class DataPerumahan extends BaseController
     {
         $db = \Config\Database::connect();
         $post = $this->request->getPost();
+        $redirectTo = $post['redirect_to'] ?? '/data-perumahan';
         
         $db->transStart();
         if (!empty($post['dp_id'])) {
@@ -82,6 +83,8 @@ class DataPerumahan extends BaseController
             foreach ($post['bd_id'] as $idx => $id) {
                 $db->table('backlog_data')->where('id', $id)->update([
                     'jumlah_backlog' => $post['jumlah_backlog'][$idx] ?? 0,
+                    'tahun' => $post['tahun'][$idx] ?? date('Y'),
+                    'keterangan' => $post['keterangan'][$idx] ?? '',
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
             }
@@ -89,10 +92,10 @@ class DataPerumahan extends BaseController
         $db->transComplete();
         
         if ($db->transStatus() === false) {
-            return redirect()->to('/data-perumahan')->with('error', 'Gagal memperbarui data.');
+            return redirect()->to($redirectTo)->with('error', 'Gagal memperbarui data.');
         }
 
-        return redirect()->to('/data-perumahan')->with('success', 'Rekapitulasi statistik desa berhasil diperbarui.');
+        return redirect()->to($redirectTo)->with('success', 'Data berhasil diperbarui.');
     }
 
     public function sync()

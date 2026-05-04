@@ -30,6 +30,7 @@
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden">
         <form action="<?= base_url('data-perumahan/update') ?>" method="POST" id="backlogForm">
             <?= csrf_field() ?>
+            <input type="hidden" name="redirect_to" value="/data-perumahan/backlog">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
