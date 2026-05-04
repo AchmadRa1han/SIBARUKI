@@ -37,9 +37,10 @@ class DataPerumahan extends BaseController
         }
         
         $dataUmum = $db->table('data_perumahan')
-                       ->select('data_perumahan.*, kode_desa.desa_nama, kode_desa.kecamatan_nama')
+                       ->select('data_perumahan.*, kode_desa.desa_nama, kode_kecamatan.kecamatan_nama')
                        ->join('kode_desa', 'kode_desa.desa_id = data_perumahan.desa_id')
-                       ->orderBy('kode_desa.kecamatan_nama', 'ASC')
+                       ->join('kode_kecamatan', 'kode_kecamatan.kecamatan_id = kode_desa.kecamatan_id')
+                       ->orderBy('kode_kecamatan.kecamatan_nama', 'ASC')
                        ->orderBy('kode_desa.desa_nama', 'ASC')
                        ->get()->getResultArray();
 
