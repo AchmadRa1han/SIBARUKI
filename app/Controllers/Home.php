@@ -158,6 +158,14 @@ class Home extends BaseController
         // ARSINUM
         $totalArsinum = $db->table('arsinum')->countAllResults();
 
+        // Data Umum Perumahan (Backlog dll)
+        $dataUmum = $db->table('data_perumahan')
+                       ->select('SUM(jumlah_rumah) as total_rumah, SUM(jumlah_rlh) as total_rlh, SUM(jumlah_backlog) as total_backlog')
+                       ->get()->getRowArray();
+        $totalRumah = $dataUmum['total_rumah'] ?? 0;
+        $totalRLH = $dataUmum['total_rlh'] ?? 0;
+        $totalBacklog = $dataUmum['total_backlog'] ?? 0;
+
         // --- 2. DATA ANALISIS (GRAFIK) ---
         
         // Status Kelayakan (RTLH)
@@ -255,6 +263,9 @@ class Home extends BaseController
         $data = [
             'title'         => 'Dashboard',
             'rekap'         => [
+                'rumah'     => $totalRumah,
+                'rlh'       => $totalRLH,
+                'backlog'   => $totalBacklog,
                 'rtlh'      => $totalRtlh,
                 'kumuh'     => $totalKumuh,
                 'formal'    => $totalFormal,
