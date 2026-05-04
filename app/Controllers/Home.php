@@ -29,11 +29,15 @@ class Home extends BaseController
 
         // Data Umum Perumahan (Backlog dll)
         $dataUmum = $db->table('data_perumahan')
-                       ->select('SUM(jumlah_rumah) as total_rumah, SUM(jumlah_rlh) as total_rlh, SUM(jumlah_backlog) as total_backlog')
+                       ->select('SUM(jumlah_rumah) as total_rumah, SUM(jumlah_rlh) as total_rlh')
                        ->get()->getRowArray();
+        $backlogData = $db->table('backlog_data')
+                          ->select('SUM(jumlah_backlog) as total_backlog')
+                          ->get()->getRowArray();
+
         $totalRumah = $dataUmum['total_rumah'] ?? 0;
         $totalRLH = $dataUmum['total_rlh'] ?? 0;
-        $totalBacklog = $dataUmum['total_backlog'] ?? 0;
+        $totalBacklog = $backlogData['total_backlog'] ?? 0;
 
         // Data Spasial Publik (Limit untuk performa)
         $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
@@ -160,11 +164,15 @@ class Home extends BaseController
 
         // Data Umum Perumahan (Backlog dll)
         $dataUmum = $db->table('data_perumahan')
-                       ->select('SUM(jumlah_rumah) as total_rumah, SUM(jumlah_rlh) as total_rlh, SUM(jumlah_backlog) as total_backlog')
+                       ->select('SUM(jumlah_rumah) as total_rumah, SUM(jumlah_rlh) as total_rlh')
                        ->get()->getRowArray();
+        $backlogData = $db->table('backlog_data')
+                          ->select('SUM(jumlah_backlog) as total_backlog')
+                          ->get()->getRowArray();
+
         $totalRumah = $dataUmum['total_rumah'] ?? 0;
         $totalRLH = $dataUmum['total_rlh'] ?? 0;
-        $totalBacklog = $dataUmum['total_backlog'] ?? 0;
+        $totalBacklog = $backlogData['total_backlog'] ?? 0;
 
         // --- 2. DATA ANALISIS (GRAFIK) ---
         

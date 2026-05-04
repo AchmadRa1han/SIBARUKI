@@ -8,44 +8,56 @@ class DataPerumahan extends BaseController
 {
     public function index()
     {
+        if (session()->get('role_id') != 1) {
+            return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat mengakses halaman rekapitulasi statistik.');
+        }
+
         $db = \Config\Database::connect();
-        $db->query("CREATE TABLE IF NOT EXISTS `data_perumahan` (
-          `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-          `desa_id` varchar(50) DEFAULT NULL,
-          `jumlah_rumah` int(11) DEFAULT 0,
-          `jumlah_rlh` int(11) DEFAULT 0,
-          `jumlah_backlog` int(11) DEFAULT 0,
-          `created_at` datetime DEFAULT NULL,
-          `updated_at` datetime DEFAULT NULL,
-          PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
         
+        // Ensure data_perumahan entries exist for all villages
         $desa = $db->table('kode_desa')->get()->getResultArray();
-        
-        // Initial insert if empty
-        if ($db->table('data_perumahan')->countAllResults() == 0) {
-            foreach($desa as $d) {
+        foreach($desa as $d) {
+            $exists = $db->table('data_perumahan')->where('desa_id', $d['desa_id'])->countAllResults();
+            if ($exists == 0) {
                 $db->table('data_perumahan')->insert([
                     'desa_id' => $d['desa_id'],
                     'jumlah_rumah' => 0,
                     'jumlah_rlh' => 0,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+
+            $existsBacklog = $db->table('backlog_data')->where('desa_id', $d['desa_id'])->countAllResults();
+            if ($existsBacklog == 0) {
+                $db->table('backlog_data')->insert([
+                    'desa_id' => $d['desa_id'],
                     'jumlah_backlog' => 0,
+                    'tahun' => date('Y'),
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
             }
         }
         
-        $dataUmum = $db->table('data_perumahan')
-                       ->select('data_perumahan.*, kode_desa.desa_nama, kode_kecamatan.kecamatan_nama')
-                       ->join('kode_desa', 'kode_desa.desa_id = data_perumahan.desa_id')
-                       ->join('kode_kecamatan', 'kode_kecamatan.kecamatan_id = kode_desa.kecamatan_id')
-                       ->orderBy('kode_kecamatan.kecamatan_nama', 'ASC')
-                       ->orderBy('kode_desa.desa_nama', 'ASC')
-                       ->get()->getResultArray();
+        $query = "
+            SELECT 
+                kd.desa_id, kd.desa_nama, kk.kecamatan_nama,
+                dp.id as dp_id, dp.jumlah_rumah, dp.jumlah_rlh,
+                bd.id as bd_id, bd.jumlah_backlog,
+                (SELECT COUNT(*) FROM rtlh_rumah rr WHERE rr.desa_id = kd.desa_id) as total_rtlh,
+                (SELECT COUNT(*) FROM rtlh_rumah rr WHERE rr.desa_id = kd.desa_id AND rr.status_bantuan = 'Sudah Menerima') as rlh_auto_count
+            FROM kode_desa kd
+            JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id
+            LEFT JOIN data_perumahan dp ON dp.desa_id = kd.desa_id
+            LEFT JOIN backlog_data bd ON bd.desa_id = kd.desa_id
+            ORDER BY kk.kecamatan_nama ASC, kd.desa_nama ASC
+        ";
+        
+        $dataUmum = $db->query($query)->getResultArray();
 
         return view('data_perumahan/index', [
-            'title' => 'Data Umum Perumahan (Backlog)',
+            'title' => 'Rekapitulasi & Statistik Desa',
             'data' => $dataUmum
         ]);
     }
@@ -55,17 +67,87 @@ class DataPerumahan extends BaseController
         $db = \Config\Database::connect();
         $post = $this->request->getPost();
         
-        if (!empty($post['id'])) {
-            foreach ($post['id'] as $idx => $id) {
+        $db->transStart();
+        if (!empty($post['dp_id'])) {
+            foreach ($post['dp_id'] as $idx => $id) {
                 $db->table('data_perumahan')->where('id', $id)->update([
                     'jumlah_rumah' => $post['jumlah_rumah'][$idx] ?? 0,
                     'jumlah_rlh' => $post['jumlah_rlh'][$idx] ?? 0,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+
+        if (!empty($post['bd_id'])) {
+            foreach ($post['bd_id'] as $idx => $id) {
+                $db->table('backlog_data')->where('id', $id)->update([
                     'jumlah_backlog' => $post['jumlah_backlog'][$idx] ?? 0,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
             }
         }
+        $db->transComplete();
         
-        return redirect()->to('/data-perumahan')->with('success', 'Data Umum Perumahan berhasil diperbarui.');
+        if ($db->transStatus() === false) {
+            return redirect()->to('/data-perumahan')->with('error', 'Gagal memperbarui data.');
+        }
+
+        return redirect()->to('/data-perumahan')->with('success', 'Rekapitulasi statistik desa berhasil diperbarui.');
+    }
+
+    public function sync()
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+        
+        $desa = $db->table('kode_desa')->get()->getResultArray();
+        foreach($desa as $d) {
+            // Total Data Lapangan (All records in rtlh_rumah)
+            $totalCount = $db->table('rtlh_rumah')
+                            ->where('desa_id', $d['desa_id'])
+                            ->countAllResults();
+
+            // Sync RLH based on rtlh_rumah status 'Sudah Menerima'
+            $rlhCount = $db->table('rtlh_rumah')
+                           ->where('desa_id', $d['desa_id'])
+                           ->where('status_bantuan', 'Sudah Menerima')
+                           ->countAllResults();
+            
+            $db->table('data_perumahan')->where('desa_id', $d['desa_id'])->update([
+                'jumlah_rumah' => $totalCount,
+                'jumlah_rlh' => $rlhCount,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+        
+        $db->transComplete();
+        
+        return redirect()->to('/data-perumahan')->with('success', 'Sinkronisasi data (Total Rumah & RLH) dari lapangan berhasil diselesaikan.');
+    }
+
+    public function backlog()
+    {
+        if (session()->get('role_id') != 1) {
+            return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat mengakses halaman manajemen backlog.');
+        }
+
+        $db = \Config\Database::connect();
+        
+        $query = "
+            SELECT 
+                kd.desa_id, kd.desa_nama, kk.kecamatan_nama,
+                bd.id as bd_id, bd.jumlah_backlog, bd.tahun, bd.keterangan
+            FROM kode_desa kd
+            JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id
+            LEFT JOIN backlog_data bd ON bd.desa_id = kd.desa_id
+            ORDER BY kk.kecamatan_nama ASC, kd.desa_nama ASC
+        ";
+        
+        $data = $db->query($query)->getResultArray();
+
+        return view('data_perumahan/backlog', [
+            'title' => 'Manajemen Data Backlog',
+            'data' => $data
+        ]);
     }
 }

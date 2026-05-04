@@ -125,6 +125,8 @@ $routes->group('bansos-rtlh', function($routes) {
 $routes->group('data-perumahan', function($routes) {
     $routes->get('/', 'DataPerumahan::index');
     $routes->post('update', 'DataPerumahan::update');
+    $routes->get('sync', 'DataPerumahan::sync');
+    $routes->get('backlog', 'DataPerumahan::backlog');
 });
 
 // SISTEM & PENGATURAN
