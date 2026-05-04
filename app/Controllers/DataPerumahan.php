@@ -71,9 +71,9 @@ class DataPerumahan extends BaseController
         $db->transStart();
         if (!empty($post['dp_id'])) {
             foreach ($post['dp_id'] as $idx => $id) {
+                // Remove jumlah_rlh from update to prevent manual changes
                 $db->table('data_perumahan')->where('id', $id)->update([
                     'jumlah_rumah' => $post['jumlah_rumah'][$idx] ?? 0,
-                    'jumlah_rlh' => $post['jumlah_rlh'][$idx] ?? 0,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
             }
@@ -105,27 +105,38 @@ class DataPerumahan extends BaseController
         
         $desa = $db->table('kode_desa')->get()->getResultArray();
         foreach($desa as $d) {
-            // Total Data Lapangan (All records in rtlh_rumah)
+            // 1. Total Data Lapangan (All records in rtlh_rumah)
             $totalCount = $db->table('rtlh_rumah')
                             ->where('desa_id', $d['desa_id'])
                             ->countAllResults();
 
-            // Sync RLH based on rtlh_rumah status 'Sudah Menerima'
-            $rlhCount = $db->table('rtlh_rumah')
+            // 2. Sync RLH dari rtlh_rumah (status 'Sudah Menerima')
+            $rlhSurvei = $db->table('rtlh_rumah')
                            ->where('desa_id', $d['desa_id'])
                            ->where('status_bantuan', 'Sudah Menerima')
                            ->countAllResults();
             
+            // 3. Sync RLH dari rtlh_bansos yang TIDAK terhubung ke survei (id_survei NULL)
+            // Dan NIK-nya tidak ada di rtlh_rumah desa tersebut (untuk menghindari double count)
+            $bansosExtra = $db->query("
+                SELECT COUNT(*) as total FROM rtlh_bansos b
+                WHERE (b.desa = ? OR b.desa = ?)
+                AND b.id_survei IS NULL
+                AND b.nik NOT IN (SELECT nik_pemilik FROM rtlh_rumah WHERE desa_id = ?)
+            ", [$d['desa_nama'], strtoupper($d['desa_nama']), $d['desa_id']])->getRowArray()['total'] ?? 0;
+
+            $totalRlh = $rlhSurvei + $bansosExtra;
+
             $db->table('data_perumahan')->where('desa_id', $d['desa_id'])->update([
                 'jumlah_rumah' => $totalCount,
-                'jumlah_rlh' => $rlhCount,
+                'jumlah_rlh' => $totalRlh,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
         }
         
         $db->transComplete();
         
-        return redirect()->to('/data-perumahan')->with('success', 'Sinkronisasi data (Total Rumah & RLH) dari lapangan berhasil diselesaikan.');
+        return redirect()->to('/data-perumahan')->with('success', 'Sinkronisasi data (Total Rumah & Capaian RLH) dari tabel RTLH dan Bansos berhasil diselesaikan.');
     }
 
     public function backlog()

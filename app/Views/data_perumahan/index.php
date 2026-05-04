@@ -89,12 +89,17 @@
                                 </div>
                             </td>
 
-                            <!-- Capaian RLH (Syncable) -->
+                            <!-- Capaian RLH (Read Only - Auto Sync) -->
                             <td class="px-6 py-6 bg-emerald-50/30 dark:bg-emerald-900/10">
                                 <div class="flex flex-col items-center gap-2">
-                                    <input type="number" name="jumlah_rlh[]" value="<?= $item['jumlah_rlh'] ?>" 
-                                        class="w-24 text-center bg-white dark:bg-slate-950 border-2 border-emerald-100 dark:border-emerald-900 rounded-xl py-2 px-3 text-sm font-black text-emerald-600 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none">
-                                    <p class="text-[8px] font-bold text-emerald-600/50 uppercase tracking-widest">Auto: <?= $item['rlh_auto_count'] ?></p>
+                                    <div class="relative group/rlh">
+                                        <input type="number" value="<?= $item['jumlah_rlh'] ?>" readonly
+                                            class="w-24 text-center bg-slate-100 dark:bg-slate-800 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-xl py-2 px-3 text-sm font-black text-emerald-600 cursor-not-allowed transition-all outline-none">
+                                        <div class="absolute -top-2 -right-2 w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-900 group-hover/rlh:scale-125 transition-transform">
+                                            <i data-lucide="lock" class="w-2.5 h-2.5"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-[8px] font-bold text-emerald-600/50 uppercase tracking-widest">Sinkronisasi Otomatis</p>
                                 </div>
                             </td>
                         </tr>
