@@ -623,8 +623,7 @@ class Rtlh extends BaseController
             
             $sheet->setCellValue('AQ' . $rowNum, $row['status_bantuan']);
             $sheet->setCellValue('AR' . $rowNum, $row['tahun_bansos']);
-            $sheet->setCellValue('AS' . $rowNum, $row['status_backlog']);
-            $sheet->setCellValue('AT' . $rowNum, $row['desil_nasional']);
+            $sheet->setCellValue('AS' . $rowNum, $row['desil_nasional']);
             $sheet->setCellValue('AU' . $rowNum, $row['wkt_text']);
             
             $rowNum++;

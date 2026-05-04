@@ -185,11 +185,7 @@
                         <p class="text-[8px] font-bold text-slate-400 uppercase mb-1 tracking-[0.2em]">Luas Lahan</p>
                         <p class="text-2xl font-bold italic"><?= $rumah['luas_lahan_m2'] ?? '0' ?><span class="text-xs font-bold ml-1 opacity-60">m²</span></p>
                     </div>
-                    <div>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status Backlog</p>
-                        <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['status_backlog'] ?: 'TIDAK' ?></p>
-                    </div>
-                    <div>
+                    <div class="col-span-2">
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desil Nasional</p>
                         <p class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase"><?= $rumah['desil_nasional'] ?: '-' ?></p>
                     </div>

@@ -235,10 +235,6 @@
                         <input type="text" name="kepemilikan_tanah_manual" id="kepemilikan_tanah_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan kepemilikan..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Status Backlog</label>
-                        <input type="text" name="status_backlog" value="<?= old('status_backlog', $rumah['status_backlog']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
-                    </div>
-                    <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Desil Nasional</label>
                         <input type="text" name="desil_nasional" value="<?= old('desil_nasional', $rumah['desil_nasional']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
                     </div>
