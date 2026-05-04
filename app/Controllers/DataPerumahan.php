@@ -116,14 +116,14 @@ class DataPerumahan extends BaseController
                            ->where('status_bantuan', 'Sudah Menerima')
                            ->countAllResults();
             
-            // 3. Sync RLH dari rtlh_bansos yang TIDAK terhubung ke survei (id_survei NULL)
+            // 3. Sync RLH dari rtlh_bansos yang TIDAK terhubung ke survei (id_survei NULL/Empty)
             // Dan NIK-nya tidak ada di rtlh_rumah desa tersebut (untuk menghindari double count)
             $bansosExtra = $db->query("
                 SELECT COUNT(*) as total FROM rtlh_bansos b
-                WHERE (b.desa = ? OR b.desa = ?)
-                AND b.id_survei IS NULL
+                WHERE (TRIM(UPPER(b.desa)) = TRIM(UPPER(?)))
+                AND (b.id_survei IS NULL OR b.id_survei = '' OR b.id_survei = '0')
                 AND b.nik NOT IN (SELECT nik_pemilik FROM rtlh_rumah WHERE desa_id = ?)
-            ", [$d['desa_nama'], strtoupper($d['desa_nama']), $d['desa_id']])->getRowArray()['total'] ?? 0;
+            ", [$d['desa_nama'], $d['desa_id']])->getRowArray()['total'] ?? 0;
 
             $totalRlh = $rlhSurvei + $bansosExtra;
 
