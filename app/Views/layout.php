@@ -99,12 +99,10 @@
                         </button>
                         <div id="dropdown-perumahan" class="dropdown-container">
                             <div class="dropdown-content pl-20 mt-1 space-y-1 text-slate-400">
-                                <a href="<?= base_url('rtlh') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh') || (url_is('rtlh/*') && !url_is('rtlh/rekap-desa'))) ? 'text-blue-400 font-bold' : '' ?>">RTLH</a>
+                                <a href="<?= base_url('rtlh') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh') || (url_is('rtlh/*') && !url_is('rtlh/rekap-desa') && !url_is('rtlh/backlog'))) ? 'text-blue-400 font-bold' : '' ?>">RTLH</a>
                                 <?php if (session()->get('role_id') == 1): ?>
                                 <a href="<?= base_url('rtlh/rekap-desa') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh/rekap-desa*')) ? 'text-blue-400 font-bold' : '' ?>">Rekapitulasi Desa</a>
-                                <?php if (session()->get('role_id') == 1): ?>
                                 <a href="<?= base_url('rtlh/backlog') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh/backlog*')) ? 'text-blue-400 font-bold' : '' ?>">Manajemen Backlog</a>
-                                <?php endif; ?>
                                 <?php endif; ?>
                                 <a href="<?= base_url('psu') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('psu*')) ? 'text-blue-400 font-bold' : '' ?>">PSU Terbangun</a>
                                 <a href="<?= base_url('perumahan-formal') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('perumahan-formal*')) ? 'text-blue-400 font-bold' : '' ?>">Perumahan</a>

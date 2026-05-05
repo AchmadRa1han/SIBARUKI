@@ -73,6 +73,20 @@
         </div>
     </div>
 
+    <!-- Search Bar -->
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-all duration-300">
+        <form action="<?= base_url('rtlh/rekap-desa') ?>" method="GET" class="w-full md:w-96 relative group">
+            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors"></i>
+            <input type="text" name="keyword" value="<?= esc($keyword ?? '') ?>" placeholder="Cari nama desa..." 
+                class="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20 transition-all outline-none">
+        </form>
+        <?php if ($keyword ?? false): ?>
+            <a href="<?= base_url('rtlh/rekap-desa') ?>" class="text-[10px] font-bold text-rose-500 uppercase tracking-widest hover:underline flex items-center gap-2">
+                <i data-lucide="x-circle" class="w-3 h-3"></i> Hapus Filter Pencarian
+            </a>
+        <?php endif; ?>
+    </div>
+
     <!-- Table Section -->
     <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
         <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex items-center gap-3">

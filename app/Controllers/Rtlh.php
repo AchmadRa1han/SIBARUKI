@@ -464,8 +464,16 @@ class Rtlh extends BaseController
     public function rekapDesa()
     {
         if (session()->get('role_id') != 1) return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat melihat data rekapan per desa.');
+        
         $db = \Config\Database::connect();
-        $desaMaster = $db->table('kode_desa')->select('desa_id, desa_nama')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
+        $keyword = $this->request->getGet('keyword');
+        
+        $desaBuilder = $db->table('kode_desa')->select('desa_id, desa_nama')->orderBy('desa_nama', 'ASC');
+        if ($keyword) {
+            $desaBuilder->like('desa_nama', $keyword);
+        }
+        $desaMaster = $desaBuilder->get()->getResultArray();
+        
         $rekap = [];
         foreach($desaMaster as $dm) {
             $desaId = $dm['desa_id']; $desaNama = $dm['desa_nama'];
@@ -483,15 +491,47 @@ class Rtlh extends BaseController
                 'desa' => $desaNama, 'desa_id' => $desaId, 'total_rtlh' => $totalRtlh, 'total_rlh' => $totalRlh, 'total_semua' => $totalRtlh + $totalRlh
             ];
         }
-        return view('rtlh/rekap_desa', ['title' => 'Rekapitulasi Desa', 'rekap' => $rekap]);
+        return view('rtlh/rekap_desa', ['title' => 'Rekapitulasi Desa', 'rekap' => $rekap, 'keyword' => $keyword]);
     }
 
     public function backlog()
     {
         if (session()->get('role_id') != 1) return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat mengakses halaman manajemen backlog.');
+        
         $db = \Config\Database::connect();
-        $query = "SELECT kd.desa_id, kd.desa_nama, kk.kecamatan_nama, bd.id as bd_id, bd.jumlah_backlog, bd.tahun, bd.keterangan FROM kode_desa kd JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id LEFT JOIN backlog_data bd ON bd.desa_id = kd.desa_id ORDER BY kk.kecamatan_nama ASC, kd.desa_nama ASC";
-        return view('rtlh/backlog', ['title' => 'Manajemen Data Backlog', 'data' => $db->query($query)->getResultArray()]);
+        $keyword = $this->request->getGet('keyword');
+        
+        // Ensure backlog entries exist for all villages
+        $desa = $db->table('kode_desa')->get()->getResultArray();
+        foreach($desa as $d) {
+            $exists = $db->table('backlog_data')->where('desa_id', $d['desa_id'])->countAllResults();
+            if ($exists == 0) {
+                $db->table('backlog_data')->insert([
+                    'desa_id' => $d['desa_id'],
+                    'jumlah_backlog' => 0,
+                    'tahun' => date('Y'),
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+
+        $queryStr = "SELECT kd.desa_id, kd.desa_nama, kk.kecamatan_nama, bd.id as bd_id, bd.jumlah_backlog, bd.tahun, bd.keterangan 
+                     FROM kode_desa kd 
+                     JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id 
+                     LEFT JOIN backlog_data bd ON bd.desa_id = kd.desa_id ";
+        
+        if ($keyword) {
+            $queryStr .= " WHERE kd.desa_nama LIKE " . $db->escape('%' . $keyword . '%') . " OR kk.kecamatan_nama LIKE " . $db->escape('%' . $keyword . '%');
+        }
+        
+        $queryStr .= " ORDER BY kk.kecamatan_nama ASC, kd.desa_nama ASC";
+        
+        return view('rtlh/backlog', [
+            'title' => 'Manajemen Data Backlog', 
+            'data' => $db->query($queryStr)->getResultArray(),
+            'keyword' => $keyword
+        ]);
     }
 
     public function updateBacklog()
@@ -694,5 +734,19 @@ class Rtlh extends BaseController
             return $previousValue;
         }
         return $val ?: $previousValue;
+    }
+
+    protected function logActivity($action, $table, $description)
+    {
+        $db = \Config\Database::connect();
+        $db->table('sys_logs')->insert([
+            'user' => session()->get('username') ?? 'System',
+            'action' => $action,
+            'table_name' => $table,
+            'description' => $description,
+            'ip_address' => $this->request->getIPAddress(),
+            'user_agent' => $this->request->getUserAgent()->getAgentString(),
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
     }
 }
