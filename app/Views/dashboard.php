@@ -44,9 +44,9 @@
     <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         <?php 
         $metrics = [
-            ['rumah', 'home', 'blue', 'TOTAL RUMAH', base_url('data-perumahan')],
-            ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('data-perumahan')],
-            ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('data-perumahan')],
+            ['rumah', 'home', 'blue', 'TOTAL RUMAH', base_url('rtlh/rekap-desa')],
+            ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('rtlh/rekap-desa')],
+            ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('rtlh/rekap-desa')],
             ['rtlh', 'home', 'amber', 'RTLH (SASARAN)', base_url('rtlh')],
             ['kumuh', 'map-pin', 'rose', 'KUMUH', base_url('wilayah-kumuh')],
             ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],

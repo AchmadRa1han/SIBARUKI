@@ -103,7 +103,7 @@
                                 <?php if (session()->get('role_id') == 1): ?>
                                 <a href="<?= base_url('rtlh/rekap-desa') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh/rekap-desa*')) ? 'text-blue-400 font-bold' : '' ?>">Rekapitulasi Desa</a>
                                 <?php if (session()->get('role_id') == 1): ?>
-                                <a href="<?= base_url('data-perumahan/backlog') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('data-perumahan/backlog*')) ? 'text-blue-400 font-bold' : '' ?>">Manajemen Backlog</a>
+                                <a href="<?= base_url('rtlh/backlog') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh/backlog*')) ? 'text-blue-400 font-bold' : '' ?>">Manajemen Backlog</a>
                                 <?php endif; ?>
                                 <?php endif; ?>
                                 <a href="<?= base_url('psu') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('psu*')) ? 'text-blue-400 font-bold' : '' ?>">PSU Terbangun</a>
