@@ -511,22 +511,155 @@ class Rtlh extends BaseController
         }
 
         $db = \Config\Database::connect();
-        $builder = $db->table('rtlh_rumah');
-        $builder->select("
-            desa, 
-            desa_id, 
-            COUNT(*) as total_semua,
-            COUNT(CASE WHEN status_bantuan = 'Belum Menerima' THEN 1 END) as total_rtlh,
-            COUNT(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 END) as total_rlh
-        ");
-        $builder->groupBy('desa, desa_id');
-        $builder->orderBy('desa', 'ASC');
-        $rekap = $builder->get()->getResultArray();
+        
+        // 1. Ambil data master desa
+        $desaMaster = $db->table('kode_desa')
+                         ->select('desa_id, desa_nama')
+                         ->orderBy('desa_nama', 'ASC')
+                         ->get()->getResultArray();
+        
+        $rekap = [];
+        foreach($desaMaster as $dm) {
+            $desaId = $dm['desa_id'];
+            $desaNama = $dm['desa_nama'];
+
+            // a. RTLH (Belum Menerima di tabel survei)
+            $totalRtlh = $db->table('rtlh_rumah')
+                            ->where('desa_id', $desaId)
+                            ->where('status_bantuan', 'Belum Menerima')
+                            ->countAllResults();
+
+            // b. RLH (Sudah Menerima di tabel survei)
+            $rlhSurvei = $db->table('rtlh_rumah')
+                            ->where('desa_id', $desaId)
+                            ->where('status_bantuan', 'Sudah Menerima')
+                            ->countAllResults();
+
+            // c. RLH (Bansos yang tidak terhubung ke survei)
+            $baseName = trim(str_replace(['DESA', 'KELURAHAN', 'KEL.', ' '], '', strtoupper($desaNama)));
+            $bansosExtra = $db->query("
+                SELECT COUNT(*) as total FROM rtlh_bansos b
+                WHERE (
+                    REPLACE(REPLACE(REPLACE(REPLACE(UPPER(b.desa), 'DESA', ''), 'KELURAHAN', ''), 'KEL.', ''), ' ', '') LIKE ? 
+                    OR ? LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(REPLACE(UPPER(b.desa), 'DESA', ''), 'KELURAHAN', ''), 'KEL.', ''), ' ', ''), '%')
+                )
+                AND (b.id_survei IS NULL OR b.id_survei = '' OR b.id_survei = '0')
+                AND b.nik NOT IN (SELECT nik_pemilik FROM rtlh_rumah WHERE desa_id = ?)
+            ", ['%' . $baseName . '%', $baseName, $desaId])->getRowArray()['total'] ?? 0;
+
+            $totalRlh = $rlhSurvei + $bansosExtra;
+
+            $rekap[] = [
+                'desa' => $desaNama,
+                'desa_id' => $desaId,
+                'total_rtlh' => $totalRtlh,
+                'total_rlh' => $totalRlh,
+                'total_semua' => $totalRtlh + $totalRlh
+            ];
+        }
 
         return view('rtlh/rekap_desa', [
-            'title' => 'Rekapitulasi RTLH per Desa',
+            'title' => 'Rekapitulasi Desa',
             'rekap' => $rekap
         ]);
+    }
+
+    public function backlog()
+    {
+        if (session()->get('role_id') != 1) {
+            return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat mengakses halaman manajemen backlog.');
+        }
+
+        $db = \Config\Database::connect();
+        
+        $query = "
+            SELECT 
+                kd.desa_id, kd.desa_nama, kk.kecamatan_nama,
+                bd.id as bd_id, bd.jumlah_backlog, bd.tahun, bd.keterangan
+            FROM kode_desa kd
+            JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id
+            LEFT JOIN backlog_data bd ON bd.desa_id = kd.desa_id
+            ORDER BY kk.kecamatan_nama ASC, kd.desa_nama ASC
+        ";
+        
+        $data = $db->query($query)->getResultArray();
+
+        return view('rtlh/backlog', [
+            'title' => 'Manajemen Data Backlog',
+            'data' => $data
+        ]);
+    }
+
+    public function updateBacklog()
+    {
+        if (session()->get('role_id') != 1) return redirect()->to('/dashboard');
+
+        $db = \Config\Database::connect();
+        $post = $this->request->getPost();
+        
+        $db->transStart();
+        if (!empty($post['bd_id'])) {
+            foreach ($post['bd_id'] as $idx => $id) {
+                $db->table('backlog_data')->where('id', $id)->update([
+                    'jumlah_backlog' => $post['jumlah_backlog'][$idx] ?? 0,
+                    'tahun' => $post['tahun'][$idx] ?? date('Y'),
+                    'keterangan' => $post['keterangan'][$idx] ?? '',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+        $db->transComplete();
+        
+        return redirect()->to('/rtlh/backlog')->with('success', 'Data Backlog berhasil diperbarui.');
+    }
+
+    public function backlog()
+    {
+        if (session()->get('role_id') != 1) {
+            return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat mengakses halaman manajemen backlog.');
+        }
+
+        $db = \Config\Database::connect();
+        
+        $query = "
+            SELECT 
+                kd.desa_id, kd.desa_nama, kk.kecamatan_nama,
+                bd.id as bd_id, bd.jumlah_backlog, bd.tahun, bd.keterangan
+            FROM kode_desa kd
+            JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id
+            LEFT JOIN backlog_data bd ON bd.desa_id = kd.desa_id
+            ORDER BY kk.kecamatan_nama ASC, kd.desa_nama ASC
+        ";
+        
+        $data = $db->query($query)->getResultArray();
+
+        return view('rtlh/backlog', [
+            'title' => 'Manajemen Data Backlog',
+            'data' => $data
+        ]);
+    }
+
+    public function updateBacklog()
+    {
+        if (session()->get('role_id') != 1) return redirect()->to('/dashboard');
+
+        $db = \Config\Database::connect();
+        $post = $this->request->getPost();
+        
+        $db->transStart();
+        if (!empty($post['bd_id'])) {
+            foreach ($post['bd_id'] as $idx => $id) {
+                $db->table('backlog_data')->where('id', $id)->update([
+                    'jumlah_backlog' => $post['jumlah_backlog'][$idx] ?? 0,
+                    'tahun' => $post['tahun'][$idx] ?? date('Y'),
+                    'keterangan' => $post['keterangan'][$idx] ?? '',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+        $db->transComplete();
+        
+        return redirect()->to('/rtlh/backlog')->with('success', 'Data Backlog berhasil diperbarui.');
     }
 
     public function historyTransformasi()
@@ -538,6 +671,61 @@ class Rtlh extends BaseController
             'ref' => $this->refModel->getAllMapped()
         ];
         return view('rtlh/history_transformasi', $data);
+    }
+
+    public function backlog()
+    {
+        if (session()->get('role_id') != 1) {
+            return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat mengakses halaman manajemen backlog.');
+        }
+
+        $db = \Config\Database::connect();
+        
+        $query = "
+            SELECT 
+                kd.desa_id, kd.desa_nama, kk.kecamatan_nama,
+                bd.id as bd_id, bd.jumlah_backlog, bd.tahun, bd.keterangan
+            FROM kode_desa kd
+            JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id
+            LEFT JOIN backlog_data bd ON bd.desa_id = kd.desa_id
+            ORDER BY kk.kecamatan_nama ASC, kd.desa_nama ASC
+        ";
+        
+        $data = $db->query($query)->getResultArray();
+
+        return view('rtlh/backlog', [
+            'title' => 'Manajemen Data Backlog',
+            'data' => $data
+        ]);
+    }
+
+    public function updateBacklog()
+    {
+        if (session()->get('role_id') != 1) return redirect()->to('/dashboard');
+
+        $db = \Config\Database::connect();
+        $post = $this->request->getPost();
+        
+        $db->transStart();
+        if (!empty($post['bd_id'])) {
+            foreach ($post['bd_id'] as $idx => $id) {
+                // Ensure entry exists
+                if (empty($id)) {
+                    // This case shouldn't happen if initialized, but safety first
+                    continue; 
+                }
+
+                $db->table('backlog_data')->where('id', $id)->update([
+                    'jumlah_backlog' => $post['jumlah_backlog'][$idx] ?? 0,
+                    'tahun' => $post['tahun'][$idx] ?? date('Y'),
+                    'keterangan' => $post['keterangan'][$idx] ?? '',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+        $db->transComplete();
+        
+        return redirect()->to('/rtlh/backlog')->with('success', 'Data Backlog berhasil diperbarui.');
     }
 
     public function exportExcel()

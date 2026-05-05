@@ -7,7 +7,7 @@
     <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <a href="<?= base_url('data-perumahan') ?>" class="hover:text-blue-600 transition-colors">Rekapitulasi Desa</a>
+        <a href="<?= base_url('rtlh/rekap-desa') ?>" class="hover:text-blue-600 transition-colors">Rekapitulasi Desa</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <span class="text-blue-600">Manajemen Backlog</span>
     </nav>
@@ -28,9 +28,8 @@
 
     <!-- Main Content Table -->
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <form action="<?= base_url('data-perumahan/update') ?>" method="POST" id="backlogForm">
+        <form action="<?= base_url('rtlh/update-backlog') ?>" method="POST" id="backlogForm">
             <?= csrf_field() ?>
-            <input type="hidden" name="redirect_to" value="/data-perumahan/backlog">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>

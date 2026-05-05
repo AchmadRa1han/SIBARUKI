@@ -84,6 +84,8 @@ $routes->group('aset-tanah', function($routes) {
 $routes->group('rtlh', function($routes) {
     $routes->get('/', 'Rtlh::index');
     $routes->get('rekap-desa', 'Rtlh::rekapDesa');
+    $routes->get('backlog', 'Rtlh::backlog');
+    $routes->post('update-backlog', 'Rtlh::updateBacklog');
     $routes->get('history-transformasi', 'Rtlh::historyTransformasi');
     $routes->get('export-excel', 'Rtlh::exportExcel');
     $routes->post('import-csv', 'Rtlh::importCsv');
@@ -119,14 +121,6 @@ $routes->group('bansos-rtlh', function($routes) {
     $routes->get('edit/(:num)', 'BansosRtlh::edit/$1');
     $routes->post('update/(:num)', 'BansosRtlh::update/$1');
     $routes->post('delete/(:num)', 'BansosRtlh::delete/$1');
-});
-
-// Modul Data Umum Perumahan
-$routes->group('data-perumahan', function($routes) {
-    $routes->get('/', 'DataPerumahan::index');
-    $routes->post('update', 'DataPerumahan::update');
-    $routes->get('sync', 'DataPerumahan::sync');
-    $routes->get('backlog', 'DataPerumahan::backlog');
 });
 
 // SISTEM & PENGATURAN

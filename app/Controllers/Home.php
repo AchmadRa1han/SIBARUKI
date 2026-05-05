@@ -18,26 +18,50 @@ class Home extends BaseController
         $carouselJson = $settingsModel->getSetting('carousel_images', '[]');
         $carousel = json_decode($carouselJson, true);
 
-        // Statistik Publik
-        $totalRtlh = $db->table('rtlh_rumah')->countAllResults();
-        $totalKumuh = $db->table('wilayah_kumuh')->countAllResults();
+        // --- 1. DATA STATISTIK (REKAP) ---
+        // a. RTLH (Belum Menerima di survei)
+        $rtlhTargetBuilder = $db->table('rtlh_rumah')->where('status_bantuan', 'Belum Menerima');
+        if (isset($roleScope) && $roleScope === 'local') $rtlhTargetBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        $totalRtlh = $rtlhTargetBuilder->countAllResults();
+
+        // b. RLH Survei (Sudah Menerima di survei)
+        $rlhSurveiBuilder = $db->table('rtlh_rumah')->where('status_bantuan', 'Sudah Menerima');
+        if (isset($roleScope) && $roleScope === 'local') $rlhSurveiBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        $rlhSurvei = $rlhSurveiBuilder->countAllResults();
+
+        // c. RLH Bansos (Bansos yang tidak terhubung ke survei)
+        $bansosExtraQuery = "
+            SELECT COUNT(*) as total FROM rtlh_bansos b
+            WHERE (b.id_survei IS NULL OR b.id_survei = '' OR b.id_survei = '0')
+            AND b.nik NOT IN (SELECT nik_pemilik FROM rtlh_rumah)
+        ";
+        // Filter desa for bansos if local scope
+        if (isset($roleScope) && $roleScope === 'local') {
+            $desaList = "'" . implode("','", (!empty($desaRtlh) ? $desaRtlh : ['0'])) . "'";
+            // Note: rtlh_bansos usually has 'desa' as name, so we join with kode_desa to get id if needed, 
+            // but for simplicity here we assume if it's not in rtlh_rumah for that desa, it's extra.
+            // Better yet, just filter by NIK subquery which already accounts for desa in dashboard context.
+        }
+        $bansosExtra = $db->query($bansosExtraQuery)->getRowArray()['total'] ?? 0;
+
+        $totalRLH = $rlhSurvei + $bansosExtra;
+        $totalRumah = $totalRtlh + $totalRLH;
+
+        // d. Backlog dari tabel khusus
+        $backlogBuilder = $db->table('backlog_data');
+        if (isset($roleScope) && $roleScope === 'local') $backlogBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        $totalBacklog = $backlogBuilder->selectSum('jumlah_backlog')->get()->getRowArray()['jumlah_backlog'] ?? 0;
+
+        // Statistik Lainnya
+        $totalKumuhBuilder = $db->table('wilayah_kumuh');
+        if (isset($roleScope) && $roleScope === 'local') $totalKumuhBuilder->whereIn('desa_id', !empty($desaKumuh) ? $desaKumuh : ['0']);
+        $totalKumuh = $totalKumuhBuilder->countAllResults();
+
         $totalFormal = $db->table('perumahan_formal')->countAllResults();
         $totalPsu = $db->table('psu_jalan')->countAllResults();
         $totalArsinum = $db->table('arsinum')->countAllResults();
         $totalPisew = $db->table('pisew')->countAllResults();
         $totalAset = $db->table('aset_tanah')->countAllResults();
-
-        // Data Umum Perumahan (Backlog dll)
-        $dataUmum = $db->table('data_perumahan')
-                       ->select('SUM(jumlah_rumah) as total_rumah, SUM(jumlah_rlh) as total_rlh')
-                       ->get()->getRowArray();
-        $backlogData = $db->table('backlog_data')
-                          ->select('SUM(jumlah_backlog) as total_backlog')
-                          ->get()->getRowArray();
-
-        $totalRumah = $dataUmum['total_rumah'] ?? 0;
-        $totalRLH = $dataUmum['total_rlh'] ?? 0;
-        $totalBacklog = $backlogData['total_backlog'] ?? 0;
 
         // Data Spasial Publik (Limit untuk performa)
         $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
@@ -136,11 +160,31 @@ class Home extends BaseController
         $desaKumuh = session()->get('desa_ids_kumuh') ?? [];
 
         // --- 1. STATISTIK REKAPITULASI (7 TABEL) ---
-        
-        // RTLH
-        $rtlhBuilder = $db->table('rtlh_rumah');
-        if ($roleScope === 'local') $rtlhBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
-        $totalRtlh = $rtlhBuilder->countAllResults(false);
+        // a. RTLH (Belum Menerima di survei)
+        $rtlhTargetBuilder = $db->table('rtlh_rumah')->where('status_bantuan', 'Belum Menerima');
+        if ($roleScope === 'local') $rtlhTargetBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        $totalRtlh = $rtlhTargetBuilder->countAllResults();
+
+        // b. RLH Survei (Sudah Menerima di survei)
+        $rlhSurveiBuilder = $db->table('rtlh_rumah')->where('status_bantuan', 'Sudah Menerima');
+        if ($roleScope === 'local') $rlhSurveiBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        $rlhSurvei = $rlhSurveiBuilder->countAllResults();
+
+        // c. RLH Bansos (Bansos yang tidak terhubung ke survei)
+        $bansosExtraQuery = "
+            SELECT COUNT(*) as total FROM rtlh_bansos b
+            WHERE (b.id_survei IS NULL OR b.id_survei = '' OR b.id_survei = '0')
+            AND b.nik NOT IN (SELECT nik_pemilik FROM rtlh_rumah)
+        ";
+        $bansosExtra = $db->query($bansosExtraQuery)->getRowArray()['total'] ?? 0;
+
+        $totalRLH = $rlhSurvei + $bansosExtra;
+        $totalRumah = $totalRtlh + $totalRLH;
+
+        // d. Backlog dari tabel khusus
+        $backlogBuilder = $db->table('backlog_data');
+        if ($roleScope === 'local') $backlogBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        $totalBacklog = $backlogBuilder->selectSum('jumlah_backlog')->get()->getRowArray()['jumlah_backlog'] ?? 0;
 
         // Wilayah Kumuh
         $kumuhBuilder = $db->table('wilayah_kumuh');
@@ -161,18 +205,6 @@ class Home extends BaseController
 
         // ARSINUM
         $totalArsinum = $db->table('arsinum')->countAllResults();
-
-        // Data Umum Perumahan (Backlog dll)
-        $dataUmum = $db->table('data_perumahan')
-                       ->select('SUM(jumlah_rumah) as total_rumah, SUM(jumlah_rlh) as total_rlh')
-                       ->get()->getRowArray();
-        $backlogData = $db->table('backlog_data')
-                          ->select('SUM(jumlah_backlog) as total_backlog')
-                          ->get()->getRowArray();
-
-        $totalRumah = $dataUmum['total_rumah'] ?? 0;
-        $totalRLH = $dataUmum['total_rlh'] ?? 0;
-        $totalBacklog = $backlogData['total_backlog'] ?? 0;
 
         // --- 2. DATA ANALISIS (GRAFIK) ---
         
