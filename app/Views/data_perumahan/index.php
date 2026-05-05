@@ -136,6 +136,45 @@
         </form>
     </div>
 
+    <!-- Unmapped Bansos Warning -->
+    <?php if (!empty($unmappedBansos)): ?>
+    <div class="bg-rose-50 dark:bg-rose-900/20 border-2 border-dashed border-rose-200 dark:border-rose-800 p-8 rounded-[2.5rem] space-y-4">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-rose-100 dark:bg-rose-900 text-rose-600 rounded-2xl flex items-center justify-center">
+                <i data-lucide="alert-octagon" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-black text-rose-950 dark:text-rose-200 uppercase tracking-tight">Data Bansos Tidak Terpetakan (<?= count($unmappedBansos) ?>)</h3>
+                <p class="text-[10px] font-bold text-rose-600/70 uppercase tracking-widest">Sistem menemukan data bansos yang nama desanya tidak cocok dengan database master wilayah</p>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto bg-white/50 dark:bg-slate-900/50 rounded-2xl border border-rose-100 dark:border-rose-800">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="text-[8px] font-black text-rose-400 uppercase tracking-widest border-b border-rose-50 dark:border-rose-900">
+                        <th class="px-6 py-3">Nama Penerima</th>
+                        <th class="px-6 py-3">NIK</th>
+                        <th class="px-6 py-3">Desa di Bansos</th>
+                        <th class="px-6 py-3">Tahun</th>
+                    </tr>
+                </thead>
+                <tbody class="text-[10px]">
+                    <?php foreach($unmappedBansos as $ub): ?>
+                    <tr>
+                        <td class="px-6 py-3 font-black text-slate-700 dark:text-slate-300"><?= $ub['nama_penerima'] ?></td>
+                        <td class="px-6 py-3 font-mono"><?= $ub['nik'] ?></td>
+                        <td class="px-6 py-3 text-rose-600 font-black italic"><?= $ub['desa'] ?></td>
+                        <td class="px-6 py-3 font-bold"><?= $ub['tahun_anggaran'] ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <p class="text-[9px] font-medium text-rose-500 italic">Saran: Pastikan penulisan nama desa di Modul Bansos sesuai dengan daftar desa di atas agar dapat terhitung otomatis.</p>
+    </div>
+    <?php endif; ?>
+
     <!-- Action Bar (Sticky Bottom) -->
     <div class="sticky bottom-6 z-50 px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[2rem] shadow-2xl flex items-center justify-between no-print mx-4">
         <div class="flex items-center gap-4">

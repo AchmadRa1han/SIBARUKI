@@ -1665,6 +1665,10 @@ video {
 .border-white\/30 {
   border-color: rgb(255 255 255 / 0.3);
 }
+.border-rose-50 {
+  --tw-border-opacity: 1;
+  border-color: rgb(255 241 242 / var(--tw-border-opacity, 1));
+}
 .bg-\[\#f43f5e\] {
   --tw-bg-opacity: 1;
   background-color: rgb(244 63 94 / var(--tw-bg-opacity, 1));
@@ -2562,6 +2566,9 @@ video {
 }
 .text-emerald-600\/50 {
   color: rgb(5 150 105 / 0.5);
+}
+.text-rose-600\/70 {
+  color: rgb(225 29 72 / 0.7);
 }
 .line-through {
   text-decoration-line: line-through;
@@ -3576,6 +3583,10 @@ video {
   --tw-border-opacity: 1;
   border-color: rgb(15 23 42 / var(--tw-border-opacity, 1));
 }
+.dark\:border-rose-800:is(.dark *) {
+  --tw-border-opacity: 1;
+  border-color: rgb(159 18 57 / var(--tw-border-opacity, 1));
+}
 .dark\:bg-amber-600:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(217 119 6 / var(--tw-bg-opacity, 1));
@@ -3740,6 +3751,10 @@ video {
 .dark\:bg-white:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+.dark\:bg-rose-900:is(.dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(136 19 55 / var(--tw-bg-opacity, 1));
 }
 .dark\:from-slate-900\/50:is(.dark *) {
   --tw-gradient-from: rgb(15 23 42 / 0.5) var(--tw-gradient-from-position);

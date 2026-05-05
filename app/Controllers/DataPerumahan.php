@@ -56,9 +56,30 @@ class DataPerumahan extends BaseController
         
         $dataUmum = $db->query($query)->getResultArray();
 
+        // Debug: Find unmapped bansos
+        $unmappedBansos = $db->query("
+            SELECT b.* FROM rtlh_bansos b
+            WHERE b.id_survei IS NULL OR b.id_survei = '' OR b.id_survei = '0'
+        ")->getResultArray();
+        
+        $unmappedList = [];
+        foreach($unmappedBansos as $ub) {
+            $found = false;
+            $ubDesa = trim(str_replace(['DESA', 'KELURAHAN', 'KEL.', ' '], '', strtoupper($ub['desa'])));
+            foreach($desa as $d) {
+                $dDesa = trim(str_replace(['DESA', 'KELURAHAN', 'KEL.', ' '], '', strtoupper($d['desa_nama'])));
+                if (strpos($ubDesa, $dDesa) !== false || strpos($dDesa, $ubDesa) !== false) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) $unmappedList[] = $ub;
+        }
+
         return view('data_perumahan/index', [
             'title' => 'Rekapitulasi & Statistik Desa',
-            'data' => $dataUmum
+            'data' => $dataUmum,
+            'unmappedBansos' => $unmappedList
         ]);
     }
 
@@ -118,12 +139,18 @@ class DataPerumahan extends BaseController
             
             // 3. Sync RLH dari rtlh_bansos yang TIDAK terhubung ke survei (id_survei NULL/Empty)
             // Dan NIK-nya tidak ada di rtlh_rumah desa tersebut (untuk menghindari double count)
+            // Menggunakan fuzzy match yang sangat agresif
+            $baseName = trim(str_replace(['DESA', 'KELURAHAN', 'KEL.', ' '], '', strtoupper($d['desa_nama'])));
+            
             $bansosExtra = $db->query("
                 SELECT COUNT(*) as total FROM rtlh_bansos b
-                WHERE (TRIM(UPPER(b.desa)) = TRIM(UPPER(?)))
+                WHERE (
+                    REPLACE(REPLACE(REPLACE(REPLACE(UPPER(b.desa), 'DESA', ''), 'KELURAHAN', ''), 'KEL.', ''), ' ', '') LIKE ? 
+                    OR ? LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(REPLACE(UPPER(b.desa), 'DESA', ''), 'KELURAHAN', ''), 'KEL.', ''), ' ', ''), '%')
+                )
                 AND (b.id_survei IS NULL OR b.id_survei = '' OR b.id_survei = '0')
                 AND b.nik NOT IN (SELECT nik_pemilik FROM rtlh_rumah WHERE desa_id = ?)
-            ", [$d['desa_nama'], $d['desa_id']])->getRowArray()['total'] ?? 0;
+            ", ['%' . $baseName . '%', $baseName, $d['desa_id']])->getRowArray()['total'] ?? 0;
 
             $totalRlh = $rlhSurvei + $bansosExtra;
 
