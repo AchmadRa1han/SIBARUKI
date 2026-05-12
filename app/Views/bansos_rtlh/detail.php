@@ -32,9 +32,9 @@
             <a href="<?= base_url('bansos-rtlh/edit/' . $bansos['id']) ?>" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-indigo-600/20">
                 <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
             </a>
-            <button onclick="window.print()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all active:scale-95 flex items-center gap-2">
-                <i data-lucide="printer" class="w-4 h-4"></i> Cetak
-            </button>
+            <a href="<?= base_url('bansos-rtlh/print/' . $bansos['id']) ?>" target="_blank" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all active:scale-95 flex items-center gap-2">
+                <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan
+            </a>
         </div>
     </div>
 

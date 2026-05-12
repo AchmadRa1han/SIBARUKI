@@ -189,6 +189,27 @@ class BansosRtlh extends BaseController
         ]);
     }
 
+    public function print($id)
+    {
+        $db = \Config\Database::connect();
+        $bansos = $db->table('rtlh_bansos')
+                     ->select('rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
+                     ->where('id', $id)
+                     ->get()->getRowArray();
+
+        if (!$bansos) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+
+        $rumah = null;
+        if ($bansos['id_survei']) {
+            $rumah = $this->rumahModel->find($bansos['id_survei']);
+        }
+
+        return view('bansos_rtlh/print_report', [
+            'bansos' => $bansos,
+            'rumah' => $rumah
+        ]);
+    }
+
     public function delete($id)
     {
         $this->bansosModel->delete($id);

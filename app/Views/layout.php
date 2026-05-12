@@ -53,6 +53,25 @@
         }
         .dropdown-container.open { grid-template-rows: 1fr; opacity: 1; }
         .dropdown-content { min-height: 0; }
+
+        @media print {
+            body, html { 
+                height: auto !important; 
+                overflow: visible !important; 
+                display: block !important;
+                background: white !important;
+            }
+            #main-content {
+                height: auto !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: block !important;
+            }
+            aside, header, #sidebar-overlay, .no-print {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-slate-950 font-sans flex h-screen overflow-hidden transition-colors duration-300">
