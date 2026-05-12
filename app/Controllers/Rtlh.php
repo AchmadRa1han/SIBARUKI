@@ -468,18 +468,29 @@ class Rtlh extends BaseController
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         
         $penerima = $db->table('rtlh_penerima')
-                       ->select('rtlh_penerima.*, ref_master_pekerjaan.nama_pilihan as nama_pekerjaan')
-                       ->join('ref_master as ref_master_pekerjaan', 'ref_master_pekerjaan.id = rtlh_penerima.pekerjaan_id', 'left')
+                       ->select('rtlh_penerima.*, ref_edu.nama_pilihan as nama_pendidikan, ref_job.nama_pilihan as nama_pekerjaan')
+                       ->join('ref_master as ref_edu', 'ref_edu.id = rtlh_penerima.pendidikan_id', 'left')
+                       ->join('ref_master as ref_job', 'ref_job.id = rtlh_penerima.pekerjaan_id', 'left')
                        ->where('nik', $rumah['nik_pemilik'])
                        ->get()->getRowArray();
 
         $kondisi = $db->table('rtlh_kondisi_rumah')
                       ->select('rtlh_kondisi_rumah.*, 
-                                r1.nama_pilihan as nama_st_pondasi, 
-                                r9.nama_pilihan as nama_mat_lantai, r10.nama_pilihan as nama_st_lantai,
-                                r11.nama_pilihan as nama_mat_dinding, r12.nama_pilihan as nama_st_dinding,
-                                r13.nama_pilihan as nama_mat_atap, r14.nama_pilihan as nama_st_atap')
+                                r1.nama_pilihan as nm_st_pondasi, r2.nama_pilihan as nm_st_kolom, 
+                                r3.nama_pilihan as nm_st_balok, r4.nama_pilihan as nm_st_sloof,
+                                r5.nama_pilihan as nm_st_rangka_atap, r6.nama_pilihan as nm_st_plafon,
+                                r7.nama_pilihan as nm_st_jendela, r8.nama_pilihan as nm_st_ventilasi,
+                                r9.nama_pilihan as nm_mat_lantai, r10.nama_pilihan as nm_st_lantai,
+                                r11.nama_pilihan as nm_mat_dinding, r12.nama_pilihan as nm_st_dinding,
+                                r13.nama_pilihan as nm_mat_atap, r14.nama_pilihan as nm_st_atap')
                       ->join('ref_master as r1', 'r1.id = rtlh_kondisi_rumah.st_pondasi', 'left')
+                      ->join('ref_master as r2', 'r2.id = rtlh_kondisi_rumah.st_kolom', 'left')
+                      ->join('ref_master as r3', 'r3.id = rtlh_kondisi_rumah.st_balok', 'left')
+                      ->join('ref_master as r4', 'r4.id = rtlh_kondisi_rumah.st_sloof', 'left')
+                      ->join('ref_master as r5', 'r5.id = rtlh_kondisi_rumah.st_rangka_atap', 'left')
+                      ->join('ref_master as r6', 'r6.id = rtlh_kondisi_rumah.st_plafon', 'left')
+                      ->join('ref_master as r7', 'r7.id = rtlh_kondisi_rumah.st_jendela', 'left')
+                      ->join('ref_master as r8', 'r8.id = rtlh_kondisi_rumah.st_ventilasi', 'left')
                       ->join('ref_master as r9', 'r9.id = rtlh_kondisi_rumah.mat_lantai', 'left')
                       ->join('ref_master as r10', 'r10.id = rtlh_kondisi_rumah.st_lantai', 'left')
                       ->join('ref_master as r11', 'r11.id = rtlh_kondisi_rumah.mat_dinding', 'left')
@@ -492,7 +503,8 @@ class Rtlh extends BaseController
         return view('rtlh/print_report', [
             'rumah' => $rumah,
             'penerima' => $penerima,
-            'kondisi' => $kondisi
+            'kondisi' => $kondisi,
+            'ref' => $this->refModel->getAllMapped()
         ]);
     }
 
