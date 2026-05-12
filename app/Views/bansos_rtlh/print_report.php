@@ -56,7 +56,7 @@
         <img src="<?= base_url('sinjai.png') ?>" class="logo">
         <div class="kop-text">
             <h1>Pemerintah Kabupaten Sinjai</h1>
-            <h2>Dinas Perumahan Rakyat dan Kawasan Permukiman</h2>
+            <h2>Dinas Perumahan Kawasan Permukiman dan Pertanahan Kab. Sinjai</h2>
             <p>Jl. Persatuan Raya No. 123, Kabupaten Sinjai - Sulawesi Selatan</p>
         </div>
         <div style="width: 70px;"></div>
@@ -132,24 +132,13 @@
         <?php endif; ?>
     </div>
 
-    <div class="footer">
-        <div class="signature">
-            <p>Mengetahui,<br>Kepala Bidang Perumahan</p>
-            <div class="sig-space"></div>
-            <p class="sig-name">..........................................</p>
-            <p>NIP. ..........................................</p>
-        </div>
-        <div class="signature">
-            <p>Sinjai, <?= date('d F Y') ?><br>Verifikator Lapangan</p>
-            <div class="sig-space"></div>
-            <p class="sig-name"><?= session()->get('username') ?></p>
-            <p>ID Sistem: SIBARUKI-<?= str_pad($bansos['id'], 4, '0', STR_PAD_LEFT) ?></p>
-        </div>
+    <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; text-align: center;">
+        <p style="font-size: 7pt; color: #666;">Dicetak otomatis oleh Sistem SIBARUKI pada <?= date('d/m/Y H:i') ?> | ID Referensi: SIBARUKI-<?= str_pad($bansos['id'], 4, '0', STR_PAD_LEFT) ?></p>
     </div>
 
     <script>
-        // Auto trigger print when loaded if needed, 
-        // but better keep manual for preview.
+        // Auto trigger print when loaded
+        // window.onload = function() { window.print(); }
     </script>
 </body>
 </html>
