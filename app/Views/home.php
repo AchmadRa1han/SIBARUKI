@@ -102,7 +102,7 @@
                     ['backlog', 'alert-triangle', 'rose', 'Backlog'],
                     ['rtlh', 'home', 'amber', 'RTLH'],
                     ['kumuh', 'map-pin', 'rose', 'Kumuh'],
-                    ['formal', 'building-2', 'indigo', 'Formal'],
+                    ['formal', 'building-2', 'indigo', 'Perumahan'],
                     ['psu', 'route', 'emerald', 'PSU'],
                     ['arsinum', 'droplets', 'blue', 'Arsinum'],
                     ['pisew', 'hard-hat', 'orange', 'PISEW'],
@@ -174,7 +174,7 @@
                     <?php foreach(['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
                     <button type="button" onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg" data-layer="<?= $l ?>">
                         <?php 
-                            $labels = ['rtlh'=>'RTLH', 'bansos'=>'Bansos', 'kumuh'=>'Kumuh', 'formal'=>'Formal', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
+                            $labels = ['rtlh'=>'RTLH', 'bansos'=>'Bansos', 'kumuh'=>'Kumuh', 'formal'=>'Perumahan', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
                             echo $labels[$l];
                         ?>
                     </button>

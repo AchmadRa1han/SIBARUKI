@@ -63,7 +63,7 @@ class ImportPerumahanFormal extends BaseCommand
                 $count++;
             }
             fclose($file);
-            CLI::write("✅ Berhasil mengimpor $count data Perumahan Formal.", 'green');
+            CLI::write("✅ Berhasil mengimpor $count data Perumahan.", 'green');
         } else {
             CLI::error('File Sebaran Perumahan Kab.Sinjai.csv tidak ditemukan!');
         }

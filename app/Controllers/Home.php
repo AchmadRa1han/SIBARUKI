@@ -78,11 +78,18 @@ class Home extends BaseController
         $mapPisew = $db->table('pisew')->select('id, jenis_pekerjaan as name, koordinat as coords')->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
         $mapAset = $db->table('aset_tanah')->select('id, nama_pemilik as name, no_sertifikat, koordinat as coords, luas_m2, tgl_terbit')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
 
+        // Markers Bansos (Tambahkan ini untuk homepage)
+        $mapBansos = $db->table('rtlh_bansos')->select('id, nama_penerima as name, desa, ST_AsText(lokasi_realisasi) as wkt, "bansos" as type')
+            ->where('lokasi_realisasi IS NOT NULL')->get()->getResultArray();
+
         $data = [
             'title'   => 'Selamat Datang di SIBARUKI Sinjai',
             'isLoggedIn' => session()->get('user_id') ? true : false,
             'carousel' => $carousel,
             'rekap'   => [
+                'rumah'   => $totalRumah,
+                'rlh'     => $totalRLH,
+                'backlog' => $totalBacklog,
                 'rtlh'    => $totalRtlh,
                 'kumuh'   => $totalKumuh,
                 'formal'  => $totalFormal,
@@ -99,7 +106,8 @@ class Home extends BaseController
                 'psu'       => $mapPsu,
                 'arsinum'   => $mapArsinum,
                 'pisew'     => $mapPisew,
-                'aset'      => $mapAset
+                'aset'      => $mapAset,
+                'bansos'    => $mapBansos
             ]
         ];
 

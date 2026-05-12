@@ -7,7 +7,7 @@
     <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <a href="<?= base_url('perumahan-formal') ?>" class="hover:text-blue-600 transition-colors">Perumahan Formal</a>
+        <a href="<?= base_url('perumahan-formal') ?>" class="hover:text-blue-600 transition-colors">Perumahan</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <span class="text-blue-600">Tambah Lokasi</span>
     </nav>
@@ -25,7 +25,7 @@
                 </div>
                 <div>
                     <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Tambah Perumahan</h1>
-                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Registrasi Kawasan Perumahan Formal Baru</p>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Registrasi Kawasan Perumahan Baru</p>
                 </div>
             </div>
         </div>

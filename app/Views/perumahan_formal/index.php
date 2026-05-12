@@ -14,7 +14,7 @@
     <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <span class="text-blue-600">Perumahan Formal</span>
+        <span class="text-blue-600">Perumahan</span>
     </nav>
 
     <!-- Header -->
@@ -25,8 +25,8 @@
                 <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Perumahan Formal</h1>
-                <p class="text-slate-500 dark:text-slate-400 font-medium text-xs mt-1">Pemetaan sebaran perumahan formal Kabupaten Sinjai.</p>
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Perumahan</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-medium text-xs mt-1">Pemetaan sebaran perumahan Kabupaten Sinjai.</p>
             </div>
         </div>
         <div class="flex flex-wrap items-center gap-2 relative z-10">
@@ -107,7 +107,7 @@
                 </div>
                 <div>
                     <h3 class="text-sm font-bold text-blue-950 dark:text-white uppercase tracking-tight">Data Induk Perumahan</h3>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Monitoring Sektor Perumahan Formal</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Monitoring Sektor Perumahan</p>
                 </div>
             </div>
         </div>
@@ -134,7 +134,7 @@
                         </td>
                         <td class="px-4 py-3">
                             <span class="font-bold text-blue-950 dark:text-white uppercase truncate block text-xs mb-0.5"><?= $item['nama_perumahan'] ?></span>
-                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Kawasan Permukiman Formal</span>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Kawasan Permukiman</span>
                         </td>
                         <td class="px-4 py-3">
                             <span class="font-bold text-slate-700 dark:text-slate-200 uppercase tracking-tight"><?= $item['pengembang'] ?></span>

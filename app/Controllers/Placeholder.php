@@ -5,7 +5,7 @@ namespace App\Controllers;
 class Placeholder extends BaseController
 {
     public function psu() { return $this->render('Sebaran PSU Terbangun'); }
-    public function formal() { return $this->render('Sebaran Perumahan Formal'); }
+    public function formal() { return $this->render('Sebaran Perumahan'); }
     public function bansos() { return $this->render('Sebaran Bantuan Sosial Perbaikan RTLH'); }
     public function pisew() { return $this->render('Sebaran PISEW'); }
     public function arsinum() { return $this->render('Sebaran Arsinum'); }

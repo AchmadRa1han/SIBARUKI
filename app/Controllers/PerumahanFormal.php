@@ -31,7 +31,7 @@ class PerumahanFormal extends BaseController
         $perumahan = $query->paginate($perPage, 'default');
         
         $data = [
-            'title' => 'Data Perumahan Formal',
+            'title' => 'Data Perumahan',
             'perumahan' => $perumahan,
             'perumahan_all' => $this->perumahanModel->findAll(),
             'pager' => $this->perumahanModel->pager,
@@ -141,7 +141,7 @@ class PerumahanFormal extends BaseController
                 return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
             }
 
-            return redirect()->to('/perumahan-formal')->with('success', "$count data Perumahan Formal berhasil diimpor.");
+            return redirect()->to('/perumahan-formal')->with('success', "$count data Perumahan berhasil diimpor.");
 
         } catch (\Exception $e) {
             if (isset($handle)) fclose($handle);
@@ -151,7 +151,7 @@ class PerumahanFormal extends BaseController
     public function create()
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
-        return view('perumahan_formal/create', ['title' => 'Tambah Perumahan Formal']);
+        return view('perumahan_formal/create', ['title' => 'Tambah Perumahan']);
     }
 
     public function store()
@@ -172,7 +172,7 @@ class PerumahanFormal extends BaseController
         $data = $this->request->getPost();
         $this->perumahanModel->insert($data);
         
-        $this->logActivity('Tambah', 'Perumahan Formal', 'Menambah perumahan: ' . $data['nama_perumahan'], $this->formatLogData($data));
+        $this->logActivity('Tambah', 'Perumahan', 'Menambah perumahan: ' . $data['nama_perumahan'], $this->formatLogData($data));
 
         return redirect()->to('/perumahan-formal')->with('success', 'Data perumahan berhasil ditambahkan.');
     }
@@ -190,7 +190,7 @@ class PerumahanFormal extends BaseController
     {
         $data['item'] = $this->perumahanModel->find($id);
         if (!$data['item']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        $data['title'] = 'Edit Perumahan Formal';
+        $data['title'] = 'Edit Perumahan';
         return view('perumahan_formal/edit', $data);
     }
 
@@ -202,7 +202,7 @@ class PerumahanFormal extends BaseController
         $this->perumahanModel->update($id, $newData);
         
         $diff = $this->generateDiff($oldData, $newData);
-        $this->logActivity('Ubah', 'Perumahan Formal', 'Memperbarui data perumahan: ' . $oldData['nama_perumahan'], $diff);
+        $this->logActivity('Ubah', 'Perumahan', 'Memperbarui data perumahan: ' . $oldData['nama_perumahan'], $diff);
 
         return redirect()->to('/perumahan-formal')->with('success', 'Data berhasil diperbarui.');
     }
@@ -225,7 +225,7 @@ class PerumahanFormal extends BaseController
             ]);
 
             $this->perumahanModel->delete($id);
-            $this->logActivity('Hapus', 'Perumahan Formal', 'Memindahkan perumahan ke Recycle Bin: ' . ($data['nama_perumahan'] ?? 'Tanpa Nama'), $this->formatLogData($data));
+            $this->logActivity('Hapus', 'Perumahan', 'Memindahkan perumahan ke Recycle Bin: ' . ($data['nama_perumahan'] ?? 'Tanpa Nama'), $this->formatLogData($data));
         }
 
         return redirect()->to('/perumahan-formal')->with('success', 'Data berhasil dipindahkan ke Recycle Bin.');
@@ -254,7 +254,7 @@ class PerumahanFormal extends BaseController
             $this->perumahanModel->whereIn('id', $ids)->delete();
             $db->transComplete();
             if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
-            $this->logActivity('Hapus Massal', 'Perumahan Formal', "Memindahkan " . count($ids) . " data perumahan ke Recycle Bin");
+            $this->logActivity('Hapus Massal', 'Perumahan', "Memindahkan " . count($ids) . " data perumahan ke Recycle Bin");
             return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dipindahkan ke Recycle Bin.']);
         } catch (\Exception $e) {
             $db->transRollback();

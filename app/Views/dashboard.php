@@ -84,7 +84,7 @@
             <div class="flex flex-wrap gap-1.5">
                 <?php foreach(['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'] as $l): ?>
                 <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
-                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'check-circle':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= strtoupper($l) ?>
+                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'check-circle':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= $l == 'formal' ? 'PERUMAHAN' : strtoupper($l) ?>
                 </button>
                 <?php endforeach; ?>
             </div>
@@ -279,7 +279,7 @@
         activeDataGroup.clearLayers();
         document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
-        document.getElementById('activeLayerLabel').innerText = `Database: ${type.toUpperCase()}`;
+        document.getElementById('activeLayerLabel').innerText = `Database: ${type === 'formal' ? 'PERUMAHAN' : type.toUpperCase()}`;
 
         const items = spasialData[type] || [];
         const colorMap = { rtlh: '#f59e0b', bansos: '#10b981', kumuh: '#ef4444', formal: '#6366f1', psu: '#3b82f6', arsinum: '#06b6d4', pisew: '#f97316', aset: '#1e1b4b' };
