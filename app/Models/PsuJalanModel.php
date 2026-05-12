@@ -10,6 +10,6 @@ class PsuJalanModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $allowedFields    = ['wkt', 'id_csv', 'nama_jalan', 'jalan', 'foto_before', 'foto_after'];
+    protected $allowedFields    = ['wkt', 'nama_jalan', 'jalan', 'tahun', 'panjang_luas', 'foto_before', 'foto_after'];
     protected $useTimestamps    = true;
 }

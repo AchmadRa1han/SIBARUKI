@@ -24,7 +24,7 @@ class Psu extends BaseController
         if ($keyword) {
             $query = $query->groupStart()
                 ->like('nama_jalan', $keyword)
-                ->orLike('id_csv', $keyword)
+                ->orLike('tahun', $keyword)
                 ->groupEnd();
         }
 
@@ -38,7 +38,7 @@ class Psu extends BaseController
             'perPage' => $perPage,
             'keyword' => $keyword,
             'total_jalan' => $this->jalanModel->countAllResults(false),
-            'total_panjang' => $this->jalanModel->selectSum('jalan')->get()->getRow()->jalan,
+            'total_panjang' => $this->jalanModel->selectSum('panjang_luas')->get()->getRow()->panjang_luas,
         ];
 
         return view('psu/index', $data);
@@ -51,7 +51,7 @@ class Psu extends BaseController
         $sheet = $spreadsheet->getActiveSheet();
 
         // Header
-        $headers = ['ID', 'Nama Jalan', 'ID CSV', 'Nilai Jalan', 'WKT', 'Dibuat Pada'];
+        $headers = ['ID', 'Nama Jalan', 'Tahun', 'Panjang/Luas (m)', 'WKT', 'Dibuat Pada'];
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '1', $header);
@@ -63,8 +63,8 @@ class Psu extends BaseController
         foreach ($data as $row) {
             $sheet->setCellValue('A' . $rowNum, $row['id']);
             $sheet->setCellValue('B' . $rowNum, $row['nama_jalan']);
-            $sheet->setCellValue('C' . $rowNum, $row['id_csv']);
-            $sheet->setCellValue('D' . $rowNum, $row['jalan']);
+            $sheet->setCellValue('C' . $rowNum, $row['tahun']);
+            $sheet->setCellValue('D' . $rowNum, $row['panjang_luas']);
             $sheet->setCellValue('E' . $rowNum, $row['wkt']);
             $sheet->setCellValue('F' . $rowNum, $row['created_at']);
             $rowNum++;
@@ -119,18 +119,18 @@ class Psu extends BaseController
                 }
 
                 /* 
-                   Struktur CSV Jaringan Jalan:
+                   Struktur CSV Jaringan Jalan Baru:
                    Index 0: WKT (Diharapkan POINT)
-                   Index 1: Id
-                   Index 2: nama_jalan
-                   Index 3: jalan
+                   Index 1: nama_jalan
+                   Index 2: tahun
+                   Index 3: panjang_luas
                 */
 
                 $this->jalanModel->insert([
-                    'wkt'        => $row[0] ?? null,
-                    'id_csv'     => trim($row[1] ?? '0'),
-                    'nama_jalan' => trim($row[2] ?? '-'),
-                    'jalan'      => (float)preg_replace('/[^0-9.]/', '', $row[3] ?? '0'),
+                    'wkt'          => $row[0] ?? null,
+                    'nama_jalan'   => trim($row[1] ?? '-'),
+                    'tahun'        => (int)($row[2] ?? date('Y')),
+                    'panjang_luas' => (float)preg_replace('/[^0-9.]/', '', $row[3] ?? '0'),
                 ]);
                 $count++;
             }
