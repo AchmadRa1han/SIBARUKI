@@ -68,9 +68,9 @@
 
         <div class="flex flex-wrap items-center gap-2 relative z-10">
             <?php if (has_permission('export_data')) : ?>
-            <button onclick="downloadPDF()" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm" title="Download Laporan PDF">
-                <i data-lucide="file-down" class="w-5 h-5"></i>
-            </button>
+            <a href="<?= base_url('rtlh/print/' . ($rumah['id_survei'] ?? '')) ?>" target="_blank" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm" title="Cetak Laporan Formal">
+                <i data-lucide="printer" class="w-5 h-5"></i>
+            </a>
             <?php endif; ?>
             
             <?php if (has_permission('edit_rtlh')) : ?>

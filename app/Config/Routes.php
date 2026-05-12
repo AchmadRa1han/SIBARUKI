@@ -92,6 +92,7 @@ $routes->group('rtlh', function($routes) {
     $routes->get('create', 'Rtlh::create');
     $routes->post('store', 'Rtlh::store');
     $routes->get('detail/(:num)', 'Rtlh::detail/$1');
+    $routes->get('print/(:num)', 'Rtlh::print/$1');
     $routes->post('mark-tuntas/(:num)', 'Rtlh::markTuntas/$1');
     $routes->get('edit/(:num)', 'Rtlh::edit/$1');
     $routes->post('update/(:num)', 'Rtlh::update/$1');
@@ -107,6 +108,7 @@ $routes->group('wilayah-kumuh', function($routes) {
     $routes->get('create', 'WilayahKumuh::create');
     $routes->post('store', 'WilayahKumuh::store');
     $routes->get('detail/(:num)', 'WilayahKumuh::detail/$1');
+    $routes->get('print/(:num)', 'WilayahKumuh::print/$1');
     $routes->get('edit/(:num)', 'WilayahKumuh::edit/$1');
     $routes->post('update/(:num)', 'WilayahKumuh::update/$1');
     $routes->post('delete/(:num)', 'WilayahKumuh::delete/$1');

@@ -461,6 +461,41 @@ class Rtlh extends BaseController
         ]);
     }
 
+    public function print($id)
+    {
+        $db = \Config\Database::connect();
+        $rumah = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
+        if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        
+        $penerima = $db->table('rtlh_penerima')
+                       ->select('rtlh_penerima.*, ref_master_pekerjaan.nama_pilihan as nama_pekerjaan')
+                       ->join('ref_master as ref_master_pekerjaan', 'ref_master_pekerjaan.id = rtlh_penerima.pekerjaan_id', 'left')
+                       ->where('nik', $rumah['nik_pemilik'])
+                       ->get()->getRowArray();
+
+        $kondisi = $db->table('rtlh_kondisi_rumah')
+                      ->select('rtlh_kondisi_rumah.*, 
+                                r1.nama_pilihan as nama_st_pondasi, 
+                                r9.nama_pilihan as nama_mat_lantai, r10.nama_pilihan as nama_st_lantai,
+                                r11.nama_pilihan as nama_mat_dinding, r12.nama_pilihan as nama_st_dinding,
+                                r13.nama_pilihan as nama_mat_atap, r14.nama_pilihan as nama_st_atap')
+                      ->join('ref_master as r1', 'r1.id = rtlh_kondisi_rumah.st_pondasi', 'left')
+                      ->join('ref_master as r9', 'r9.id = rtlh_kondisi_rumah.mat_lantai', 'left')
+                      ->join('ref_master as r10', 'r10.id = rtlh_kondisi_rumah.st_lantai', 'left')
+                      ->join('ref_master as r11', 'r11.id = rtlh_kondisi_rumah.mat_dinding', 'left')
+                      ->join('ref_master as r12', 'r12.id = rtlh_kondisi_rumah.st_dinding', 'left')
+                      ->join('ref_master as r13', 'r13.id = rtlh_kondisi_rumah.mat_atap', 'left')
+                      ->join('ref_master as r14', 'r14.id = rtlh_kondisi_rumah.st_atap', 'left')
+                      ->where('id_survei', $id)
+                      ->get()->getRowArray();
+
+        return view('rtlh/print_report', [
+            'rumah' => $rumah,
+            'penerima' => $penerima,
+            'kondisi' => $kondisi
+        ]);
+    }
+
     public function rekapDesa()
     {
         if (session()->get('role_id') != 1) return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat melihat data rekapan per desa.');

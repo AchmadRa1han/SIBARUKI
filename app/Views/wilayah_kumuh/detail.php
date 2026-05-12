@@ -39,9 +39,9 @@
                 <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
             </a>
             <?php endif; ?>
-            <button onclick="window.print()" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm no-print" title="Cetak Laporan">
+            <a href="<?= base_url('wilayah-kumuh/print/' . $kumuh['FID']) ?>" target="_blank" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm no-print" title="Cetak Laporan Formal">
                 <i data-lucide="printer" class="w-5 h-5"></i>
-            </button>
+            </a>
         </div>
     </div>
 

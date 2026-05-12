@@ -198,6 +198,13 @@ class WilayahKumuh extends BaseController
         return view('wilayah_kumuh/detail', $data);
     }
 
+    public function print($id)
+    {
+        $data['kumuh'] = $this->kumuhModel->find($id);
+        if (!$data['kumuh']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        return view('wilayah_kumuh/print_report', $data);
+    }
+
     public function create()
     {
         return view('wilayah_kumuh/create', ['title' => 'Tambah Wilayah Kumuh']);
