@@ -330,7 +330,7 @@
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
                 }
 
-                const popupContent = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[11px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800">${detailsHtml}<a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>`;
+                const popupContent = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[11px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800">${detailsHtml}<a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-center text-[10px] font-black uppercase tracking-[0.1em] rounded-xl shadow-lg transition-all">Detail</a></div>`;
 
                 if (geojson.type === 'Point') { 
                     const icon = L.divIcon({

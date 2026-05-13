@@ -270,7 +270,7 @@
                         const marker = L.circleMarker(coords, { radius: 7, fillColor: "#4f46e5", color: "#fff", weight: 2, fillOpacity: 0.8 });
                         marker.bindPopup(`
                             <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-bold uppercase tracking-widest text-indigo-400 mb-1">PISEW</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.jenis_pekerjaan}</h5></div>
-                            <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.lokasi_desa}</p><a href="<?= base_url('pisew/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-950 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail</a></div>
+                            <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.lokasi_desa}</p><a href="<?= base_url('pisew/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-center text-[10px] font-black uppercase tracking-[0.1em] rounded-xl shadow-lg transition-all">Detail</a></div>
                         `);
                         clusterGroup.addLayer(marker);
                     }
