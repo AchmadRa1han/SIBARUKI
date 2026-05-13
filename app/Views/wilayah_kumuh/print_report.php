@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Laporan Delineasi Kumuh - <?= $kumuh['Kelurahan'] ?></title>
+    <link rel="shortcut icon" type="image/png" href="<?= base_url('sinjai.png') ?>">
     <style>
         @page { size: A4; margin: 1cm; }
         body { font-family: 'Arial', sans-serif; font-size: 10pt; line-height: 1.4; color: #000; background: #fff; margin: 0; padding: 0; }
