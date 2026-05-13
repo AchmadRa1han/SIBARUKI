@@ -257,8 +257,8 @@
                     if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
                         const marker = L.circleMarker(coords, { radius: 7, fillColor: "#2563eb", color: "#fff", weight: 2, fillOpacity: 0.8 });
                         marker.bindPopup(`
-                            <div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-bold uppercase tracking-widest text-blue-400 mb-1">ARSINUM</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.jenis_pekerjaan}</h5></div>
-                            <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('arsinum/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-center text-[10px] font-black uppercase tracking-[0.1em] rounded-xl shadow-lg transition-all">Detail</a></div>
+                            <div class="bg-blue-950 text-white p-3 rounded-t-xl border-b border-white/10"><p class="text-[7px] font-bold uppercase tracking-[0.2em] text-blue-400 mb-1">Arsinum</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.name}</h5></div>
+                                                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700">📍 ${item.desa}</p><a href="<?= base_url('arsinum/detail/') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a></div>
                         `);
                         clusterGroup.addLayer(marker);
                     }

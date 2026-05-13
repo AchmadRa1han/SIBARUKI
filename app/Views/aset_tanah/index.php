@@ -267,7 +267,7 @@
                     const marker = L.circleMarker(coords, { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
                     marker.bindPopup(`
                         <div class="bg-blue-950 text-white p-3 rounded-t-xl border-b border-white/10"><p class="text-[7px] font-bold uppercase tracking-[0.2em] text-blue-400 mb-1">Aset Tanah</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.nama_pemilik}</h5></div>
-                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-blue-600 uppercase">${item.no_sertifikat}</p><a href="<?= base_url('aset-tanah/detail/') ?>/${item.id}" class="block w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-center text-[10px] font-black uppercase tracking-[0.1em] rounded-xl shadow-lg transition-all">Detail</a></div>
+                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-blue-600 uppercase">${item.no_sertifikat}</p><a href="<?= base_url('aset-tanah/detail/') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a></div>
                     `);
                     clusterGroup.addLayer(marker);
                 }

@@ -225,7 +225,7 @@
                         }).bindPopup(`<div class="p-3">
                             <h5 class="text-[10px] font-bold uppercase mb-1">${item.nama_jalan}</h5>
                             <p class="text-[8px] text-slate-500 uppercase font-bold mb-2">Tahun: ${item.tahun || '-'}</p>
-                            <a href="<?= base_url('psu/detail') ?>/${item.id}" class="block w-full py-1.5 bg-blue-600 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg">Detail</a>
+                            <a href="<?= base_url('psu/detail') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a>
                         </div>`).addTo(activeDataGroup);
                     }
                 }
