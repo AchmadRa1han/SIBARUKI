@@ -102,7 +102,7 @@ Data RTLH wajib dipecah menjadi 3 tabel untuk memastikan normalisasi data person
 - `id` (PK), `jenis_pekerjaan`, `lokasi_desa`, `kecamatan`, `pelaksana`, `anggaran`, `sumber_dana`, `tahun`, `koordinat`
 
 **Tabel `psu_jalan` (Prasarana, Sarana, Utilitas)**
-- `id` (PK), `id_csv`, `nama_jalan`, `jalan`, `wkt` (GEOMETRY - *WKT LINESTRING*)
+- `id` (PK), `nama_jalan`, `jalan` (Lokasi), `tahun`, `panjang_luas` (DOUBLE), `wkt` (GEOMETRY - *WKT LINESTRING*)
 
 **Tabel `perumahan_formal`**
 - `id` (PK), `nama_perumahan`, `luas_kawasan_ha`, `longitude`, `latitude`, `pengembang`, `tahun_pembangunan`, `wkt` (GEOMETRY - *WKT POLYGON*)

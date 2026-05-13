@@ -390,7 +390,7 @@
                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'psu') {
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran/Nilai: Rp ${item.nilai ? parseInt(item.nilai).toLocaleString('id-ID') : '-'}</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pnjg/Luas (ID): ${item.id_csv || '-'}</p>`;
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'formal') {
                     detailsHtml = `<p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
                 } else if (type === 'rtlh' || type === 'bansos') {

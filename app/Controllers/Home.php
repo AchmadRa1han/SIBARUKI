@@ -73,7 +73,7 @@ class Home extends BaseController
                        ->limit(200)->get()->getResultArray();
         $mapKumuh = $db->table('wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt, skor_kumuh, Luas_kumuh, Kode_RT_RW')->where('WKT IS NOT NULL')->get()->getResultArray();
         $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude')->get()->getResultArray();
-        $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt, jalan as nilai, id_csv')->limit(100)->get()->getResultArray();
+        $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt, panjang_luas as nilai, tahun')->limit(100)->get()->getResultArray();
         $mapArsinum = $db->table('arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, anggaran, tahun')->get()->getResultArray();
         $mapPisew = $db->table('pisew')->select('id, jenis_pekerjaan as name, koordinat as coords')->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
         $mapAset = $db->table('aset_tanah')->select('id, nama_pemilik as name, no_sertifikat, koordinat as coords, luas_m2, tgl_terbit')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
@@ -275,7 +275,7 @@ class Home extends BaseController
         $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude, "formal" as type')->get()->getResultArray();
 
         // Linestrings PSU (Tipe: TEXT -> Ambil Langsung)
-        $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt, jalan as nilai, id_csv, "psu" as type')->get()->getResultArray();
+        $mapPsu = $db->table('psu_jalan')->select('id, nama_jalan as name, wkt, panjang_luas as nilai, tahun, "psu" as type')->get()->getResultArray();
 
         // Markers Aset Tanah
         $mapAset = $db->table('aset_tanah')

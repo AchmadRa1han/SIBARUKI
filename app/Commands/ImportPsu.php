@@ -24,9 +24,12 @@ class ImportPsu extends BaseCommand
         $fieldsJalan = [
             'id' => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
             'wkt' => ['type' => 'TEXT', 'null' => true],
-            'id_csv' => ['type' => 'INT', 'constraint' => 11, 'null' => true],
             'nama_jalan' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
-            'jalan' => ['type' => 'DECIMAL', 'constraint' => '10,2', 'null' => true],
+            'jalan' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true], // Lokasi wilayah
+            'tahun' => ['type' => 'INT', 'constraint' => 4, 'null' => true],
+            'panjang_luas' => ['type' => 'DOUBLE', 'null' => true],
+            'foto_before' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
+            'foto_after' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
             'updated_at' => ['type' => 'DATETIME', 'null' => true],
         ];
@@ -40,24 +43,24 @@ class ImportPsu extends BaseCommand
         if (file_exists($fileJalan)) {
             CLI::write('Mengimpor Jaringan Jalan...', 'yellow');
             $file = fopen($fileJalan, 'r');
-            fgetcsv($file, 0, ','); // Header: WKT,Id,nama_jalan,jalan
+            fgetcsv($file, 0, ','); // Header: WKT,nama_jalan,tahun,panjang_luas
             
             $count = 0;
             while (($row = fgetcsv($file, 0, ',')) !== FALSE) {
                 if (empty($row[0])) continue;
                 
                 $db->table('psu_jalan')->insert([
-                    'wkt' => $row[0],
-                    'id_csv' => (int)$row[1],
-                    'nama_jalan' => !empty($row[2]) ? $row[2] : null,
-                    'jalan' => (float)$row[3],
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s'),
+                    'wkt'          => $row[0],
+                    'nama_jalan'   => trim($row[1] ?? '-'),
+                    'tahun'        => (int)($row[2] ?? date('Y')),
+                    'panjang_luas' => (float)preg_replace('/[^0-9.]/', '', $row[3] ?? '0'),
+                    'created_at'   => date('Y-m-d H:i:s'),
+                    'updated_at'   => date('Y-m-d H:i:s'),
                 ]);
                 $count++;
             }
             fclose($file);
-            CLI::write("✅ Berhasil mengimpor $count data Jaringan Jalan sesuai kolom CSV.", 'green');
+            CLI::write("✅ Berhasil mengimpor $count data Jaringan Jalan.", 'green');
         } else {
             CLI::error('File jaringan jalan.csv tidak ditemukan!');
         }
