@@ -115,7 +115,7 @@
         
         <?php if ($pager) : ?>
         <div class="p-8 bg-slate-50/50 dark:bg-slate-900/50 border-t dark:border-slate-800">
-            <?= $pager->links('default', 'tailwind_pager') ?>
+            <?= $pager->links('default', 'tailwind_full') ?>
         </div>
         <?php endif; ?>
     </div>
