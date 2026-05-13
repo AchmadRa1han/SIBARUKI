@@ -172,16 +172,25 @@
         return [lat * (180 / Math.PI), lon * (180 / Math.PI)];
     }
 
-    function parseWKTUniversal(wkt, isUTM = false) {
+    function parseWKTUniversal(wkt) {
         if (!wkt || typeof wkt !== 'string' || typeof wellknown === 'undefined') return null;
         try {
             let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
             let geojson = wellknown.parse(cleanWkt);
             if (!geojson) return null;
-            if (isUTM) {
-                const convert = (c) => (typeof c[0] === 'number') ? (([lat, lon] = utmToLatLng(c[0], c[1])), [lon, lat]) : c.map(convert);
-                geojson.coordinates = convert(geojson.coordinates);
-            }
+            
+            // Intelligent UTM detection
+            const convert = (c) => {
+                if (typeof c[0] === 'number') {
+                    if (Math.abs(c[0]) > 500) { // Likely UTM Easting/Northing
+                        const [lat, lon] = utmToLatLng(c[0], c[1]);
+                        return [lon, lat];
+                    }
+                    return c;
+                }
+                return c.map(convert);
+            };
+            geojson.coordinates = convert(geojson.coordinates);
             return geojson;
         } catch(e) { return null; }
     }
@@ -295,7 +304,7 @@
                     if (p.length === 2) { lat = healCoordinate(p[0], true); lon = healCoordinate(p[1], false); }
                 }
                 if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) { geojson = { type: 'Point', coordinates: [lon, lat] }; }
-                else if (item.wkt) { geojson = parseWKTUniversal(item.wkt, (type === 'psu')); }
+                else if (item.wkt) { geojson = parseWKTUniversal(item.wkt); }
                 if (!geojson) return;
 
                 let detailsHtml = '';

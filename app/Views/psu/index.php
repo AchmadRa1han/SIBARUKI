@@ -152,6 +152,21 @@
 </div>
 
 <script>
+    function utmToLatLng(easting, northing) {
+        const a = 6378137, f = 1 / 298.257223563;
+        const b = a * (1 - f), e = Math.sqrt(1 - (b * b) / (a * a)), e1sq = (e * e) / (1 - e * e);
+        const k0 = 0.9996, falseEasting = 500000, falseNorthing = 10000000;
+        const zoneCentralMeridian = 123 * (Math.PI / 180); 
+        let x = easting - falseEasting, y = northing - falseNorthing;
+        let M = y / k0, mu = M / (a * (1 - e * e / 4 - 3 * e * e * e * e / 64 - 5 * e * e * e * e * e * e / 256));
+        let phi1Rad = mu + (3 * e1sq / 2 - 27 * e1sq * e1sq * e1sq / 32) * Math.sin(2 * mu) + (21 * e1sq * e1sq / 16 - 55 * e1sq * e1sq * e1sq / 32) * Math.sin(4 * mu) + (151 * e1sq * e1sq / 96) * Math.sin(6 * mu);
+        let N1 = a / Math.sqrt(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad)), T1 = Math.tan(phi1Rad) * Math.tan(phi1Rad), C1 = e1sq * Math.cos(phi1Rad) * Math.cos(phi1Rad), R1 = a * (1 - e * e) / Math.pow(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad), 1.5);
+        let D = x / (N1 * k0);
+        let lat = phi1Rad - (N1 * Math.tan(phi1Rad) / R1) * (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e1sq) * D * D * D * D / 24 + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e1sq - 3 * C1 * C1) * D * D * D * D * D * D / 720);
+        let lon = zoneCentralMeridian + (D - (1 + 2 * T1 + C1) * D * D * D / 6 + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * e1sq + 24 * T1 * T1) * D * D * D * D * D / 120) / Math.cos(phi1Rad);
+        return [lat * (180 / Math.PI), lon * (180 / Math.PI)];
+    }
+
     function initMap() {
         const jalanData = <?= json_encode($jalan_all ?? []) ?>;
         const isDark = document.documentElement.classList.contains('dark');
@@ -165,8 +180,21 @@
         jalanData.forEach(item => {
             try {
                 if (item.wkt) {
-                    const geojson = wellknown.parse(item.wkt);
+                    let geojson = wellknown.parse(item.wkt);
                     if (geojson) {
+                        // Intelligent UTM detection
+                        const convert = (c) => {
+                            if (typeof c[0] === 'number') {
+                                if (Math.abs(c[0]) > 500) { // Likely UTM
+                                    const [la, lo] = utmToLatLng(c[0], c[1]);
+                                    return [lo, la];
+                                }
+                                return c;
+                            }
+                            return c.map(convert);
+                        };
+                        geojson.coordinates = convert(geojson.coordinates);
+
                         L.geoJSON(geojson, {
                             style: { color: '#3b82f6', weight: 4, opacity: 0.8 }
                         }).bindPopup(`<div class="p-3">
