@@ -252,9 +252,9 @@
 
         const markerIcon = L.divIcon({
             className: 'custom-marker',
-            html: `<div class="w-8 h-8 bg-emerald-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center animate-bounce-slow"><div class="w-2 h-2 bg-white rounded-full"></div></div>`,
-            iconSize: [32, 32],
-            iconAnchor: [16, 32]
+            html: `<div class="w-6 h-6 bg-emerald-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center animate-bounce-slow"><div class="w-1 h-1 bg-white rounded-full"></div></div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
         });
 
         L.marker([lat, lng], { icon: markerIcon }).addTo(map);

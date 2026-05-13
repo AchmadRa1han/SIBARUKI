@@ -947,6 +947,9 @@ video {
 .h-8 {
   height: 2rem;
 }
+.h-80 {
+  height: 20rem;
+}
 .h-9 {
   height: 2.25rem;
 }
@@ -2668,6 +2671,10 @@ video {
 }
 .shadow-blue-950\/20 {
   --tw-shadow-color: rgb(23 37 84 / 0.2);
+  --tw-shadow: var(--tw-shadow-colored);
+}
+.shadow-emerald-500\/5 {
+  --tw-shadow-color: rgb(16 185 129 / 0.05);
   --tw-shadow: var(--tw-shadow-colored);
 }
 .shadow-emerald-600\/10 {

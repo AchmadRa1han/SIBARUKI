@@ -418,11 +418,16 @@
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
                 }
 
-                const detailLink = `<a href="${detailUrls[type]}/${item.id}" class="block w-full py-2 bg-blue-950 hover:bg-blue-800 text-white text-center text-[8px] font-bold uppercase tracking-widest rounded-lg transition-all">Detail Lengkap</a>`;
                 const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[9px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t dark:border-slate-800">${detailsHtml}${detailLink}</div>`;
 
                 if (geojson.type === 'Point') {
-                    L.circleMarker([geojson.coordinates[1], geojson.coordinates[0]], { radius: 7, fillColor: markerColor, color: '#fff', weight: 2, fillOpacity: 0.8 }).bindPopup(popup).addTo(clusterGroup);
+                    const icon = L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div class="w-6 h-6 rounded-full border-4 border-white shadow-xl flex items-center justify-center" style="background-color: ${markerColor};"><div class="w-1 h-1 bg-white rounded-full"></div></div>`,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+                    L.marker([geojson.coordinates[1], geojson.coordinates[0]], { icon: icon }).bindPopup(popup).addTo(clusterGroup);
                 } else {
                     L.geoJSON(geojson, { style: layerStyle }).bindPopup(popup).addTo(activeDataGroup);
                 }

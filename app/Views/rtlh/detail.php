@@ -615,7 +615,14 @@
         });
         map.addControl(new LayerToggle({ position: 'topright' }));
 
-        L.marker([lat, lng]).addTo(map);
+        const dotIcon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div class="w-6 h-6 bg-blue-600 rounded-full border-4 border-white shadow-xl"></div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
+
+        L.circleMarker([lat, lng], { radius: 8, fillColor: '#2563eb', color: '#fff', weight: 3, fillOpacity: 1 }).addTo(map);
         setTimeout(() => map.invalidateSize(), 500);
     }
 

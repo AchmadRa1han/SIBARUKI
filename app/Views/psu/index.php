@@ -39,7 +39,7 @@
 
     <!-- Map Section -->
     <div class="relative">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-100 dark:border-slate-800">
+        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-md border border-slate-100 dark:border-slate-800">
             <div id="map" class="w-full h-[450px] z-10" style="background: #ececec;"></div>
             <div class="absolute top-6 left-6 z-[1000] hidden md:block">
                 <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] shadow-2xl border border-white/10 flex items-center gap-3">
@@ -50,8 +50,8 @@
         </div>
     </div>
 
-    <!-- Filter & Search Card -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 p-3">
+    <!-- Filter & Search Bar (Identical to RTLH) -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-3">
         <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 w-full lg:w-auto">
                 <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
@@ -86,43 +86,55 @@
         </div>
     </div>
 
-    <!-- Table Section -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+    <!-- Table Section (Identical to RTLH) -->
+    <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative transition-all duration-300">
+        <div class="p-6 border-b border-slate-50 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                    <i data-lucide="route" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-blue-950 dark:text-white uppercase tracking-tight">Daftar PSU Jaringan Jalan</h3>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Data Prasarana Terintegrasi Spasial</p>
+                </div>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse table-fixed">
                 <thead>
-                    <tr class="bg-slate-50/50 dark:bg-slate-900/50 border-b dark:border-slate-800">
-                        <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">No</th>
-                        <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">Nama Jaringan Jalan</th>
-                        <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Tahun</th>
-                        <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">Panjang / Luas</th>
-                        <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                    <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                        <th class="px-6 py-4 w-16 text-center">No</th>
+                        <th class="px-4 py-4 w-64">Nama Jaringan Jalan</th>
+                        <th class="px-4 py-4 w-28 text-center">Tahun</th>
+                        <th class="px-4 py-4 w-40">Panjang / Luas</th>
+                        <th class="px-6 py-4 text-center w-36">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y dark:divide-slate-800">
+                <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]">
                     <?php if(!empty($jalan)): $no = 1 + (($pager->getCurrentPage() - 1) * $perPage); foreach($jalan as $item): ?>
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                        <td class="p-4 text-[10px] font-bold text-slate-400"><?= $no++ ?></td>
-                        <td class="p-4">
-                            <p class="text-[11px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-tight"><?= $item['nama_jalan'] ?></p>
-                            <p class="text-[9px] text-slate-400 font-medium mt-0.5"><?= $item['jalan'] ?></p>
+                    <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-200">
+                        <td class="px-6 py-3 text-center font-bold text-slate-400"><?= $no++ ?></td>
+                        <td class="px-4 py-3">
+                            <span class="font-bold text-blue-950 dark:text-white uppercase truncate block text-xs mb-0.5"><?= $item['nama_jalan'] ?></span>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest"><?= $item['jalan'] ?></span>
                         </td>
-                        <td class="p-4 text-center">
-                            <span class="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 text-[9px] font-bold rounded-lg border border-blue-100 dark:border-blue-800/50"><?= $item['tahun'] ?: '-' ?></span>
+                        <td class="px-4 py-3 text-center">
+                            <span class="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg font-bold uppercase text-[8px] border border-blue-100 dark:border-blue-900 tracking-wider"><?= $item['tahun'] ?: '-' ?></span>
                         </td>
-                        <td class="p-4">
-                            <p class="text-[11px] font-black text-slate-700 dark:text-slate-200 italic"><?= number_format($item['panjang_luas'], 2, ',', '.') ?> <span class="text-[8px] ml-0.5 opacity-50 not-italic uppercase font-bold">Meter</span></p>
+                        <td class="px-4 py-3">
+                            <p class="text-sm font-black text-slate-700 dark:text-slate-200 italic"><?= number_format($item['panjang_luas'], 2, ',', '.') ?> <span class="text-[8px] ml-0.5 opacity-50 not-italic uppercase font-bold">Meter</span></p>
                         </td>
-                        <td class="p-4 text-right">
-                            <div class="flex items-center justify-end gap-1.5">
-                                <a href="<?= base_url('psu/detail/' . $item['id']) ?>" class="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Detail">
+                        <td class="px-6 py-3 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <a href="<?= base_url('psu/detail/' . $item['id']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail">
                                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                                 </a>
                                 <?php if (has_permission('edit_psu')): ?>
-                                <a href="<?= base_url('psu/edit/' . $item['id']) ?>" class="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-amber-500 hover:text-white transition-all active:scale-95" title="Edit">
+                                <a href="<?= base_url('psu/edit/' . $item['id']) ?>" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-amber-500 hover:text-white transition-all active:scale-95" title="Edit">
                                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                                 </a>
-                                <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus">
+                                <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus">
                                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                 </button>
                                 <?php endif; ?>
@@ -131,10 +143,10 @@
                     </tr>
                     <?php endforeach; else: ?>
                     <tr>
-                        <td colspan="5" class="p-20 text-center">
-                            <div class="flex flex-col items-center">
-                                <i data-lucide="database" class="w-12 h-12 text-slate-200 mb-4"></i>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Data tidak ditemukan</p>
+                        <td colspan="5" class="px-8 py-16 text-center">
+                            <div class="flex flex-col items-center justify-center opacity-40">
+                                <i data-lucide="package-search" class="w-12 h-12 mb-3"></i>
+                                <p class="font-bold uppercase text-[9px] tracking-[0.3em]">Data Tidak Ditemukan</p>
                             </div>
                         </td>
                     </tr>
@@ -144,7 +156,7 @@
         </div>
         
         <?php if ($pager) : ?>
-        <div class="p-4 bg-slate-50/50 dark:bg-slate-900/50 border-t dark:border-slate-800">
+        <div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800">
             <?= $pager->links('default', 'tailwind_full') ?>
         </div>
         <?php endif; ?>
@@ -168,24 +180,36 @@
     }
 
     function initMap() {
+        if (typeof L === 'undefined' || typeof L.markerClusterGroup === 'undefined' || typeof wellknown === 'undefined') { 
+            setTimeout(initMap, 200); 
+            return; 
+        }
+
         const jalanData = <?= json_encode($jalan_all ?? []) ?>;
         const isDark = document.documentElement.classList.contains('dark');
         const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
         
         const map = L.map('map', { zoomControl: false, layers: [cartoDB] }).setView([-5.1245, 120.2536], 11);
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        L.control.zoom({ position: 'topright' }).addTo(map);
 
+        clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 }).addTo(map);
         const activeDataGroup = L.featureGroup().addTo(map);
+
+        const dotIcon = (color) => L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div class="w-6 h-6 rounded-full border-4 border-white shadow-xl flex items-center justify-center" style="background-color: ${color};"><div class="w-1 h-1 bg-white rounded-full"></div></div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
 
         jalanData.forEach(item => {
             try {
                 if (item.wkt) {
                     let geojson = wellknown.parse(item.wkt);
                     if (geojson) {
-                        // Intelligent UTM detection
                         const convert = (c) => {
                             if (typeof c[0] === 'number') {
-                                if (Math.abs(c[0]) > 500) { // Likely UTM
+                                if (Math.abs(c[0]) > 500) {
                                     const [la, lo] = utmToLatLng(c[0], c[1]);
                                     return [lo, la];
                                 }
@@ -196,7 +220,8 @@
                         geojson.coordinates = convert(geojson.coordinates);
 
                         L.geoJSON(geojson, {
-                            style: { color: '#3b82f6', weight: 4, opacity: 0.8 }
+                            style: { color: '#2563eb', weight: 4, opacity: 0.8 },
+                            pointToLayer: (feature, latlng) => L.marker(latlng, { icon: dotIcon('#2563eb') })
                         }).bindPopup(`<div class="p-3">
                             <h5 class="text-[10px] font-bold uppercase mb-1">${item.nama_jalan}</h5>
                             <p class="text-[8px] text-slate-500 uppercase font-bold mb-2">Tahun: ${item.tahun || '-'}</p>
@@ -210,6 +235,7 @@
         if (activeDataGroup.getLayers().length > 0) {
             map.fitBounds(activeDataGroup.getBounds(), { padding: [30, 30] });
         }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function confirmDelete(id) {
@@ -230,4 +256,11 @@
         initMap();
     });
 </script>
+
+<style>
+    .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2); border: none; }
+    .leaflet-popup-content { margin: 0; width: 200px !important; }
+    .leaflet-container { font-family: inherit; }
+    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
+</style>
 <?= $this->endSection() ?>
