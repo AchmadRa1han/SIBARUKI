@@ -72,6 +72,20 @@ class AsetTanah extends BaseController
             'pct_belum_bersertifikat' => $pct_belum_bersertifikat,
         ];
 
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'html' => view('aset_tanah/index', $data), // We can use a partial or parse this in JS
+                'data' => [
+                    'count_bersertifikat' => $count_bersertifikat,
+                    'count_belum_bersertifikat' => $count_belum_bersertifikat,
+                    'pct_bersertifikat' => round($pct_bersertifikat, 1),
+                    'pct_belum_bersertifikat' => round($pct_belum_bersertifikat, 1),
+                    'aset_all' => $data['aset_all']
+                ]
+            ]);
+        }
+
         return view('aset_tanah/index', $data);
     }
 

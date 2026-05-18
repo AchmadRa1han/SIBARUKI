@@ -42,7 +42,7 @@
     </div>
 
     <!-- Mini Dashboard Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div id="mini-dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between relative overflow-hidden group">
             <div class="absolute -right-2 -bottom-2 opacity-5 group-hover:scale-110 transition-transform duration-700">
                 <i data-lucide="check-circle" class="w-16 h-16 text-blue-600"></i>
@@ -50,14 +50,14 @@
             <div class="relative z-10 flex-1">
                 <p class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Aset Bersertifikat</p>
                 <div class="flex items-baseline gap-1.5">
-                    <h3 class="text-2xl font-black text-blue-600 tracking-tighter"><?= number_format($count_bersertifikat) ?></h3>
+                    <h3 id="stat-bersertifikat-count" class="text-2xl font-black text-blue-600 tracking-tighter"><?= number_format($count_bersertifikat) ?></h3>
                     <span class="text-[9px] font-bold text-slate-400 uppercase">Unit</span>
                 </div>
                 <div class="mt-2.5 flex items-center gap-2 pr-6">
                     <div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full bg-blue-600 rounded-full" style="width: <?= $pct_bersertifikat ?>%"></div>
+                        <div id="stat-bersertifikat-bar" class="h-full bg-blue-600 rounded-full" style="width: <?= $pct_bersertifikat ?>%"></div>
                     </div>
-                    <span class="text-[9px] font-black text-blue-600 w-8 text-right"><?= round($pct_bersertifikat, 1) ?>%</span>
+                    <span id="stat-bersertifikat-pct" class="text-[9px] font-black text-blue-600 w-8 text-right"><?= round($pct_bersertifikat, 1) ?>%</span>
                 </div>
             </div>
             <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 shadow-inner shrink-0 relative z-10">
@@ -72,14 +72,14 @@
             <div class="relative z-10 flex-1">
                 <p class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Belum Bersertifikat</p>
                 <div class="flex items-baseline gap-1.5">
-                    <h3 class="text-2xl font-black text-amber-500 tracking-tighter"><?= number_format($count_belum_bersertifikat) ?></h3>
+                    <h3 id="stat-belum-bersertifikat-count" class="text-2xl font-black text-amber-500 tracking-tighter"><?= number_format($count_belum_bersertifikat) ?></h3>
                     <span class="text-[9px] font-bold text-slate-400 uppercase">Unit</span>
                 </div>
                 <div class="mt-2.5 flex items-center gap-2 pr-6">
                     <div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full bg-amber-500 rounded-full" style="width: <?= $pct_belum_bersertifikat ?>%"></div>
+                        <div id="stat-belum-bersertifikat-bar" class="h-full bg-amber-500 rounded-full" style="width: <?= $pct_belum_bersertifikat ?>%"></div>
                     </div>
-                    <span class="text-[9px] font-black text-amber-500 w-8 text-right"><?= round($pct_belum_bersertifikat, 1) ?>%</span>
+                    <span id="stat-belum-bersertifikat-pct" class="text-[9px] font-black text-amber-500 w-8 text-right"><?= round($pct_belum_bersertifikat, 1) ?>%</span>
                 </div>
             </div>
             <div class="w-10 h-10 bg-amber-50 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-500 shadow-inner shrink-0 relative z-10">
@@ -105,20 +105,20 @@
     <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 p-3">
         <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 w-full lg:w-auto">
-                <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full md:w-auto">
-                    <a href="<?= base_url('aset-tanah?status_sertifikat=Bersertifikat&search='.$search.'&kecamatan='.$selected_kecamatan) ?>" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'Bersertifikat' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Bersertifikat</a>
-                    <a href="<?= base_url('aset-tanah?status_sertifikat=Belum Bersertifikat&search='.$search.'&kecamatan='.$selected_kecamatan) ?>" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'Belum Bersertifikat' ? 'bg-white dark:bg-slate-700 text-amber-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Belum Sertifikat</a>
-                    <a href="<?= base_url('aset-tanah?status_sertifikat=semua&search='.$search.'&kecamatan='.$selected_kecamatan) ?>" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'semua' ? 'bg-white dark:bg-slate-700 text-slate-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Semua</a>
+                <div id="status-tabs" class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full md:w-auto">
+                    <button data-status="Bersertifikat" class="status-tab flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'Bersertifikat' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Bersertifikat</button>
+                    <button data-status="Belum Bersertifikat" class="status-tab flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'Belum Bersertifikat' ? 'bg-white dark:bg-slate-700 text-amber-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Belum Sertifikat</button>
+                    <button data-status="semua" class="status-tab flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'semua' ? 'bg-white dark:bg-slate-700 text-slate-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Semua</button>
                 </div>
             </div>
 
             <form action="<?= base_url('aset-tanah') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
                 <input type="hidden" name="sort_by" value="<?= $sortBy ?>">
                 <input type="hidden" name="sort_order" value="<?= $sortOrder ?>">
-                <input type="hidden" name="status_sertifikat" value="<?= $status_sertifikat ?>">
+                <input type="hidden" id="status_sertifikat_input" name="status_sertifikat" value="<?= $status_sertifikat ?>">
                 
                 <div class="relative w-full md:w-28">
-                    <select name="per_page" onchange="submitWithScroll(this)" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none">
+                    <select name="per_page" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none filter-input">
                         <?php foreach([5, 10, 25, 50, 100] as $p): ?>
                             <option value="<?= $p ?>" <?= ($perPage ?? 10) == $p ? 'selected' : '' ?>><?= $p ?> Baris</option>
                         <?php endforeach; ?>
@@ -127,7 +127,7 @@
                 </div>
 
                 <div class="relative w-full md:w-40">
-                    <select name="kecamatan" onchange="submitWithScroll(this)" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none">
+                    <select name="kecamatan" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none filter-input">
                         <option value="">Semua Wilayah</option>
                         <?php foreach($kecamatans as $k): ?>
                             <option value="<?= $k['kecamatan'] ?>" <?= $selected_kecamatan == $k['kecamatan'] ? 'selected' : '' ?>><?= $k['kecamatan'] ?></option>
@@ -137,7 +137,7 @@
                 </div>
 
                 <div class="relative w-full md:w-64">
-                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari aset..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 pl-10 focus:ring-2 focus:ring-blue-500 transition-all">
+                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari aset..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 pl-10 focus:ring-2 focus:ring-blue-500 transition-all filter-input">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
                 </div>
             </form>
@@ -145,7 +145,7 @@
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+    <div id="table-container" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
         <!-- Floating Bulk Action Bar -->
         <div id="bulk-action-bar" class="absolute top-0 left-0 right-0 z-50 bg-blue-950 text-white p-4 transform -translate-y-full transition-transform duration-500 flex items-center justify-between px-8">
             <div class="flex items-center gap-4">
@@ -172,8 +172,11 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse table-fixed">
+        <div class="overflow-x-auto relative">
+            <div id="table-loader" class="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-[2px] z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+                <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <table class="w-full text-left border-collapse table-fixed" id="main-table">
                 <thead>
                     <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                         <th class="px-6 py-4 w-16 text-center">
@@ -192,7 +195,7 @@
                         <th class="px-6 py-4 text-center w-40">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]">
+                <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]" id="table-body">
                     <?php if (!empty($aset)): foreach($aset as $item): ?>
                     <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-200">
                         <td class="px-6 py-3 text-center">
@@ -243,11 +246,14 @@
                 </tbody>
             </table>
         </div>
-        <?php if (isset($pager)): ?>
-        <div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800">
-            <?= $pager->links('group1', 'tailwind_full') ?>
+        <div id="pagination-container">
+            <?php if (isset($pager)): ?>
+            <div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800">
+                <?= $pager->links('group1', 'tailwind_full') ?>
+            </div>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
+    </div>
     </div>
 </div>
 
@@ -423,6 +429,144 @@
     }
 
     window.addEventListener('load', initMap);
+
+    // AJAX Dynamic Filtering
+    async function updateData(url) {
+        const loader = document.getElementById('table-loader');
+        loader.classList.remove('opacity-0', 'pointer-events-none');
+        
+        try {
+            const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                // Parse the returned HTML to extract components
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(result.html, 'text/html');
+                
+                // Update Table Body
+                document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
+                
+                // Update Pagination
+                document.getElementById('pagination-container').innerHTML = doc.getElementById('pagination-container').innerHTML;
+                
+                // Update Mini Dashboard Stats
+                if (result.data) {
+                    document.getElementById('stat-bersertifikat-count').innerText = new Intl.NumberFormat().format(result.data.count_bersertifikat);
+                    document.getElementById('stat-belum-bersertifikat-count').innerText = new Intl.NumberFormat().format(result.data.count_belum_bersertifikat);
+                    document.getElementById('stat-bersertifikat-bar').style.width = result.data.pct_bersertifikat + '%';
+                    document.getElementById('stat-belum-bersertifikat-bar').style.width = result.data.pct_belum_bersertifikat + '%';
+                    document.getElementById('stat-bersertifikat-pct').innerText = result.data.pct_bersertifikat + '%';
+                    document.getElementById('stat-belum-bersertifikat-pct').innerText = result.data.pct_belum_bersertifikat + '%';
+                }
+                
+                // Re-initialize Lucide Icons and Tooltips in the new content
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                
+                // Update Map Markers if aset_all is provided
+                if (result.data.aset_all && map && clusterGroup) {
+                    clusterGroup.clearLayers();
+                    result.data.aset_all.forEach(item => {
+                        if (item.koordinat) {
+                            const coords = item.koordinat.split(',').map(c => parseFloat(c.trim()));
+                            const marker = L.circleMarker(coords, { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
+                            marker.bindPopup(`
+                                <div class="bg-blue-950 text-white p-3 rounded-t-xl border-b border-white/10"><p class="text-[7px] font-bold uppercase tracking-[0.2em] text-blue-400 mb-1">Aset Tanah</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.nama_pemilik}</h5></div>
+                                <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-blue-600 uppercase">${item.no_sertifikat}</p><a href="<?= base_url('aset-tanah/detail/') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a></div>
+                            `);
+                            clusterGroup.addLayer(marker);
+                        }
+                    });
+                }
+                
+                // Update Browser URL
+                window.history.pushState({}, '', url);
+                
+                // Re-attach checkbox listeners if needed
+                attachCheckboxListeners();
+            }
+        } catch (error) {
+            console.error('AJAX Update Error:', error);
+            showToast('Gagal memuat data.', 'error');
+        } finally {
+            loader.classList.add('opacity-0', 'pointer-events-none');
+        }
+    }
+
+    function attachCheckboxListeners() {
+        const selectAll = document.getElementById('select-all');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        if (selectAll) {
+            selectAll.checked = false;
+            selectAll.onclick = function() {
+                rowCheckboxes.forEach(cb => {
+                    cb.checked = this.checked;
+                    cb.closest('tr').classList.toggle('bg-blue-50/50', this.checked);
+                    cb.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked);
+                });
+                updateBulkBar();
+            };
+        }
+        rowCheckboxes.forEach(cb => {
+            cb.onchange = function() {
+                this.closest('tr').classList.toggle('bg-blue-50/50', this.checked);
+                this.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked);
+                updateBulkBar();
+            };
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        // Handle Tab Clicks
+        if (e.target.classList.contains('status-tab')) {
+            const status = e.target.getAttribute('data-status');
+            document.getElementById('status_sertifikat_input').value = status;
+            
+            // UI Active State
+            document.querySelectorAll('.status-tab').forEach(btn => {
+                btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'text-amber-600', 'text-slate-600', 'shadow-sm');
+                btn.classList.add('text-slate-400', 'hover:text-slate-600');
+            });
+            const activeColor = status === 'Bersertifikat' ? 'text-blue-600' : (status === 'Belum Bersertifikat' ? 'text-amber-600' : 'text-slate-600');
+            e.target.classList.add('bg-white', 'dark:bg-slate-700', activeColor, 'shadow-sm');
+            e.target.classList.remove('text-slate-400', 'hover:text-slate-600');
+            
+            const form = document.getElementById('filter-form');
+            const url = new URL(form.action);
+            const formData = new FormData(form);
+            for (let [key, val] of formData.entries()) url.searchParams.set(key, val);
+            updateData(url.toString());
+        }
+        
+        // Handle Pagination Links
+        const paginationLink = e.target.closest('#pagination-container a');
+        if (paginationLink) {
+            e.preventDefault();
+            updateData(paginationLink.href);
+        }
+    });
+
+    document.querySelectorAll('.filter-input').forEach(input => {
+        input.addEventListener('change', () => {
+            const form = document.getElementById('filter-form');
+            const url = new URL(form.action);
+            const formData = new FormData(form);
+            for (let [key, val] of formData.entries()) url.searchParams.set(key, val);
+            updateData(url.toString());
+        });
+        if (input.type === 'text') {
+            let timeout;
+            input.addEventListener('keyup', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    input.dispatchEvent(new Event('change'));
+                }, 500);
+            });
+        }
+    });
+
+    // Initial attach
+    document.addEventListener('DOMContentLoaded', attachCheckboxListeners);
 </script>
 
 <style>
