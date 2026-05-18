@@ -20,6 +20,7 @@ class AsetTanah extends BaseController
         $search = $this->request->getGet('search') ?? '';
         $perPage = $this->request->getGet('per_page') ?? 10;
         $selected_kecamatan = $this->request->getGet('kecamatan') ?? '';
+        $status_sertifikat = $this->request->getGet('status_sertifikat') ?? 'semua';
         $sortBy = $this->request->getGet('sort_by') ?? 'id';
         $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
 
@@ -37,6 +38,19 @@ class AsetTanah extends BaseController
             $query = $query->where('kecamatan', $selected_kecamatan);
         }
 
+        if ($status_sertifikat === 'Bersertifikat') {
+            $query = $query->where('no_sertifikat !=', 'Belum Bersertifikat');
+        } elseif ($status_sertifikat === 'Belum Bersertifikat') {
+            $query = $query->where('no_sertifikat', 'Belum Bersertifikat');
+        }
+
+        $total_count = $this->asetModel->countAllResults();
+        $count_bersertifikat = $this->asetModel->where('no_sertifikat !=', 'Belum Bersertifikat')->countAllResults();
+        $count_belum_bersertifikat = $this->asetModel->where('no_sertifikat', 'Belum Bersertifikat')->countAllResults();
+
+        $pct_bersertifikat = $total_count > 0 ? ($count_bersertifikat / $total_count) * 100 : 0;
+        $pct_belum_bersertifikat = $total_count > 0 ? ($count_belum_bersertifikat / $total_count) * 100 : 0;
+
         $data = [
             'title' => 'Data Aset Tanah',
             'aset' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
@@ -46,11 +60,16 @@ class AsetTanah extends BaseController
             'search' => $search,
             'kecamatans' => $this->asetModel->select('kecamatan')->distinct()->findAll(),
             'selected_kecamatan' => $selected_kecamatan,
+            'status_sertifikat' => $status_sertifikat,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
-            'total_aset' => $this->asetModel->countAllResults(false),
+            'total_aset' => $total_count,
             'total_luas' => $this->asetModel->selectSum('luas_m2')->get()->getRow()->luas_m2 ?? 0,
             'total_nilai' => $this->asetModel->selectSum('nilai_aset')->get()->getRow()->nilai_aset ?? 0,
+            'count_bersertifikat' => $count_bersertifikat,
+            'count_belum_bersertifikat' => $count_belum_bersertifikat,
+            'pct_bersertifikat' => $pct_bersertifikat,
+            'pct_belum_bersertifikat' => $pct_belum_bersertifikat,
         ];
 
         return view('aset_tanah/index', $data);

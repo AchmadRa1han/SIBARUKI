@@ -145,6 +145,41 @@
 </div>
 
 <script>
+    function toggleSertifikat() {
+        const status = document.getElementById('status_sertifikat_select').value;
+        const wrapper = document.getElementById('no_sertifikat_wrapper');
+        const input = document.getElementById('no_sertifikat_input');
+        
+        if (status === 'Belum Bersertifikat') {
+            wrapper.style.display = 'none';
+            input.value = 'Belum Bersertifikat';
+        } else {
+            wrapper.style.display = 'block';
+            if (input.value === 'Belum Bersertifikat') {
+                input.value = '';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        toggleSertifikat();
+    });
+</script>
+<?= $this->endSection() ?>
+racking-[0.3em] opacity-60 mb-0.5">Simpan Perubahan</span>
+                        <span class="text-base uppercase tracking-tighter">Perbarui Aset</span>
+                    </div>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     });

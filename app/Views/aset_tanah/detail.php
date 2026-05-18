@@ -29,7 +29,9 @@
                 </div>
                 <div>
                     <h1 class="text-xl md:text-2xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter leading-tight"><?= $aset['nama_pemilik'] ?></h1>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">Sertifikat No. <?= $aset['no_sertifikat'] ?></p>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">
+                        <?= $aset['no_sertifikat'] === 'Belum Bersertifikat' ? 'Belum Bersertifikat' : 'Sertifikat No. ' . $aset['no_sertifikat'] ?>
+                    </p>
                 </div>
             </div>
         </div>

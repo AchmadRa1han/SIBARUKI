@@ -169,8 +169,25 @@
 </div>
 
 <script>
+    function toggleSertifikat() {
+        const status = document.getElementById('status_sertifikat_select').value;
+        const wrapper = document.getElementById('no_sertifikat_wrapper');
+        const input = document.getElementById('no_sertifikat_input');
+        
+        if (status === 'Belum Bersertifikat') {
+            wrapper.style.display = 'none';
+            input.value = 'Belum Bersertifikat';
+        } else {
+            wrapper.style.display = 'block';
+            if (input.value === 'Belum Bersertifikat') {
+                input.value = '';
+            }
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
+        toggleSertifikat();
     });
 </script>
 <?= $this->endSection() ?>

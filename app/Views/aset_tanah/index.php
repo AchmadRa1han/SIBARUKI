@@ -30,9 +30,6 @@
             </div>
         </div>
         <div class="flex flex-wrap items-center gap-2 relative z-10">
-            <div class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-blue-100 dark:border-blue-800/50 shadow-sm">
-                <?= number_format($total_aset ?? 0) ?> Bidang
-            </div>
             <a href="<?= base_url('aset-tanah/export-excel') ?>" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-emerald-100 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition-all active:scale-95 flex items-center gap-2 shadow-sm">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
             </a>
@@ -41,6 +38,53 @@
                 <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform"></i> Tambah Data
             </a>
             <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Mini Dashboard Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between relative overflow-hidden group">
+            <div class="absolute -right-2 -bottom-2 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                <i data-lucide="check-circle" class="w-16 h-16 text-blue-600"></i>
+            </div>
+            <div class="relative z-10 flex-1">
+                <p class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Aset Bersertifikat</p>
+                <div class="flex items-baseline gap-1.5">
+                    <h3 class="text-2xl font-black text-blue-600 tracking-tighter"><?= number_format($count_bersertifikat) ?></h3>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase">Unit</span>
+                </div>
+                <div class="mt-2.5 flex items-center gap-2 pr-6">
+                    <div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-600 rounded-full" style="width: <?= $pct_bersertifikat ?>%"></div>
+                    </div>
+                    <span class="text-[9px] font-black text-blue-600 w-8 text-right"><?= round($pct_bersertifikat, 1) ?>%</span>
+                </div>
+            </div>
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 shadow-inner shrink-0 relative z-10">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between relative overflow-hidden group">
+            <div class="absolute -right-2 -bottom-2 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                <i data-lucide="alert-circle" class="w-16 h-16 text-amber-500"></i>
+            </div>
+            <div class="relative z-10 flex-1">
+                <p class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Belum Bersertifikat</p>
+                <div class="flex items-baseline gap-1.5">
+                    <h3 class="text-2xl font-black text-amber-500 tracking-tighter"><?= number_format($count_belum_bersertifikat) ?></h3>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase">Unit</span>
+                </div>
+                <div class="mt-2.5 flex items-center gap-2 pr-6">
+                    <div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-amber-500 rounded-full" style="width: <?= $pct_belum_bersertifikat ?>%"></div>
+                    </div>
+                    <span class="text-[9px] font-black text-amber-500 w-8 text-right"><?= round($pct_belum_bersertifikat, 1) ?>%</span>
+                </div>
+            </div>
+            <div class="w-10 h-10 bg-amber-50 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-500 shadow-inner shrink-0 relative z-10">
+                <i data-lucide="file-warning" class="w-5 h-5"></i>
+            </div>
         </div>
     </div>
 
@@ -62,13 +106,16 @@
         <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 w-full lg:w-auto">
                 <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full md:w-auto">
-                    <button class="px-4 py-2 bg-white dark:bg-slate-700 text-blue-600 rounded-lg text-[9px] font-bold uppercase tracking-widest shadow-sm">Daftar Sertifikat</button>
+                    <a href="<?= base_url('aset-tanah?status_sertifikat=Bersertifikat&search='.$search.'&kecamatan='.$selected_kecamatan) ?>" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'Bersertifikat' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Bersertifikat</a>
+                    <a href="<?= base_url('aset-tanah?status_sertifikat=Belum Bersertifikat&search='.$search.'&kecamatan='.$selected_kecamatan) ?>" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'Belum Bersertifikat' ? 'bg-white dark:bg-slate-700 text-amber-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Belum Sertifikat</a>
+                    <a href="<?= base_url('aset-tanah?status_sertifikat=semua&search='.$search.'&kecamatan='.$selected_kecamatan) ?>" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all <?= $status_sertifikat == 'semua' ? 'bg-white dark:bg-slate-700 text-slate-600 shadow-sm' : 'text-slate-400 hover:text-slate-600' ?>">Semua</a>
                 </div>
             </div>
 
             <form action="<?= base_url('aset-tanah') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
                 <input type="hidden" name="sort_by" value="<?= $sortBy ?>">
                 <input type="hidden" name="sort_order" value="<?= $sortOrder ?>">
+                <input type="hidden" name="status_sertifikat" value="<?= $status_sertifikat ?>">
                 
                 <div class="relative w-full md:w-28">
                     <select name="per_page" onchange="submitWithScroll(this)" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none">
@@ -152,7 +199,14 @@
                             <input type="checkbox" name="ids[]" value="<?= $item['id'] ?>" class="row-checkbox w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
                         </td>
                         <td class="px-4 py-3">
-                            <span class="font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider"><?= $item['no_sertifikat'] ?></span>
+                            <div class="flex flex-col gap-1">
+                                <span class="font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider"><?= $item['no_sertifikat'] ?></span>
+                                <?php if($item['no_sertifikat'] === 'Belum Bersertifikat'): ?>
+                                    <span class="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-md font-bold uppercase text-[7px] border border-amber-100 dark:border-amber-900 w-fit">BELUM SERTIFIKAT</span>
+                                <?php else: ?>
+                                    <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-md font-bold uppercase text-[7px] border border-blue-100 dark:border-blue-900 w-fit">BERSERTIFIKAT</span>
+                                <?php endif; ?>
+                            </div>
                         </td>
                         <td class="px-4 py-3">
                             <div class="flex flex-col gap-0.5">
