@@ -53,17 +53,27 @@
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nama Pemilik / Nama Aset</label>
                         <input type="text" name="nama_pemilik" value="<?= old('nama_pemilik', $aset['nama_pemilik']) ?>" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
                     </div>
-                    <div>
+                    <div class="lg:col-span-1">
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Status Sertifikat</label>
+                        <div class="relative">
+                            <select id="status_sertifikat_select" name="status_sertifikat_dummy" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold uppercase" onchange="toggleSertifikat()">
+                                <option value="Bersertifikat" <?= old('no_sertifikat', $aset['no_sertifikat']) !== 'Belum Bersertifikat' ? 'selected' : '' ?>>Bersertifikat</option>
+                                <option value="Belum Bersertifikat" <?= old('no_sertifikat', $aset['no_sertifikat']) === 'Belum Bersertifikat' ? 'selected' : '' ?>>Belum Bersertifikat</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div id="no_sertifikat_wrapper">
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nomor Sertifikat</label>
-                        <input type="text" name="no_sertifikat" value="<?= old('no_sertifikat', $aset['no_sertifikat']) ?>" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
+                        <input type="text" id="no_sertifikat_input" name="no_sertifikat" value="<?= old('no_sertifikat', $aset['no_sertifikat']) ?>" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nomor Hak</label>
                         <input type="text" name="nomor_hak" value="<?= old('nomor_hak', $aset['nomor_hak']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
                     </div>
-                    <div>
+                    <div id="tgl_terbit_wrapper">
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Tanggal Terbit</label>
-                        <input type="date" name="tgl_terbit" value="<?= old('tgl_terbit', $aset['tgl_terbit']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold">
+                        <input type="date" id="tgl_terbit_input" name="tgl_terbit" value="<?= old('tgl_terbit', $aset['tgl_terbit']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Status Tanah</label>
@@ -103,15 +113,33 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Kecamatan</label>
-                        <input type="text" name="kecamatan" value="<?= old('kecamatan', $aset['kecamatan']) ?>" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
+                        <div class="relative">
+                            <select name="kecamatan" id="kecamatan_select" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold uppercase" onchange="loadDesa()">
+                                <option value="">Pilih Kecamatan</option>
+                                <?php foreach($kecamatans as $k): ?>
+                                    <option value="<?= $k['Kecamatan'] ?>" <?= $aset['kecamatan'] == $k['Kecamatan'] ? 'selected' : '' ?>><?= $k['Kecamatan'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Desa / Kelurahan</label>
-                        <input type="text" name="desa_kelurahan" value="<?= old('desa_kelurahan', $aset['desa_kelurahan']) ?>" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
+                        <div class="relative">
+                            <select name="desa_kelurahan" id="desa_select" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold uppercase">
+                                <option value="">Pilih Desa</option>
+                                <?php foreach($desas as $d): ?>
+                                    <option value="<?= $d['desa'] ?>" <?= $aset['desa_kelurahan'] == $d['desa'] ? 'selected' : '' ?>><?= $d['desa'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Titik Koordinat (Lat, Long)</label>
-                        <input type="text" name="koordinat" value="<?= old('koordinat', $aset['koordinat']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-mono text-xs">
+                    <div class="md:col-span-3">
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Pilih Lokasi di Peta</label>
+                        <div id="map-picker" class="w-full h-80 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-hidden mb-4"></div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat (Lat, Long)</label>
+                        <input type="text" name="koordinat" id="koordinat_input" value="<?= $aset['koordinat'] ?>" readonly class="w-full p-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-0 dark:text-slate-200 outline-none transition-all font-mono text-xs cursor-not-allowed" placeholder="Klik pada peta untuk mengambil koordinat...">
                     </div>
                     <div class="md:col-span-3">
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Alamat Lengkap / Lokasi Detail</label>
@@ -144,19 +172,113 @@
     </form>
 </div>
 
+<!-- Leaflet Setup -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+    let map, marker;
+
+    function initMap() {
+        // Initial Coordinates from data or Default Sinjai
+        const coordInput = document.getElementById('koordinat_input').value;
+        let initialLat = -5.123;
+        let initialLng = 120.211;
+
+        if (coordInput && coordInput.includes(',')) {
+            const parts = coordInput.split(',');
+            initialLat = parseFloat(parts[0]);
+            initialLng = parseFloat(parts[1]);
+        }
+
+        // Base Layers
+        const street = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        });
+
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EBP, and the GIS User Community'
+        });
+
+        map = L.map('map-picker', {
+            center: [initialLat, initialLng],
+            zoom: 14,
+            layers: [street]
+        });
+
+        const baseMaps = {
+            "Mode Jalan": street,
+            "Mode Satelit": satellite
+        };
+
+        L.control.layers(baseMaps).addTo(map);
+
+        if (coordInput && coordInput.includes(',')) {
+            marker = L.marker([initialLat, initialLng], { draggable: true }).addTo(map);
+            marker.on('dragend', updateCoords);
+        }
+
+        map.on('click', function(e) {
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                marker.on('dragend', updateCoords);
+            }
+            updateCoords({ target: marker });
+        });
+    }
+
+    function updateCoords(event) {
+        const pos = event.target.getLatLng();
+        document.getElementById('koordinat_input').value = pos.lat.toFixed(7) + ', ' + pos.lng.toFixed(7);
+    }
+
+    async function loadDesa() {
+        const kecamatan = document.getElementById('kecamatan_select').value;
+        const desaSelect = document.getElementById('desa_select');
+        
+        desaSelect.innerHTML = '<option value="">Memuat...</option>';
+        
+        if (!kecamatan) {
+            desaSelect.innerHTML = '<option value="">Pilih Desa</option>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`<?= base_url('aset-tanah/get-desa') ?>?kecamatan=${kecamatan}`);
+            const data = await response.json();
+            
+            desaSelect.innerHTML = '<option value="">Pilih Desa</option>';
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.desa;
+                option.textContent = item.desa;
+                desaSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Failed to load Desa:', error);
+            desaSelect.innerHTML = '<option value="">Gagal memuat data</option>';
+        }
+    }
+
     function toggleSertifikat() {
         const status = document.getElementById('status_sertifikat_select').value;
-        const wrapper = document.getElementById('no_sertifikat_wrapper');
-        const input = document.getElementById('no_sertifikat_input');
+        const noWrapper = document.getElementById('no_sertifikat_wrapper');
+        const tglWrapper = document.getElementById('tgl_terbit_wrapper');
+        const noInput = document.getElementById('no_sertifikat_input');
+        const tglInput = document.getElementById('tgl_terbit_input');
         
         if (status === 'Belum Bersertifikat') {
-            wrapper.style.display = 'none';
-            input.value = 'Belum Bersertifikat';
+            noWrapper.style.display = 'none';
+            tglWrapper.style.display = 'none';
+            noInput.value = 'Belum Bersertifikat';
+            tglInput.value = '';
         } else {
-            wrapper.style.display = 'block';
-            if (input.value === 'Belum Bersertifikat') {
-                input.value = '';
+            noWrapper.style.display = 'block';
+            tglWrapper.style.display = 'block';
+            if (noInput.value === 'Belum Bersertifikat') {
+                noInput.value = '';
             }
         }
     }
@@ -164,24 +286,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
         toggleSertifikat();
-    });
-</script>
-<?= $this->endSection() ?>
-racking-[0.3em] opacity-60 mb-0.5">Simpan Perubahan</span>
-                        <span class="text-base uppercase tracking-tighter">Perbarui Aset</span>
-                    </div>
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                        <i data-lucide="save" class="w-5 h-5"></i>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </form>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
+        initMap();
     });
 </script>
 <?= $this->endSection() ?>

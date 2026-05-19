@@ -8,6 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
+
 <div class="space-y-6 pb-12 text-slate-900 dark:text-slate-200">
     
     <!-- Breadcrumbs -->
@@ -260,14 +262,27 @@
 <form id="delete-form" action="" method="post" class="hidden"><?= csrf_field() ?></form>
 
 <script>
-    let map;
-    let clusterGroup;
+    let map, clusterGroup, kecLayerGroup;
     let rot = 0;
 
+    function parseWKTUniversal(wkt) {
+        if (!wkt || typeof wkt !== 'string' || typeof wellknown === 'undefined') return null;
+        try {
+            let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
+            let geojson = wellknown.parse(cleanWkt);
+            return geojson;
+        } catch(e) { return null; }
+    }
+
     function initMap() {
-        if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
+        if (typeof L === 'undefined' || typeof wellknown === 'undefined') { setTimeout(initMap, 100); return; }
+        if (map) return; // Guard: prevent double initialization error
+
         try {
             const isDark = document.documentElement.classList.contains('dark');
+            const mapContainer = document.getElementById('map');
+            if (!mapContainer) return;
+
             const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
                 attribution: '&copy; CartoDB' 
             });
@@ -277,64 +292,80 @@
                 attribution: '&copy; Google'
             });
 
-            map = L.map('map', { 
-                zoomControl: false, 
-                layers: [cartoDB] 
-            }).setView([-5.1245, 120.2536], 13);
-
+            map = L.map('map', { zoomControl: false, layers: [cartoDB] }).setView([-5.1245, 120.2536], 12);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            let rot = 0;
             const LayerToggle = L.Control.extend({
                 onAdd: function(map) {
                     const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
-                    btn.type = 'button';
-                    btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
-                    const isDark = document.documentElement.classList.contains('dark');
+                    btn.type = 'button'; btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
                     const svgColor = isDark ? '#60a5fa' : '#2563eb';
                     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
                     L.DomEvent.disableClickPropagation(btn);
                     L.DomEvent.on(btn, 'click', function(e) {
-                        L.DomEvent.stopPropagation(e);
-                        L.DomEvent.preventDefault(e);
-                        rot += 360;
-                        const svg = btn.querySelector('svg');
-                        svg.style.transform = `rotate(${rot}deg)`;
+                        rot += 360; btn.querySelector('svg').style.transform = `rotate(${rot}deg)`;
                         setTimeout(() => {
-                            if (map.hasLayer(cartoDB)) { 
-                                map.removeLayer(cartoDB); 
-                                map.addLayer(googleSat); 
-                                btn.style.backgroundColor = '#2563eb'; 
-                                svg.setAttribute('stroke', '#ffffff'); 
-                            }
-                            else { 
-                                map.removeLayer(googleSat); 
-                                map.addLayer(cartoDB); 
-                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
-                                svg.setAttribute('stroke', svgColor); 
-                            }
+                            if (map.hasLayer(cartoDB)) { map.removeLayer(cartoDB); map.addLayer(googleSat); btn.style.backgroundColor = '#2563eb'; btn.querySelector('svg').setAttribute('stroke', '#ffffff'); }
+                            else { map.removeLayer(googleSat); map.addLayer(cartoDB); btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; btn.querySelector('svg').setAttribute('stroke', svgColor); }
                         }, 200);
                     });
                     return btn;
                 }
             });
             map.addControl(new LayerToggle({ position: 'topright' }));
-            clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
-            const asetData = <?= json_encode($aset_all ?? []) ?>;
-            asetData.forEach(item => {
-                if (item.koordinat) {
-                    const coords = item.koordinat.split(',').map(c => parseFloat(c.trim()));
-                    const marker = L.circleMarker(coords, { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
-                    marker.bindPopup(`
-                        <div class="bg-blue-950 text-white p-3 rounded-t-xl border-b border-white/10"><p class="text-[7px] font-bold uppercase tracking-[0.2em] text-blue-400 mb-1">Aset Tanah</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.nama_pemilik}</h5></div>
-                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-blue-600 uppercase">${item.no_sertifikat}</p><a href="<?= base_url('aset-tanah/detail/') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a></div>
-                    `);
-                    clusterGroup.addLayer(marker);
+
+            clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 }).addTo(map);
+            kecLayerGroup = L.featureGroup().addTo(map);
+
+            // Render Kecamatan Boundaries (Dashboard Logic)
+            const kecData = <?= json_encode($kecamatans_spasial ?? []) ?>;
+            const kecColors = ['#1e1b4b', '#1e40af', '#2563eb', '#1d4ed8', '#0ea5e9'];
+            kecData.forEach((k, idx) => {
+                const geojson = parseWKTUniversal(k.wkt);
+                if (geojson) {
+                    L.geoJSON(geojson, { 
+                        style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.2 } 
+                    }).addTo(kecLayerGroup).bindTooltip(`<p class="font-bold uppercase text-[8px] text-white">${k.desa}</p>`, { sticky: true, className: 'custom-tooltip' });
                 }
             });
-            map.addLayer(clusterGroup);
+            kecLayerGroup.bringToBack();
+
+            renderMarkers(<?= json_encode($aset_all ?? []) ?>);
             if (typeof lucide !== 'undefined') lucide.createIcons();
         } catch(err) { console.error(err); }
+    }
+
+    function renderMarkers(data) {
+        clusterGroup.clearLayers();
+        data.forEach(item => {
+            if (item.koordinat) {
+                const coords = item.koordinat.split(',').map(c => parseFloat(c.trim()));
+                const noSertif = (item.no_sertifikat || '').toString().toUpperCase().trim();
+                const isBelum = noSertif === 'BELUM BERSERTIFIKAT' || noSertif === '-' || noSertif === '';
+                const markerColor = isBelum ? "#f59e0b" : "#1e1b4b"; // Amber for Belum, Dark Blue for Certified
+                
+                const icon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div class="w-6 h-6 rounded-full border-4 border-white shadow-xl flex items-center justify-center" style="background-color: ${markerColor};"><div class="w-1 h-1 bg-white rounded-full"></div></div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+
+                const marker = L.marker(coords, { icon: icon });
+                marker.bindPopup(`
+                    <div class="bg-blue-950 text-white p-3 rounded-t-xl border-b border-white/10">
+                        <p class="text-[7px] font-bold uppercase tracking-[0.2em] ${isBelum ? 'text-amber-400' : 'text-blue-400'} mb-1">Aset Tanah</p>
+                        <h5 class="text-[11px] font-bold uppercase leading-tight">${item.nama_pemilik}</h5>
+                    </div>
+                    <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl">
+                        <p class="text-[9px] font-bold ${isBelum ? 'text-amber-600' : 'text-blue-600'} uppercase">${item.no_sertifikat}</p>
+                        <a href="<?= base_url('aset-tanah/detail/') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a>
+                    </div>
+                `);
+                clusterGroup.addLayer(marker);
+            }
+        });
+        if (data.length > 0) map.fitBounds(clusterGroup.getBounds().pad(0.1));
     }
 
     function focusMap(coordsStr) {
@@ -465,18 +496,7 @@
                 
                 // Update Map Markers if aset_all is provided
                 if (result.data.aset_all && map && clusterGroup) {
-                    clusterGroup.clearLayers();
-                    result.data.aset_all.forEach(item => {
-                        if (item.koordinat) {
-                            const coords = item.koordinat.split(',').map(c => parseFloat(c.trim()));
-                            const marker = L.circleMarker(coords, { radius: 7, fillColor: "#1e1b4b", color: "#fff", weight: 2, fillOpacity: 0.8 });
-                            marker.bindPopup(`
-                                <div class="bg-blue-950 text-white p-3 rounded-t-xl border-b border-white/10"><p class="text-[7px] font-bold uppercase tracking-[0.2em] text-blue-400 mb-1">Aset Tanah</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.nama_pemilik}</h5></div>
-                                <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-blue-600 uppercase">${item.no_sertifikat}</p><a href="<?= base_url('aset-tanah/detail/') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a></div>
-                            `);
-                            clusterGroup.addLayer(marker);
-                        }
-                    });
+                    renderMarkers(result.data.aset_all);
                 }
                 
                 // Update Browser URL
@@ -574,5 +594,33 @@
     .leaflet-popup-content { margin: 0; width: 200px !important; }
     .leaflet-container { font-family: inherit; }
     .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
+
+    .custom-div-icon {
+        background: transparent;
+        border: none;
+    }
+    .custom-div-icon div {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .custom-div-icon:hover div {
+        transform: scale(1.2);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+
+    .custom-tooltip {
+        background: rgba(15, 23, 42, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+        color: white !important;
+        font-weight: 800 !important;
+        font-size: 9px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+        padding: 4px 8px !important;
+    }
+    .leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before {
+        border: none !important;
+    }
 </style>
 <?= $this->endSection() ?>

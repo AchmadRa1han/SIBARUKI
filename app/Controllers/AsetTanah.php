@@ -24,10 +24,26 @@ class AsetTanah extends BaseController
         $sortBy = $this->request->getGet('sort_by') ?? 'id';
         $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
 
-        $query = $this->asetModel;
+        // 1. STATISTIK & SPASIAL: Gunakan instance BARU untuk setiap hitungan agar tidak merusak builder
+        $db = \Config\Database::connect();
+        $total_count = (new AsetTanahModel())->countAllResults();
+        $count_bersertifikat = (new AsetTanahModel())->where('no_sertifikat !=', 'Belum Bersertifikat')->countAllResults();
+        $count_belum_bersertifikat = (new AsetTanahModel())->where('no_sertifikat', 'Belum Bersertifikat')->countAllResults();
+        
+        $pct_bersertifikat = $total_count > 0 ? ($count_bersertifikat / $total_count) * 100 : 0;
+        $pct_belum_bersertifikat = $total_count > 0 ? ($count_belum_bersertifikat / $total_count) * 100 : 0;
+
+        // Ambil Data Kecamatan (WKT) untuk Background Map seperti di Dashboard
+        $kecamatans_spasial = $db->table('wilayah_kumuh')
+            ->select('Kecamatan as nama, Kelurahan as desa, ST_AsText(WKT) as wkt')
+            ->groupBy('Kelurahan')
+            ->get()->getResultArray();
+
+        // 2. QUERY UTAMA: Gunakan instance BARU agar filter TERISOLASI sepenuhnya
+        $mainQuery = new AsetTanahModel();
 
         if ($search) {
-            $query = $query->groupStart()
+            $mainQuery->groupStart()
                 ->like('nama_pemilik', $search)
                 ->orLike('no_sertifikat', $search)
                 ->orLike('lokasi', $search)
@@ -35,53 +51,51 @@ class AsetTanah extends BaseController
         }
 
         if ($selected_kecamatan) {
-            $query = $query->where('kecamatan', $selected_kecamatan);
+            $mainQuery->where('kecamatan', $selected_kecamatan);
         }
 
         if ($status_sertifikat === 'Bersertifikat') {
-            $query = $query->where('no_sertifikat !=', 'Belum Bersertifikat');
+            $mainQuery->where('no_sertifikat !=', 'Belum Bersertifikat');
         } elseif ($status_sertifikat === 'Belum Bersertifikat') {
-            $query = $query->where('no_sertifikat', 'Belum Bersertifikat');
+            $mainQuery->where('no_sertifikat', 'Belum Bersertifikat');
         }
 
-        $total_count = $this->asetModel->countAllResults();
-        $count_bersertifikat = $this->asetModel->where('no_sertifikat !=', 'Belum Bersertifikat')->countAllResults();
-        $count_belum_bersertifikat = $this->asetModel->where('no_sertifikat', 'Belum Bersertifikat')->countAllResults();
-
-        $pct_bersertifikat = $total_count > 0 ? ($count_bersertifikat / $total_count) * 100 : 0;
-        $pct_belum_bersertifikat = $total_count > 0 ? ($count_belum_bersertifikat / $total_count) * 100 : 0;
+        // CLONE QUERY sebelum dieksekusi oleh paginate
+        $mapQuery = clone $mainQuery;
 
         $data = [
             'title' => 'Data Aset Tanah',
-            'aset' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
-            'aset_all' => $this->asetModel->findAll(),
-            'pager' => $this->asetModel->pager,
+            'aset' => $mainQuery->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
+            'aset_all' => $mapQuery->findAll(), // markers untuk peta WAJIB terfilter
+            'pager' => $this->asetModel->pager, // pager tetap ambil dari instance model global CI
             'perPage' => $perPage,
             'search' => $search,
-            'kecamatans' => $this->asetModel->select('kecamatan')->distinct()->findAll(),
+            'kecamatans' => (new AsetTanahModel())->select('kecamatan')->distinct()->findAll(),
             'selected_kecamatan' => $selected_kecamatan,
             'status_sertifikat' => $status_sertifikat,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
             'total_aset' => $total_count,
-            'total_luas' => $this->asetModel->selectSum('luas_m2')->get()->getRow()->luas_m2 ?? 0,
-            'total_nilai' => $this->asetModel->selectSum('nilai_aset')->get()->getRow()->nilai_aset ?? 0,
+            'total_luas' => (new AsetTanahModel())->selectSum('luas_m2')->get()->getRow()->luas_m2 ?? 0,
+            'total_nilai' => (new AsetTanahModel())->selectSum('nilai_aset')->get()->getRow()->nilai_aset ?? 0,
             'count_bersertifikat' => $count_bersertifikat,
             'count_belum_bersertifikat' => $count_belum_bersertifikat,
             'pct_bersertifikat' => $pct_bersertifikat,
             'pct_belum_bersertifikat' => $pct_belum_bersertifikat,
+            'kecamatans_spasial' => $kecamatans_spasial
         ];
 
         if ($this->request->isAJAX()) {
             return $this->response->setJSON([
                 'status' => 'success',
-                'html' => view('aset_tanah/index', $data), // We can use a partial or parse this in JS
+                'html' => view('aset_tanah/index', $data),
                 'data' => [
                     'count_bersertifikat' => $count_bersertifikat,
                     'count_belum_bersertifikat' => $count_belum_bersertifikat,
                     'pct_bersertifikat' => round($pct_bersertifikat, 1),
                     'pct_belum_bersertifikat' => round($pct_belum_bersertifikat, 1),
-                    'aset_all' => $data['aset_all']
+                    'aset_all' => $data['aset_all'],
+                    'kecamatans_spasial' => $kecamatans_spasial
                 ]
             ]);
         }
@@ -131,7 +145,6 @@ class AsetTanah extends BaseController
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
-        // Catat Log
         $this->logActivity('Export Excel', 'Aset Tanah', "Mengekspor " . count($data) . " data Aset Tanah Lengkap");
 
         $filename = 'Export_Lengkap_Aset_Tanah_' . date('YmdHis') . '.xlsx';
@@ -162,7 +175,6 @@ class AsetTanah extends BaseController
         $count = 0;
         $db = \Config\Database::connect();
 
-        // Reset Auto Increment jika tabel kosong
         if ($db->table('aset_tanah')->countAllResults() === 0) {
             $db->query("ALTER TABLE aset_tanah AUTO_INCREMENT = 1");
         }
@@ -172,19 +184,16 @@ class AsetTanah extends BaseController
         try {
             $handle = fopen($file->getTempName(), 'r');
             while (($row = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
-                // Lewati header atau baris judul
                 if (count($row) < 10 || stripos(implode(' ', $row), 'Sertifikat') !== false || !is_numeric($row[0])) {
                     continue;
                 }
 
-                // Bersihkan format angka Indonesia (misal: 6.890,00 -> 6890.00)
                 $luasRaw = $row[3] ?? '0';
                 $luas = (float)str_replace(',', '.', str_replace('.', '', $luasRaw));
 
                 $nilaiRaw = $row[12] ?? '0';
                 $nilai = (float)str_replace(',', '.', str_replace('.', '', $nilaiRaw));
 
-                // Parsing Tanggal (d-m-Y -> Y-m-d)
                 $tglTerbit = null;
                 $tglRaw = trim($row[7] ?? '');
                 if ($tglRaw) {
@@ -192,14 +201,12 @@ class AsetTanah extends BaseController
                     if ($dt) $tglTerbit = $dt->format('Y-m-d');
                 }
 
-                // Gabungkan & Sembuhkan Koordinat (Hilangkan titik ribuan pada lat/lng)
                 $lonRaw = trim($row[10] ?? '');
                 $latRaw = trim($row[11] ?? '');
                 
                 $lon = str_replace(',', '.', $lonRaw);
                 $lat = str_replace(',', '.', $latRaw);
                 
-                // Jika lat/lng punya > 1 titik, asumsikan titik pertama adalah pemisah ribuan yang salah
                 if (substr_count($lat, '.') > 1) {
                     $firstDot = strpos($lat, '.');
                     $lat = substr($lat, 0, $firstDot) . substr($lat, $firstDot + 1);
@@ -260,7 +267,40 @@ class AsetTanah extends BaseController
 
     public function create()
     {
-        return view('aset_tanah/create', ['title' => 'Tambah Aset']);
+        $db = \Config\Database::connect();
+        $kecamatans = $db->table('wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
+        
+        return view('aset_tanah/create', [
+            'title' => 'Tambah Aset',
+            'kecamatans' => $kecamatans
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $data['aset'] = $this->asetModel->find($id);
+        if (!$data['aset']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        
+        $db = \Config\Database::connect();
+        $data['kecamatans'] = $db->table('wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
+        $data['desas'] = $db->table('wilayah_kumuh')->select('Kelurahan as desa')->where('Kecamatan', $data['aset']['kecamatan'])->distinct()->get()->getResultArray();
+        
+        $data['title'] = 'Edit Aset Tanah';
+        return view('aset_tanah/edit', $data);
+    }
+
+    public function getDesaByKecamatan()
+    {
+        $kecamatan = $this->request->getGet('kecamatan');
+        $db = \Config\Database::connect();
+        $desas = $db->table('wilayah_kumuh')
+                    ->select('Kelurahan as desa')
+                    ->where('Kecamatan', $kecamatan)
+                    ->distinct()
+                    ->get()
+                    ->getResultArray();
+        
+        return $this->response->setJSON($desas);
     }
 
     public function store()
@@ -269,14 +309,6 @@ class AsetTanah extends BaseController
         $this->asetModel->insert($data);
         $this->logActivity('Tambah', 'Aset Tanah', "Menambah aset tanah baru: {$data['nama_pemilik']}", $this->formatLogData($data));
         return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil ditambahkan.');
-    }
-
-    public function edit($id)
-    {
-        $data['aset'] = $this->asetModel->find($id);
-        if (!$data['aset']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        $data['title'] = 'Edit Aset Tanah';
-        return view('aset_tanah/edit', $data);
     }
 
     public function update($id)

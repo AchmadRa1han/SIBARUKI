@@ -34,31 +34,8 @@
         </div>
     </div>
 
-    <!-- 1. FORM IMPORT -->
-    <div class="bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl p-6 border border-emerald-100 dark:border-emerald-900/30 relative overflow-hidden group">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-600/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-600/20">
-                    <i data-lucide="file-up" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h3 class="text-base font-bold text-emerald-900 dark:text-emerald-400 uppercase tracking-tight">Import via CSV</h3>
-                    <p class="text-[9px] text-emerald-600/70 dark:text-emerald-500/50 font-bold uppercase tracking-[0.2em]">Unggah database sertifikat tanah secara massal</p>
-                </div>
-            </div>
-            <form action="<?= base_url('aset-tanah/import-csv') ?>" method="post" enctype="multipart/form-data" class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto">
-                <?= csrf_field() ?>
-                <input type="file" name="csv_file" accept=".csv" required class="block w-full text-[9px] text-emerald-900 dark:text-emerald-400 file:mr-4 file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-[9px] file:font-bold file:uppercase file:tracking-widest file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer transition-all">
-                <button type="submit" class="w-full md:w-auto bg-emerald-900 dark:bg-emerald-600 text-white px-6 py-2.5 rounded-lg text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-emerald-900/20 hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-2">
-                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i> Impor
-                </button>
-            </form>
-        </div>
-    </div>
-
     <!-- 2. FORM MANUAL -->
-    <form action="<?= base_url('aset-tanah/store') ?>" method="post">
+    <form action="<?= base_url('aset-tanah/store') ?>" method="post" id="aset-form">
         <?= csrf_field() ?>
         <div class="space-y-10">
             <!-- SECTION 1: LEGALITAS & PEMILIK -->
@@ -77,17 +54,27 @@
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nama Pemilik / Nama Aset</label>
                         <input type="text" name="nama_pemilik" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase placeholder:opacity-30" placeholder="PEMDA KAB. SINJAI...">
                     </div>
-                    <div>
+                    <div class="lg:col-span-1">
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Status Sertifikat</label>
+                        <div class="relative">
+                            <select id="status_sertifikat_select" name="status_sertifikat_dummy" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold uppercase" onchange="toggleSertifikat()">
+                                <option value="Bersertifikat">Bersertifikat</option>
+                                <option value="Belum Bersertifikat">Belum Bersertifikat</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div id="no_sertifikat_wrapper">
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nomor Sertifikat</label>
-                        <input type="text" name="no_sertifikat" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
+                        <input type="text" id="no_sertifikat_input" name="no_sertifikat" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Nomor Hak</label>
                         <input type="text" name="nomor_hak" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
                     </div>
-                    <div>
+                    <div id="tgl_terbit_wrapper">
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Tanggal Terbit Sertifikat</label>
-                        <input type="date" name="tgl_terbit" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold">
+                        <input type="date" id="tgl_terbit_input" name="tgl_terbit" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Status Tanah</label>
@@ -127,15 +114,30 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Kecamatan</label>
-                        <input type="text" name="kecamatan" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
+                        <div class="relative">
+                            <select name="kecamatan" id="kecamatan_select" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold uppercase" onchange="loadDesa()">
+                                <option value="">Pilih Kecamatan</option>
+                                <?php foreach($kecamatans as $k): ?>
+                                    <option value="<?= $k['Kecamatan'] ?>"><?= $k['Kecamatan'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Desa / Kelurahan</label>
-                        <input type="text" name="desa_kelurahan" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
+                        <div class="relative">
+                            <select name="desa_kelurahan" id="desa_select" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold uppercase">
+                                <option value="">Pilih Desa</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
                     </div>
-                    <div>
+                    <div class="md:col-span-3">
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Pilih Lokasi di Peta</label>
+                        <div id="map-picker" class="w-full h-80 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-hidden mb-4"></div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Koordinat (Lat, Long)</label>
-                        <input type="text" name="koordinat" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-mono text-xs" placeholder="-5.123, 120.123">
+                        <input type="text" name="koordinat" id="koordinat_input" readonly class="w-full p-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-0 dark:text-slate-200 outline-none transition-all font-mono text-xs cursor-not-allowed" placeholder="Klik pada peta untuk mengambil koordinat...">
                     </div>
                     <div class="md:col-span-3">
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Alamat Lengkap / Lokasi Detail</label>
@@ -168,19 +170,138 @@
     </form>
 </div>
 
+<!-- Leaflet Setup -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+    let map, marker;
+
+    function initMap() {
+        // Default Sinjai Coordinates
+        const defaultLat = -5.123;
+        const defaultLng = 120.211;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        
+        // Base Layers
+        const street = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        });
+
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EBP, and the GIS User Community'
+        });
+
+        map = L.map('map-picker', {
+            center: [defaultLat, defaultLng],
+            zoom: 12,
+            layers: [street],
+            zoomControl: false
+        });
+
+        // Add Zoom Control at top-right
+        L.control.zoom({ position: 'topright' }).addTo(map);
+
+        // Better Layer Toggle Integration
+        let rot = 0;
+        const LayerToggle = L.Control.extend({
+            onAdd: function(map) {
+                const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
+                btn.type = 'button';
+                const svgColor = isDark ? '#60a5fa' : '#2563eb';
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                
+                L.DomEvent.disableClickPropagation(btn);
+                L.DomEvent.on(btn, 'click', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    L.DomEvent.preventDefault(e);
+                    rot += 360;
+                    const svg = btn.querySelector('svg');
+                    svg.style.transform = `rotate(${rot}deg)`;
+                    setTimeout(() => {
+                        if (map.hasLayer(street)) { 
+                            map.removeLayer(street); 
+                            map.addLayer(satellite); 
+                            btn.style.backgroundColor = '#2563eb'; 
+                            svg.setAttribute('stroke', '#ffffff'); 
+                        } else { 
+                            map.removeLayer(satellite); 
+                            map.addLayer(street); 
+                            btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
+                            svg.setAttribute('stroke', svgColor); 
+                        }
+                    }, 200);
+                });
+                return btn;
+            }
+        });
+        map.addControl(new LayerToggle({ position: 'topright' }));
+
+        map.on('click', function(e) {
+            const lat = e.latlng.lat.toFixed(7);
+            const lng = e.latlng.lng.toFixed(7);
+            
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                marker.on('dragend', function(event) {
+                    const pos = event.target.getLatLng();
+                    document.getElementById('koordinat_input').value = pos.lat.toFixed(7) + ', ' + pos.lng.toFixed(7);
+                });
+            }
+            
+            document.getElementById('koordinat_input').value = lat + ', ' + lng;
+        });
+    }
+
+    async function loadDesa() {
+        const kecamatan = document.getElementById('kecamatan_select').value;
+        const desaSelect = document.getElementById('desa_select');
+        
+        desaSelect.innerHTML = '<option value="">Memuat...</option>';
+        
+        if (!kecamatan) {
+            desaSelect.innerHTML = '<option value="">Pilih Desa</option>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`<?= base_url('aset-tanah/get-desa') ?>?kecamatan=${kecamatan}`);
+            const data = await response.json();
+            
+            desaSelect.innerHTML = '<option value="">Pilih Desa</option>';
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.desa;
+                option.textContent = item.desa;
+                desaSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Failed to load Desa:', error);
+            desaSelect.innerHTML = '<option value="">Gagal memuat data</option>';
+        }
+    }
+
     function toggleSertifikat() {
         const status = document.getElementById('status_sertifikat_select').value;
-        const wrapper = document.getElementById('no_sertifikat_wrapper');
-        const input = document.getElementById('no_sertifikat_input');
+        const noWrapper = document.getElementById('no_sertifikat_wrapper');
+        const tglWrapper = document.getElementById('tgl_terbit_wrapper');
+        const noInput = document.getElementById('no_sertifikat_input');
+        const tglInput = document.getElementById('tgl_terbit_input');
         
         if (status === 'Belum Bersertifikat') {
-            wrapper.style.display = 'none';
-            input.value = 'Belum Bersertifikat';
+            noWrapper.style.display = 'none';
+            tglWrapper.style.display = 'none';
+            noInput.value = 'Belum Bersertifikat';
+            tglInput.value = '';
         } else {
-            wrapper.style.display = 'block';
-            if (input.value === 'Belum Bersertifikat') {
-                input.value = '';
+            noWrapper.style.display = 'block';
+            tglWrapper.style.display = 'block';
+            if (noInput.value === 'Belum Bersertifikat') {
+                noInput.value = '';
             }
         }
     }
@@ -188,6 +309,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
         toggleSertifikat();
+        initMap();
     });
 </script>
 <?= $this->endSection() ?>

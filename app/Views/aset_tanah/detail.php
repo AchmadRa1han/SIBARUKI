@@ -72,6 +72,18 @@
                 </h3>
                 <div class="space-y-6">
                     <div>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Status Sertifikat</p>
+                        <?php if($aset['no_sertifikat'] === 'Belum Bersertifikat'): ?>
+                            <span class="px-3 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-full text-[9px] font-black uppercase border border-amber-100 dark:border-amber-800 shadow-sm flex items-center gap-2 w-fit">
+                                <i data-lucide="alert-circle" class="w-3 h-3"></i> Belum Bersertifikat
+                            </span>
+                        <?php else: ?>
+                            <span class="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full text-[9px] font-black uppercase border border-blue-100 dark:border-blue-800 shadow-sm flex items-center gap-2 w-fit">
+                                <i data-lucide="shield-check" class="w-3 h-3"></i> Bersertifikat
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                    <div>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Hak</p>
                         <p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $aset['nomor_hak'] ?: '-' ?></p>
                     </div>

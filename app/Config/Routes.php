@@ -69,6 +69,7 @@ $routes->group('arsinum', function($routes) {
 });
 
 $routes->group('aset-tanah', function($routes) {
+    $routes->get('get-desa', 'AsetTanah::getDesaByKecamatan');
     $routes->get('/', 'AsetTanah::index');
     $routes->get('export-excel', 'AsetTanah::exportExcel');
     $routes->post('import-csv', 'AsetTanah::importCsv');
