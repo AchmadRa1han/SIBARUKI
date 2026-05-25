@@ -34,7 +34,7 @@ class Rtlh extends BaseController
     {
         $keyword = $this->request->getGet('keyword');
         $perPage = $this->request->getGet('per_page') ?? 10;
-        $status = $this->request->getGet('status') ?? 'Belum Menerima';
+        $status = $this->request->getGet('status') ?? 'semua';
 
         $query = $this->rumahModel->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt, perumahan_rtlh_penerima.nama_kepala_keluarga as pemilik')
                                   ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left');
@@ -47,21 +47,21 @@ class Rtlh extends BaseController
             $query->groupStart()
                   ->like('perumahan_rtlh_penerima.nama_kepala_keluarga', $keyword)
                   ->orLike('perumahan_rtlh_rumah.desa', $keyword)
+                  ->orLike('perumahan_rtlh_rumah.nik_pemilik', $keyword)
                   ->groupEnd();
         }
 
         $rumah = $query->paginate($perPage, 'default');
 
-        // Data untuk Map (Semua yang punya koordinat) - Ambil data minimal saja
+        // Data untuk Map
         $db = \Config\Database::connect();
         $rumah_all = $db->table('perumahan_rtlh_rumah')
-                        ->select('id_survei, desa, ST_AsText(lokasi_koordinat) as wkt, nik_pemilik')
+                        ->select('id_survei, desa, ST_AsText(lokasi_koordinat) as wkt, nik_pemilik, status_bantuan')
                         ->where('lokasi_koordinat IS NOT NULL')
                         ->where('lokasi_koordinat !=', '')
-                        ->limit(500)
+                        ->limit(1000)
                         ->get()->getResultArray();
 
-        // Ambil nama pemilik secara terpisah untuk popup agar tidak membebani join
         $niks = array_unique(array_column($rumah_all, 'nik_pemilik'));
         $pemilikMap = [];
         if (!empty($niks)) {
@@ -73,14 +73,14 @@ class Rtlh extends BaseController
         }
 
         $data = [
-            'title' => 'Data RTLH',
+            'title' => 'Master Data Perumahan',
             'rumah' => $rumah,
             'rumah_all' => $rumah_all,
             'pager' => $this->rumahModel->pager,
             'perPage' => $perPage,
             'keyword' => $keyword,
             'status' => $status,
-            'total_verifikasi' => $this->rumahModel->countAllResults(false),
+            'total_data' => $this->rumahModel->countAllResults(false),
         ];
 
         return view('rtlh/index', $data);
