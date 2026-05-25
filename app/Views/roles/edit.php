@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 <div class="p-8 max-w-5xl mx-auto">
     <div class="mb-10">
-        <a href="<?= base_url('roles') ?>" class="inline-flex items-center gap-2 text-blue-900 font-bold hover:gap-3 transition-all mb-4 text-sm uppercase tracking-widest">
+        <a href="<?= base_url('sys_roles') ?>" class="inline-flex items-center gap-2 text-blue-900 font-bold hover:gap-3 transition-all mb-4 text-sm uppercase tracking-widest">
             <i data-lucide="chevron-left" class="w-4 h-4 text-blue-900"></i>
             Kembali ke Daftar
         </a>
@@ -130,7 +130,7 @@
                                 <td class="p-6">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700">
-                                            <i data-lucide="users" class="w-4 h-4"></i>
+                                            <i data-lucide="sys_users" class="w-4 h-4"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs font-bold text-slate-800 uppercase tracking-tight">Manajemen User</p>
@@ -160,7 +160,7 @@
                 <!-- Bagian Izin Lainnya -->
                 <div class="p-8 bg-slate-50/50">
                     <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                        <i data-lucide="sys_settings" class="w-3.5 h-3.5"></i>
                         Izin Sistem & Manajemen Lainnya
                     </h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -189,7 +189,7 @@
                     <i data-lucide="save" class="w-5 h-5"></i>
                     PERBARUI ROLE
                 </button>
-                <a href="<?= base_url('roles') ?>" class="bg-slate-50 hover:bg-slate-100 text-slate-400 font-bold px-10 py-5 rounded-2xl transition-all uppercase tracking-widest text-xs border border-slate-100">
+                <a href="<?= base_url('sys_roles') ?>" class="bg-slate-50 hover:bg-slate-100 text-slate-400 font-bold px-10 py-5 rounded-2xl transition-all uppercase tracking-widest text-xs border border-slate-100">
                     Batal
                 </a>
             </div>

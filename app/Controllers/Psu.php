@@ -105,8 +105,8 @@ class Psu extends BaseController
         $db = \Config\Database::connect();
 
         // Reset Auto Increment jika tabel kosong agar ID mulai dari 1 lagi
-        if ($db->table('psu_jalan')->countAllResults() === 0) {
-            $db->query("ALTER TABLE psu_jalan AUTO_INCREMENT = 1");
+        if ($db->table('permukiman_psu_jalan')->countAllResults() === 0) {
+            $db->query("ALTER TABLE permukiman_psu_jalan AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
@@ -273,7 +273,7 @@ class Psu extends BaseController
             }
 
             $db = \Config\Database::connect();
-            $db->table('trash_data')->insert([
+            $db->table('sys_trash')->insert([
                 'entity_type' => 'PSU_JALAN',
                 'entity_id'   => $id,
                 'data_json'   => json_encode($data),
@@ -299,7 +299,7 @@ class Psu extends BaseController
         try {
             $items = $this->jalanModel->whereIn('id', $ids)->findAll();
             foreach ($items as $item) {
-                $db->table('trash_data')->insert([
+                $db->table('sys_trash')->insert([
                     'entity_type' => 'PSU_JALAN',
                     'entity_id'   => $item['id'],
                     'data_json'   => json_encode($item),

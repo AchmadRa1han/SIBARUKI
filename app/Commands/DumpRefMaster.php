@@ -14,7 +14,7 @@ class DumpRefMaster extends BaseCommand
     public function run(array $params)
     {
         $db = \Config\Database::connect();
-        $results = $db->table('ref_master')->select('kategori, nama_pilihan')->orderBy('kategori', 'ASC')->get()->getResultArray();
+        $results = $db->table('sys_ref_master')->select('kategori, nama_pilihan')->orderBy('kategori', 'ASC')->get()->getResultArray();
 
         $current_data = [];
         foreach ($results as $row) {

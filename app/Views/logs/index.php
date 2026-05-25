@@ -130,7 +130,7 @@
                     <label class="text-[9px] font-bold text-blue-900 dark:text-blue-400 uppercase tracking-widest ml-1">Subject</label>
                     <select name="user" onchange="this.form.submit()" class="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-[11px] font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none dark:text-slate-200 shadow-sm">
                         <option value="">Semua User</option>
-                        <?php foreach($options['users'] as $u): ?>
+                        <?php foreach($options['sys_users'] as $u): ?>
                             <option value="<?= $u ?>" <?= $filters['user'] == $u ? 'selected' : '' ?>><?= $u ?></option>
                         <?php endforeach; ?>
                     </select>

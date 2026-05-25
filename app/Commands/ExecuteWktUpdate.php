@@ -16,7 +16,7 @@ class ExecuteWktUpdate extends BaseCommand
         $db = \Config\Database::connect();
         
         // 1. Ambil Data dari Database
-        $dbRecords = $db->table('wilayah_kumuh')->get()->getResultArray();
+        $dbRecords = $db->table('permukiman_wilayah_kumuh')->get()->getResultArray();
 
         // 2. Baca CSV
         $csvFile = ROOTPATH . 'output.csv';
@@ -57,7 +57,7 @@ class ExecuteWktUpdate extends BaseCommand
                     }
 
                     // EKSEKUSI UPDATE HANYA KOLOM WKT
-                    $db->table('wilayah_kumuh')
+                    $db->table('permukiman_wilayah_kumuh')
                        ->where('FID', $dbRow['FID'])
                        ->update(['WKT' => $finalWkt]);
 

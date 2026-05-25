@@ -25,13 +25,13 @@ class TotalReimportKumuh extends BaseCommand
         if ($confirmation !== 'y') return;
 
         // 1. Kosongkan tabel
-        $db->table('wilayah_kumuh')->emptyTable();
+        $db->table('permukiman_wilayah_kumuh')->emptyTable();
         
         // 2. Izinkan angka 0 masuk ke kolom Auto Increment
         $db->query("SET SESSION sql_mode = CONCAT(@@sql_mode, ',NO_AUTO_VALUE_ON_ZERO')");
         
         // 3. Reset urutan awal
-        $db->query("ALTER TABLE wilayah_kumuh AUTO_INCREMENT = 0");
+        $db->query("ALTER TABLE permukiman_wilayah_kumuh AUTO_INCREMENT = 0");
         
         CLI::write("Database dikosongkan dan mode ID 0 diaktifkan.", 'yellow');
 
@@ -79,7 +79,7 @@ class TotalReimportKumuh extends BaseCommand
                 'WKT'         => $finalWkt
             ];
 
-            if ($db->table('wilayah_kumuh')->insert($insertData)) {
+            if ($db->table('permukiman_wilayah_kumuh')->insert($insertData)) {
                 $successCount++;
             }
         }

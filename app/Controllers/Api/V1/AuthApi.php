@@ -33,9 +33,9 @@ class AuthApi extends BaseApiController
         $role = $roleModel->find($user['role_id']);
         
         // Ambil Permissions
-        $permissions = $db->table('role_permissions rp')
+        $permissions = $db->table('sys_role_permissions rp')
             ->select('p.permission_name')
-            ->join('permissions p', 'p.id = rp.permission_id')
+            ->join('sys_permissions p', 'p.id = rp.permission_id')
             ->where('rp.role_id', $user['role_id'])
             ->get()
             ->getResultArray();
@@ -73,7 +73,7 @@ class AuthApi extends BaseApiController
             'role_id' => $user['role_id'],
             'role_name' => $role['role_name'],
             'role_scope' => $role['scope'],
-            'permissions' => $perm_list,
+            'sys_permissions' => $perm_list,
             'desa_ids_rtlh' => $desa_rtlh,
             'desa_ids_kumuh' => $desa_kumuh
         ];

@@ -20,23 +20,23 @@ class RtlhApi extends BaseApiController
         $lastSync = $this->request->getGet('last_sync'); // Format: Y-m-d H:i:s
 
         $builder = $rumahModel->builder();
-        $builder->select('rtlh_rumah.*, rtlh_penerima.nama_kepala_keluarga, rtlh_penerima.no_kk');
-        $builder->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik');
+        $builder->select('perumahan_rtlh_rumah.*, perumahan_rtlh_penerima.nama_kepala_keluarga, perumahan_rtlh_penerima.no_kk');
+        $builder->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik');
 
         // Filter Scope Wilayah
         $desaIds = $userData->desa_ids_rtlh ?? [];
         if ($userData->role_scope !== 'global' && !empty($desaIds)) {
-            $builder->whereIn('rtlh_rumah.desa_id', $desaIds);
+            $builder->whereIn('perumahan_rtlh_rumah.desa_id', $desaIds);
         }
 
         // Filter Spesifik Desa (jika diminta)
         if ($desaId) {
-            $builder->where('rtlh_rumah.desa_id', $desaId);
+            $builder->where('perumahan_rtlh_rumah.desa_id', $desaId);
         }
 
         // Incremental Sync (Hanya yang berubah setelah lastSync)
         if ($lastSync) {
-            $builder->where('rtlh_rumah.updated_at >', $lastSync);
+            $builder->where('perumahan_rtlh_rumah.updated_at >', $lastSync);
         }
 
         $data = $builder->get()->getResultArray();

@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class RefMasterModel extends Model
 {
-    protected $table            = 'ref_master';
+    protected $table            = 'sys_ref_master';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

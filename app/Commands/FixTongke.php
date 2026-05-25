@@ -21,7 +21,7 @@ class FixTongke extends BaseCommand
         // Konversi ke MultiPolygon
         $finalWkt = "MULTIPOLYGON (((" . str_replace("POLYGON ((", "", rtrim($wktRaw, ")")) . ")))";
 
-        $db->table('wilayah_kumuh')->where('FID', 47)->update(['WKT' => $finalWkt]);
+        $db->table('permukiman_wilayah_kumuh')->where('FID', 47)->update(['WKT' => $finalWkt]);
         
         CLI::write("Berhasil: Koordinat Desa Tongke-Tongke (FID 47) telah diperbarui ke versi lengkap.", 'green');
     }

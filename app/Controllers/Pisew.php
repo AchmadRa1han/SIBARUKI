@@ -38,7 +38,7 @@ class Pisew extends BaseController
 
         $data = [
             'title' => 'Data PISEW',
-            'pisew' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
+            'permukiman_pisew' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
             'pisew_all' => $this->pisewModel->findAll(),
             'pager' => $this->pisewModel->pager,
             'perPage' => $perPage,
@@ -120,8 +120,8 @@ class Pisew extends BaseController
         $db = \Config\Database::connect();
 
         // Reset Auto Increment jika tabel kosong
-        if ($db->table('pisew')->countAllResults() === 0) {
-            $db->query("ALTER TABLE pisew AUTO_INCREMENT = 1");
+        if ($db->table('permukiman_pisew')->countAllResults() === 0) {
+            $db->query("ALTER TABLE permukiman_pisew AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
@@ -268,7 +268,7 @@ class Pisew extends BaseController
             }
 
             $db = \Config\Database::connect();
-            $db->table('trash_data')->insert([
+            $db->table('sys_trash')->insert([
                 'entity_type' => 'PISEW',
                 'entity_id'   => $id,
                 'data_json'   => json_encode($data),
@@ -292,7 +292,7 @@ class Pisew extends BaseController
         try {
             $items = $this->pisewModel->whereIn('id', $ids)->findAll();
             foreach ($items as $item) {
-                $db->table('trash_data')->insert([
+                $db->table('sys_trash')->insert([
                     'entity_type' => 'PISEW',
                     'entity_id'   => $item['id'],
                     'data_json'   => json_encode($item),

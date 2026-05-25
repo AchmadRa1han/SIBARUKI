@@ -23,7 +23,7 @@ class Roles extends BaseController
     {
         $data = [
             'title' => 'Manajemen Role',
-            'roles' => $this->roleModel->findAll(),
+            'sys_roles' => $this->roleModel->findAll(),
         ];
         return view('roles/index', $data);
     }
@@ -32,7 +32,7 @@ class Roles extends BaseController
     {
         $data = [
             'title' => 'Tambah Role Baru',
-            'permissions' => $this->permissionModel->findAll(),
+            'sys_permissions' => $this->permissionModel->findAll(),
         ];
         return view('roles/create', $data);
     }
@@ -50,7 +50,7 @@ class Roles extends BaseController
         $this->roleModel->insert($roleData);
         $roleId = $this->roleModel->insertID();
 
-        $permissions = $this->request->getPost('permissions');
+        $permissions = $this->request->getPost('sys_permissions');
         if (!empty($permissions)) {
             $pivotData = [];
             foreach ($permissions as $permId) {
@@ -68,14 +68,14 @@ class Roles extends BaseController
             return redirect()->back()->with('error', 'Gagal menyimpan role.');
         }
 
-        return redirect()->to(base_url('roles'))->with('success', 'Role berhasil ditambahkan.');
+        return redirect()->to(base_url('sys_roles'))->with('success', 'Role berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $role = $this->roleModel->find($id);
         if (!$role) {
-            return redirect()->to(base_url('roles'))->with('error', 'Role tidak ditemukan.');
+            return redirect()->to(base_url('sys_roles'))->with('error', 'Role tidak ditemukan.');
         }
 
         // Get current permissions
@@ -85,7 +85,7 @@ class Roles extends BaseController
         $data = [
             'title'         => 'Edit Role: ' . $role['role_name'],
             'role'          => $role,
-            'permissions'   => $this->permissionModel->findAll(),
+            'sys_permissions'   => $this->permissionModel->findAll(),
             'activePerms'   => $activePermIds,
         ];
         return view('roles/edit', $data);
@@ -103,10 +103,10 @@ class Roles extends BaseController
 
         $this->roleModel->update($id, $roleData);
 
-        // Reset and update permissions
+        // Reset and update sys_permissions
         $this->rolePermissionModel->where('role_id', $id)->delete();
 
-        $permissions = $this->request->getPost('permissions');
+        $permissions = $this->request->getPost('sys_permissions');
         if (!empty($permissions)) {
             $pivotData = [];
             foreach ($permissions as $permId) {
@@ -124,17 +124,17 @@ class Roles extends BaseController
             return redirect()->back()->with('error', 'Gagal memperbarui role.');
         }
 
-        return redirect()->to(base_url('roles'))->with('success', 'Role berhasil diperbarui.');
+        return redirect()->to(base_url('sys_roles'))->with('success', 'Role berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         // Admin cannot be deleted
         if ($id == 1) {
-            return redirect()->to(base_url('roles'))->with('error', 'Role Admin tidak dapat dihapus.');
+            return redirect()->to(base_url('sys_roles'))->with('error', 'Role Admin tidak dapat dihapus.');
         }
 
         $this->roleModel->delete($id);
-        return redirect()->to(base_url('roles'))->with('success', 'Role berhasil dihapus.');
+        return redirect()->to(base_url('sys_roles'))->with('success', 'Role berhasil dihapus.');
     }
 }

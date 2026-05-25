@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class ArsinumModel extends Model
 {
-    protected $table            = 'arsinum';
+    protected $table            = 'permukiman_arsinum';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

@@ -25,8 +25,8 @@ class Users extends BaseController
             return redirect()->to('/dashboard');
         }
 
-        $builder = $this->userModel->select('users.*, roles.role_name, roles.scope as role_scope')
-                        ->join('roles', 'roles.id = users.role_id');
+        $builder = $this->userModel->select('sys_users.*, sys_roles.role_name, sys_roles.scope as role_scope')
+                        ->join('sys_roles', 'sys_roles.id = sys_users.role_id');
 
         // Filter Wilayah (Untuk Kepala Desa / Local Scope)
         if (session()->get('role_scope') === 'local') {
@@ -39,7 +39,7 @@ class Users extends BaseController
 
             if (!empty($my_desa_ids)) {
                 // 2. Cari semua USER_ID yang ditugaskan di desa yang sama
-                $related_users = $db->table('user_desa')
+                $related_users = $db->table('sys_user_desa')
                                     ->select('user_id')
                                     ->whereIn('desa_id', $my_desa_ids)
                                     ->get()
@@ -48,18 +48,18 @@ class Users extends BaseController
                 $user_ids = array_column($related_users, 'user_id');
                 
                 if (!empty($user_ids)) {
-                    $builder->whereIn('users.id', $user_ids);
+                    $builder->whereIn('sys_users.id', $user_ids);
                 } else {
-                    $builder->where('users.id', 0); // Kosongkan jika tidak ada
+                    $builder->where('sys_users.id', 0); // Kosongkan jika tidak ada
                 }
             } else {
-                $builder->where('users.id', 0);
+                $builder->where('sys_users.id', 0);
             }
         }
 
         $data = [
             'title' => 'Daftar Pengguna / Petugas',
-            'users' => $builder->findAll()
+            'sys_users' => $builder->findAll()
         ];
 
         return view('users/index', $data);
@@ -77,7 +77,7 @@ class Users extends BaseController
 
         $data = [
             'title' => 'Tambah Pengguna Baru',
-            'roles' => $this->roleModel->findAll(),
+            'sys_roles' => $this->roleModel->findAll(),
             'desa_list' => $desaList
         ];
 
@@ -89,7 +89,7 @@ class Users extends BaseController
         if (!has_permission('create_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
 
         $rules = [
-            'username' => 'required|is_unique[users.username]',
+            'username' => 'required|is_unique[sys_users.username]',
             'password' => 'required|min_length[6]',
             'role_id'  => 'required'
         ];
@@ -141,7 +141,7 @@ class Users extends BaseController
         $data = [
             'title'             => 'Edit Pengguna',
             'user'              => $user,
-            'roles'             => $this->roleModel->findAll(),
+            'sys_roles'             => $this->roleModel->findAll(),
             'assigned_rtlh'     => $assignedRtlh,
             'assigned_kumuh'    => $assignedKumuh,
             'desa_list'         => $desaList
@@ -190,7 +190,7 @@ class Users extends BaseController
         $db = \Config\Database::connect();
         
         // Ambil data penugasan desa sebelum dihapus
-        $assignments = $db->table('user_desa')->where('user_id', $id)->get()->getResultArray();
+        $assignments = $db->table('sys_user_desa')->where('user_id', $id)->get()->getResultArray();
 
         $allData = [
             'user' => $user,
@@ -200,7 +200,7 @@ class Users extends BaseController
         $db->transStart();
         
         // 1. Simpan ke Trash
-        $db->table('trash_data')->insert([
+        $db->table('sys_trash')->insert([
             'entity_type' => 'USER',
             'entity_id'   => $id,
             'data_json'   => json_encode($allData),
@@ -209,7 +209,7 @@ class Users extends BaseController
         ]);
 
         // 2. Hapus data asli
-        $db->table('user_desa')->where('user_id', $id)->delete();
+        $db->table('sys_user_desa')->where('user_id', $id)->delete();
         $this->userModel->delete($id);
 
         $db->transComplete();
@@ -233,10 +233,10 @@ class Users extends BaseController
             foreach ($items as $item) {
                 if ($item['username'] === 'admin') continue; // Proteksi admin utama
 
-                $assignments = $db->table('user_desa')->where('user_id', $item['id'])->get()->getResultArray();
+                $assignments = $db->table('sys_user_desa')->where('user_id', $item['id'])->get()->getResultArray();
                 $allData = ['user' => $item, 'assignments' => $assignments];
 
-                $db->table('trash_data')->insert([
+                $db->table('sys_trash')->insert([
                     'entity_type' => 'USER',
                     'entity_id'   => $item['id'],
                     'data_json'   => json_encode($allData),
@@ -244,7 +244,7 @@ class Users extends BaseController
                     'created_at'  => date('Y-m-d H:i:s')
                 ]);
                 
-                $db->table('user_desa')->where('user_id', $item['id'])->delete();
+                $db->table('sys_user_desa')->where('user_id', $item['id'])->delete();
             }
 
             $this->userModel->whereIn('id', $ids)->where('username !=', 'admin')->delete();

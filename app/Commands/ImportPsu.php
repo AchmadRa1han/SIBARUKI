@@ -19,7 +19,7 @@ class ImportPsu extends BaseCommand
         CLI::write('Mereset tabel psu_jalan agar sesuai CSV...', 'yellow');
         
         // Hapus tabel lama untuk sinkronisasi total
-        $forge->dropTable('psu_jalan', true);
+        $forge->dropTable('permukiman_psu_jalan', true);
         
         $fieldsJalan = [
             'id' => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
@@ -36,7 +36,7 @@ class ImportPsu extends BaseCommand
         
         $forge->addField($fieldsJalan);
         $forge->addKey('id', true);
-        $forge->createTable('psu_jalan', true);
+        $forge->createTable('permukiman_psu_jalan', true);
 
         // 2. Import Jaringan Jalan
         $fileJalan = WRITEPATH . 'repository/PSU/jaringan jalan.csv';
@@ -49,7 +49,7 @@ class ImportPsu extends BaseCommand
             while (($row = fgetcsv($file, 0, ',')) !== FALSE) {
                 if (empty($row[0])) continue;
                 
-                $db->table('psu_jalan')->insert([
+                $db->table('permukiman_psu_jalan')->insert([
                     'wkt'          => $row[0],
                     'nama_jalan'   => trim($row[1] ?? '-'),
                     'tahun'        => (int)($row[2] ?? date('Y')),

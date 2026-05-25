@@ -18,17 +18,17 @@ class ImportRtlh extends BaseCommand
 
         // --- 1. PASTIKAN SKEMA ---
         CLI::write('Sinkronisasi skema No...', 'yellow');
-        $tables = ['rtlh_penerima', 'rtlh_rumah', 'rtlh_kondisi_rumah'];
+        $tables = ['perumahan_rtlh_penerima', 'perumahan_rtlh_rumah', 'perumahan_rtlh_kondisi'];
         foreach ($tables as $table) {
             if (!$db->fieldExists('No', $table)) {
                 $forge->addColumn($table, ['No' => ['type' => 'INT', 'constraint' => 11, 'null' => true]]);
             }
         }
-        $db->query("ALTER TABLE rtlh_penerima MODIFY jenis_kelamin VARCHAR(20) NULL");
+        $db->query("ALTER TABLE perumahan_rtlh_penerima MODIFY jenis_kelamin VARCHAR(20) NULL");
 
         // --- 2. PREPARASI ---
         CLI::write('Menyiapkan referensi...', 'yellow');
-        $refResults = $db->table('ref_master')->get()->getResultArray();
+        $refResults = $db->table('sys_ref_master')->get()->getResultArray();
         $refMap = [];
         foreach ($refResults as $ref) { $refMap[$ref['kategori']][strtoupper(trim($ref['nama_pilihan']))] = $ref['id']; }
 
@@ -81,7 +81,7 @@ class ImportRtlh extends BaseCommand
             }
 
             // A. INSERT PENERIMA
-            $db->table('rtlh_penerima')->insert([
+            $db->table('perumahan_rtlh_penerima')->insert([
                 'No' => $noUrut,
                 'nik' => $nik,
                 'no_kk' => trim($row[2], " \t\n\r\0\x0B';"),
@@ -96,7 +96,7 @@ class ImportRtlh extends BaseCommand
             ]);
 
             // B. INSERT RUMAH
-            $db->table('rtlh_rumah')->insert([
+            $db->table('perumahan_rtlh_rumah')->insert([
                 'No' => $noUrut,
                 'nik_pemilik' => $nik,
                 'desa' => $row[6],
@@ -122,7 +122,7 @@ class ImportRtlh extends BaseCommand
             $idSurvei = $db->insertID();
 
             // C. INSERT KONDISI
-            $db->table('rtlh_kondisi_rumah')->insert([
+            $db->table('perumahan_rtlh_kondisi')->insert([
                 'No' => $noUrut,
                 'id_survei' => $idSurvei,
                 'st_pondasi' => $refMap['KONDISI'][strtoupper(trim($row[22]))] ?? null,

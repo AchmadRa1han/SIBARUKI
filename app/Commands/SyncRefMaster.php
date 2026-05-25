@@ -46,13 +46,13 @@ class SyncRefMaster extends BaseCommand
             $uniquePilihan = array_unique($pilihan);
             foreach ($uniquePilihan as $p) {
                 // Cek apakah sudah ada di DB
-                $exists = $db->table('ref_master')
+                $exists = $db->table('sys_ref_master')
                             ->where('kategori', $kategori)
                             ->where('nama_pilihan', $p)
                             ->countAllResults();
 
                 if ($exists === 0) {
-                    $db->table('ref_master')->insert([
+                    $db->table('sys_ref_master')->insert([
                         'kategori' => $kategori,
                         'nama_pilihan' => $p
                     ]);

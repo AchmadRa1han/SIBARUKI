@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class RtlhHistoryModel extends Model
 {
-    protected $table            = 'rtlh_history_perubahan';
+    protected $table            = 'perumahan_rtlh_history';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

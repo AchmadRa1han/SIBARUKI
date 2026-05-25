@@ -18,7 +18,7 @@
 
     <div class="p-8 border-b dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/50">
         <div class="flex items-center gap-4">
-            <a href="<?= base_url('settings') ?>" class="p-3 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm border border-slate-100 dark:border-slate-800" title="Kembali ke Pengaturan">
+            <a href="<?= base_url('sys_settings') ?>" class="p-3 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm border border-slate-100 dark:border-slate-800" title="Kembali ke Pengaturan">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
             <div>

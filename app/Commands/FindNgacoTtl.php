@@ -14,7 +14,7 @@ class FindNgacoTtl extends BaseCommand
     public function run(array $params)
     {
         $db = \Config\Database::connect();
-        $rows = $db->table('rtlh_penerima')
+        $rows = $db->table('perumahan_rtlh_penerima')
                    ->where('tanggal_lahir IS NULL')
                    ->orWhere('tanggal_lahir', '0000-00-00')
                    ->get()->getResultArray();

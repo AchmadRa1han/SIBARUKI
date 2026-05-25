@@ -10,7 +10,7 @@ if (!function_exists('has_permission')) {
     function has_permission(string $permission): bool
     {
         $session = session();
-        $permissions = $session->get('permissions') ?? [];
+        $permissions = $session->get('sys_permissions') ?? [];
         
         // Admin selalu punya akses penuh
         if ($session->get('role_name') === 'admin') {

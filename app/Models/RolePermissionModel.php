@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class RolePermissionModel extends Model
 {
-    protected $table            = 'role_permissions';
+    protected $table            = 'sys_role_permissions';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

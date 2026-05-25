@@ -116,8 +116,8 @@ class WilayahKumuh extends BaseController
         $db = \Config\Database::connect();
 
         // Reset Auto Increment jika tabel kosong
-        if ($db->table('wilayah_kumuh')->countAllResults() === 0) {
-            $db->query("ALTER TABLE wilayah_kumuh AUTO_INCREMENT = 1");
+        if ($db->table('permukiman_wilayah_kumuh')->countAllResults() === 0) {
+            $db->query("ALTER TABLE permukiman_wilayah_kumuh AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
@@ -250,7 +250,7 @@ class WilayahKumuh extends BaseController
         $data = $this->kumuhModel->find($id);
         if ($data) {
             $db = \Config\Database::connect();
-            $db->table('trash_data')->insert([
+            $db->table('sys_trash')->insert([
                 'entity_type' => 'KUMUH',
                 'entity_id'   => $id,
                 'data_json'   => json_encode($data),
@@ -274,7 +274,7 @@ class WilayahKumuh extends BaseController
         try {
             $items = $this->kumuhModel->whereIn('FID', $ids)->findAll();
             foreach ($items as $item) {
-                $db->table('trash_data')->insert([
+                $db->table('sys_trash')->insert([
                     'entity_type' => 'KUMUH',
                     'entity_id'   => $item['FID'],
                     'data_json'   => json_encode($item),

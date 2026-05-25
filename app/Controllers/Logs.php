@@ -81,7 +81,7 @@ class Logs extends BaseController
         foreach($actionDistRaw as $row) { if(!empty($row['action'])) { $actionDist[] = ['label' => $row['action'], 'total' => (int)$row['total']]; } }
 
         // 7. ONLINE USERS
-        $onlineUsers = $db->table('users')->select('username, last_active, instansi')->where('last_active >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))->get()->getResultArray();
+        $onlineUsers = $db->table('sys_users')->select('username, last_active, instansi')->where('last_active >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))->get()->getResultArray();
 
         // 8. ANOMALY DETECTION
         $anomalies = [];
@@ -99,9 +99,9 @@ class Logs extends BaseController
         ];
 
         // 9. LOGS QUERY WITH USER INFO
-        $logModel->select('sys_logs.*, users.instansi, roles.role_name')
-                 ->join('users', 'users.username = sys_logs.user', 'left')
-                 ->join('roles', 'roles.id = users.role_id', 'left');
+        $logModel->select('sys_logs.*, sys_users.instansi, sys_roles.role_name')
+                 ->join('sys_users', 'sys_users.username = sys_logs.user', 'left')
+                 ->join('sys_roles', 'sys_roles.id = sys_users.role_id', 'left');
 
         if ($filterUser) $logModel->where('sys_logs.user', $filterUser);
         if ($filterAction) $logModel->where('sys_logs.action', $filterAction);
@@ -128,7 +128,7 @@ class Logs extends BaseController
                 'topLogins' => $topLogins, 'failedLogins' => $failedLogins, 'onlineUsers' => $onlineUsers, 'anomalies' => $anomalies, 'actionDist' => $actionDist,
                 'trend' => ['hourly' => ['data' => $trendHourlyData, 'labels' => $trendHourlyLabels], 'daily' => ['data' => $trendDailyData, 'labels' => $trendDailyLabels], 'monthly' => ['data' => $trendMonthlyData, 'labels' => $trendMonthlyLabels]]
             ],
-            'options' => ['users' => array_column($optUsers, 'user'), 'tables' => array_column($optTables, 'table_name')],
+            'options' => ['sys_users' => array_column($optUsers, 'user'), 'tables' => array_column($optTables, 'table_name')],
             'filters' => ['user' => $filterUser, 'action' => $filterAction, 'table' => $filterTable, 'date' => $filterDate, 'severity' => $filterSeverity]
         ];
 

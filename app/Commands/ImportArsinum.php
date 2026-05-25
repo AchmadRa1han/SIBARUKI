@@ -33,8 +33,8 @@ class ImportArsinum extends BaseCommand
 
         $forge->addField($fields);
         $forge->addKey('id', true);
-        $forge->createTable('arsinum', true);
-        $db->table('arsinum')->truncate();
+        $forge->createTable('permukiman_arsinum', true);
+        $db->table('permukiman_arsinum')->truncate();
 
         $filePath = WRITEPATH . 'repository/ARSINUM KAB. SINJAI 2022-2025.csv';
         $file = fopen($filePath, 'r');
@@ -66,7 +66,7 @@ class ImportArsinum extends BaseCommand
         fclose($file);
 
         if (!empty($batch)) {
-            $db->table('arsinum')->insertBatch($batch);
+            $db->table('permukiman_arsinum')->insertBatch($batch);
             CLI::write("Berhasil mengimpor $count data ARSINUM.", 'green');
         }
     }

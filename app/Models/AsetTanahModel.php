@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class AsetTanahModel extends Model
 {
-    protected $table            = 'aset_tanah';
+    protected $table            = 'pertanahan_aset';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

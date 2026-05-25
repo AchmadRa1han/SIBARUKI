@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class UserDesaModel extends Model
 {
-    protected $table            = 'user_desa';
+    protected $table            = 'sys_user_desa';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

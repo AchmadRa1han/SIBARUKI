@@ -93,38 +93,54 @@
     </div>
 
     <!-- 4. BOTTOM ANALYTICS -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- ANALISIS RTLH & RLH -->
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
             <h3 class="text-[9px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
-                <span class="w-6 h-[2px] bg-blue-600"></span> Analisis Kelayakan
+                <span class="w-6 h-[2px] bg-blue-600"></span> Analisis RTLH & RLH
             </h3>
             <div id="conditionChart" class="flex justify-center"></div>
         </div>
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+
+        <!-- LEGALITAS ASET TANAH -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+            <h3 class="text-[9px] font-bold text-emerald-600 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+                <span class="w-6 h-[2px] bg-emerald-600"></span> Legalitas Aset Tanah
+            </h3>
+            <div id="asetLegalitasChart" class="flex justify-center"></div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- PRIORITAS KAWASAN KUMUH -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
             <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
                 <i data-lucide="alert-triangle" class="w-32 h-32 text-rose-600"></i>
             </div>
             <h3 class="text-[9px] font-bold text-rose-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
                 <span class="w-6 h-[2px] bg-rose-600"></span> Prioritas Kawasan Kumuh
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+            <div class="space-y-4 relative z-10">
                 <?php foreach($topKumuh as $k): ?>
                 <a href="<?= base_url('wilayah-kumuh/detail/' . $k['FID']) ?>" class="p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl transition-all duration-500 group shadow-sm">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold text-base group-hover:scale-110 transition-all duration-500 shadow-lg shadow-rose-600/20"><?= substr($k['Kelurahan'], 0, 1) ?></div>
+                        <div class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs group-hover:scale-110 transition-all duration-500 shadow-lg shadow-rose-600/20"><?= substr($k['Kelurahan'], 0, 1) ?></div>
                         <div>
-                            <p class="text-xs font-bold text-blue-950 dark:text-white uppercase tracking-tight"><?= $k['Kelurahan'] ?></p>
-                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5"><?= $k['Kawasan'] ?: 'Kawasan Kumuh' ?></p>
+                            <p class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-tight"><?= $k['Kelurahan'] ?></p>
+                            <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-0.5 truncate w-24"><?= $k['Kawasan'] ?: 'Kawasan Kumuh' ?></p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-xl font-bold text-rose-600 leading-none italic"><?= number_format($k['skor_kumuh'], 0) ?></p>
-                        <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Skor</p>
+                        <p class="text-lg font-bold text-rose-600 leading-none italic"><?= number_format($k['skor_kumuh'], 0) ?></p>
+                        <p class="text-[6px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Skor</p>
                     </div>
                 </a>
                 <?php endforeach; ?>
             </div>
         </div>
+        
+        <!-- Placeholder or empty space to keep layout balanced if needed, 
+             but grid-cols-2 will handle two cards nicely. -->
     </div>
 </div>
 
@@ -352,13 +368,27 @@
     }
 
     function initChart() {
+        // 1. Analisis RTLH & RLH
         const s = <?= json_encode($statusLayak) ?>;
+        // series: [RLH, Belum Teridentifikasi, RTLH]
         new ApexCharts(document.querySelector("#conditionChart"), {
-            series: [parseInt(s.layak||0), parseInt(s.menuju_layak||0), parseInt(s.tidak_layak||0)],
+            series: [parseInt(s.rlh||0), parseInt(s.belum_teridentifikasi||0), parseInt(s.rtlh||0)],
             chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
-            labels: ['LAYAK', 'MENUJU LAYAK', 'TIDAK LAYAK'],
-            colors: ['#10b981', '#f59e0b', '#ef4444'],
-            plotOptions: { pie: { donut: { size: '85%', labels: { show: true, total: { show: true, label: 'DATA', color: '#94a3b8', fontSize: '9px', fontWeight: 900 } } } } },
+            labels: ['RLH', 'BELUM TERIDENTIFIKASI', 'RTLH'],
+            colors: ['#10b981', '#94a3b8', '#ef4444'],
+            plotOptions: { pie: { donut: { size: '85%', labels: { show: true, total: { show: true, label: 'TOTAL DATA', color: '#94a3b8', fontSize: '9px', fontWeight: 900 } } } } },
+            legend: { position: 'bottom', fontSize: '9px', fontWeight: 700 },
+            stroke: { show: false }
+        }).render();
+
+        // 2. Legalitas Aset Tanah
+        const a = <?= json_encode($statusAset) ?>;
+        new ApexCharts(document.querySelector("#asetLegalitasChart"), {
+            series: [parseInt(a.bersertifikat||0), parseInt(a.belum_sertifikat||0)],
+            chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
+            labels: ['BERSERTIFIKAT', 'BELUM BERSERTIFIKAT'],
+            colors: ['#2563eb', '#f59e0b'],
+            plotOptions: { pie: { donut: { size: '85%', labels: { show: true, total: { show: true, label: 'ASET', color: '#94a3b8', fontSize: '9px', fontWeight: 900 } } } } },
             legend: { position: 'bottom', fontSize: '9px', fontWeight: 700 },
             stroke: { show: false }
         }).render();

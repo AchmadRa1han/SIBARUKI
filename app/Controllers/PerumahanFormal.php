@@ -216,7 +216,7 @@ class PerumahanFormal extends BaseController
         $data = $this->perumahanModel->find($id);
         if ($data) {
             $db = \Config\Database::connect();
-            $db->table('trash_data')->insert([
+            $db->table('sys_trash')->insert([
                 'entity_type' => 'PERUMAHAN',
                 'entity_id'   => $id,
                 'data_json'   => json_encode($data),
@@ -242,7 +242,7 @@ class PerumahanFormal extends BaseController
         try {
             $items = $this->perumahanModel->whereIn('id', $ids)->findAll();
             foreach ($items as $item) {
-                $db->table('trash_data')->insert([
+                $db->table('sys_trash')->insert([
                     'entity_type' => 'PERUMAHAN',
                     'entity_id'   => $item['id'],
                     'data_json'   => json_encode($item),

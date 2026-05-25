@@ -15,7 +15,7 @@ class UpdatePhotoColumns extends BaseCommand
     {
         $db = \Config\Database::connect();
         
-        $tables = ['arsinum', 'pisew', 'psu_jalan', 'rtlh_bansos'];
+        $tables = ['permukiman_arsinum', 'permukiman_pisew', 'permukiman_psu_jalan', 'perumahan_rtlh_bansos'];
         
         foreach ($tables as $table) {
             CLI::write("Updating table: $table", 'yellow');

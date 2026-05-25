@@ -17,8 +17,8 @@ class InfrastrukturApi extends BaseApiController
     {
         switch ($module) {
             case 'psu': return new PsuJalanModel();
-            case 'pisew': return new PisewModel();
-            case 'arsinum': return new ArsinumModel();
+            case 'permukiman_pisew': return new PisewModel();
+            case 'permukiman_arsinum': return new ArsinumModel();
             case 'perumahan-formal': return new PerumahanFormalModel();
             case 'aset-tanah': return new AsetTanahModel();
             default: return null;

@@ -20,24 +20,24 @@ class KondisiFisik extends BaseController
     {
         $data = [
             'title' => 'Kondisi Fisik Rumah',
-            'kondisi' => $this->kondisiModel->select('rtlh_kondisi_rumah.*, p.nama_kepala_keluarga as pemilik, r.desa')
+            'kondisi' => $this->kondisiModel->select('perumahan_rtlh_kondisi.*, p.nama_kepala_keluarga as pemilik, r.desa')
                 ->select('ref_pondasi.nama_pilihan as pondasi, ref_kolom.nama_pilihan as kolom')
                 ->select('ref_balok.nama_pilihan as balok, ref_sloof.nama_pilihan as sloof')
                 ->select('ref_atap_st.nama_pilihan as atap_st, ref_atap_mat.nama_pilihan as atap_mat')
                 ->select('ref_dinding_st.nama_pilihan as dinding_st, ref_dinding_mat.nama_pilihan as dinding_mat')
                 ->select('ref_lantai_st.nama_pilihan as lantai_st, ref_lantai_mat.nama_pilihan as lantai_mat')
-                ->join('rtlh_rumah r', 'r.id_survei = rtlh_kondisi_rumah.id_survei')
+                ->join('rtlh_rumah r', 'r.id_survei = perumahan_rtlh_kondisi.id_survei')
                 ->join('rtlh_penerima p', 'p.nik = r.nik_pemilik')
-                ->join('ref_master ref_pondasi', 'ref_pondasi.id = rtlh_kondisi_rumah.st_pondasi', 'left')
-                ->join('ref_master ref_kolom', 'ref_kolom.id = rtlh_kondisi_rumah.st_kolom', 'left')
-                ->join('ref_master ref_balok', 'ref_balok.id = rtlh_kondisi_rumah.st_balok', 'left')
-                ->join('ref_master ref_sloof', 'ref_sloof.id = rtlh_kondisi_rumah.st_sloof', 'left')
-                ->join('ref_master ref_atap_st', 'ref_atap_st.id = rtlh_kondisi_rumah.st_atap', 'left')
-                ->join('ref_master ref_atap_mat', 'ref_atap_mat.id = rtlh_kondisi_rumah.mat_atap', 'left')
-                ->join('ref_master ref_dinding_st', 'ref_dinding_st.id = rtlh_kondisi_rumah.st_dinding', 'left')
-                ->join('ref_master ref_dinding_mat', 'ref_dinding_mat.id = rtlh_kondisi_rumah.mat_dinding', 'left')
-                ->join('ref_master ref_lantai_st', 'ref_lantai_st.id = rtlh_kondisi_rumah.st_lantai', 'left')
-                ->join('ref_master ref_lantai_mat', 'ref_lantai_mat.id = rtlh_kondisi_rumah.mat_lantai', 'left')
+                ->join('ref_master ref_pondasi', 'ref_pondasi.id = perumahan_rtlh_kondisi.st_pondasi', 'left')
+                ->join('ref_master ref_kolom', 'ref_kolom.id = perumahan_rtlh_kondisi.st_kolom', 'left')
+                ->join('ref_master ref_balok', 'ref_balok.id = perumahan_rtlh_kondisi.st_balok', 'left')
+                ->join('ref_master ref_sloof', 'ref_sloof.id = perumahan_rtlh_kondisi.st_sloof', 'left')
+                ->join('ref_master ref_atap_st', 'ref_atap_st.id = perumahan_rtlh_kondisi.st_atap', 'left')
+                ->join('ref_master ref_atap_mat', 'ref_atap_mat.id = perumahan_rtlh_kondisi.mat_atap', 'left')
+                ->join('ref_master ref_dinding_st', 'ref_dinding_st.id = perumahan_rtlh_kondisi.st_dinding', 'left')
+                ->join('ref_master ref_dinding_mat', 'ref_dinding_mat.id = perumahan_rtlh_kondisi.mat_dinding', 'left')
+                ->join('ref_master ref_lantai_st', 'ref_lantai_st.id = perumahan_rtlh_kondisi.st_lantai', 'left')
+                ->join('ref_master ref_lantai_mat', 'ref_lantai_mat.id = perumahan_rtlh_kondisi.mat_lantai', 'left')
                 ->paginate(25, 'group1'),
             'pager' => $this->kondisiModel->pager
         ];

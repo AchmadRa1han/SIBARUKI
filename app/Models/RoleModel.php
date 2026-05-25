@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class RoleModel extends Model
 {
-    protected $table            = 'roles';
+    protected $table            = 'sys_roles';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

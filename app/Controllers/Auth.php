@@ -66,7 +66,7 @@ class Auth extends BaseController
                     'role_id'        => $user['role_id'],
                     'role_name'      => $role['role_name'],
                     'role_scope'     => $role['scope'], // global atau local
-                    'permissions'    => $perm_list,    // Array string izin
+                    'sys_permissions'    => $perm_list,    // Array string izin
                     'desa_ids_rtlh'  => $desa_rtlh,    // Filter wilayah RTLH
                     'desa_ids_kumuh' => $desa_kumuh,   // Filter wilayah Kumuh
                     'isLoggedIn'     => TRUE

@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class RtlhPenerimaModel extends Model
 {
-    protected $table            = 'rtlh_penerima';
+    protected $table            = 'perumahan_rtlh_penerima';
     protected $primaryKey       = 'nik';
     protected $useAutoIncrement = false;
     protected $returnType       = 'array';

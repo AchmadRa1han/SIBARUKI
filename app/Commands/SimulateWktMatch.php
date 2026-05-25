@@ -16,7 +16,7 @@ class SimulateWktMatch extends BaseCommand
         $db = \Config\Database::connect();
         
         // 1. Get DB Records
-        $dbRecords = $db->table('wilayah_kumuh')->get()->getResultArray();
+        $dbRecords = $db->table('permukiman_wilayah_kumuh')->get()->getResultArray();
         $dbCount = count($dbRecords);
 
         // 2. Read CSV

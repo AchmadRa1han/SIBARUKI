@@ -39,7 +39,7 @@ abstract class BaseController extends Controller
             $lastUpdate = session()->get('last_active_update') ?? 0;
             $now = time();
             if (($now - $lastUpdate) > 300) { // 5 minutes
-                $this->db->table('users')->where('id', session()->get('user_id'))->update([
+                $this->db->table('sys_users')->where('id', session()->get('user_id'))->update([
                     'last_active' => date('Y-m-d H:i:s')
                 ]);
                 session()->set('last_active_update', $now);
@@ -111,13 +111,13 @@ abstract class BaseController extends Controller
             if (is_numeric($value)) {
                 if ($key === 'role_id') {
                     // Ambil dari tabel roles
-                    $role = $this->db->table('roles')->where('id', $value)->get()->getRowArray();
+                    $role = $this->db->table('sys_roles')->where('id', $value)->get()->getRowArray();
                     if ($role) $displayValue = strtoupper($role['role_name']);
                 } else {
                     // Ambil dari ref_master untuk kolom st_, mat_, atau _id lainnya
                     $isRef = str_starts_with($key, 'st_') || str_starts_with($key, 'mat_') || str_ends_with($key, '_id');
                     if ($isRef) {
-                        $ref = $this->db->table('ref_master')->where('id', $value)->get()->getRowArray();
+                        $ref = $this->db->table('sys_ref_master')->where('id', $value)->get()->getRowArray();
                         if ($ref) $displayValue = $ref['nama_pilihan'];
                     }
                 }
@@ -152,22 +152,22 @@ abstract class BaseController extends Controller
                     // Logika Resolusi Nama
                     if ($key === 'role_id') {
                         if ($normOld) {
-                            $role = $this->db->table('roles')->where('id', $normOld)->get()->getRowArray();
+                            $role = $this->db->table('sys_roles')->where('id', $normOld)->get()->getRowArray();
                             if ($role) $displayOld = strtoupper($role['role_name']);
                         }
                         if ($normNew) {
-                            $role = $this->db->table('roles')->where('id', $normNew)->get()->getRowArray();
+                            $role = $this->db->table('sys_roles')->where('id', $normNew)->get()->getRowArray();
                             if ($role) $displayNew = strtoupper($role['role_name']);
                         }
                     } else {
                         $isRef = str_starts_with($key, 'st_') || str_starts_with($key, 'mat_') || str_ends_with($key, '_id');
                         if ($isRef) {
                             if ($normOld && is_numeric($normOld)) {
-                                $ref = $this->db->table('ref_master')->where('id', $normOld)->get()->getRowArray();
+                                $ref = $this->db->table('sys_ref_master')->where('id', $normOld)->get()->getRowArray();
                                 if ($ref) $displayOld = $ref['nama_pilihan'];
                             }
                             if ($normNew && is_numeric($normNew)) {
-                                $ref = $this->db->table('ref_master')->where('id', $normNew)->get()->getRowArray();
+                                $ref = $this->db->table('sys_ref_master')->where('id', $normNew)->get()->getRowArray();
                                 if ($ref) $displayNew = $ref['nama_pilihan'];
                             }
                         }

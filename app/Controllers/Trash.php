@@ -11,7 +11,7 @@ class Trash extends BaseController
         $db = \Config\Database::connect();
         $data = [
             'title' => 'Recycle Bin (Pemulihan Data)',
-            'trash' => $db->table('trash_data')->orderBy('created_at', 'DESC')->get()->getResultArray()
+            'trash' => $db->table('sys_trash')->orderBy('created_at', 'DESC')->get()->getResultArray()
         ];
 
         return view('trash/index', $data);
@@ -22,7 +22,7 @@ class Trash extends BaseController
         if (!has_permission('manage_roles')) return redirect()->to('/dashboard');
 
         $db = \Config\Database::connect();
-        $item = $db->table('trash_data')->where('id', $id)->get()->getRowArray();
+        $item = $db->table('sys_trash')->where('id', $id)->get()->getRowArray();
         if (!$item) return redirect()->to('/trash')->with('error', 'Data tidak ditemukan.');
 
         $data = json_decode($item['data_json'], true);
@@ -31,29 +31,29 @@ class Trash extends BaseController
         if ($item['entity_type'] === 'RTLH') {
             // Restore ke 3 Tabel
             if (!empty($data['penerima'])) {
-                $db->table('rtlh_penerima')->ignore(true)->insert($data['penerima']);
+                $db->table('perumahan_rtlh_penerima')->ignore(true)->insert($data['penerima']);
             }
-            $db->table('rtlh_rumah')->insert($data['rumah']);
-            $db->table('rtlh_kondisi_rumah')->insert($data['kondisi']);
+            $db->table('perumahan_rtlh_rumah')->insert($data['rumah']);
+            $db->table('perumahan_rtlh_kondisi')->insert($data['kondisi']);
         } elseif ($item['entity_type'] === 'USER') {
             // Restore User & Assignments
-            $db->table('users')->insert($data['user']);
+            $db->table('sys_users')->insert($data['user']);
             if (!empty($data['assignments'])) {
-                $db->table('user_desa')->insertBatch($data['assignments']);
+                $db->table('sys_user_desa')->insertBatch($data['assignments']);
             }
         } elseif ($item['entity_type'] === 'KUMUH') {
             // Restore Wilayah Kumuh
-            $db->table('wilayah_kumuh')->insert($data);
+            $db->table('permukiman_wilayah_kumuh')->insert($data);
         } elseif ($item['entity_type'] === 'PISEW') {
-            $db->table('pisew')->insert($data);
+            $db->table('permukiman_pisew')->insert($data);
         } elseif ($item['entity_type'] === 'ARSINUM') {
-            $db->table('arsinum')->insert($data);
+            $db->table('permukiman_arsinum')->insert($data);
         } elseif ($item['entity_type'] === 'PSU_JALAN') {
-            $db->table('psu_jalan')->insert($data);
+            $db->table('permukiman_psu_jalan')->insert($data);
         }
 
         // Hapus dari Trash setelah direstore
-        $db->table('trash_data')->where('id', $id)->delete();
+        $db->table('sys_trash')->where('id', $id)->delete();
         $db->transComplete();
 
         $this->logActivity('Restore', $item['entity_type'], "Memulihkan data ID: {$item['entity_id']} dari Recycle Bin");
@@ -66,11 +66,11 @@ class Trash extends BaseController
         if (!has_permission('manage_roles')) return redirect()->to('/dashboard');
 
         $db = \Config\Database::connect();
-        $item = $db->table('trash_data')->where('id', $id)->get()->getRowArray();
+        $item = $db->table('sys_trash')->where('id', $id)->get()->getRowArray();
         if ($item) {
             $data = json_decode($item['data_json'], true);
             $this->cleanupPhysicalFiles($item['entity_type'], $data);
-            $db->table('trash_data')->where('id', $id)->delete();
+            $db->table('sys_trash')->where('id', $id)->delete();
         }
 
         return redirect()->to('/trash')->with('message', 'Data dihapus secara permanen.');
@@ -81,13 +81,13 @@ class Trash extends BaseController
         if (!has_permission('manage_roles')) return redirect()->to('/dashboard');
 
         $db = \Config\Database::connect();
-        $items = $db->table('trash_data')->get()->getResultArray();
+        $items = $db->table('sys_trash')->get()->getResultArray();
         foreach ($items as $item) {
             $data = json_decode($item['data_json'], true);
             $this->cleanupPhysicalFiles($item['entity_type'], $data);
         }
 
-        $db->table('trash_data')->truncate();
+        $db->table('sys_trash')->truncate();
 
         $this->logActivity('Hapus', 'Recycle Bin', 'Mengosongkan seluruh data di Recycle Bin');
 

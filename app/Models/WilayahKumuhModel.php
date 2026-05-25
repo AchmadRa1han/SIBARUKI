@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class WilayahKumuhModel extends Model
 {
-    protected $table            = 'wilayah_kumuh';
+    protected $table            = 'permukiman_wilayah_kumuh';
     protected $primaryKey       = 'FID';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

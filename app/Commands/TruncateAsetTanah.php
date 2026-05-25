@@ -21,7 +21,7 @@ class TruncateAsetTanah extends BaseCommand
         $db->query("SET FOREIGN_KEY_CHECKS = 0;");
         
         // Kosongkan tabel utama
-        $db->query("TRUNCATE TABLE aset_tanah");
+        $db->query("TRUNCATE TABLE pertanahan_aset");
         
         $db->query("SET FOREIGN_KEY_CHECKS = 1;");
         

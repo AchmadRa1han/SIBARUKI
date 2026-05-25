@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class KondisiRumahModel extends Model
 {
-    protected $table            = 'rtlh_kondisi_rumah';
+    protected $table            = 'perumahan_rtlh_kondisi';
     protected $primaryKey       = 'id_survei';
     protected $useAutoIncrement = false;
     protected $returnType       = 'array';

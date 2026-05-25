@@ -14,7 +14,7 @@ class CheckTongke extends BaseCommand
     public function run(array $params)
     {
         $db = \Config\Database::connect();
-        $row = $db->table('wilayah_kumuh')->like('Kode_RT_RW', 'Tongke-Tongke')->get()->getRowArray();
+        $row = $db->table('permukiman_wilayah_kumuh')->like('Kode_RT_RW', 'Tongke-Tongke')->get()->getRowArray();
 
         if ($row) {
             CLI::write("DATA DITEMUKAN:", 'green');

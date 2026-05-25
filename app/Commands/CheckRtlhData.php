@@ -14,12 +14,12 @@ class CheckRtlhData extends BaseCommand
     public function run(array $params)
     {
         $db = \Config\Database::connect();
-        CLI::write('Total di rtlh_penerima: ' . $db->table('rtlh_penerima')->countAllResults());
-        CLI::write('Total di rtlh_rumah: ' . $db->table('rtlh_rumah')->countAllResults());
-        CLI::write('Total di rtlh_kondisi_rumah: ' . $db->table('rtlh_kondisi_rumah')->countAllResults());
+        CLI::write('Total di rtlh_penerima: ' . $db->table('perumahan_rtlh_penerima')->countAllResults());
+        CLI::write('Total di rtlh_rumah: ' . $db->table('perumahan_rtlh_rumah')->countAllResults());
+        CLI::write('Total di rtlh_kondisi_rumah: ' . $db->table('perumahan_rtlh_kondisi')->countAllResults());
 
-        $sample = $db->table('rtlh_rumah')->select('rtlh_rumah.*, rtlh_penerima.nama_kepala_keluarga')
-                    ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left')
+        $sample = $db->table('perumahan_rtlh_rumah')->select('perumahan_rtlh_rumah.*, perumahan_rtlh_penerima.nama_kepala_keluarga')
+                    ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left')
                     ->limit(1)->get()->getRowArray();
         CLI::write("
 Contoh Join Data:");

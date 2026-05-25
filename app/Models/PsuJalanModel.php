@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class PsuJalanModel extends Model
 {
-    protected $table            = 'psu_jalan';
+    protected $table            = 'permukiman_psu_jalan';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

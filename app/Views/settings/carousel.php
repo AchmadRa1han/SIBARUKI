@@ -8,7 +8,7 @@
             <h1 class="text-4xl font-bold text-blue-950 dark:text-white uppercase tracking-tight">Pengaturan Carousel</h1>
             <p class="text-slate-500 dark:text-slate-400 font-medium mt-1">Kelola gambar dan teks yang muncul pada halaman utama.</p>
         </div>
-        <a href="<?= base_url('settings') ?>" class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-800 px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">
+        <a href="<?= base_url('sys_settings') ?>" class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-800 px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
             <span>Kembali</span>
         </a>

@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class BansosRtlhModel extends Model
 {
-    protected $table            = 'rtlh_bansos';
+    protected $table            = 'perumahan_rtlh_bansos';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

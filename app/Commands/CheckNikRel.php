@@ -14,8 +14,8 @@ class CheckNikRel extends BaseCommand
     public function run(array $params)
     {
         $db = \Config\Database::connect();
-        $penerima = $db->table('rtlh_penerima')->limit(3)->get()->getResultArray();
-        $rumah = $db->table('rtlh_rumah')->limit(3)->get()->getResultArray();
+        $penerima = $db->table('perumahan_rtlh_penerima')->limit(3)->get()->getResultArray();
+        $rumah = $db->table('perumahan_rtlh_rumah')->limit(3)->get()->getResultArray();
 
         CLI::write('--- DATA PENERIMA ---');
         foreach($penerima as $p) {
@@ -28,8 +28,8 @@ class CheckNikRel extends BaseCommand
             CLI::write("NIK Pemilik: [" . $r['nik_pemilik'] . "]");
         }
 
-        $matchCount = $db->table('rtlh_rumah')
-                         ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik')
+        $matchCount = $db->table('perumahan_rtlh_rumah')
+                         ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik')
                          ->countAllResults();
         CLI::write("
 Total Data Match: " . $matchCount, 'green');

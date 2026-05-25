@@ -88,7 +88,7 @@ Mengirim banyak data survei sekaligus dari HP ke Server (Offline-to-Online).
 ## 5. Modul Infrastruktur & Aset
 
 ### 5.1 Operasi CRUD Dinamis
-Endpoint ini mendukung modul: `psu`, `pisew`, `arsinum`, `perumahan-formal`, `aset-tanah`.
+Endpoint ini mendukung modul: `psu`, `permukiman_pisew`, `permukiman_arsinum`, `perumahan-formal`, `aset-tanah`.
 - **List:** `GET /infrastruktur/{modul}`
 - **Detail:** `GET /infrastruktur/{modul}/{id}`
 - **Create:** `POST /infrastruktur/{modul}`

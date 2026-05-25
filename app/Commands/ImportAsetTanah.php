@@ -16,7 +16,7 @@ class ImportAsetTanah extends BaseCommand
         $db = \Config\Database::connect();
         
         // Kosongkan tabel sebelum impor ulang
-        $db->table('aset_tanah')->truncate();
+        $db->table('pertanahan_aset')->truncate();
         
         CLI::write('Tabel aset_tanah dikosongkan.', 'yellow');
 
@@ -104,7 +104,7 @@ class ImportAsetTanah extends BaseCommand
         fclose($file);
 
         if (!empty($batch)) {
-            $db->table('aset_tanah')->insertBatch($batch);
+            $db->table('pertanahan_aset')->insertBatch($batch);
             CLI::write("Berhasil mengimpor $count data aset tanah.", 'green');
         }
     }

@@ -1,13 +1,12 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<!-- Leaflet Assets -->
+<!-- Leaflet & GIS Assets -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 
 <div class="space-y-6 pb-12 text-slate-900 dark:text-slate-200">
@@ -148,7 +147,6 @@
 
     <!-- Table Section -->
     <div id="table-container" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
-        <!-- Floating Bulk Action Bar -->
         <div id="bulk-action-bar" class="absolute top-0 left-0 right-0 z-50 bg-blue-950 text-white p-4 transform -translate-y-full transition-transform duration-500 flex items-center justify-between px-8">
             <div class="flex items-center gap-4">
                 <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-lg text-[9px] font-bold tracking-widest shadow-lg shadow-blue-600/20">0 TERPILIH</span>
@@ -184,15 +182,9 @@
                         <th class="px-6 py-4 w-16 text-center">
                             <input type="checkbox" id="select-all" class="w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
                         </th>
-                        <th class="px-4 py-4 w-36 cursor-pointer hover:text-blue-600 transition-colors" onclick="applySort('no_sertifikat')">
-                            No. Sertifikat
-                        </th>
-                        <th class="px-4 py-4 w-64 cursor-pointer hover:text-blue-600 transition-colors" onclick="applySort('nama_pemilik')">
-                            Pemilik / Instansi
-                        </th>
-                        <th class="px-4 py-4 w-32 text-center cursor-pointer hover:text-blue-600 transition-colors" onclick="applySort('luas_m2')">
-                            Luas (M²)
-                        </th>
+                        <th class="px-4 py-4 w-36 cursor-pointer hover:text-blue-600 transition-colors" onclick="applySort('no_sertifikat')">No. Sertifikat</th>
+                        <th class="px-4 py-4 w-64 cursor-pointer hover:text-blue-600 transition-colors" onclick="applySort('nama_pemilik')">Pemilik / Instansi</th>
+                        <th class="px-4 py-4 w-32 text-center cursor-pointer hover:text-blue-600 transition-colors" onclick="applySort('luas_m2')">Luas (M²)</th>
                         <th class="px-4 py-4 w-48">Kecamatan</th>
                         <th class="px-6 py-4 text-center w-40">Aksi</th>
                     </tr>
@@ -236,26 +228,16 @@
                         </td>
                     </tr>
                     <?php endforeach; else: ?>
-                        <tr>
-                            <td colspan="6" class="px-8 py-16 text-center">
-                                <div class="flex flex-col items-center justify-center opacity-40">
-                                    <i data-lucide="package-search" class="w-12 h-12 mb-3"></i>
-                                    <p class="font-bold uppercase text-[9px] tracking-[0.3em]">Data Tidak Ditemukan</p>
-                                </div>
-                            </td>
-                        </tr>
+                        <tr><td colspan="6" class="px-8 py-16 text-center opacity-40 font-bold uppercase text-[9px] tracking-[0.3em]">Data Tidak Ditemukan</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
         <div id="pagination-container">
             <?php if (isset($pager)): ?>
-            <div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800">
-                <?= $pager->links('group1', 'tailwind_full') ?>
-            </div>
+            <div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800"><?= $pager->links('group1', 'tailwind_full') ?></div>
             <?php endif; ?>
         </div>
-    </div>
     </div>
 </div>
 
@@ -266,31 +248,18 @@
     let rot = 0;
 
     function parseWKTUniversal(wkt) {
-        if (!wkt || typeof wkt !== 'string' || typeof wellknown === 'undefined') return null;
-        try {
-            let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
-            let geojson = wellknown.parse(cleanWkt);
-            return geojson;
-        } catch(e) { return null; }
+        if (!wkt || typeof wellknown === 'undefined') return null;
+        try { return wellknown.parse(wkt.includes(';') ? wkt.split(';')[1] : wkt); } catch(e) { return null; }
     }
 
     function initMap() {
-        if (typeof L === 'undefined' || typeof wellknown === 'undefined') { setTimeout(initMap, 100); return; }
-        if (map) return; // Guard: prevent double initialization error
-
+        if (typeof L === 'undefined' || typeof wellknown === 'undefined') { setTimeout(initMap, 200); return; }
+        if (map) return;
+        
         try {
             const isDark = document.documentElement.classList.contains('dark');
-            const mapContainer = document.getElementById('map');
-            if (!mapContainer) return;
-
-            const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
-                attribution: '&copy; CartoDB' 
-            });
-            const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-                maxZoom: 20,
-                subdomains:['mt0','mt1','mt2','mt3'],
-                attribution: '&copy; Google'
-            });
+            const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CartoDB' });
+            const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], attribution: '&copy; Google' });
 
             map = L.map('map', { zoomControl: false, layers: [cartoDB] }).setView([-5.1245, 120.2536], 12);
             L.control.zoom({ position: 'topright' }).addTo(map);
@@ -298,7 +267,7 @@
             const LayerToggle = L.Control.extend({
                 onAdd: function(map) {
                     const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
-                    btn.type = 'button'; btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
+                    btn.type = 'button'; btn.style.width = '38px'; btn.style.height = '38px';
                     const svgColor = isDark ? '#60a5fa' : '#2563eb';
                     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
                     L.DomEvent.disableClickPropagation(btn);
@@ -317,63 +286,73 @@
             clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 }).addTo(map);
             kecLayerGroup = L.featureGroup().addTo(map);
 
-            // Render Kecamatan Boundaries (Dashboard Logic)
             const kecData = <?= json_encode($kecamatans_spasial ?? []) ?>;
             const kecColors = ['#1e1b4b', '#1e40af', '#2563eb', '#1d4ed8', '#0ea5e9'];
             kecData.forEach((k, idx) => {
-                const geojson = parseWKTUniversal(k.wkt);
-                if (geojson) {
-                    L.geoJSON(geojson, { 
-                        style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.2 } 
-                    }).addTo(kecLayerGroup).bindTooltip(`<p class="font-bold uppercase text-[8px] text-white">${k.desa}</p>`, { sticky: true, className: 'custom-tooltip' });
-                }
+                try {
+                    const geojson = parseWKTUniversal(k.wkt);
+                    if (geojson) {
+                        L.geoJSON(geojson, { style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.2 } }).addTo(kecLayerGroup).bindTooltip(`<p class="font-bold uppercase text-[8px] text-white">${k.desa}</p>`, { sticky: true, className: 'custom-tooltip' });
+                    }
+                } catch(e) {}
             });
             kecLayerGroup.bringToBack();
 
-            renderMarkers(<?= json_encode($aset_all ?? []) ?>);
+            const initialMarkers = <?= json_encode($aset_all ?? []) ?>;
+            if (initialMarkers && initialMarkers.length > 0) renderMarkers(initialMarkers);
             if (typeof lucide !== 'undefined') lucide.createIcons();
         } catch(err) { console.error(err); }
     }
 
     function renderMarkers(data) {
+        if (!clusterGroup) return;
         clusterGroup.clearLayers();
+        let validMarkers = 0;
         data.forEach(item => {
-            if (item.koordinat) {
-                const coords = item.koordinat.split(',').map(c => parseFloat(c.trim()));
-                const noSertif = (item.no_sertifikat || '').toString().toUpperCase().trim();
-                const isBelum = noSertif === 'BELUM BERSERTIFIKAT' || noSertif === '-' || noSertif === '';
-                const markerColor = isBelum ? "#f59e0b" : "#1e1b4b"; // Amber for Belum, Dark Blue for Certified
-                
-                const icon = L.divIcon({
-                    className: 'custom-div-icon',
-                    html: `<div class="w-6 h-6 rounded-full border-4 border-white shadow-xl flex items-center justify-center" style="background-color: ${markerColor};"><div class="w-1 h-1 bg-white rounded-full"></div></div>`,
-                    iconSize: [24, 24],
-                    iconAnchor: [12, 12]
+            if (item.koordinat && item.koordinat.includes(',')) {
+                let parts = item.koordinat.split(',').map(p => {
+                    let s = p.trim().replace(/[^\d.-]/g, '');
+                    let firstDot = s.indexOf('.');
+                    if (firstDot !== -1) s = s.substring(0, firstDot + 1) + s.substring(firstDot + 1).replace(/\./g, '');
+                    let val = parseFloat(s);
+                    if (Math.abs(val) > 1000) val = val / 1000000;
+                    return val;
                 });
-
-                const marker = L.marker(coords, { icon: icon });
-                marker.bindPopup(`
-                    <div class="bg-blue-950 text-white p-3 rounded-t-xl border-b border-white/10">
-                        <p class="text-[7px] font-bold uppercase tracking-[0.2em] ${isBelum ? 'text-amber-400' : 'text-blue-400'} mb-1">Aset Tanah</p>
-                        <h5 class="text-[11px] font-bold uppercase leading-tight">${item.nama_pemilik}</h5>
-                    </div>
-                    <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl">
-                        <p class="text-[9px] font-bold ${isBelum ? 'text-amber-600' : 'text-blue-600'} uppercase">${item.no_sertifikat}</p>
-                        <a href="<?= base_url('aset-tanah/detail/') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a>
-                    </div>
-                `);
-                clusterGroup.addLayer(marker);
+                const [lat, lng] = parts;
+                if (!isNaN(lat) && !isNaN(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+                    const noSertif = (item.no_sertifikat || '').toString().toUpperCase().trim();
+                    const isBelum = noSertif === 'BELUM BERSERTIFIKAT' || noSertif === '-' || noSertif === '';
+                    const markerColor = isBelum ? "#f59e0b" : "#1e1b4b";
+                    const icon = L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div class="w-6 h-6 rounded-full border-4 border-white shadow-xl flex items-center justify-center" style="background-color: ${markerColor};"><div class="w-1 h-1 bg-white rounded-full"></div></div>`,
+                        iconSize: [24, 24], iconAnchor: [12, 12]
+                    });
+                    const marker = L.marker([lat, lng], { icon: icon });
+                    marker.bindPopup(`
+                        <div class="bg-blue-950 text-white p-3 rounded-t-xl border-b border-white/10"><p class="text-[7px] font-bold uppercase tracking-[0.2em] ${isBelum ? 'text-amber-400' : 'text-blue-400'} mb-1">Aset Tanah</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.nama_pemilik}</h5></div>
+                        <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold ${isBelum ? 'text-amber-600' : 'text-blue-600'} uppercase">${item.no_sertifikat}</p><a href="<?= base_url('aset-tanah/detail/') ?>/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a></div>
+                    `);
+                    clusterGroup.addLayer(marker);
+                    validMarkers++;
+                }
             }
         });
-        if (data.length > 0) map.fitBounds(clusterGroup.getBounds().pad(0.1));
+        if (validMarkers > 0) try { map.fitBounds(clusterGroup.getBounds().pad(0.1)); } catch(e) {}
     }
 
     function focusMap(coordsStr) {
-        if (!coordsStr) return;
-        const [lat, lng] = coordsStr.split(',').map(c => parseFloat(c.trim()));
-        map.setView([lat, lng], 18);
-        const mc = document.getElementById('main-content');
-        if (mc) mc.scrollTo({ top: 0, behavior: 'smooth' });
+        if (!coordsStr || !map) return;
+        let parts = coordsStr.split(',').map(p => {
+            let s = p.trim().replace(/[^\d.-]/g, '');
+            let firstDot = s.indexOf('.');
+            if (firstDot !== -1) s = s.substring(0, firstDot + 1) + s.substring(firstDot + 1).replace(/\./g, '');
+            let val = parseFloat(s);
+            if (Math.abs(val) > 1000) val = val / 1000000;
+            return val;
+        });
+        map.setView([parts[0], parts[1]], 18);
+        document.getElementById('main-content')?.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function confirmDelete(id) {
@@ -382,106 +361,25 @@
         });
     }
 
-    function submitWithScroll(el) {
-        const mc = document.getElementById('main-content');
-        if (mc) localStorage.setItem('asetTanahScrollPos', mc.scrollTop);
-        const form = el.tagName === 'FORM' ? el : el.form;
-        if (form) form.submit();
-    }
-
     function applySort(column) {
         const f = document.getElementById('filter-form');
         const b = f.querySelector('input[name="sort_by"]');
         const o = f.querySelector('input[name="sort_order"]');
         if (b.value === column) o.value = o.value === 'asc' ? 'desc' : 'asc';
         else { b.value = column; o.value = 'asc'; }
-        submitWithScroll(f);
+        updateData(new URL(f.action + '?' + new URLSearchParams(new FormData(f))).toString());
     }
 
-    function updateBulkBar() {
-        const checked = document.querySelectorAll('.row-checkbox:checked');
-        const bulkBar = document.getElementById('bulk-action-bar');
-        const selectedCount = document.getElementById('selected-count');
-        if (checked.length > 0) { bulkBar.classList.remove('-translate-y-full'); selectedCount.innerText = `${checked.length} TERPILIH`; }
-        else { bulkBar.classList.add('-translate-y-full'); }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const mc = document.getElementById('main-content');
-        if (mc) {
-            const sp = localStorage.getItem('asetTanahScrollPos');
-            if (sp) { setTimeout(() => { mc.scrollTop = sp; localStorage.removeItem('asetTanahScrollPos'); }, 100); }
-        }
-        const selectAll = document.getElementById('select-all');
-        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-        if (selectAll) {
-            selectAll.addEventListener('change', function() {
-                rowCheckboxes.forEach(cb => {
-                    cb.checked = this.checked;
-                    cb.closest('tr').classList.toggle('bg-blue-50/50', this.checked);
-                    cb.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked);
-                });
-                updateBulkBar();
-            });
-        }
-        rowCheckboxes.forEach(cb => {
-            cb.addEventListener('change', function() {
-                this.closest('tr').classList.toggle('bg-blue-50/50', this.checked);
-                this.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked);
-                const allChecked = document.querySelectorAll('.row-checkbox:checked').length === rowCheckboxes.length;
-                if(selectAll) selectAll.checked = allChecked;
-                updateBulkBar();
-            });
-        });
-        initMap();
-    });
-
-    async function handleBulkDelete() {
-        const checked = document.querySelectorAll('.row-checkbox:checked');
-        const ids = Array.from(checked).map(cb => cb.value);
-        const ok = await window.customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} data aset yang dipilih?`, 'danger');
-        if (ok) {
-            const formData = new FormData();
-            ids.forEach(id => formData.append('ids[]', id));
-            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
-            try {
-                const response = await fetch('<?= base_url('aset-tanah/bulk-delete') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                const result = await response.json();
-                if (result.status === 'success') { showToast(result.message, 'success'); setTimeout(() => window.location.reload(), 1000); }
-                else { showToast(result.message, 'error'); }
-            } catch (error) { showToast('Terjadi kesalahan sistem.', 'error'); }
-        }
-    }
-
-    function clearSelection() {
-        document.getElementById('select-all').checked = false;
-        document.querySelectorAll('.row-checkbox').forEach(cb => { cb.checked = false; cb.closest('tr').classList.remove('bg-blue-50/50', 'dark:bg-blue-900/10'); });
-        updateBulkBar();
-    }
-
-    window.addEventListener('load', initMap);
-
-    // AJAX Dynamic Filtering
     async function updateData(url) {
         const loader = document.getElementById('table-loader');
         loader.classList.remove('opacity-0', 'pointer-events-none');
-        
         try {
             const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const result = await response.json();
-            
             if (result.status === 'success') {
-                // Parse the returned HTML to extract components
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(result.html, 'text/html');
-                
-                // Update Table Body
+                const doc = new DOMParser().parseFromString(result.html, 'text/html');
                 document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
-                
-                // Update Pagination
                 document.getElementById('pagination-container').innerHTML = doc.getElementById('pagination-container').innerHTML;
-                
-                // Update Mini Dashboard Stats
                 if (result.data) {
                     document.getElementById('stat-bersertifikat-count').innerText = new Intl.NumberFormat().format(result.data.count_bersertifikat);
                     document.getElementById('stat-belum-bersertifikat-count').innerText = new Intl.NumberFormat().format(result.data.count_belum_bersertifikat);
@@ -490,103 +388,63 @@
                     document.getElementById('stat-bersertifikat-pct').innerText = result.data.pct_bersertifikat + '%';
                     document.getElementById('stat-belum-bersertifikat-pct').innerText = result.data.pct_belum_bersertifikat + '%';
                 }
-                
-                // Re-initialize Lucide Icons and Tooltips in the new content
                 if (typeof lucide !== 'undefined') lucide.createIcons();
-                
-                // Update Map Markers if aset_all is provided
-                if (result.data.aset_all && map && clusterGroup) {
-                    renderMarkers(result.data.aset_all);
-                }
-                
-                // Update Browser URL
+                if (result.data.aset_all) renderMarkers(result.data.aset_all);
                 window.history.pushState({}, '', url);
-                
-                // Re-attach checkbox listeners if needed
                 attachCheckboxListeners();
             }
-        } catch (error) {
-            console.error('AJAX Update Error:', error);
-            showToast('Gagal memuat data.', 'error');
-        } finally {
-            loader.classList.add('opacity-0', 'pointer-events-none');
-        }
+        } catch (e) { console.error(e); } finally { loader.classList.add('opacity-0', 'pointer-events-none'); }
     }
 
     function attachCheckboxListeners() {
         const selectAll = document.getElementById('select-all');
-        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-        if (selectAll) {
-            selectAll.checked = false;
-            selectAll.onclick = function() {
-                rowCheckboxes.forEach(cb => {
-                    cb.checked = this.checked;
-                    cb.closest('tr').classList.toggle('bg-blue-50/50', this.checked);
-                    cb.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked);
-                });
-                updateBulkBar();
-            };
-        }
-        rowCheckboxes.forEach(cb => {
-            cb.onchange = function() {
-                this.closest('tr').classList.toggle('bg-blue-50/50', this.checked);
-                this.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked);
-                updateBulkBar();
-            };
-        });
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        if (selectAll) selectAll.onclick = function() { checkboxes.forEach(cb => { cb.checked = this.checked; cb.closest('tr').classList.toggle('bg-blue-50/50', this.checked); cb.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked); }); updateBulkBar(); };
+        checkboxes.forEach(cb => cb.onchange = function() { this.closest('tr').classList.toggle('bg-blue-50/50', this.checked); this.closest('tr').classList.toggle('dark:bg-blue-900/10', this.checked); updateBulkBar(); });
     }
 
-    document.addEventListener('click', (e) => {
-        // Handle Tab Clicks
-        if (e.target.classList.contains('status-tab')) {
-            const status = e.target.getAttribute('data-status');
-            document.getElementById('status_sertifikat_input').value = status;
-            
-            // UI Active State
-            document.querySelectorAll('.status-tab').forEach(btn => {
-                btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'text-amber-600', 'text-slate-600', 'shadow-sm');
-                btn.classList.add('text-slate-400', 'hover:text-slate-600');
-            });
-            const activeColor = status === 'Bersertifikat' ? 'text-blue-600' : (status === 'Belum Bersertifikat' ? 'text-amber-600' : 'text-slate-600');
-            e.target.classList.add('bg-white', 'dark:bg-slate-700', activeColor, 'shadow-sm');
-            e.target.classList.remove('text-slate-400', 'hover:text-slate-600');
-            
-            const form = document.getElementById('filter-form');
-            const url = new URL(form.action);
-            const formData = new FormData(form);
-            for (let [key, val] of formData.entries()) url.searchParams.set(key, val);
-            updateData(url.toString());
-        }
-        
-        // Handle Pagination Links
-        const paginationLink = e.target.closest('#pagination-container a');
-        if (paginationLink) {
-            e.preventDefault();
-            updateData(paginationLink.href);
-        }
-    });
+    function updateBulkBar() {
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const bulkBar = document.getElementById('bulk-action-bar');
+        if (checked.length > 0) { bulkBar.classList.remove('-translate-y-full'); document.getElementById('selected-count').innerText = `${checked.length} TERPILIH`; }
+        else bulkBar.classList.add('-translate-y-full');
+    }
 
-    document.querySelectorAll('.filter-input').forEach(input => {
-        input.addEventListener('change', () => {
-            const form = document.getElementById('filter-form');
-            const url = new URL(form.action);
-            const formData = new FormData(form);
-            for (let [key, val] of formData.entries()) url.searchParams.set(key, val);
-            updateData(url.toString());
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        attachCheckboxListeners();
+        document.querySelectorAll('.filter-input').forEach(input => {
+            input.addEventListener('change', () => {
+                const f = document.getElementById('filter-form');
+                updateData(new URL(f.action + '?' + new URLSearchParams(new FormData(f))).toString());
+            });
+            if (input.type === 'text') { let t; input.addEventListener('keyup', () => { clearTimeout(t); t = setTimeout(() => input.dispatchEvent(new Event('change')), 500); }); }
         });
-        if (input.type === 'text') {
-            let timeout;
-            input.addEventListener('keyup', () => {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    input.dispatchEvent(new Event('change'));
-                }, 500);
-            });
-        }
     });
 
-    // Initial attach
-    document.addEventListener('DOMContentLoaded', attachCheckboxListeners);
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('status-tab')) {
+            const s = e.target.getAttribute('data-status');
+            document.getElementById('status_sertifikat_input').value = s;
+            document.querySelectorAll('.status-tab').forEach(b => { b.classList.remove('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'text-amber-600', 'text-slate-600', 'shadow-sm'); b.classList.add('text-slate-400', 'hover:text-slate-600'); });
+            e.target.classList.add('bg-white', 'dark:bg-slate-700', s === 'Bersertifikat' ? 'text-blue-600' : (s === 'Belum Bersertifikat' ? 'text-amber-600' : 'text-slate-600'), 'shadow-sm');
+            e.target.classList.remove('text-slate-400', 'hover:text-slate-600');
+            const f = document.getElementById('filter-form');
+            updateData(new URL(f.action + '?' + new URLSearchParams(new FormData(f))).toString());
+        }
+        const link = e.target.closest('#pagination-container a');
+        if (link) { e.preventDefault(); updateData(link.href); }
+    });
+
+    async function handleBulkDelete() {
+        const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+        if (await window.customConfirm('Hapus Massal?', `Hapus ${ids.length} data?`, 'danger')) {
+            const fd = new FormData(); ids.forEach(id => fd.append('ids[]', id));
+            fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+            const r = await (await fetch('<?= base_url('aset-tanah/bulk-delete') ?>', { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })).json();
+            if (r.status === 'success') { showToast(r.message, 'success'); setTimeout(() => location.reload(), 1000); }
+        }
+    }
 </script>
 
 <style>
@@ -594,33 +452,10 @@
     .leaflet-popup-content { margin: 0; width: 200px !important; }
     .leaflet-container { font-family: inherit; }
     .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
-
-    .custom-div-icon {
-        background: transparent;
-        border: none;
-    }
-    .custom-div-icon div {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .custom-div-icon:hover div {
-        transform: scale(1.2);
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
-
-    .custom-tooltip {
-        background: rgba(15, 23, 42, 0.9) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 8px !important;
-        color: white !important;
-        font-weight: 800 !important;
-        font-size: 9px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
-        padding: 4px 8px !important;
-    }
-    .leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before {
-        border: none !important;
-    }
+    .custom-div-icon { background: transparent; border: none; }
+    .custom-div-icon div { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .custom-div-icon:hover div { transform: scale(1.2); box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+    .custom-tooltip { background: rgba(15, 23, 42, 0.9) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 8px !important; color: white !important; font-weight: 800 !important; font-size: 9px !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; padding: 4px 8px !important; }
+    .leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before { border: none !important; }
 </style>
 <?= $this->endSection() ?>

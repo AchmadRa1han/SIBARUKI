@@ -14,7 +14,7 @@ class FixWktData extends BaseCommand
     public function run(array $params)
     {
         $db = \Config\Database::connect();
-        $records = $db->table('wilayah_kumuh')->get()->getResultArray();
+        $records = $db->table('permukiman_wilayah_kumuh')->get()->getResultArray();
         
         CLI::write("Mengecek integritas data WKT...", 'yellow');
         $fixed = 0;
@@ -41,7 +41,7 @@ class FixWktData extends BaseCommand
                     }
                 }
 
-                $db->table('wilayah_kumuh')
+                $db->table('permukiman_wilayah_kumuh')
                    ->where('FID', $row['FID'])
                    ->update(['WKT' => $newWkt]);
                 

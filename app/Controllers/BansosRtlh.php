@@ -49,9 +49,9 @@ class BansosRtlh extends BaseController
     public function create()
     {
         // Cari data RTLH yang belum menerima bantuan untuk pilihan dropdown
-        $rtlh = $this->rumahModel->select('rtlh_rumah.id_survei, rtlh_rumah.desa, rtlh_penerima.nama_kepala_keluarga, rtlh_penerima.nik')
-                                ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik')
-                                ->where('rtlh_rumah.status_bantuan', 'Belum Menerima')
+        $rtlh = $this->rumahModel->select('perumahan_rtlh_rumah.id_survei, perumahan_rtlh_rumah.desa, perumahan_rtlh_penerima.nama_kepala_keluarga, perumahan_rtlh_penerima.nik')
+                                ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik')
+                                ->where('perumahan_rtlh_rumah.status_bantuan', 'Belum Menerima')
                                 ->findAll();
 
         $data = [
@@ -108,7 +108,7 @@ class BansosRtlh extends BaseController
 
         // Simpan Koordinat Realisasi jika ada (POINT WKT)
         if (!empty($koordinat) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $koordinat)) {
-            $db->table('rtlh_bansos')->where('id', $bansosId)
+            $db->table('perumahan_rtlh_bansos')->where('id', $bansosId)
                ->set('lokasi_realisasi', "ST_GeomFromText('{$koordinat}')", false)
                ->update();
         }
@@ -122,8 +122,8 @@ class BansosRtlh extends BaseController
 
         if ($targetId) {
             // Capture Snapshot Sebelum
-            $rumahData = $db->table('rtlh_rumah')
-                            ->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')
+            $rumahData = $db->table('perumahan_rtlh_rumah')
+                            ->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')
                             ->where('id_survei', $targetId)
                             ->get()->getRowArray();
             
@@ -134,7 +134,7 @@ class BansosRtlh extends BaseController
                 $snapshot = ['rumah' => $rumahData, 'kondisi' => $kondisi, 'penerima' => $penerima];
 
                 // Update Status RTLH
-                $db->table('rtlh_rumah')->where('id_survei', $targetId)->update([
+                $db->table('perumahan_rtlh_rumah')->where('id_survei', $targetId)->update([
                     'status_bantuan' => 'Sudah Menerima',
                     'tahun_bansos' => $tahun,
                     'bantuan_perumahan' => $sumber,
@@ -170,8 +170,8 @@ class BansosRtlh extends BaseController
     public function detail($id)
     {
         $db = \Config\Database::connect();
-        $bansos = $db->table('rtlh_bansos')
-                     ->select('rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
+        $bansos = $db->table('perumahan_rtlh_bansos')
+                     ->select('perumahan_rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
                      ->where('id', $id)
                      ->get()->getRowArray();
 
@@ -192,8 +192,8 @@ class BansosRtlh extends BaseController
     public function print($id)
     {
         $db = \Config\Database::connect();
-        $bansos = $db->table('rtlh_bansos')
-                     ->select('rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
+        $bansos = $db->table('perumahan_rtlh_bansos')
+                     ->select('perumahan_rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
                      ->where('id', $id)
                      ->get()->getRowArray();
 
@@ -219,16 +219,16 @@ class BansosRtlh extends BaseController
     public function edit($id)
     {
         $db = \Config\Database::connect();
-        $bansos = $db->table('rtlh_bansos')
-                     ->select('rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
+        $bansos = $db->table('perumahan_rtlh_bansos')
+                     ->select('perumahan_rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
                      ->where('id', $id)
                      ->get()->getRowArray();
 
         if (!$bansos) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         // Data RTLH untuk pilihan dropdown (jika ingin mengubah link)
-        $rtlh = $this->rumahModel->select('rtlh_rumah.id_survei, rtlh_rumah.desa, rtlh_penerima.nama_kepala_keluarga, rtlh_penerima.nik')
-                                ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik')
+        $rtlh = $this->rumahModel->select('perumahan_rtlh_rumah.id_survei, perumahan_rtlh_rumah.desa, perumahan_rtlh_penerima.nama_kepala_keluarga, perumahan_rtlh_penerima.nik')
+                                ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik')
                                 ->findAll();
 
         return view('bansos_rtlh/edit', [
@@ -286,7 +286,7 @@ class BansosRtlh extends BaseController
 
         // Update Koordinat Realisasi (POINT WKT)
         if (!empty($koordinat) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $koordinat)) {
-            $db->table('rtlh_bansos')->where('id', $id)
+            $db->table('perumahan_rtlh_bansos')->where('id', $id)
                ->set('lokasi_realisasi', "ST_GeomFromText('{$koordinat}')", false)
                ->update();
         }

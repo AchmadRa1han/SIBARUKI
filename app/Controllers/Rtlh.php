@@ -36,8 +36,8 @@ class Rtlh extends BaseController
         $perPage = $this->request->getGet('per_page') ?? 10;
         $status = $this->request->getGet('status') ?? 'Belum Menerima';
 
-        $query = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt, rtlh_penerima.nama_kepala_keluarga as pemilik')
-                                  ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left');
+        $query = $this->rumahModel->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt, perumahan_rtlh_penerima.nama_kepala_keluarga as pemilik')
+                                  ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left');
 
         if ($status !== 'semua') {
             $query->where('status_bantuan', $status);
@@ -45,8 +45,8 @@ class Rtlh extends BaseController
 
         if ($keyword) {
             $query->groupStart()
-                  ->like('rtlh_penerima.nama_kepala_keluarga', $keyword)
-                  ->orLike('rtlh_rumah.desa', $keyword)
+                  ->like('perumahan_rtlh_penerima.nama_kepala_keluarga', $keyword)
+                  ->orLike('perumahan_rtlh_rumah.desa', $keyword)
                   ->groupEnd();
         }
 
@@ -54,7 +54,7 @@ class Rtlh extends BaseController
 
         // Data untuk Map (Semua yang punya koordinat) - Ambil data minimal saja
         $db = \Config\Database::connect();
-        $rumah_all = $db->table('rtlh_rumah')
+        $rumah_all = $db->table('perumahan_rtlh_rumah')
                         ->select('id_survei, desa, ST_AsText(lokasi_koordinat) as wkt, nik_pemilik')
                         ->where('lokasi_koordinat IS NOT NULL')
                         ->where('lokasi_koordinat !=', '')
@@ -65,7 +65,7 @@ class Rtlh extends BaseController
         $niks = array_unique(array_column($rumah_all, 'nik_pemilik'));
         $pemilikMap = [];
         if (!empty($niks)) {
-            $penerima = $db->table('rtlh_penerima')->select('nik, nama_kepala_keluarga')->whereIn('nik', $niks)->get()->getResultArray();
+            $penerima = $db->table('perumahan_rtlh_penerima')->select('nik, nama_kepala_keluarga')->whereIn('nik', $niks)->get()->getResultArray();
             foreach ($penerima as $p) $pemilikMap[$p['nik']] = $p['nama_kepala_keluarga'];
         }
         foreach ($rumah_all as &$r) {
@@ -96,8 +96,8 @@ class Rtlh extends BaseController
         if (!$id) return redirect()->back()->with('error', 'ID Survei tidak valid.');
 
         $db = \Config\Database::connect();
-        $rumah = $db->table('rtlh_rumah')
-                    ->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat_text')
+        $rumah = $db->table('perumahan_rtlh_rumah')
+                    ->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as lokasi_koordinat_text')
                     ->where('id_survei', $id)
                     ->get()->getRowArray();
 
@@ -117,7 +117,7 @@ class Rtlh extends BaseController
             $now = date('Y-m-d H:i:s');
             
             // 1. Update Tabel Utama
-            $db->table('rtlh_rumah')->where('id_survei', $id)->update([
+            $db->table('perumahan_rtlh_rumah')->where('id_survei', $id)->update([
                 'status_bantuan' => 'Sudah Menerima',
                 'tahun_bansos' => $tahun,
                 'bantuan_perumahan' => $program ?: 'Bansos RTLH',
@@ -161,14 +161,14 @@ class Rtlh extends BaseController
             $bansosId = $this->bansosModel->getInsertID();
 
             // Simpan Koordinat Realisasi jika ada
-            if (!empty($koordinat) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $koordinat)) {
-                $db->table('rtlh_bansos')->where('id', $bansosId)
+            if (!empty($koordinat) && preg_match('/POINT\s*\(\s*-?\\d+\\.?\\d*\\s+-?\\d+\\.?\\d*\\s*\\)/i', $koordinat)) {
+                $db->table('perumahan_rtlh_bansos')->where('id', $bansosId)
                    ->set('lokasi_realisasi', "ST_GeomFromText('{$koordinat}')", false)
                    ->update();
             }
 
             // 3. Simpan History Perubahan
-            $db->table('rtlh_history_perubahan')->insert([
+            $db->table('perumahan_rtlh_history')->insert([
                 'id_survei' => $id,
                 'nik' => $rumah['nik_pemilik'],
                 'nama_penerima' => $penerima['nama_kepala_keluarga'] ?? 'Unknown',
@@ -251,9 +251,9 @@ class Rtlh extends BaseController
 
         $db = \Config\Database::connect();
         
-        if ($db->table('rtlh_rumah')->countAllResults() === 0) {
-            $db->query("ALTER TABLE rtlh_rumah AUTO_INCREMENT = 1");
-            $db->query("ALTER TABLE rtlh_kondisi_rumah AUTO_INCREMENT = 1");
+        if ($db->table('perumahan_rtlh_rumah')->countAllResults() === 0) {
+            $db->query("ALTER TABLE perumahan_rtlh_rumah AUTO_INCREMENT = 1");
+            $db->query("ALTER TABLE perumahan_rtlh_kondisi AUTO_INCREMENT = 1");
         }
 
         $allRefs = $this->refModel->findAll();
@@ -450,12 +450,12 @@ class Rtlh extends BaseController
     public function detail($id)
     {
         if (!has_permission('view_rtlh_detail')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
-        $rumah = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
+        $rumah = $this->rumahModel->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         $db = \Config\Database::connect();
         $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
-        $realisasi = $db->table('rtlh_bansos')->select('*, ST_AsText(lokasi_realisasi) as wkt_realisasi')->where('id_survei', $id)->orderBy('id', 'DESC')->get()->getRowArray();
+        $realisasi = $db->table('perumahan_rtlh_bansos')->select('*, ST_AsText(lokasi_realisasi) as wkt_realisasi')->where('id_survei', $id)->orderBy('id', 'DESC')->get()->getRowArray();
         return view('rtlh/detail', [
             'title' => 'Detail RTLH', 'rumah' => $rumah, 'kondisi' => $kondisi, 'penerima' => $penerima, 'realisasi' => $realisasi, 'ref' => $this->refModel->getAllMapped()
         ]);
@@ -464,18 +464,18 @@ class Rtlh extends BaseController
     public function print($id)
     {
         $db = \Config\Database::connect();
-        $rumah = $this->rumahModel->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
+        $rumah = $this->rumahModel->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         
-        $penerima = $db->table('rtlh_penerima')
-                       ->select('rtlh_penerima.*, ref_edu.nama_pilihan as nama_pendidikan, ref_job.nama_pilihan as nama_pekerjaan')
-                       ->join('ref_master as ref_edu', 'ref_edu.id = rtlh_penerima.pendidikan_id', 'left')
-                       ->join('ref_master as ref_job', 'ref_job.id = rtlh_penerima.pekerjaan_id', 'left')
+        $penerima = $db->table('perumahan_rtlh_penerima')
+                       ->select('perumahan_rtlh_penerima.*, ref_edu.nama_pilihan as nama_pendidikan, ref_job.nama_pilihan as nama_pekerjaan')
+                       ->join('sys_ref_master as ref_edu', 'ref_edu.id = perumahan_rtlh_penerima.pendidikan_id', 'left')
+                       ->join('sys_ref_master as ref_job', 'ref_job.id = perumahan_rtlh_penerima.pekerjaan_id', 'left')
                        ->where('nik', $rumah['nik_pemilik'])
                        ->get()->getRowArray();
 
-        $kondisi = $db->table('rtlh_kondisi_rumah')
-                      ->select('rtlh_kondisi_rumah.*, 
+        $kondisi = $db->table('perumahan_rtlh_kondisi')
+                      ->select('perumahan_rtlh_kondisi.*, 
                                 r1.nama_pilihan as nm_st_pondasi, r2.nama_pilihan as nm_st_kolom, 
                                 r3.nama_pilihan as nm_st_balok, r4.nama_pilihan as nm_st_sloof,
                                 r5.nama_pilihan as nm_st_rangka_atap, r6.nama_pilihan as nm_st_plafon,
@@ -483,20 +483,20 @@ class Rtlh extends BaseController
                                 r9.nama_pilihan as nm_mat_lantai, r10.nama_pilihan as nm_st_lantai,
                                 r11.nama_pilihan as nm_mat_dinding, r12.nama_pilihan as nm_st_dinding,
                                 r13.nama_pilihan as nm_mat_atap, r14.nama_pilihan as nm_st_atap')
-                      ->join('ref_master as r1', 'r1.id = rtlh_kondisi_rumah.st_pondasi', 'left')
-                      ->join('ref_master as r2', 'r2.id = rtlh_kondisi_rumah.st_kolom', 'left')
-                      ->join('ref_master as r3', 'r3.id = rtlh_kondisi_rumah.st_balok', 'left')
-                      ->join('ref_master as r4', 'r4.id = rtlh_kondisi_rumah.st_sloof', 'left')
-                      ->join('ref_master as r5', 'r5.id = rtlh_kondisi_rumah.st_rangka_atap', 'left')
-                      ->join('ref_master as r6', 'r6.id = rtlh_kondisi_rumah.st_plafon', 'left')
-                      ->join('ref_master as r7', 'r7.id = rtlh_kondisi_rumah.st_jendela', 'left')
-                      ->join('ref_master as r8', 'r8.id = rtlh_kondisi_rumah.st_ventilasi', 'left')
-                      ->join('ref_master as r9', 'r9.id = rtlh_kondisi_rumah.mat_lantai', 'left')
-                      ->join('ref_master as r10', 'r10.id = rtlh_kondisi_rumah.st_lantai', 'left')
-                      ->join('ref_master as r11', 'r11.id = rtlh_kondisi_rumah.mat_dinding', 'left')
-                      ->join('ref_master as r12', 'r12.id = rtlh_kondisi_rumah.st_dinding', 'left')
-                      ->join('ref_master as r13', 'r13.id = rtlh_kondisi_rumah.mat_atap', 'left')
-                      ->join('ref_master as r14', 'r14.id = rtlh_kondisi_rumah.st_atap', 'left')
+                      ->join('sys_ref_master as r1', 'r1.id = perumahan_rtlh_kondisi.st_pondasi', 'left')
+                      ->join('sys_ref_master as r2', 'r2.id = perumahan_rtlh_kondisi.st_kolom', 'left')
+                      ->join('sys_ref_master as r3', 'r3.id = perumahan_rtlh_kondisi.st_balok', 'left')
+                      ->join('sys_ref_master as r4', 'r4.id = perumahan_rtlh_kondisi.st_sloof', 'left')
+                      ->join('sys_ref_master as r5', 'r5.id = perumahan_rtlh_kondisi.st_rangka_atap', 'left')
+                      ->join('sys_ref_master as r6', 'r6.id = perumahan_rtlh_kondisi.st_plafon', 'left')
+                      ->join('sys_ref_master as r7', 'r7.id = perumahan_rtlh_kondisi.st_jendela', 'left')
+                      ->join('sys_ref_master as r8', 'r8.id = perumahan_rtlh_kondisi.st_ventilasi', 'left')
+                      ->join('sys_ref_master as r9', 'r9.id = perumahan_rtlh_kondisi.mat_lantai', 'left')
+                      ->join('sys_ref_master as r10', 'r10.id = perumahan_rtlh_kondisi.st_lantai', 'left')
+                      ->join('sys_ref_master as r11', 'r11.id = perumahan_rtlh_kondisi.mat_dinding', 'left')
+                      ->join('sys_ref_master as r12', 'r12.id = perumahan_rtlh_kondisi.st_dinding', 'left')
+                      ->join('sys_ref_master as r13', 'r13.id = perumahan_rtlh_kondisi.mat_atap', 'left')
+                      ->join('sys_ref_master as r14', 'r14.id = perumahan_rtlh_kondisi.st_atap', 'left')
                       ->where('id_survei', $id)
                       ->get()->getRowArray();
 
@@ -524,14 +524,14 @@ class Rtlh extends BaseController
         $rekap = [];
         foreach($desaMaster as $dm) {
             $desaId = $dm['desa_id']; $desaNama = $dm['desa_nama'];
-            $totalRtlh = $db->table('rtlh_rumah')->where('desa_id', $desaId)->where('status_bantuan', 'Belum Menerima')->countAllResults();
-            $rlhSurvei = $db->table('rtlh_rumah')->where('desa_id', $desaId)->where('status_bantuan', 'Sudah Menerima')->countAllResults();
+            $totalRtlh = $db->table('perumahan_rtlh_rumah')->where('desa_id', $desaId)->where('status_bantuan', 'Belum Menerima')->countAllResults();
+            $rlhSurvei = $db->table('perumahan_rtlh_rumah')->where('desa_id', $desaId)->where('status_bantuan', 'Sudah Menerima')->countAllResults();
             $baseName = trim(str_replace(['DESA', 'KELURAHAN', 'KEL.', ' '], '', strtoupper($desaNama)));
             $bansosExtra = $db->query("
-                SELECT COUNT(*) as total FROM rtlh_bansos b
+                SELECT COUNT(*) as total FROM perumahan_rtlh_bansos b
                 WHERE (REPLACE(REPLACE(REPLACE(REPLACE(UPPER(b.desa), 'DESA', ''), 'KELURAHAN', ''), 'KEL.', ''), ' ', '') LIKE ?)
                 AND (b.id_survei IS NULL OR b.id_survei = '' OR b.id_survei = '0')
-                AND b.nik NOT IN (SELECT nik_pemilik FROM rtlh_rumah WHERE desa_id = ?)
+                AND b.nik NOT IN (SELECT nik_pemilik FROM perumahan_rtlh_rumah WHERE desa_id = ?)
             ", ['%' . $baseName . '%', $desaId])->getRowArray()['total'] ?? 0;
             $totalRlh = $rlhSurvei + $bansosExtra;
             $rekap[] = [
@@ -551,9 +551,9 @@ class Rtlh extends BaseController
         // Ensure backlog entries exist for all villages
         $desa = $db->table('kode_desa')->get()->getResultArray();
         foreach($desa as $d) {
-            $exists = $db->table('backlog_data')->where('desa_id', $d['desa_id'])->countAllResults();
+            $exists = $db->table('perumahan_backlog_agregat')->where('desa_id', $d['desa_id'])->countAllResults();
             if ($exists == 0) {
-                $db->table('backlog_data')->insert([
+                $db->table('perumahan_backlog_agregat')->insert([
                     'desa_id' => $d['desa_id'],
                     'jumlah_backlog' => 0,
                     'tahun' => date('Y'),
@@ -566,7 +566,7 @@ class Rtlh extends BaseController
         $queryStr = "SELECT kd.desa_id, kd.desa_nama, kk.kecamatan_nama, bd.id as bd_id, bd.jumlah_backlog, bd.tahun, bd.keterangan 
                      FROM kode_desa kd 
                      JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id 
-                     LEFT JOIN backlog_data bd ON bd.desa_id = kd.desa_id ";
+                     LEFT JOIN perumahan_backlog_agregat bd ON bd.desa_id = kd.desa_id ";
         
         if ($keyword) {
             $queryStr .= " WHERE kd.desa_nama LIKE " . $db->escape('%' . $keyword . '%') . " OR kk.kecamatan_nama LIKE " . $db->escape('%' . $keyword . '%');
@@ -589,7 +589,7 @@ class Rtlh extends BaseController
         if (!empty($post['bd_id'])) {
             foreach ($post['bd_id'] as $idx => $id) {
                 if (empty($id)) continue;
-                $db->table('backlog_data')->where('id', $id)->update([
+                $db->table('perumahan_backlog_agregat')->where('id', $id)->update([
                     'jumlah_backlog' => $post['jumlah_backlog'][$idx] ?? 0,
                     'tahun' => $post['tahun'][$idx] ?? date('Y'),
                     'keterangan' => $post['keterangan'][$idx] ?? '',
@@ -614,9 +614,9 @@ class Rtlh extends BaseController
     public function exportExcel()
     {
         $db = \Config\Database::connect();
-        $data = $db->table('rtlh_rumah')->select('rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt_text, rtlh_penerima.*, rtlh_kondisi_rumah.*')
-                   ->join('rtlh_penerima', 'rtlh_penerima.nik = rtlh_rumah.nik_pemilik', 'left')
-                   ->join('rtlh_kondisi_rumah', 'rtlh_kondisi_rumah.id_survei = rtlh_rumah.id_survei', 'left')
+        $data = $db->table('perumahan_rtlh_rumah')->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt_text, perumahan_rtlh_penerima.*, perumahan_rtlh_kondisi.*')
+                   ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left')
+                   ->join('perumahan_rtlh_kondisi', 'perumahan_rtlh_kondisi.id_survei = perumahan_rtlh_rumah.id_survei', 'left')
                    ->get()->getResultArray();
         $refMap = $this->refModel->getAllMapped();
         $spreadsheet = new Spreadsheet(); $sheet = $spreadsheet->getActiveSheet();
@@ -743,8 +743,8 @@ class Rtlh extends BaseController
         $rumah = $this->rumahModel->find($id);
         if ($rumah) {
             $db = \Config\Database::connect(); $db->transStart();
-            $db->table('trash_data')->insert(['entity_type' => 'RTLH', 'entity_id' => $id, 'data_json' => json_encode(['rumah' => $rumah]), 'deleted_by' => session()->get('username'), 'created_at' => date('Y-m-d H:i:s')]);
-            $db->table('rtlh_kondisi_rumah')->where('id_survei', $id)->delete(); $this->rumahModel->delete($id); $db->transComplete();
+            $db->table('sys_trash')->insert(['entity_type' => 'RTLH', 'entity_id' => $id, 'data_json' => json_encode(['rumah' => $rumah]), 'deleted_by' => session()->get('username'), 'created_at' => date('Y-m-d H:i:s')]);
+            $db->table('perumahan_rtlh_kondisi')->where('id_survei', $id)->delete(); $this->rumahModel->delete($id); $db->transComplete();
         }
         return redirect()->to('/rtlh')->with('success', 'Data dipindahkan ke Recycle Bin.');
     }
@@ -758,7 +758,7 @@ class Rtlh extends BaseController
             foreach ($ids as $id) {
                 $rumah = $this->rumahModel->find($id); if (!$rumah) continue;
                 $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first(); $kondisi = $this->kondisiModel->find($id);
-                $db->table('trash_data')->insert(['entity_type' => 'RTLH', 'entity_id' => $rumah['nik_pemilik'], 'data_json' => json_encode(['penerima' => $penerima, 'rumah' => $rumah, 'kondisi' => $kondisi]), 'deleted_by' => session()->get('username'), 'created_at' => date('Y-m-d H:i:s')]);
+                $db->table('sys_trash')->insert(['entity_type' => 'RTLH', 'entity_id' => $rumah['nik_pemilik'], 'data_json' => json_encode(['penerima' => $penerima, 'rumah' => $rumah, 'kondisi' => $kondisi]), 'deleted_by' => session()->get('username'), 'created_at' => date('Y-m-d H:i:s')]);
                 $this->kondisiModel->delete($id); $this->rumahModel->delete($id); if ($penerima) $this->penerimaModel->delete($penerima['nik']);
                 $deletedCount++;
             }

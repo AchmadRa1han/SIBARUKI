@@ -34,8 +34,8 @@ class AsetTanah extends BaseController
         $pct_belum_bersertifikat = $total_count > 0 ? ($count_belum_bersertifikat / $total_count) * 100 : 0;
 
         // Ambil Data Kecamatan (WKT) untuk Background Map seperti di Dashboard
-        $kecamatans_spasial = $db->table('wilayah_kumuh')
-            ->select('Kecamatan as nama, Kelurahan as desa, ST_AsText(WKT) as wkt')
+        $kecamatans_spasial = $db->table('permukiman_wilayah_kumuh')
+            ->select('Kecamatan as nama, Kelurahan as desa, WKT as wkt')
             ->groupBy('Kelurahan')
             ->get()->getResultArray();
 
@@ -66,8 +66,8 @@ class AsetTanah extends BaseController
         $data = [
             'title' => 'Data Aset Tanah',
             'aset' => $mainQuery->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
-            'aset_all' => $mapQuery->findAll(), // markers untuk peta WAJIB terfilter
-            'pager' => $this->asetModel->pager, // pager tetap ambil dari instance model global CI
+            'aset_all' => $mapQuery->select('id, nama_pemilik, no_sertifikat, koordinat')->findAll(), // Optimized Payload
+            'pager' => $mainQuery->pager, 
             'perPage' => $perPage,
             'search' => $search,
             'kecamatans' => (new AsetTanahModel())->select('kecamatan')->distinct()->findAll(),
@@ -94,7 +94,7 @@ class AsetTanah extends BaseController
                     'count_belum_bersertifikat' => $count_belum_bersertifikat,
                     'pct_bersertifikat' => round($pct_bersertifikat, 1),
                     'pct_belum_bersertifikat' => round($pct_belum_bersertifikat, 1),
-                    'aset_all' => $data['aset_all'],
+                    'aset_all' => $data['aset_all'], // Already optimized above
                     'kecamatans_spasial' => $kecamatans_spasial
                 ]
             ]);
@@ -175,8 +175,8 @@ class AsetTanah extends BaseController
         $count = 0;
         $db = \Config\Database::connect();
 
-        if ($db->table('aset_tanah')->countAllResults() === 0) {
-            $db->query("ALTER TABLE aset_tanah AUTO_INCREMENT = 1");
+        if ($db->table('pertanahan_aset')->countAllResults() === 0) {
+            $db->query("ALTER TABLE pertanahan_aset AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
@@ -268,7 +268,7 @@ class AsetTanah extends BaseController
     public function create()
     {
         $db = \Config\Database::connect();
-        $kecamatans = $db->table('wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
+        $kecamatans = $db->table('permukiman_wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
         
         return view('aset_tanah/create', [
             'title' => 'Tambah Aset',
@@ -282,8 +282,8 @@ class AsetTanah extends BaseController
         if (!$data['aset']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         
         $db = \Config\Database::connect();
-        $data['kecamatans'] = $db->table('wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
-        $data['desas'] = $db->table('wilayah_kumuh')->select('Kelurahan as desa')->where('Kecamatan', $data['aset']['kecamatan'])->distinct()->get()->getResultArray();
+        $data['kecamatans'] = $db->table('permukiman_wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
+        $data['desas'] = $db->table('permukiman_wilayah_kumuh')->select('Kelurahan as desa')->where('Kecamatan', $data['aset']['kecamatan'])->distinct()->get()->getResultArray();
         
         $data['title'] = 'Edit Aset Tanah';
         return view('aset_tanah/edit', $data);
@@ -293,7 +293,7 @@ class AsetTanah extends BaseController
     {
         $kecamatan = $this->request->getGet('kecamatan');
         $db = \Config\Database::connect();
-        $desas = $db->table('wilayah_kumuh')
+        $desas = $db->table('permukiman_wilayah_kumuh')
                     ->select('Kelurahan as desa')
                     ->where('Kecamatan', $kecamatan)
                     ->distinct()
@@ -328,7 +328,7 @@ class AsetTanah extends BaseController
         $data = $this->asetModel->find($id);
         if ($data) {
             $db = \Config\Database::connect();
-            $db->table('trash_data')->insert([
+            $db->table('sys_trash')->insert([
                 'entity_type' => 'ASET_TANAH',
                 'entity_id'   => $id,
                 'data_json'   => json_encode($data),
@@ -352,7 +352,7 @@ class AsetTanah extends BaseController
         try {
             $items = $this->asetModel->whereIn('id', $ids)->findAll();
             foreach ($items as $item) {
-                $db->table('trash_data')->insert([
+                $db->table('sys_trash')->insert([
                     'entity_type' => 'ASET_TANAH',
                     'entity_id'   => $item['id'],
                     'data_json'   => json_encode($item),

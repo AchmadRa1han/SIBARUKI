@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class PisewModel extends Model
 {
-    protected $table            = 'pisew';
+    protected $table            = 'permukiman_pisew';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class PermissionModel extends Model
 {
-    protected $table            = 'permissions';
+    protected $table            = 'sys_permissions';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

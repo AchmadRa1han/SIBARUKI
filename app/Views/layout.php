@@ -139,7 +139,7 @@
                         <div id="dropdown-permukiman" class="dropdown-container">
                             <div class="dropdown-content pl-20 mt-1 space-y-1 text-slate-400">
                                 <a href="<?= base_url('wilayah-kumuh') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('wilayah-kumuh')) ? 'text-blue-400 font-bold' : '' ?>">Wilayah Kumuh</a>
-                                <a href="<?= base_url('pisew') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('pisew*')) ? 'text-blue-400 font-bold' : '' ?>">PISEW</a>
+                                <a href="<?= base_url('permukiman_pisew') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('pisew*')) ? 'text-blue-400 font-bold' : '' ?>">PISEW</a>
                                 <a href="<?= base_url('arsinum') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('arsinum*')) ? 'text-blue-400 font-bold' : '' ?>">Arsinum</a>
                             </div>
                         </div>
@@ -158,8 +158,8 @@
                         </div>
                     </div>
 
-                    <a href="<?= base_url('settings') ?>" class="flex items-center h-11 w-full transition-all duration-300 <?= (url_is('settings*')) ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800/50 hover:text-white' ?>">
-                        <div class="sidebar-icon-box"><i data-lucide="settings" class="w-4.5 h-4.5"></i></div>
+                    <a href="<?= base_url('sys_settings') ?>" class="flex items-center h-11 w-full transition-all duration-300 <?= (url_is('settings*')) ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800/50 hover:text-white' ?>">
+                        <div class="sidebar-icon-box"><i data-lucide="sys_settings" class="w-4.5 h-4.5"></i></div>
                         <span class="text-sm font-bold sidebar-text">Pengaturan</span>
                     </a>
                 </nav>
@@ -288,7 +288,7 @@
             const sidebar = document.getElementById('main-sidebar');
             if (localStorage.getItem('sidebarState') === 'collapsed' && window.innerWidth >= 1024) { sidebar.classList.add('sidebar-collapsed', 'lg:w-20'); sidebar.classList.remove('lg:w-64'); updateToggleIcon(true); }
             const path = window.location.pathname;
-            const dropdowns = [ { id: 'dropdown-perumahan', arrow: 'arrow-perumahan', paths: ['rtlh', 'psu', 'perumahan-formal', 'bansos-rtlh'] }, { id: 'dropdown-permukiman', arrow: 'arrow-permukiman', paths: ['wilayah-kumuh', 'pisew', 'arsinum'] }, { id: 'dropdown-pertanahan', arrow: 'arrow-pertanahan', paths: ['aset-tanah'] } ];
+            const dropdowns = [ { id: 'dropdown-perumahan', arrow: 'arrow-perumahan', paths: ['rtlh', 'psu', 'perumahan-formal', 'bansos-rtlh'] }, { id: 'dropdown-permukiman', arrow: 'arrow-permukiman', paths: ['wilayah-kumuh', 'permukiman_pisew', 'arsinum'] }, { id: 'dropdown-pertanahan', arrow: 'arrow-pertanahan', paths: ['aset-tanah'] } ];
             dropdowns.forEach(item => { if (item.paths.some(p => path.includes(p)) || localStorage.getItem(item.id) === 'open') openDropdown(item.id, item.arrow); });
             <?php if (session()->getFlashdata('success')): ?> showToast("<?= session()->getFlashdata('success') ?>", 'success'); <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?> showToast("<?= session()->getFlashdata('error') ?>", 'error'); <?php endif; ?>

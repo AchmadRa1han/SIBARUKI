@@ -32,8 +32,8 @@ class ImportPisew extends BaseCommand
 
         $forge->addField($fields);
         $forge->addKey('id', true);
-        $forge->createTable('pisew', true);
-        $db->table('pisew')->truncate();
+        $forge->createTable('permukiman_pisew', true);
+        $db->table('permukiman_pisew')->truncate();
 
         $filePath = WRITEPATH . 'repository/PISEW KAB. SINJAI 2022-2025.csv';
         $file = fopen($filePath, 'r');
@@ -69,7 +69,7 @@ class ImportPisew extends BaseCommand
         fclose($file);
 
         if (!empty($batch)) {
-            $db->table('pisew')->insertBatch($batch);
+            $db->table('permukiman_pisew')->insertBatch($batch);
             CLI::write("✅ Berhasil mengimpor $count data PISEW.", 'green');
         }
     }

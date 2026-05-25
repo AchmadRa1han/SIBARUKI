@@ -59,21 +59,21 @@ npm install
 ### 3.1. Modul RTLH (Triad Relasional)
 Data RTLH wajib dipecah menjadi 3 tabel untuk memastikan normalisasi data personal, spasial, dan teknis.
 
-**Tabel `rtlh_penerima` (Data Personal)**
+**Tabel `perumahan_rtlh_penerima` (Data Personal)**
 - `nik` (VARCHAR 16) - **PRIMARY KEY**
 - `no_kk` (VARCHAR 16)
 - `nama_kepala_keluarga` (VARCHAR)
 - `tempat_lahir` (VARCHAR)
 - `tanggal_lahir` (DATE)
 - `jenis_kelamin` (ENUM: 'L', 'P')
-- `pendidikan_id` (INT - *Ref to ref_master*)
-- `pekerjaan_id` (INT - *Ref to ref_master*)
+- `pendidikan_id` (INT - *Ref to sys_ref_master*)
+- `pekerjaan_id` (INT - *Ref to sys_ref_master*)
 - `penghasilan_per_bulan` (VARCHAR)
 - `jumlah_anggota_keluarga` (INT)
 
-**Tabel `rtlh_rumah` (Data Hunian & Geospasial)**
+**Tabel `perumahan_rtlh_rumah` (Data Hunian & Geospasial)**
 - `id_survei` (INT Auto Increment) - **PRIMARY KEY**
-- `nik_pemilik` (VARCHAR 16) - *Foreign Key ke rtlh_penerima*
+- `nik_pemilik` (VARCHAR 16) - *Foreign Key ke perumahan_rtlh_penerima*
 - `desa` (VARCHAR), `desa_id` (VARCHAR)
 - `alamat_detail` (TEXT)
 - `kepemilikan_rumah`, `aset_rumah_di_lokasi_lain`, `kepemilikan_tanah` (VARCHAR)
@@ -88,49 +88,49 @@ Data RTLH wajib dipecah menjadi 3 tabel untuk memastikan normalisasi data person
 - `tahun_bansos`, `status_backlog`, `desil_nasional` (VARCHAR)
 - **Dokumentasi Visual:** `foto_depan`, `foto_samping`, `foto_belakang`, `foto_dalam` (VARCHAR 255 - *Path file*)
 
-**Tabel `rtlh_kondisi_rumah` (Penilaian Teknis)**
-- `id_survei` (INT) - **PRIMARY KEY** (*Relasi 1:1 dengan rtlh_rumah*)
-- *Semua kolom di bawah berisi INT yang merujuk ke tabel `ref_master`:*
+**Tabel `perumahan_rtlh_kondisi` (Penilaian Teknis)**
+- `id_survei` (INT) - **PRIMARY KEY** (*Relasi 1:1 dengan perumahan_rtlh_rumah*)
+- *Semua kolom di bawah berisi INT yang merujuk ke tabel `sys_ref_master`:*
 - Struktur: `st_pondasi`, `st_kolom`, `st_balok`, `st_sloof`, `st_rangka_atap`, `st_plafon`, `st_jendela`, `st_ventilasi`
 - Material & Kondisi Penutup: `mat_lantai`, `st_lantai`, `mat_dinding`, `st_dinding`, `mat_atap`, `st_atap`
 
 ### 3.2. Modul Infrastruktur (Permukiman)
-**Tabel `arsinum` (Air Siap Minum)**
+**Tabel `permukiman_arsinum` (Air Siap Minum)**
 - `id` (PK), `jenis_pekerjaan`, `volume`, `kecamatan`, `desa`, `pelaksana`, `anggaran`, `sumber_dana`, `koordinat`, `tahun`
 
-**Tabel `pisew` (Pengembangan Infrastruktur Sosial Ekonomi)**
+**Tabel `permukiman_pisew` (Pengembangan Infrastruktur Sosial Ekonomi)**
 - `id` (PK), `jenis_pekerjaan`, `lokasi_desa`, `kecamatan`, `pelaksana`, `anggaran`, `sumber_dana`, `tahun`, `koordinat`
 
-**Tabel `psu_jalan` (Prasarana, Sarana, Utilitas)**
+**Tabel `permukiman_psu_jalan` (Prasarana, Sarana, Utilitas)**
 - `id` (PK), `nama_jalan`, `jalan` (Lokasi), `tahun`, `panjang_luas` (DOUBLE), `wkt` (GEOMETRY - *WKT LINESTRING*)
 
 **Tabel `perumahan_formal`**
 - `id` (PK), `nama_perumahan`, `luas_kawasan_ha`, `longitude`, `latitude`, `pengembang`, `tahun_pembangunan`, `wkt` (GEOMETRY - *WKT POLYGON*)
 
-**Tabel `wilayah_kumuh`**
+**Tabel `permukiman_wilayah_kumuh`**
 - `FID` (PK - *Harus sesuai dengan shapefile GIS*), `Provinsi`, `Kode_Prov`, `Kab_Kota`, `Kode_Kab`, `Kecamatan`, `Kode_Kec`, `Kelurahan`, `desa_id`, `Kode_Kel`, `Kode_RT_RW`, `Luas_kumuh`, `skor_kumuh`, `Sumber_data`, `Sk_Kumuh`, `Kawasan`, `WKT` (GEOMETRY)
 
 ### 3.3. Modul Aset & Pertanahan
-**Tabel `aset_tanah`**
+**Tabel `pertanahan_aset`**
 - `id` (PK), `no_sertifikat`, `nama_pemilik`, `luas_m2`, `lokasi`, `desa_kelurahan`, `kecamatan`, `tgl_terbit`, `nomor_hak`, `peruntukan`, `koordinat` (GEOMETRY), `nilai_aset`, `status_tanah`, `keterangan`
 
 ### 3.4. Sistem Referensi & Keamanan
-**Tabel `ref_master` (Pusat Kamus ID)**
+**Tabel `sys_ref_master` (Pusat Kamus ID)**
 - `id` (PK), `kategori` (VARCHAR - e.g., 'PENDIDIKAN', 'KONDISI', 'MATERIAL_ATAP'), `nama_pilihan` (VARCHAR).
 - *Catatan: Tidak boleh dihapus karena berelasi dengan ID numerik di tabel RTLH.*
 
-**Tabel `users` & RBAC (Role-Based Access Control)**
-- `users`: `id` (PK), `username`, `password` (Bcrypt), `instansi`, `role_id`
-- `roles`: `id` (PK), `role_name`, `scope` (Kecamatan/Desa/Global)
-- `user_desa` (Pivot): `user_id`, `desa_id`
-- `permissions`: `id` (PK), `permission_name`, `description`
-- `role_permissions` (Pivot): `role_id`, `permission_id`
+**Tabel `sys_users` & RBAC (Role-Based Access Control)**
+- `sys_users`: `id` (PK), `username`, `password` (Bcrypt), `instansi`, `role_id`
+- `sys_roles`: `id` (PK), `role_name`, `scope` (Kecamatan/Desa/Global)
+- `sys_user_desa` (Pivot): `user_id`, `desa_id`
+- `sys_permissions`: `id` (PK), `permission_name`, `description`
+- `sys_role_permissions` (Pivot): `role_id`, `permission_id`
 
 ### 3.5. Sistem Audit & Pemulihan
 **Tabel `sys_logs` (Forensic Audit Trail)**
 - `id` (PK), `user`, `action` (Tambah/Ubah/Hapus), `severity` (info/warning/critical), `table_name`, `description`, `details` (Data diff), `user_agent` (JSON metadata: browser, OS, latency), `ip_address`, `created_at`
 
-**Tabel `trash_data` (Recycle Bin System)**
+**Tabel `sys_trash` (Recycle Bin System)**
 - Menampung data yang dihapus dari tabel manapun untuk menghindari hilangnya aset data vital.
 - Struktur: `id` (PK), `entity_type` (e.g., 'RTLH', 'ASET_TANAH'), `entity_id` (ID asli dari tabel sumber), `data_json` (Seluruh *row* direpresentasikan dalam JSON), `deleted_by`, `created_at`.
 

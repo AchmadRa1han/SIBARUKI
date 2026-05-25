@@ -20,9 +20,9 @@ class PenerimaRtlh extends BaseController
     {
         $data = [
             'title' => 'Penerima RTLH',
-            'penerima' => $this->penerimaModel->select('rtlh_penerima.*, pnd.nama_pilihan as pendidikan, pkj.nama_pilihan as pekerjaan')
-                ->join('ref_master pnd', 'pnd.id = rtlh_penerima.pendidikan_id', 'left')
-                ->join('ref_master pkj', 'pkj.id = rtlh_penerima.pekerjaan_id', 'left')
+            'penerima' => $this->penerimaModel->select('perumahan_rtlh_penerima.*, pnd.nama_pilihan as pendidikan, pkj.nama_pilihan as pekerjaan')
+                ->join('ref_master pnd', 'pnd.id = perumahan_rtlh_penerima.pendidikan_id', 'left')
+                ->join('ref_master pkj', 'pkj.id = perumahan_rtlh_penerima.pekerjaan_id', 'left')
                 ->paginate(25, 'group1'),
             'pager' => $this->penerimaModel->pager
         ];

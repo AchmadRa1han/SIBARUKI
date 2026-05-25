@@ -38,7 +38,7 @@ class Arsinum extends BaseController
 
         $data = [
             'title' => 'Data ARSINUM',
-            'arsinum' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
+            'permukiman_arsinum' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
             'arsinum_all' => $this->arsinumModel->findAll(),
             'pager' => $this->arsinumModel->pager,
             'perPage' => $perPage,
@@ -118,8 +118,8 @@ class Arsinum extends BaseController
         $db = \Config\Database::connect();
 
         // Reset Auto Increment jika tabel kosong
-        if ($db->table('arsinum')->countAllResults() === 0) {
-            $db->query("ALTER TABLE arsinum AUTO_INCREMENT = 1");
+        if ($db->table('permukiman_arsinum')->countAllResults() === 0) {
+            $db->query("ALTER TABLE permukiman_arsinum AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
@@ -271,7 +271,7 @@ class Arsinum extends BaseController
             $items = $this->arsinumModel->whereIn('id', $ids)->findAll();
             
             foreach ($items as $item) {
-                $db->table('trash_data')->insert([
+                $db->table('sys_trash')->insert([
                     'entity_type' => 'ARSINUM',
                     'entity_id'   => $item['id'],
                     'data_json'   => json_encode($item),

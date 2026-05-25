@@ -21,7 +21,7 @@ class FixTongkeDelineasi extends BaseCommand
         // Bungkus ke MultiPolygon
         $finalWkt = "MULTIPOLYGON (((" . str_replace("POLYGON ((", "", rtrim($wktRaw, ")")) . ")))";
 
-        $db->table('wilayah_kumuh')->where('FID', 47)->update(['WKT' => $finalWkt]);
+        $db->table('permukiman_wilayah_kumuh')->where('FID', 47)->update(['WKT' => $finalWkt]);
         
         CLI::write("Berhasil: Koordinat Tongke-Tongke (FID 47) telah diperbarui dari file Delineasi.", 'green');
     }

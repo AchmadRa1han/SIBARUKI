@@ -15,7 +15,7 @@ class VerifyTtl extends BaseCommand
     {
         $db = \Config\Database::connect();
         $nik = $params[0] ?? '7307087112710055';
-        $row = $db->table('rtlh_penerima')->where('nik', $nik)->get()->getRowArray();
+        $row = $db->table('perumahan_rtlh_penerima')->where('nik', $nik)->get()->getRowArray();
         if ($row) {
             CLI::write("NIK: " . $row['nik']);
             CLI::write("Nama: " . $row['nama_kepala_keluarga']);
