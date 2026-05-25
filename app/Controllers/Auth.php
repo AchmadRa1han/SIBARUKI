@@ -37,9 +37,9 @@ class Auth extends BaseController
                 $role = $roleModel->find($user['role_id']);
                 
                 // 2. Ambil Permissions (Daftar Izin)
-                $permissions = $db->table('role_permissions rp')
+                $permissions = $db->table('sys_role_permissions rp')
                     ->select('p.permission_name')
-                    ->join('permissions p', 'p.id = rp.permission_id')
+                    ->join('sys_permissions p', 'p.id = rp.permission_id')
                     ->where('rp.role_id', $user['role_id'])
                     ->get()
                     ->getResultArray();
