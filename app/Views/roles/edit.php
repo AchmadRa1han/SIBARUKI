@@ -130,7 +130,7 @@
                                 <td class="p-6">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700">
-                                            <i data-lucide="sys_users" class="w-4 h-4"></i>
+                                            <i data-lucide="users" class="w-4 h-4"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs font-bold text-slate-800 uppercase tracking-tight">Manajemen User</p>
@@ -160,7 +160,7 @@
                 <!-- Bagian Izin Lainnya -->
                 <div class="p-8 bg-slate-50/50">
                     <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <i data-lucide="sys_settings" class="w-3.5 h-3.5"></i>
+                        <i data-lucide="settings" class="w-3.5 h-3.5"></i>
                         Izin Sistem & Manajemen Lainnya
                     </h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

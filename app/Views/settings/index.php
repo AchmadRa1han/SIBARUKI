@@ -28,7 +28,7 @@
             <div class="absolute -right-4 -top-4 w-32 h-32 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 transition-colors"></div>
             <div class="relative z-10 space-y-6">
                 <div class="w-16 h-16 bg-blue-900 dark:bg-blue-700 text-white rounded-3xl flex items-center justify-center shadow-lg shadow-blue-900/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                    <i data-lucide="sys_users" class="w-8 h-8 text-white"></i>
+                    <i data-lucide="users" class="w-8 h-8 text-white"></i>
                 </div>
                 <div>
                     <h3 class="text-xl font-bold text-blue-950 dark:text-white uppercase tracking-tight mb-2">Manajemen User</h3>

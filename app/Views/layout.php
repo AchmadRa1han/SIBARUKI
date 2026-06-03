@@ -158,8 +158,8 @@
                         </div>
                     </div>
 
-                    <a href="<?= base_url('sys_settings') ?>" class="flex items-center h-11 w-full transition-all duration-300 <?= (url_is('settings*')) ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800/50 hover:text-white' ?>">
-                        <div class="sidebar-icon-box"><i data-lucide="sys_settings" class="w-4.5 h-4.5"></i></div>
+                    <a href="<?= base_url('sys_settings') ?>" class="flex items-center h-11 w-full transition-all duration-300 <?= (url_is('sys_settings*')) ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800/50 hover:text-white' ?>">
+                        <div class="sidebar-icon-box"><i data-lucide="settings" class="w-4.5 h-4.5"></i></div>
                         <span class="text-sm font-bold sidebar-text">Pengaturan</span>
                     </a>
                 </nav>

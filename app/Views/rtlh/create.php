@@ -201,6 +201,32 @@
                         </select>
                         <input type="text" name="kepemilikan_rumah_manual" id="kepemilikan_rumah_manual" placeholder="Sebutkan kepemilikan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                     </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Kepemilikan Tanah</label>
+                        <select name="kepemilikan_tanah" onchange="toggleLainnya(this, 'kepemilikan_tanah_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="">Pilih Kepemilikan</option>
+                            <?php if(isset($master['KEPEMILIKAN_TANAH'])): foreach($master['KEPEMILIKAN_TANAH'] as $opt): ?>
+                                <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
+                            <?php endforeach; endif; ?>
+                            <option value="lainnya">Lainnya...</option>
+                        </select>
+                        <input type="text" name="kepemilikan_tanah_manual" id="kepemilikan_tanah_manual" placeholder="Sebutkan kepemilikan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Aset di Lokasi Lain</label>
+                        <select name="aset_rumah_di_lokasi_lain" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="TIDAK ADA">Tidak Ada</option>
+                            <option value="ADA">Ada</option>
+                        </select>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Bantuan Perumahan Sebelumnya</label>
+                        <input type="text" name="bantuan_perumahan" placeholder="Misal: BSPS 2022, Bedah Rumah BAZNAS, dll" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Desil Nasional</label>
+                        <input type="text" name="desil_nasional" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
+                    </div>
                 </div>
             </div>
 
@@ -304,6 +330,10 @@
                             <input type="text" name="sumber_penerangan_manual" id="sumber_penerangan_manual" placeholder="Sebutkan penerangan..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                         </div>
                         <div>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">ID Pelanggan Listrik</label>
+                            <input type="text" name="sumber_penerangan_detail" placeholder="Nomor Meter / ID Pelanggan" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                        </div>
+                        <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Sanitasi (Jamban)</label>
                             <select name="jenis_jamban_kloset" onchange="toggleLainnya(this, 'jenis_jamban_kloset_manual')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
                                 <option value="">Pilih Sanitasi</option>
@@ -313,6 +343,22 @@
                                 <option value="lainnya">Lainnya...</option>
                             </select>
                             <input type="text" name="jenis_jamban_kloset_manual" id="jenis_jamban_kloset_manual" placeholder="Sebutkan sanitasi..." class="hidden w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Status KM & Jamban</label>
+                            <select name="kamar_mandi_dan_jamban" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
+                                <option value="SENDIRI">Sendiri</option>
+                                <option value="BERSAMA">Bersama/Umum</option>
+                                <option value="TIDAK ADA">Tidak Ada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Detail TPA Tinja</label>
+                            <input type="text" name="jenis_tpa_tinja" placeholder="Misal: Tangki Septik, Lubang Tanah, dll" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Jarak SAM ke TPA</label>
+                            <input type="text" name="jarak_sam_ke_tpa_tinja" placeholder="Misal: < 10m atau > 10m" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
                         </div>
                     </div>
 

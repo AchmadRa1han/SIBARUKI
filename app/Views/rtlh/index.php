@@ -19,11 +19,11 @@
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-            <a href="<?= base_url('rtlh/export-excel') ?>" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-emerald-100 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition-all active:scale-95 flex items-center gap-2">
+            <a href="<?= base_url('rtlh/export-excel') ?>" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2">
                 <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Export Excel
             </a>
             <?php if (has_permission('create_rtlh')): ?>
-            <a href="<?= base_url('rtlh/create') ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95 flex items-center gap-2 group">
+            <a href="<?= base_url('rtlh/create') ?>" class="bg-blue-950 text-white px-5 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-blue-950/20 transition-all active:scale-95 flex items-center gap-2 group border border-white/10">
                 <i data-lucide="plus" class="w-3.5 h-3.5 transition-transform group-hover:rotate-90"></i> Tambah Data Rumah
             </a>
             <?php endif; ?>
@@ -35,7 +35,7 @@
         <!-- Interactive Map Card -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2.5rem] p-3 shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-800 relative overflow-hidden">
             <div class="absolute top-6 left-6 z-[1000] flex flex-col gap-2">
-                <span class="px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-lg text-[8px] font-bold uppercase tracking-widest shadow-sm border border-slate-200 dark:border-slate-700 text-slate-500">
+                <span class="px-3 py-1 bg-blue-950/90 backdrop-blur-md rounded-lg text-[8px] font-bold uppercase tracking-widest shadow-sm border border-white/10 text-white">
                     Geospasial Perumahan
                 </span>
             </div>
@@ -49,30 +49,32 @@
                 <div class="flex flex-wrap gap-2">
                     <?php 
                         $filters = [
-                            ['semua', 'Semua', 'slate'],
-                            ['Unknown', 'Unknown', 'slate'],
-                            ['Rtlh', 'RTLH', 'rose'],
-                            ['Target', 'Target', 'indigo'],
-                            ['Rlh', 'RLH', 'emerald']
+                            ['semua', 'Semua', 'bg-blue-950 shadow-blue-950/20 hover:bg-black'],
+                            ['Unknown', 'Unknown', 'bg-blue-800 shadow-blue-800/20 hover:bg-blue-700'],
+                            ['Rtlh', 'RTLH', 'bg-rose-600 shadow-rose-600/20 hover:bg-rose-700'],
+                            ['Target', 'Target', 'bg-indigo-600 shadow-indigo-600/20 hover:bg-indigo-700'],
+                            ['Rlh', 'RLH', 'bg-emerald-600 shadow-emerald-600/20 hover:bg-emerald-700']
                         ];
                         foreach($filters as $f): 
+                            $isActive = ($status == $f[0]);
                     ?>
                     <a href="<?= base_url('rtlh?status='.$f[0].'&keyword='.$keyword) ?>" 
-                       class="px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all 
-                       <?= ($status == $f[0]) ? 'bg-'.$f[2].'-600 text-white shadow-lg' : 'bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700' ?>">
+                       class="px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all 
+                       <?= $isActive ? $f[2].' text-white shadow-lg scale-105' : 'bg-white dark:bg-slate-900 border border-blue-950/10 dark:border-white/10 text-blue-950/40 dark:text-white/40 hover:border-blue-950/30 dark:hover:border-white/30 hover:text-blue-950 dark:hover:text-white' ?>">
                        <?= $f[1] ?>
                     </a>
                     <?php endforeach; ?>
                 </div>
             </div>
 
-            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-600/20">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-md"><i data-lucide="database" class="w-6 h-6"></i></div>
-                    <span class="text-[8px] font-black uppercase tracking-widest px-2 py-1 bg-emerald-500 rounded-lg">Validated</span>
+            <div class="bg-blue-950 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-950/40 border border-white/5 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                <div class="flex justify-between items-start mb-6 relative z-10">
+                    <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10"><i data-lucide="database" class="w-6 h-6 text-white"></i></div>
+                    <span class="text-[8px] font-black uppercase tracking-widest px-2 py-1 bg-emerald-500 rounded-lg shadow-lg">Verified</span>
                 </div>
-                <h4 class="text-3xl font-black tracking-tighter mb-1"><?= number_format($total_data) ?></h4>
-                <p class="text-[10px] font-bold uppercase tracking-widest opacity-80 leading-relaxed">Total Rumah Terdata <br/> di Kabupaten Sinjai</p>
+                <h4 class="text-4xl font-black tracking-tighter mb-1 relative z-10"><?= number_format($total_data) ?></h4>
+                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 leading-relaxed relative z-10">Database Perumahan <br/> Kabupaten Sinjai</p>
             </div>
         </div>
     </div>
@@ -92,7 +94,18 @@
             
             <form action="<?= base_url('rtlh') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
                 <input type="hidden" name="status" value="<?= $status ?>">
-                <div class="relative w-full md:w-72 group">
+                
+                <div class="flex items-center gap-2 w-full md:w-auto bg-blue-950/10 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-blue-950/20 dark:border-white/10 focus-within:border-blue-950 transition-all">
+                    <span class="text-[9px] font-black text-blue-950/40 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">Tampil</span>
+                    <select name="per_page" onchange="this.form.submit()" class="bg-transparent border-none text-xs font-black text-blue-950 dark:text-white outline-none cursor-pointer appearance-none">
+                        <option value="10" <?= $perPage == 10 ? 'selected' : '' ?>>10</option>
+                        <option value="25" <?= $perPage == 25 ? 'selected' : '' ?>>25</option>
+                        <option value="50" <?= $perPage == 50 ? 'selected' : '' ?>>50</option>
+                        <option value="100" <?= $perPage == 100 ? 'selected' : '' ?>>100</option>
+                    </select>
+                </div>
+
+                <div class="relative w-full md:w-64 group">
                     <input type="text" name="keyword" value="<?= $keyword ?>" placeholder="Cari Nama, NIK, atau Desa..." 
                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-600 transition-all outline-none">
                     <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors"></i>
@@ -119,18 +132,9 @@
                             <input type="checkbox" name="rtlh_ids[]" value="<?= $item['id_survei'] ?>" class="row-checkbox w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
                         </td>
                         <td class="px-6 py-5">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0 flex items-center justify-center border border-slate-200 dark:border-slate-700">
-                                    <?php if(!empty($item['foto_depan'])): ?>
-                                        <img src="<?= base_url('uploads/rtlh/'.$item['foto_depan']) ?>" class="w-full h-full object-cover">
-                                    <?php else: ?>
-                                        <i data-lucide="home" class="w-4 h-4 text-slate-400"></i>
-                                    <?php endif; ?>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight line-clamp-1"><?= $item['pemilik'] ?: 'Tidak Terdata' ?></p>
-                                    <p class="text-[9px] font-bold text-slate-400 tracking-widest mt-0.5"><?= $item['nik_pemilik'] ?></p>
-                                </div>
+                            <div>
+                                <p class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight line-clamp-1"><?= $item['pemilik'] ?: 'Tidak Terdata' ?></p>
+                                <p class="text-[9px] font-bold text-slate-400 tracking-widest mt-0.5"><?= $item['nik_pemilik'] ?></p>
                             </div>
                         </td>
                         <td class="px-6 py-5">
@@ -140,19 +144,21 @@
                         <td class="px-6 py-5">
                             <?php 
                                 $statusColors = [
-                                    'Unknown' => 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
-                                    'Rtlh'    => 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800',
-                                    'Target'  => 'bg-indigo-50 text-indigo-600 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800',
-                                    'Rlh'     => 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',
+                                    'Unknown'         => 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+                                    'Belum Menerima'  => 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800',
+                                    'Sudah Menerima'  => 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',
+                                    'Rtlh'            => 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800',
+                                    'Rlh'             => 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',
+                                    'Target'          => 'bg-indigo-50 text-indigo-600 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800',
                                 ];
                                 $c = $statusColors[$item['status_bantuan']] ?? $statusColors['Unknown'];
                             ?>
-                            <span class="px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border <?= $c ?>">
-                                <?= $item['status_bantuan'] ?>
+                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border <?= $c ?>">
+                                <?= $item['status_bantuan'] ?: 'Belum Terdata' ?>
                             </span>
                         </td>
                         <td class="px-6 py-5 text-right">
-                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div class="flex justify-end gap-2 transition-opacity">
                                 <a href="<?= base_url('rtlh/detail/'.$item['id_survei']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail Master Data"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
                                 <a href="<?= base_url('rtlh/edit/'.$item['id_survei']) ?>" class="p-2 bg-amber-500 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Edit Data"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></a>
                                 <?php if (has_permission('delete_rtlh')): ?>
@@ -208,13 +214,57 @@
         const initMap = () => {
             if (map) return;
             const isDark = document.documentElement.classList.contains('dark');
-            map = L.map('rtlhMap', { zoomControl: false }).setView([-5.1245, 120.2536], 11);
-            
-            L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; CartoDB'
-            }).addTo(map);
+            });
+            const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3'],
+                attribution: '&copy; Google'
+            });
 
+            map = L.map('rtlhMap', { zoomControl: false, layers: [googleSat] }).setView([-5.1245, 120.2536], 11);
             L.control.zoom({ position: 'topright' }).addTo(map);
+
+            let rot = 0;
+            const LayerToggle = L.Control.extend({
+                onAdd: function(map) {
+                    const btn = L.DomUtil.create('button', 'rounded-lg shadow-xl border transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                    btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
+                    btn.type = 'button';
+                    
+                    // Initial State: Satellite Active
+                    btn.style.backgroundColor = '#2563eb';
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const standardSvgColor = isDark ? '#60a5fa' : '#2563eb';
+                    
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                    L.DomEvent.disableClickPropagation(btn);
+                    L.DomEvent.on(btn, 'click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        L.DomEvent.preventDefault(e);
+                        rot += 360;
+                        const svg = btn.querySelector('svg');
+                        svg.style.transform = `rotate(${rot}deg)`;
+                        setTimeout(() => {
+                            if (map.hasLayer(googleSat)) { 
+                                map.removeLayer(googleSat); 
+                                map.addLayer(cartoDB); 
+                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
+                                svg.setAttribute('stroke', standardSvgColor); 
+                            }
+                            else { 
+                                map.removeLayer(cartoDB); 
+                                map.addLayer(googleSat); 
+                                btn.style.backgroundColor = '#2563eb'; 
+                                svg.setAttribute('stroke', '#ffffff'); 
+                            }
+                        }, 200);
+                    });
+                    return btn;
+                }
+            });
+            new LayerToggle({ position: 'topright' }).addTo(map);
 
             cluster = L.markerClusterGroup({
                 showCoverageOnHover: false,

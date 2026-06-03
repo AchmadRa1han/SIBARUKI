@@ -695,8 +695,44 @@ class Rtlh extends BaseController
         if ($this->penerimaModel->find($nik)) return redirect()->back()->with('error', 'NIK sudah terdaftar.')->withInput();
         $db->transStart();
         try {
-            $this->penerimaModel->insert(['nik' => $nik, 'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''), 'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null, 'tempat_lahir' => $post['tempat_lahir'] ?? null, 'tanggal_lahir' => $post['tanggal_lahir'] ?: null, 'jenis_kelamin' => $post['jenis_kelamin'] ?? 'L', 'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'), 'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'), 'penghasilan_per_bulan' => $this->resolveMasterId('penghasilan_per_bulan', $post, 'PENGHASILAN'), 'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? 0]);
-            $dataRumah = ['nik_pemilik' => $nik, 'desa' => $post['desa'] ?? null, 'desa_id' => $post['desa_id'] ?? null, 'alamat_detail' => $post['alamat_detail'] ?? null, 'jenis_kawasan' => $this->resolveMasterId('jenis_kawasan', $post, 'JENIS_KAWASAN'), 'luas_rumah_m2' => $post['luas_rumah_m2'] ?? 0, 'luas_lahan_m2' => $post['luas_lahan_m2'] ?? 0, 'kepemilikan_rumah' => $this->resolveMasterId('kepemilikan_rumah', $post, 'KEPEMILIKAN_RUMAH'), 'kepemilikan_tanah' => $this->resolveMasterId('kepemilikan_tanah', $post, 'KEPEMILIKAN_TANAH'), 'sumber_penerangan' => $this->resolveMasterId('sumber_penerangan', $post, 'SUMBER_PENERANGAN'), 'sumber_air_minum' => $this->resolveMasterId('sumber_air_minum', $post, 'SUMBER_AIR_MINUM'), 'jenis_jamban_kloset' => $this->resolveMasterId('jenis_jamban_kloset', $post, 'JENIS_JAMBAN'), 'status_bantuan' => 'Belum Menerima', 'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')];
+            $this->penerimaModel->insert([
+                'nik' => $nik, 
+                'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''), 
+                'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null, 
+                'tempat_lahir' => $post['tempat_lahir'] ?? null, 
+                'tanggal_lahir' => $post['tanggal_lahir'] ?: null, 
+                'jenis_kelamin' => $post['jenis_kelamin'] ?? 'L', 
+                'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN'), 
+                'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN'), 
+                'penghasilan_per_bulan' => $this->resolveMasterId('penghasilan_per_bulan', $post, 'PENGHASILAN'), 
+                'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? 0
+            ]);
+            
+            $dataRumah = [
+                'nik_pemilik' => $nik, 
+                'desa' => $post['desa'] ?? null, 
+                'desa_id' => $post['desa_id'] ?? null, 
+                'alamat_detail' => $post['alamat_detail'] ?? null, 
+                'jenis_kawasan' => $this->resolveMasterId('jenis_kawasan', $post, 'JENIS_KAWASAN'), 
+                'luas_rumah_m2' => $post['luas_rumah_m2'] ?? 0, 
+                'luas_lahan_m2' => $post['luas_lahan_m2'] ?? 0, 
+                'kepemilikan_rumah' => $this->resolveMasterId('kepemilikan_rumah', $post, 'KEPEMILIKAN_RUMAH'), 
+                'kepemilikan_tanah' => $this->resolveMasterId('kepemilikan_tanah', $post, 'KEPEMILIKAN_TANAH'), 
+                'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? 'TIDAK ADA',
+                'sumber_penerangan' => $this->resolveMasterId('sumber_penerangan', $post, 'SUMBER_PENERANGAN'), 
+                'sumber_penerangan_detail' => $post['sumber_penerangan_detail'] ?? null,
+                'sumber_air_minum' => $this->resolveMasterId('sumber_air_minum', $post, 'SUMBER_AIR_MINUM'), 
+                'jarak_sam_ke_tpa_tinja' => $post['jarak_sam_ke_tpa_tinja'] ?? null,
+                'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? 'SENDIRI',
+                'jenis_jamban_kloset' => $this->resolveMasterId('jenis_jamban_kloset', $post, 'JENIS_JAMBAN'), 
+                'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null,
+                'bantuan_perumahan' => $post['bantuan_perumahan'] ?? null,
+                'desil_nasional' => $post['desil_nasional'] ?? null,
+                'status_bantuan' => 'Belum Menerima', 
+                'created_at' => date('Y-m-d H:i:s'), 
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+            
             $uploadPath = FCPATH . 'uploads/rtlh/'; if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
             foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
                 $img = $this->request->getFile($field); if ($img && $img->isValid() && !$img->hasMoved()) { $newName = $img->getRandomName(); $img->move($uploadPath, $newName); $dataRumah[$field] = $newName; }
@@ -724,15 +760,74 @@ class Rtlh extends BaseController
         $post = $this->request->getPost(); $nik = $rumahLama['nik_pemilik']; $penerima = $this->penerimaModel->where('nik', $nik)->first(); $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         try {
             $db->transException(true)->transStart();
-            $this->penerimaModel->update($nik, ['nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? null, 'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''), 'tempat_lahir' => $post['tempat_lahir'] ?? null, 'tanggal_lahir' => $post['tanggal_lahir'] ?? null, 'jenis_kelamin' => $post['jenis_kelamin'] ?? null, 'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? null, 'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN', $penerima['pendidikan_id'] ?? null), 'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN', $penerima['pekerjaan_id'] ?? null), 'penghasilan_per_bulan' => $this->resolveMasterId('penghasilan_per_bulan', $post, 'PENGHASILAN', $penerima['penghasilan_per_bulan'] ?? null)]);
-            $dataRumah = ['alamat_detail' => $post['alamat_detail'] ?? null, 'desa' => $post['desa'] ?? null, 'desa_id' => $post['desa_id'] ?? null, 'jenis_kawasan' => $this->resolveMasterId('jenis_kawasan', $post, 'JENIS_KAWASAN', $rumahLama['jenis_kawasan']), 'luas_rumah_m2' => $post['luas_rumah_m2'] ?? null, 'luas_lahan_m2' => $post['luas_lahan_m2'] ?? null, 'fungsi_ruang' => $post['fungsi_ruang'] ?? null, 'kepemilikan_rumah' => $this->resolveMasterId('kepemilikan_rumah', $post, 'KEPEMILIKAN_RUMAH', $rumahLama['kepemilikan_rumah']), 'kepemilikan_tanah' => $this->resolveMasterId('kepemilikan_tanah', $post, 'KEPEMILIKAN_TANAH', $rumahLama['kepemilikan_tanah']), 'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? null, 'sumber_penerangan' => $this->resolveMasterId('sumber_penerangan', $post, 'SUMBER_PENERANGAN', $rumahLama['sumber_penerangan']), 'sumber_penerangan_detail' => $post['sumber_penerangan_detail'] ?? null, 'sumber_air_minum' => $this->resolveMasterId('sumber_air_minum', $post, 'SUMBER_AIR_MINUM', $rumahLama['sumber_air_minum']), 'jarak_sam_ke_tpa_tinja' => $post['jarak_sam_ke_tpa_tinja'] ?? null, 'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? null, 'jenis_jamban_kloset' => $this->resolveMasterId('jenis_jamban_kloset', $post, 'JENIS_JAMBAN', $rumahLama['jenis_jamban_kloset']), 'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null, 'bantuan_perumahan' => $post['bantuan_perumahan'] ?? null, 'desil_nasional' => $post['desil_nasional'] ?? null];
-            if (!empty($post['lokasi_koordinat']) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $post['lokasi_koordinat'])) { $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false); }
+            
+            // Data Penerima - Preserve if missing
+            $dataPenerima = [
+                'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? $penerima['nama_kepala_keluarga'],
+                'no_kk' => isset($post['no_kk']) ? preg_replace('/[^0-9]/', '', $post['no_kk']) : $penerima['no_kk'],
+                'tempat_lahir' => $post['tempat_lahir'] ?? $penerima['tempat_lahir'],
+                'tanggal_lahir' => $post['tanggal_lahir'] ?? $penerima['tanggal_lahir'],
+                'jenis_kelamin' => $post['jenis_kelamin'] ?? $penerima['jenis_kelamin'],
+                'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? $penerima['jumlah_anggota_keluarga'],
+                'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN', $penerima['pendidikan_id'] ?? null),
+                'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN', $penerima['pekerjaan_id'] ?? null),
+                'penghasilan_per_bulan' => $this->resolveMasterId('penghasilan_per_bulan', $post, 'PENGHASILAN', $penerima['penghasilan_per_bulan'] ?? null)
+            ];
+            $this->penerimaModel->update($nik, $dataPenerima);
+
+            // Data Rumah - Preserve if missing
+            $dataRumah = [
+                'alamat_detail' => $post['alamat_detail'] ?? $rumahLama['alamat_detail'],
+                'desa' => $post['desa'] ?? $rumahLama['desa'],
+                'desa_id' => $post['desa_id'] ?? $rumahLama['desa_id'],
+                'jenis_kawasan' => $this->resolveMasterId('jenis_kawasan', $post, 'JENIS_KAWASAN', $rumahLama['jenis_kawasan']),
+                'luas_rumah_m2' => $post['luas_rumah_m2'] ?? $rumahLama['luas_rumah_m2'],
+                'luas_lahan_m2' => $post['luas_lahan_m2'] ?? $rumahLama['luas_lahan_m2'],
+                'fungsi_ruang' => $post['fungsi_ruang'] ?? $rumahLama['fungsi_ruang'],
+                'kepemilikan_rumah' => $this->resolveMasterId('kepemilikan_rumah', $post, 'KEPEMILIKAN_RUMAH', $rumahLama['kepemilikan_rumah']),
+                'kepemilikan_tanah' => $this->resolveMasterId('kepemilikan_tanah', $post, 'KEPEMILIKAN_TANAH', $rumahLama['kepemilikan_tanah']),
+                'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? $rumahLama['aset_rumah_di_lokasi_lain'],
+                'sumber_penerangan' => $this->resolveMasterId('sumber_penerangan', $post, 'SUMBER_PENERANGAN', $rumahLama['sumber_penerangan']),
+                'sumber_penerangan_detail' => $post['sumber_penerangan_detail'] ?? $rumahLama['sumber_penerangan_detail'],
+                'sumber_air_minum' => $this->resolveMasterId('sumber_air_minum', $post, 'SUMBER_AIR_MINUM', $rumahLama['sumber_air_minum']),
+                'jarak_sam_ke_tpa_tinja' => $post['jarak_sam_ke_tpa_tinja'] ?? $rumahLama['jarak_sam_ke_tpa_tinja'],
+                'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? $rumahLama['kamar_mandi_dan_jamban'],
+                'jenis_jamban_kloset' => $this->resolveMasterId('jenis_jamban_kloset', $post, 'JENIS_JAMBAN', $rumahLama['jenis_jamban_kloset']),
+                'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? $rumahLama['jenis_tpa_tinja'],
+                'bantuan_perumahan' => $post['bantuan_perumahan'] ?? $rumahLama['bantuan_perumahan'],
+                'desil_nasional' => $post['desil_nasional'] ?? $rumahLama['desil_nasional']
+            ];
+
+            if (!empty($post['lokasi_koordinat']) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $post['lokasi_koordinat'])) {
+                $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
+            }
+            
             $uploadPath = FCPATH . 'uploads/rtlh/'; if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
             foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
                 $img = $this->request->getFile($field); if ($img && $img->isValid() && !$img->hasMoved()) { if (!empty($rumahLama[$field]) && file_exists($uploadPath . $rumahLama[$field])) { @unlink($uploadPath . $rumahLama[$field]); } $newName = $img->getRandomName(); $img->move($uploadPath, $newName); $dataRumah[$field] = $newName; }
             }
             $this->rumahModel->update($id, $dataRumah);
-            $this->kondisiModel->update($id, ['st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI', $kondisi['st_pondasi'] ?? null), 'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI', $kondisi['st_kolom'] ?? null), 'st_balok' => $this->resolveMasterId('st_balok', $post, 'KONDISI', $kondisi['st_balok'] ?? null), 'st_sloof' => $this->resolveMasterId('st_sloof', $post, 'KONDISI', $kondisi['st_sloof'] ?? null), 'st_rangka_atap' => $this->resolveMasterId('st_rangka_atap', $post, 'KONDISI', $kondisi['st_rangka_atap'] ?? null), 'st_plafon' => $this->resolveMasterId('st_plafon', $post, 'KONDISI', $kondisi['st_plafon'] ?? null), 'st_jendela' => $this->resolveMasterId('st_jendela', $post, 'KONDISI', $kondisi['st_jendela'] ?? null), 'st_ventilasi' => $this->resolveMasterId('st_ventilasi', $post, 'KONDISI', $kondisi['st_ventilasi'] ?? null), 'mat_atap' => $this->resolveMasterId('mat_atap', $post, 'MATERIAL_ATAP', $kondisi['mat_atap'] ?? null), 'st_atap' => $this->resolveMasterId('st_atap', $post, 'KONDISI', $kondisi['st_atap'] ?? null), 'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING', $kondisi['mat_dinding'] ?? null), 'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI', $kondisi['st_dinding'] ?? null), 'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI', $kondisi['mat_lantai'] ?? null), 'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI', $kondisi['st_lantai'] ?? null)]);
+            
+            // Data Kondisi - Preserve if missing
+            $dataKondisi = [
+                'st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI', $kondisi['st_pondasi'] ?? null),
+                'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI', $kondisi['st_kolom'] ?? null),
+                'st_balok' => $this->resolveMasterId('st_balok', $post, 'KONDISI', $kondisi['st_balok'] ?? null),
+                'st_sloof' => $this->resolveMasterId('st_sloof', $post, 'KONDISI', $kondisi['st_sloof'] ?? null),
+                'st_rangka_atap' => $this->resolveMasterId('st_rangka_atap', $post, 'KONDISI', $kondisi['st_rangka_atap'] ?? null),
+                'st_plafon' => $this->resolveMasterId('st_plafon', $post, 'KONDISI', $kondisi['st_plafon'] ?? null),
+                'st_jendela' => $this->resolveMasterId('st_jendela', $post, 'KONDISI', $kondisi['st_jendela'] ?? null),
+                'st_ventilasi' => $this->resolveMasterId('st_ventilasi', $post, 'KONDISI', $kondisi['st_ventilasi'] ?? null),
+                'mat_atap' => $this->resolveMasterId('mat_atap', $post, 'MATERIAL_ATAP', $kondisi['mat_atap'] ?? null),
+                'st_atap' => $this->resolveMasterId('st_atap', $post, 'KONDISI', $kondisi['st_atap'] ?? null),
+                'mat_dinding' => $this->resolveMasterId('mat_dinding', $post, 'MATERIAL_DINDING', $kondisi['mat_dinding'] ?? null),
+                'st_dinding' => $this->resolveMasterId('st_dinding', $post, 'KONDISI', $kondisi['st_dinding'] ?? null),
+                'mat_lantai' => $this->resolveMasterId('mat_lantai', $post, 'MATERIAL_LANTAI', $kondisi['mat_lantai'] ?? null),
+                'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI', $kondisi['st_lantai'] ?? null),
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+            $this->kondisiModel->update($id, $dataKondisi);
+            
             $db->transComplete(); $this->logActivity('Ubah', 'RTLH', "Memperbarui data RTLH ID: $id");
             return redirect()->to('/rtlh/detail/' . $id)->with('success', 'Data RTLH berhasil diperbarui.');
         } catch (\Exception $e) { $db->transRollback(); return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage())->withInput(); }

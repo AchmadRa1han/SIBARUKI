@@ -235,6 +235,17 @@
                         <input type="text" name="kepemilikan_tanah_manual" id="kepemilikan_tanah_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan kepemilikan..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                     </div>
                     <div>
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Aset di Lokasi Lain</label>
+                        <select name="aset_rumah_di_lokasi_lain" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all appearance-none font-bold">
+                            <option value="TIDAK ADA" <?= (old('aset_rumah_di_lokasi_lain', $rumah['aset_rumah_di_lokasi_lain']) == 'TIDAK ADA') ? 'selected' : '' ?>>Tidak Ada</option>
+                            <option value="ADA" <?= (old('aset_rumah_di_lokasi_lain', $rumah['aset_rumah_di_lokasi_lain']) == 'ADA') ? 'selected' : '' ?>>Ada</option>
+                        </select>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Bantuan Perumahan Sebelumnya</label>
+                        <input type="text" name="bantuan_perumahan" value="<?= old('bantuan_perumahan', $rumah['bantuan_perumahan']) ?>" placeholder="Misal: BSPS 2022, Bedah Rumah BAZNAS, dll" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
+                    </div>
+                    <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Desil Nasional</label>
                         <input type="text" name="desil_nasional" value="<?= old('desil_nasional', $rumah['desil_nasional']) ?>" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-slate-200 outline-none transition-all font-bold">
                     </div>
@@ -365,6 +376,10 @@
                             <input type="text" name="sumber_penerangan_manual" id="sumber_penerangan_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan penerangan..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
                         </div>
                         <div>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">ID Pelanggan Listrik</label>
+                            <input type="text" name="sumber_penerangan_detail" value="<?= old('sumber_penerangan_detail', $rumah['sumber_penerangan_detail']) ?>" placeholder="Nomor Meter / ID Pelanggan" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                        </div>
+                        <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Sanitasi (Jamban)</label>
                             <?php 
                                 $val = old('jenis_jamban_kloset', $rumah['jenis_jamban_kloset']);
@@ -383,6 +398,22 @@
                                 <option value="lainnya" <?= $isLainnya ? 'selected' : '' ?>>Lainnya...</option>
                             </select>
                             <input type="text" name="jenis_jamban_kloset_manual" id="jenis_jamban_kloset_manual" value="<?= $isLainnya ? $val : '' ?>" placeholder="Sebutkan sanitasi..." class="<?= $isLainnya ? '' : 'hidden' ?> w-full mt-2 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl outline-none font-bold text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Status KM & Jamban</label>
+                            <select name="kamar_mandi_dan_jamban" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10 appearance-none">
+                                <option value="SENDIRI" <?= (old('kamar_mandi_dan_jamban', $rumah['kamar_mandi_dan_jamban']) == 'SENDIRI') ? 'selected' : '' ?>>Sendiri</option>
+                                <option value="BERSAMA" <?= (old('kamar_mandi_dan_jamban', $rumah['kamar_mandi_dan_jamban']) == 'BERSAMA') ? 'selected' : '' ?>>Bersama/Umum</option>
+                                <option value="TIDAK ADA" <?= (old('kamar_mandi_dan_jamban', $rumah['kamar_mandi_dan_jamban']) == 'TIDAK ADA') ? 'selected' : '' ?>>Tidak Ada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Detail TPA Tinja</label>
+                            <input type="text" name="jenis_tpa_tinja" value="<?= old('jenis_tpa_tinja', $rumah['jenis_tpa_tinja']) ?>" placeholder="Misal: Tangki Septik, Lubang Tanah, dll" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Jarak SAM ke TPA</label>
+                            <input type="text" name="jarak_sam_ke_tpa_tinja" value="<?= old('jarak_sam_ke_tpa_tinja', $rumah['jarak_sam_ke_tpa_tinja']) ?>" placeholder="Misal: < 10m atau > 10m" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold outline-none focus:ring-4 focus:ring-blue-500/10">
                         </div>
                     </div>
 
