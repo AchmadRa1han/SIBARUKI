@@ -47,10 +47,10 @@ class Home extends BaseController
         $totalRLH = $rlhSurvei + $bansosExtra;
         $totalRumah = $totalRtlh + $totalRLH;
 
-        // d. Backlog dari tabel khusus
-        $backlogBuilder = $db->table('perumahan_backlog_agregat');
+        // d. Backlog dari tabel individu (By Name By Address)
+        $backlogBuilder = $db->table('perumahan_backlog_individu');
         if (isset($roleScope) && $roleScope === 'local') $backlogBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
-        $totalBacklog = $backlogBuilder->selectSum('jumlah_backlog')->get()->getRowArray()['jumlah_backlog'] ?? 0;
+        $totalBacklog = $backlogBuilder->countAllResults();
 
         // Statistik Lainnya
         $totalKumuhBuilder = $db->table('permukiman_wilayah_kumuh');

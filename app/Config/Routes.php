@@ -86,7 +86,9 @@ $routes->group('rtlh', function($routes) {
     $routes->get('/', 'Rtlh::index');
     $routes->get('rekap-desa', 'Rtlh::rekapDesa');
     $routes->get('backlog', 'Rtlh::backlog');
-    $routes->post('update-backlog', 'Rtlh::updateBacklog');
+    $routes->post('backlog/store', 'Rtlh::storeBacklogIndividu');
+    $routes->post('backlog/update/(:num)', 'Rtlh::updateBacklogIndividu/$1');
+    $routes->delete('backlog/delete/(:num)', 'Rtlh::deleteBacklogIndividu/$1');
     $routes->get('history-transformasi', 'Rtlh::historyTransformasi');
     $routes->get('export-excel', 'Rtlh::exportExcel');
     $routes->post('import-csv', 'Rtlh::importCsv');

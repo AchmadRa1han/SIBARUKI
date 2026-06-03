@@ -544,61 +544,115 @@ class Rtlh extends BaseController
     public function backlog()
     {
         if (session()->get('role_id') != 1) return redirect()->to('/dashboard')->with('error', 'Hanya Admin yang dapat mengakses halaman manajemen backlog.');
-        
+
+        $model = new \App\Models\BacklogIndividuModel();
         $db = \Config\Database::connect();
         $keyword = $this->request->getGet('keyword');
-        
-        // Ensure backlog entries exist for all villages
-        $desa = $db->table('kode_desa')->get()->getResultArray();
-        foreach($desa as $d) {
-            $exists = $db->table('perumahan_backlog_agregat')->where('desa_id', $d['desa_id'])->countAllResults();
-            if ($exists == 0) {
-                $db->table('perumahan_backlog_agregat')->insert([
-                    'desa_id' => $d['desa_id'],
-                    'jumlah_backlog' => 0,
-                    'tahun' => date('Y'),
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-            }
+        $perPage = $this->request->getGet('per_page') ?: 10;
+
+        $query = $model->select('perumahan_backlog_individu.*');
+
+        if ($keyword) {
+            $query->groupStart()
+                  ->like('nik', $keyword)
+                  ->orLike('nama_lengkap', $keyword)
+                  ->orLike('desa', $keyword)
+                  ->groupEnd();
         }
 
-        $queryStr = "SELECT kd.desa_id, kd.desa_nama, kk.kecamatan_nama, bd.id as bd_id, bd.jumlah_backlog, bd.tahun, bd.keterangan 
-                     FROM kode_desa kd 
-                     JOIN kode_kecamatan kk ON kd.kecamatan_id = kk.kecamatan_id 
-                     LEFT JOIN perumahan_backlog_agregat bd ON bd.desa_id = kd.desa_id ";
-        
-        if ($keyword) {
-            $queryStr .= " WHERE kd.desa_nama LIKE " . $db->escape('%' . $keyword . '%') . " OR kk.kecamatan_nama LIKE " . $db->escape('%' . $keyword . '%');
-        }
-        
-        $queryStr .= " ORDER BY kk.kecamatan_nama ASC, kd.desa_nama ASC";
+        $data = $query->orderBy('created_at', 'DESC')->paginate($perPage, 'default');
         
         return view('rtlh/backlog', [
-            'title' => 'Manajemen Data Backlog', 
-            'data' => $db->query($queryStr)->getResultArray(),
-            'keyword' => $keyword
+            'title' => 'Manajemen Data Backlog',
+            'backlog' => $data,
+            'pager' => $model->pager,
+            'keyword' => $keyword,
+            'perPage' => $perPage,
+            'desa' => $db->table('kode_desa')->get()->getResultArray()
         ]);
     }
 
-    public function updateBacklog()
+    public function storeBacklogIndividu()
     {
         if (session()->get('role_id') != 1) return redirect()->to('/dashboard');
-        $db = \Config\Database::connect(); $post = $this->request->getPost();
-        $db->transStart();
-        if (!empty($post['bd_id'])) {
-            foreach ($post['bd_id'] as $idx => $id) {
-                if (empty($id)) continue;
-                $db->table('perumahan_backlog_agregat')->where('id', $id)->update([
-                    'jumlah_backlog' => $post['jumlah_backlog'][$idx] ?? 0,
-                    'tahun' => $post['tahun'][$idx] ?? date('Y'),
-                    'keterangan' => $post['keterangan'][$idx] ?? '',
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-            }
+        
+        $model = new \App\Models\BacklogIndividuModel();
+        $post = $this->request->getPost();
+        
+        $nik = preg_replace('/[^0-9]/', '', $post['nik'] ?? '');
+        if (strlen($nik) != 16) return redirect()->back()->with('error', 'NIK harus 16 digit.')->withInput();
+        
+        if ($model->where('nik', $nik)->first()) {
+            return redirect()->back()->with('error', 'NIK tersebut sudah terdaftar dalam data Backlog.')->withInput();
         }
-        $db->transComplete();
-        return redirect()->to('/rtlh/backlog')->with('success', 'Data Backlog berhasil diperbarui.');
+
+        if ($this->penerimaModel->find($nik)) {
+            return redirect()->back()->with('error', 'NIK tersebut sudah terdaftar sebagai penerima RTLH.')->withInput();
+        }
+
+        $db = \Config\Database::connect();
+        $desaInfo = $db->table('kode_desa')->where('desa_id', $post['desa_id'])->get()->getRowArray();
+
+        $data = [
+            'nik' => $nik,
+            'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''),
+            'nama_lengkap' => strtoupper($post['nama_lengkap']),
+            'desa_id' => $post['desa_id'],
+            'desa' => $desaInfo['desa_nama'] ?? null,
+            'alamat_detail' => $post['alamat_detail'],
+            'nama_pemilik_rumah' => strtoupper($post['nama_pemilik_rumah']),
+            'keterangan_hunian' => $post['keterangan_hunian'],
+            'tahun_data' => $post['tahun_data'] ?: date('Y')
+        ];
+
+        if ($model->insert($data)) {
+            $this->logActivity('Tambah', 'Backlog', "Menambah data backlog individu NIK: $nik");
+            return redirect()->to('/rtlh/backlog')->with('success', 'Data backlog berhasil ditambahkan.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal menyimpan data.')->withInput();
+    }
+
+    public function updateBacklogIndividu($id)
+    {
+        if (session()->get('role_id') != 1) return redirect()->to('/dashboard');
+        
+        $model = new \App\Models\BacklogIndividuModel();
+        $post = $this->request->getPost();
+        
+        $db = \Config\Database::connect();
+        $desaInfo = $db->table('kode_desa')->where('desa_id', $post['desa_id'])->get()->getRowArray();
+
+        $data = [
+            'no_kk' => preg_replace('/[^0-9]/', '', $post['no_kk'] ?? ''),
+            'nama_lengkap' => strtoupper($post['nama_lengkap']),
+            'desa_id' => $post['desa_id'],
+            'desa' => $desaInfo['desa_nama'] ?? null,
+            'alamat_detail' => $post['alamat_detail'],
+            'nama_pemilik_rumah' => strtoupper($post['nama_pemilik_rumah']),
+            'keterangan_hunian' => $post['keterangan_hunian'],
+            'tahun_data' => $post['tahun_data'] ?: date('Y')
+        ];
+
+        if ($model->update($id, $data)) {
+            $this->logActivity('Ubah', 'Backlog', "Memperbarui data backlog individu ID: $id");
+            return redirect()->to('/rtlh/backlog')->with('success', 'Data backlog berhasil diperbarui.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal memperbarui data.');
+    }
+
+    public function deleteBacklogIndividu($id)
+    {
+        if (session()->get('role_id') != 1) return $this->response->setJSON(['status' => 'error', 'message' => 'Akses ditolak.']);
+        
+        $model = new \App\Models\BacklogIndividuModel();
+        if ($model->delete($id)) {
+            $this->logActivity('Hapus', 'Backlog', "Menghapus data backlog individu ID: $id");
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data berhasil dihapus.']);
+        }
+
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data.']);
     }
 
     public function historyTransformasi()
