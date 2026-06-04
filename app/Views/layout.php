@@ -248,6 +248,27 @@
             setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 500); }, 4000);
         }
 
+        window.UI = {
+            openModal: (id) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    if (window.lucide) lucide.createIcons();
+                    // Dispatch event for specialized modal initializers
+                    window.dispatchEvent(new CustomEvent('modalOpened', { detail: { id } }));
+                }
+            },
+            closeModal: (id) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    window.dispatchEvent(new CustomEvent('modalClosed', { detail: { id } }));
+                }
+            }
+        };
+
         function toggleDropdown(id, arrowId) {
             const isCollapsed = document.getElementById('main-sidebar').classList.contains('lg:w-20');
             if (isCollapsed) { toggleSidebar(); setTimeout(() => openDropdown(id, arrowId), 400); } 
