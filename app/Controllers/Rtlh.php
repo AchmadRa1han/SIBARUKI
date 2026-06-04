@@ -72,6 +72,10 @@ class Rtlh extends BaseController
             $r['pemilik'] = $pemilikMap[$r['nik_pemilik']] ?? 'Pemilik Tidak Terdata';
         }
 
+        $master = []; foreach ($this->refModel->findAll() as $ref) $master[$ref['kategori']][] = $ref;
+        $allDesa = $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
+        $desaList = array_map(function($d) { return ['desa' => $d['desa_nama'], 'desa_id' => $d['desa_id']]; }, $allDesa);
+
         $data = [
             'title' => 'Master Data Perumahan',
             'rumah' => $rumah,
@@ -81,6 +85,8 @@ class Rtlh extends BaseController
             'keyword' => $keyword,
             'status' => $status,
             'total_data' => $this->rumahModel->countAllResults(false),
+            'master' => $master,
+            'desa_list' => $desaList
         ];
 
         return view('rtlh/index', $data);
@@ -914,6 +920,22 @@ class Rtlh extends BaseController
             $db->transComplete(); $this->logActivity('Hapus Massal', 'RTLH', "Menghapus $deletedCount data RTLH");
             return $this->response->setJSON(['status' => 'success', 'message' => $deletedCount . ' data dihapus.']);
         } catch (\Exception $e) { $db->transRollback(); return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]); }
+    }
+
+    public function getApiDetail($id)
+    {
+        $rumah = $this->rumahModel->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
+        if (!$rumah) return $this->response->setJSON(['status' => 'error', 'message' => 'Data tidak ditemukan.']);
+        
+        $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
+        $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
+        
+        return $this->response->setJSON([
+            'status' => 'success',
+            'rumah' => $rumah,
+            'penerima' => $penerima,
+            'kondisi' => $kondisi
+        ]);
     }
 
     private function resolveMasterId($field, $post, $kategori, $previousValue = null)

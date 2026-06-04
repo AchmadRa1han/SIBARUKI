@@ -101,6 +101,7 @@ $routes->group('rtlh', function($routes) {
     $routes->post('update/(:num)', 'Rtlh::update/$1');
     $routes->post('delete/(:num)', 'Rtlh::delete/$1');
     $routes->post('bulk-delete', 'Rtlh::bulkDelete');
+    $routes->get('api-detail/(:num)', 'Rtlh::getApiDetail/$1');
 });
 
 $routes->group('wilayah-kumuh', function($routes) {

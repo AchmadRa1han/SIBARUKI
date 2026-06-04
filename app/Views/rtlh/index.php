@@ -27,9 +27,9 @@
                 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
             </a>
             <?php if (has_permission('create_rtlh')): ?>
-            <a href="<?= base_url('rtlh/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+            <button onclick="openModalAdd()" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
                 <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah Data Rumah
-            </a>
+            </button>
             <?php endif; ?>
         </div>
     </div>
@@ -164,7 +164,7 @@
                         <td class="px-6 py-5 text-right">
                             <div class="flex justify-end gap-2 transition-opacity">
                                 <a href="<?= base_url('rtlh/detail/'.$item['id_survei']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail Master Data"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
-                                <a href="<?= base_url('rtlh/edit/'.$item['id_survei']) ?>" class="p-2 bg-amber-500 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Edit Data"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></a>
+                                <button onclick='editRtlh(<?= json_encode($item) ?>)' class="p-2 bg-amber-500 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Edit Data"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
                                 <?php if (has_permission('delete_rtlh')): ?>
                                 <button onclick="deleteConfirm(<?= $item['id_survei'] ?>)" class="p-2 bg-rose-500 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Hapus"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
@@ -208,6 +208,453 @@
         </div>
     </div>
 </div>
+
+<!-- MULTI-STEP MODAL RTLH (ADD/EDIT) -->
+<div id="modal-rtlh" class="fixed inset-0 z-[5000] hidden overflow-y-auto py-10">
+    <div class="fixed inset-0 bg-blue-950/60 backdrop-blur-sm transition-opacity" onclick="closeModalRtlh()"></div>
+    <div class="relative flex items-center justify-center p-4 min-h-full">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <!-- Modal Header -->
+            <div class="p-8 bg-blue-950 text-white flex justify-between items-center border-b border-white/10 sticky top-0 z-30">
+                <div class="flex items-center gap-5">
+                    <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10">
+                        <i data-lucide="file-edit" class="w-6 h-6 text-blue-400" id="modal-icon"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tighter" id="modal-title">Tambah Data Rumah</h3>
+                        <!-- Stepper Progress -->
+                        <div class="flex items-center gap-4 mt-2">
+                            <div class="flex items-center gap-2">
+                                <span class="step-dot w-5 h-5 rounded-full bg-blue-600 text-[10px] font-black flex items-center justify-center text-white" data-step="1">1</span>
+                                <span class="text-[8px] font-bold uppercase tracking-widest text-white">Identitas & Lokasi</span>
+                            </div>
+                            <div class="w-4 h-px bg-white/20"></div>
+                            <div class="flex items-center gap-2">
+                                <span class="step-dot w-5 h-5 rounded-full bg-white/10 text-[10px] font-black flex items-center justify-center text-white/40" data-step="2">2</span>
+                                <span class="text-[8px] font-bold uppercase tracking-widest text-white/40">Fasilitas</span>
+                            </div>
+                            <div class="w-4 h-px bg-white/20"></div>
+                            <div class="flex items-center gap-2">
+                                <span class="step-dot w-5 h-5 rounded-full bg-white/10 text-[10px] font-black flex items-center justify-center text-white/40" data-step="3">3</span>
+                                <span class="text-[8px] font-bold uppercase tracking-widest text-white/40">Teknis & Foto</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeModalRtlh()" class="p-2 hover:bg-white/10 rounded-xl transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+
+            <form id="form-rtlh" action="<?= base_url('rtlh/store') ?>" method="post" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                
+                <!-- STEP 1: IDENTITAS & LOKASI -->
+                <div class="modal-step" id="step-1">
+                    <div class="p-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Kepala Keluarga</label>
+                                    <input type="text" name="nama_kepala_keluarga" id="inp_nama" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm focus:ring-2 focus:ring-blue-600 outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">NIK Pemilik</label>
+                                    <input type="text" name="nik" id="inp_nik" required maxlength="16" minlength="16" class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm focus:ring-2 focus:ring-blue-600 outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nomor KK</label>
+                                    <input type="text" name="no_kk" id="inp_no_kk" maxlength="16" class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm focus:ring-2 focus:ring-blue-600 outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Desa/Kelurahan</label>
+                                    <select name="desa_id" id="inp_desa_id" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm focus:ring-2 focus:ring-blue-600 outline-none appearance-none">
+                                        <option value="">Pilih Lokasi</option>
+                                        <?php foreach($desa_list as $d): ?>
+                                            <option value="<?= $d['desa_id'] ?>"><?= $d['desa'] ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <input type="hidden" name="desa" id="inp_desa_nama">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Alamat Detail</label>
+                                    <input type="text" name="alamat_detail" id="inp_alamat" class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm focus:ring-2 focus:ring-blue-600 outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Koordinat (WKT POINT)</label>
+                                <input type="text" name="lokasi_koordinat" id="inp_coords" placeholder="POINT(lng lat)" class="w-full p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-2xl font-mono text-xs focus:ring-2 focus:ring-blue-600 outline-none">
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Lokasi di Peta (Klik/Geser Pin)</label>
+                            <div id="modalMap" class="h-full min-h-[350px] w-full rounded-[2rem] border-4 border-slate-100 dark:border-slate-800 shadow-inner bg-slate-100"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: PROFIL & FASILITAS -->
+                <div class="modal-step hidden" id="step-2">
+                    <div class="p-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-6 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pendidikan</label>
+                                <select name="pendidikan_id" id="inp_pendidikan" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-900 border-none rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600">
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master['PENDIDIKAN'] ?? []) as $rp): ?><option value="<?= $rp['id'] ?>"><?= $rp['nama_pilihan'] ?></option><?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pekerjaan</label>
+                                <select name="pekerjaan_id" id="inp_pekerjaan" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-900 border-none rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600">
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master['PEKERJAAN'] ?? []) as $rj): ?><option value="<?= $rj['id'] ?>"><?= $rj['nama_pilihan'] ?></option><?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Anggota Keluarga</label>
+                                <input type="number" name="jumlah_anggota_keluarga" id="inp_jml_kel" min="0" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-900 border-none rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Desil Nasional</label>
+                                <input type="text" name="desil_nasional" id="inp_desil" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-900 border-none rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600">
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <h4 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] border-b pb-2">Status Hunian</h4>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kepemilikan Rumah</label>
+                                <select name="kepemilikan_rumah" id="inp_milik_rumah" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none">
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master['KEPEMILIKAN_RUMAH'] ?? []) as $rm): ?><option value="<?= $rm['id'] ?>"><?= $rm['nama_pilihan'] ?></option><?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kepemilikan Tanah</label>
+                                <select name="kepemilikan_tanah" id="inp_milik_tanah" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none">
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master['KEPEMILIKAN_TANAH'] ?? []) as $rt): ?><option value="<?= $rt['id'] ?>"><?= $rt['nama_pilihan'] ?></option><?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Luas Rumah (m²)</label>
+                                    <input type="number" step="0.1" name="luas_rumah_m2" id="inp_luas_r" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Luas Tanah (m²)</label>
+                                    <input type="number" step="0.1" name="luas_lahan_m2" id="inp_luas_t" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <h4 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] border-b pb-2">Fasilitas Dasar</h4>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sumber Penerangan</label>
+                                <select name="sumber_penerangan" id="inp_listrik" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none">
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master['SUMBER_PENERANGAN'] ?? []) as $sp): ?><option value="<?= $sp['id'] ?>"><?= $sp['nama_pilihan'] ?></option><?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sumber Air Minum</label>
+                                <select name="sumber_air_minum" id="inp_air" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none">
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master['SUMBER_AIR_MINUM'] ?? []) as $sa): ?><option value="<?= $sa['id'] ?>"><?= $sa['nama_pilihan'] ?></option><?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Bantuan Pernah Diterima</label>
+                                <input type="text" name="bantuan_perumahan" id="inp_bantuan" placeholder="Sebutkan jika ada..." class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none uppercase">
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <h4 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] border-b pb-2">Sanitasi</h4>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Fasilitas BAB</label>
+                                <select name="kamar_mandi_dan_jamban" id="inp_bab" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none">
+                                    <option value="SENDIRI">Sendiri</option>
+                                    <option value="BERSAMA">Bersama/Umum</option>
+                                    <option value="TIDAK ADA">Tidak Ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Jenis Kloset</label>
+                                <select name="jenis_jamban_kloset" id="inp_kloset" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none">
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master['JENIS_JAMBAN'] ?? []) as $jj): ?><option value="<?= $jj['id'] ?>"><?= $jj['nama_pilihan'] ?></option><?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pembuangan Akhir Tinja</label>
+                                <input type="text" name="jenis_tpa_tinja" id="inp_tpa" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none uppercase">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: TEKNIS & DOKUMENTASI -->
+                <div class="modal-step hidden" id="step-3">
+                    <div class="p-10 space-y-10">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="lg:col-span-4 flex items-center gap-3">
+                                <span class="w-8 h-px bg-slate-200"></span>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Penilaian Teknis Komponen</span>
+                            </div>
+                            <?php 
+                                $komponen = [
+                                    ['st_pondasi', 'Kondisi Pondasi'], ['st_kolom', 'Kondisi Kolom'], ['st_balok', 'Kondisi Balok'], ['st_sloof', 'Kondisi Sloof'],
+                                    ['st_rangka_atap', 'Kondisi Rangka'], ['st_plafon', 'Kondisi Plafon'], ['st_jendela', 'Kondisi Jendela'], ['st_ventilasi', 'Kondisi Ventilasi'],
+                                    ['mat_atap', 'Material Atap', 'MATERIAL_ATAP'], ['st_atap', 'Kondisi Atap'], ['mat_dinding', 'Material Dinding', 'MATERIAL_DINDING'], ['st_dinding', 'Kondisi Dinding'],
+                                    ['mat_lantai', 'Material Lantai', 'MATERIAL_LANTAI'], ['st_lantai', 'Kondisi Lantai']
+                                ];
+                                foreach($komponen as $k):
+                            ?>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1"><?= $k[1] ?></label>
+                                <select name="<?= $k[0] ?>" id="inp_<?= $k[0] ?>" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600">
+                                    <option value="">Pilih</option>
+                                    <?php 
+                                        $cat = $k[2] ?? 'KONDISI';
+                                        foreach(($master[$cat] ?? []) as $opt): 
+                                    ?>
+                                        <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            <div class="col-span-full flex items-center gap-3">
+                                <span class="w-8 h-px bg-slate-200"></span>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Dokumentasi Visual (Unggah Foto)</span>
+                            </div>
+                            <?php 
+                                $fotos = [['foto_depan', 'Foto Depan'], ['foto_samping', 'Foto Samping'], ['foto_belakang', 'Foto Belakang'], ['foto_dalam', 'Foto Dalam']];
+                                foreach($fotos as $f):
+                            ?>
+                            <div class="space-y-3">
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1"><?= $f[1] ?></label>
+                                <div class="relative group aspect-square rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center overflow-hidden transition-all hover:border-blue-500 cursor-pointer" onclick="document.getElementById('inp_<?= $f[0] ?>').click()">
+                                    <img id="prev_<?= $f[0] ?>" class="absolute inset-0 w-full h-full object-cover hidden">
+                                    <div class="text-center z-10 p-4" id="placeholder_<?= $f[0] ?>">
+                                        <i data-lucide="image-plus" class="w-8 h-8 text-slate-300 mb-2 mx-auto"></i>
+                                        <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Pilih Gambar</p>
+                                    </div>
+                                    <input type="file" name="<?= $f[0] ?>" id="inp_<?= $f[0] ?>" class="hidden" accept="image/*" onchange="previewImg(this, '<?= $f[0] ?>')">
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-8 bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-800 flex justify-between items-center">
+                    <button type="button" id="btn-prev" onclick="moveStep(-1)" class="hidden px-8 py-3 bg-white dark:bg-slate-800 text-slate-500 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-100 transition-all">Sebelumnya</button>
+                    <div class="flex-grow"></div>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeModalRtlh()" class="px-8 py-3 bg-white dark:bg-slate-800 text-slate-400 rounded-2xl font-black uppercase tracking-widest text-[10px] border border-transparent hover:text-rose-500 transition-all">Batal</button>
+                        <button type="button" id="btn-next" onclick="moveStep(1)" class="px-10 py-3 bg-blue-950 dark:bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-blue-950/20 active:scale-95 transition-all">Selanjutnya</button>
+                        <button type="submit" id="btn-save" class="hidden px-10 py-3 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-600/20 active:scale-95 transition-all">Simpan Data</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Map Scripts & Modal Logic -->
+<script>
+    let m_map, m_marker;
+    let m_currentStep = 1;
+
+    function initModalMap() {
+        if (m_map) return;
+        m_map = L.map('modalMap', { zoomControl: false }).setView([-5.1245, 120.2536], 12);
+        L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], attribution: '&copy; Google'
+        }).addTo(m_map);
+
+        m_map.on('click', (e) => {
+            setMarker(e.latlng.lat, e.latlng.lng);
+        });
+    }
+
+    function setMarker(lat, lng) {
+        if (m_marker) m_marker.setLatLng([lat, lng]);
+        else m_marker = L.marker([lat, lng], { draggable: true }).addTo(m_map).on('dragend', (e) => {
+            const pos = e.target.getLatLng();
+            document.getElementById('inp_coords').value = `POINT(${pos.lng} ${pos.lat})`;
+        });
+        document.getElementById('inp_coords').value = `POINT(${lng} ${lat})`;
+    }
+
+    function openModalAdd() {
+        m_currentStep = 1;
+        document.getElementById('form-rtlh').reset();
+        document.getElementById('form-rtlh').action = "<?= base_url('rtlh/store') ?>";
+        document.getElementById('modal-title').innerText = "Tambah Data Rumah";
+        document.getElementById('inp_nik').readOnly = false;
+        document.getElementById('inp_nik').classList.remove('bg-slate-100', 'cursor-not-allowed');
+        
+        // Clear previews
+        ['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'].forEach(p => {
+            document.getElementById('prev_' + p).classList.add('hidden');
+            document.getElementById('placeholder_' + p).classList.remove('hidden');
+        });
+
+        showStep(1);
+        document.getElementById('modal-rtlh').classList.remove('hidden');
+        setTimeout(() => {
+            initModalMap();
+            m_map.invalidateSize();
+            if (m_marker) m_map.removeLayer(m_marker);
+            m_marker = null;
+        }, 300);
+    }
+
+    async function editRtlh(item) {
+        m_currentStep = 1;
+        document.getElementById('form-rtlh').reset();
+        document.getElementById('form-rtlh').action = "<?= base_url('rtlh/update') ?>/" + item.id_survei;
+        document.getElementById('modal-title').innerText = "Edit Data Rumah";
+        
+        // Populate Step 1
+        document.getElementById('inp_nik').value = item.nik_pemilik;
+        document.getElementById('inp_nik').readOnly = true;
+        document.getElementById('inp_nik').classList.add('bg-slate-100', 'cursor-not-allowed');
+        document.getElementById('inp_nama').value = item.pemilik;
+        document.getElementById('inp_no_kk').value = item.no_kk || '';
+        document.getElementById('inp_desa_id').value = item.desa_id;
+        document.getElementById('inp_alamat').value = item.alamat_detail;
+        document.getElementById('inp_coords').value = item.wkt;
+
+        // Populate dynamic data (Receiver & Conditions) via Fetch
+        try {
+            const res = await fetch(`<?= base_url('api/rtlh-detail') ?>/${item.id_survei}`);
+            const data = await res.json();
+            if(data.status === 'success') {
+                const p = data.penerima;
+                const c = data.kondisi;
+                const r = data.rumah;
+
+                // Step 2
+                document.getElementById('inp_pendidikan').value = p.pendidikan_id;
+                document.getElementById('inp_pekerjaan').value = p.pekerjaan_id;
+                document.getElementById('inp_jml_kel').value = p.jumlah_anggota_keluarga;
+                document.getElementById('inp_desil').value = r.desil_nasional;
+                document.getElementById('inp_milik_rumah').value = r.kepemilikan_rumah;
+                document.getElementById('inp_milik_tanah').value = r.kepemilikan_tanah;
+                document.getElementById('inp_luas_r').value = r.luas_rumah_m2;
+                document.getElementById('inp_luas_t').value = r.luas_lahan_m2;
+                document.getElementById('inp_listrik').value = r.sumber_penerangan;
+                document.getElementById('inp_air').value = r.sumber_air_minum;
+                document.getElementById('inp_bantuan').value = r.bantuan_perumahan;
+                document.getElementById('inp_bab').value = r.kamar_mandi_dan_jamban;
+                document.getElementById('inp_kloset').value = r.jenis_jamban_kloset;
+                document.getElementById('inp_tpa').value = r.jenis_tpa_tinja;
+
+                // Step 3
+                const fields = ['st_pondasi', 'st_kolom', 'st_balok', 'st_sloof', 'st_rangka_atap', 'st_plafon', 'st_jendela', 'st_ventilasi', 'mat_atap', 'st_atap', 'mat_dinding', 'st_dinding', 'mat_lantai', 'st_lantai'];
+                fields.forEach(f => {
+                    const el = document.getElementById('inp_' + f);
+                    if(el) el.value = c[f];
+                });
+
+                // Photos
+                ['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'].forEach(f => {
+                    if(r[f]) {
+                        const img = document.getElementById('prev_' + f);
+                        img.src = `<?= base_url('uploads/rtlh/') ?>/${r[f]}`;
+                        img.classList.remove('hidden');
+                        document.getElementById('placeholder_' + f).classList.add('hidden');
+                    } else {
+                        document.getElementById('prev_' + f).classList.add('hidden');
+                        document.getElementById('placeholder_' + f).classList.remove('hidden');
+                    }
+                });
+            }
+        } catch(e) {}
+        
+        showStep(1);
+        document.getElementById('modal-rtlh').classList.remove('hidden');
+        
+        setTimeout(() => {
+            initModalMap();
+            m_map.invalidateSize();
+            if (item.wkt) {
+                const geo = wellknown.parse(item.wkt);
+                if (geo) {
+                    setMarker(geo.coordinates[1], geo.coordinates[0]);
+                    m_map.setView([geo.coordinates[1], geo.coordinates[0]], 18);
+                }
+            }
+        }, 300);
+    }
+
+    function moveStep(delta) {
+        const next = m_currentStep + delta;
+        if (next >= 1 && next <= 3) showStep(next);
+    }
+
+    function showStep(step) {
+        m_currentStep = step;
+        document.querySelectorAll('.modal-step').forEach(s => s.classList.add('hidden'));
+        document.getElementById('step-' + step).classList.remove('hidden');
+
+        // Update Stepper UI
+        document.querySelectorAll('.step-dot').forEach(dot => {
+            const dStep = parseInt(dot.dataset.step);
+            if (dStep === step) {
+                dot.className = "step-dot w-5 h-5 rounded-full bg-blue-600 text-[10px] font-black flex items-center justify-center text-white";
+                dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white";
+                dot.innerHTML = dStep;
+            } else if (dStep < step) {
+                dot.className = "step-dot w-5 h-5 rounded-full bg-emerald-500 text-[10px] font-black flex items-center justify-center text-white";
+                dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white/60";
+                dot.innerHTML = '✓';
+            } else {
+                dot.className = "step-dot w-5 h-5 rounded-full bg-white/10 text-[10px] font-black flex items-center justify-center text-white/40";
+                dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white/40";
+                dot.innerHTML = dStep;
+            }
+        });
+
+        // Update Buttons
+        document.getElementById('btn-prev').classList.toggle('hidden', step === 1);
+        document.getElementById('btn-next').classList.toggle('hidden', step === 3);
+        document.getElementById('btn-save').classList.toggle('hidden', step !== 3);
+        
+        if (step === 1 && m_map) setTimeout(() => m_map.invalidateSize(), 100);
+    }
+
+    function previewImg(input, id) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('prev_' + id).src = e.target.result;
+                document.getElementById('prev_' + id).classList.remove('hidden');
+                document.getElementById('placeholder_' + id).classList.add('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function closeModalRtlh() {
+        document.getElementById('modal-rtlh').classList.add('hidden');
+    }
+
+    // Listener for Desa Name Sync
+    document.getElementById('inp_desa_id')?.addEventListener('change', function() {
+        const text = this.options[this.selectedIndex].text;
+        document.getElementById('inp_desa_nama').value = text;
+    });
+</script>
 
 <!-- Map Scripts -->
 <script>
