@@ -33,7 +33,7 @@ class SeedDummyRtlh extends BaseCommand
             $db->table('perumahan_rtlh_rumah')->insert([
                 'nik_pemilik' => $nik,
                 'desa' => 'Desa Dummy',
-                'status_bantuan' => 'Rtlh',
+                'status_bantuan' => 'Unknown',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);

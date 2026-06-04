@@ -225,12 +225,10 @@ class Home extends BaseController
         // Logika: 
         // 1. RTLH (Target) = status_bantuan 'Rtlh' atau 'Target'
         // 2. RLH = status_bantuan 'Rlh' atau 'Sudah Menerima'
-        // 3. Belum Teridentifikasi = Unknown atau Kosong
         $layakQuery = "
             SELECT 
                 SUM(CASE WHEN status_bantuan IN ('Rtlh', 'Target') THEN 1 ELSE 0 END) as rtlh,
-                SUM(CASE WHEN status_bantuan IN ('Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as rlh,
-                SUM(CASE WHEN status_bantuan IN ('Unknown', 'Belum Menerima', '') OR status_bantuan IS NULL THEN 1 ELSE 0 END) as belum_teridentifikasi
+                SUM(CASE WHEN status_bantuan IN ('Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as rlh
             FROM perumahan_rtlh_rumah
         ";
         if ($roleScope === 'local') {
@@ -238,8 +236,7 @@ class Home extends BaseController
             $layakQuery = "
                 SELECT 
                     SUM(CASE WHEN status_bantuan IN ('Rtlh', 'Target') THEN 1 ELSE 0 END) as rtlh,
-                    SUM(CASE WHEN status_bantuan IN ('Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as rlh,
-                    SUM(CASE WHEN status_bantuan IN ('Unknown', 'Belum Menerima', '') OR status_bantuan IS NULL THEN 1 ELSE 0 END) as belum_teridentifikasi
+                    SUM(CASE WHEN status_bantuan IN ('Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as rlh
                 FROM perumahan_rtlh_rumah
                 WHERE desa_id IN ($desaList)
             ";

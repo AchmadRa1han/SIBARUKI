@@ -370,13 +370,13 @@
     function initChart() {
         // 1. Analisis RTLH & RLH
         const s = <?= json_encode($statusLayak) ?>;
-        // series: [RLH, Belum Teridentifikasi, RTLH]
+        // series: [RLH, RTLH]
         new ApexCharts(document.querySelector("#conditionChart"), {
-            series: [parseInt(s.rlh||0), parseInt(s.belum_teridentifikasi||0), parseInt(s.rtlh||0)],
+            series: [parseInt(s.rlh||0), parseInt(s.rtlh||0)],
             chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
-            labels: ['RLH', 'BELUM TERIDENTIFIKASI', 'RTLH'],
-            colors: ['#10b981', '#94a3b8', '#ef4444'],
-            plotOptions: { pie: { donut: { size: '85%', labels: { show: true, total: { show: true, label: 'TOTAL DATA', color: '#94a3b8', fontSize: '9px', fontWeight: 900 } } } } },
+            labels: ['RLH (LAYAK)', 'RTLH (SASARAN)'],
+            colors: ['#10b981', '#ef4444'],
+            plotOptions: { pie: { donut: { size: '85%', labels: { show: true, total: { show: true, label: 'DATA TERIDENTIFIKASI', color: '#94a3b8', fontSize: '9px', fontWeight: 900 } } } } },
             legend: { position: 'bottom', fontSize: '9px', fontWeight: 700 },
             stroke: { show: false }
         }).render();
