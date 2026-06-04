@@ -19,13 +19,13 @@ class Home extends BaseController
         $carousel = json_decode($carouselJson, true);
 
         // --- 1. DATA STATISTIK (REKAP) ---
-        // a. RTLH (Belum Menerima di survei)
-        $rtlhTargetBuilder = $db->table('perumahan_rtlh_rumah')->where('status_bantuan', 'Belum Menerima');
+        // a. RTLH (Sasaran)
+        $rtlhTargetBuilder = $db->table('perumahan_rtlh_rumah')->whereIn('status_bantuan', ['Rtlh', 'Target']);
         if (isset($roleScope) && $roleScope === 'local') $rtlhTargetBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
         $totalRtlh = $rtlhTargetBuilder->countAllResults();
 
-        // b. RLH Survei (Sudah Menerima di survei)
-        $rlhSurveiBuilder = $db->table('perumahan_rtlh_rumah')->where('status_bantuan', 'Sudah Menerima');
+        // b. RLH (Sudah Layak)
+        $rlhSurveiBuilder = $db->table('perumahan_rtlh_rumah')->whereIn('status_bantuan', ['Rlh', 'Sudah Menerima']);
         if (isset($roleScope) && $roleScope === 'local') $rlhSurveiBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
         $rlhSurvei = $rlhSurveiBuilder->countAllResults();
 
@@ -38,14 +38,15 @@ class Home extends BaseController
         // Filter desa for bansos if local scope
         if (isset($roleScope) && $roleScope === 'local') {
             $desaList = "'" . implode("','", (!empty($desaRtlh) ? $desaRtlh : ['0'])) . "'";
-            // Note: perumahan_rtlh_bansos usually has 'desa' as name, so we join with kode_desa to get id if needed, 
-            // but for simplicity here we assume if it's not in perumahan_rtlh_rumah for that desa, it's extra.
-            // Better yet, just filter by NIK subquery which already accounts for desa in dashboard context.
         }
         $bansosExtra = $db->query($bansosExtraQuery)->getRowArray()['total'] ?? 0;
 
         $totalRLH = $rlhSurvei + $bansosExtra;
-        $totalRumah = $totalRtlh + $totalRLH;
+        
+        // d. Total Rumah (Semua record di database spasial)
+        $totalRumahBuilder = $db->table('perumahan_rtlh_rumah');
+        if (isset($roleScope) && $roleScope === 'local') $totalRumahBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        $totalRumah = $totalRumahBuilder->countAllResults();
 
         // d. Backlog dari tabel individu (By Name By Address)
         $backlogBuilder = $db->table('perumahan_backlog_individu');
@@ -168,17 +169,17 @@ class Home extends BaseController
         $desaKumuh = session()->get('desa_ids_kumuh') ?? [];
 
         // --- 1. STATISTIK REKAPITULASI (7 TABEL) ---
-        // a. RTLH (Belum Menerima di survei)
-        $rtlhTargetBuilder = $db->table('perumahan_rtlh_rumah')->where('status_bantuan', 'Belum Menerima');
+        // a. RTLH (Sasaran)
+        $rtlhTargetBuilder = $db->table('perumahan_rtlh_rumah')->whereIn('status_bantuan', ['Rtlh', 'Target']);
         if ($roleScope === 'local') $rtlhTargetBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
         $totalRtlh = $rtlhTargetBuilder->countAllResults();
 
-        // b. RLH Survei (Sudah Menerima di survei)
-        $rlhSurveiBuilder = $db->table('perumahan_rtlh_rumah')->where('status_bantuan', 'Sudah Menerima');
+        // b. RLH (Sudah Layak)
+        $rlhSurveiBuilder = $db->table('perumahan_rtlh_rumah')->whereIn('status_bantuan', ['Rlh', 'Sudah Menerima']);
         if ($roleScope === 'local') $rlhSurveiBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
         $rlhSurvei = $rlhSurveiBuilder->countAllResults();
 
-        // c. RLH Bansos (Bansos yang tidak terhubung ke survei)
+        // c. RLH Bansos (Extra)
         $bansosExtraQuery = "
             SELECT COUNT(*) as total FROM perumahan_rtlh_bansos b
             WHERE (b.id_survei IS NULL OR b.id_survei = '' OR b.id_survei = '0')
@@ -187,12 +188,16 @@ class Home extends BaseController
         $bansosExtra = $db->query($bansosExtraQuery)->getRowArray()['total'] ?? 0;
 
         $totalRLH = $rlhSurvei + $bansosExtra;
-        $totalRumah = $totalRtlh + $totalRLH;
+        
+        // d. Total Rumah (Semua record di database spasial)
+        $totalRumahBuilder = $db->table('perumahan_rtlh_rumah');
+        if ($roleScope === 'local') $totalRumahBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        $totalRumah = $totalRumahBuilder->countAllResults();
 
-        // d. Backlog dari tabel khusus
-        $backlogBuilder = $db->table('perumahan_backlog_agregat');
+        // d. Backlog dari tabel individu (By Name By Address)
+        $backlogBuilder = $db->table('perumahan_backlog_individu');
         if ($roleScope === 'local') $backlogBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
-        $totalBacklog = $backlogBuilder->selectSum('jumlah_backlog')->get()->getRowArray()['jumlah_backlog'] ?? 0;
+        $totalBacklog = $backlogBuilder->countAllResults();
 
         // Wilayah Kumuh
         $kumuhBuilder = $db->table('permukiman_wilayah_kumuh');
@@ -218,23 +223,23 @@ class Home extends BaseController
         
         // Status Kelayakan (RTLH & RLH)
         // Logika: 
-        // 1. RTLH (Target) = status_bantuan 'Belum Menerima'
-        // 2. RLH = status_bantuan 'Sudah Menerima'
-        // 3. Belum Teridentifikasi = Sisa (untuk pengembangan ke depan)
+        // 1. RTLH (Target) = status_bantuan 'Rtlh' atau 'Target'
+        // 2. RLH = status_bantuan 'Rlh' atau 'Sudah Menerima'
+        // 3. Belum Teridentifikasi = Unknown atau Kosong
         $layakQuery = "
             SELECT 
-                SUM(CASE WHEN status_bantuan = 'Belum Menerima' THEN 1 ELSE 0 END) as rtlh,
-                SUM(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 ELSE 0 END) as rlh,
-                SUM(CASE WHEN status_bantuan NOT IN ('Belum Menerima', 'Sudah Menerima') OR status_bantuan IS NULL THEN 1 ELSE 0 END) as belum_teridentifikasi
+                SUM(CASE WHEN status_bantuan IN ('Rtlh', 'Target') THEN 1 ELSE 0 END) as rtlh,
+                SUM(CASE WHEN status_bantuan IN ('Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as rlh,
+                SUM(CASE WHEN status_bantuan IN ('Unknown', 'Belum Menerima', '') OR status_bantuan IS NULL THEN 1 ELSE 0 END) as belum_teridentifikasi
             FROM perumahan_rtlh_rumah
         ";
         if ($roleScope === 'local') {
             $desaList = "'" . implode("','", (!empty($desaRtlh) ? $desaRtlh : ['0'])) . "'";
             $layakQuery = "
                 SELECT 
-                    SUM(CASE WHEN status_bantuan = 'Belum Menerima' THEN 1 ELSE 0 END) as rtlh,
-                    SUM(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 ELSE 0 END) as rlh,
-                    SUM(CASE WHEN status_bantuan NOT IN ('Belum Menerima', 'Sudah Menerima') OR status_bantuan IS NULL THEN 1 ELSE 0 END) as belum_teridentifikasi
+                    SUM(CASE WHEN status_bantuan IN ('Rtlh', 'Target') THEN 1 ELSE 0 END) as rtlh,
+                    SUM(CASE WHEN status_bantuan IN ('Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as rlh,
+                    SUM(CASE WHEN status_bantuan IN ('Unknown', 'Belum Menerima', '') OR status_bantuan IS NULL THEN 1 ELSE 0 END) as belum_teridentifikasi
                 FROM perumahan_rtlh_rumah
                 WHERE desa_id IN ($desaList)
             ";

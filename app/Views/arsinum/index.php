@@ -18,167 +18,135 @@
     </nav>
 
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all duration-300">
-        <div class="absolute top-0 right-0 w-48 h-48 bg-blue-600/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
-        <div class="relative z-10 flex items-center gap-4">
-            <a href="<?= base_url('dashboard') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali ke Dashboard">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            </a>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-blue-950 p-7 rounded-[2.5rem] text-white shadow-2xl shadow-blue-950/20 relative overflow-hidden transition-all duration-500">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div class="relative z-10 flex items-center gap-5">
+            <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 shadow-inner">
+                <i data-lucide="droplets" class="w-6 h-6 text-blue-400"></i>
+            </div>
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">ARSINUM</h1>
-                <p class="text-slate-500 dark:text-slate-400 font-medium text-xs mt-1">Teknologi Air Siap Minum Kabupaten Sinjai.</p>
+                <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter leading-none">ARSINUM</h1>
+                <p class="text-white/60 font-medium text-xs mt-2 tracking-wide">Teknologi Air Siap Minum Kabupaten Sinjai</p>
             </div>
         </div>
-        <div class="flex flex-wrap items-center gap-2 relative z-10">
-            <div class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-blue-100 dark:border-blue-800/50 shadow-sm">
-                <?= number_format($total_unit ?? 0) ?> Unit
-            </div>
-            <a href="<?= base_url('arsinum/export-excel') ?>" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-emerald-100 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition-all active:scale-95 flex items-center gap-2 shadow-sm">
-                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
+        <div class="flex flex-wrap items-center gap-3 relative z-10">
+            <a href="<?= base_url('arsinum/export-excel') ?>" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
             </a>
             <?php if (has_permission('create_rtlh')): ?>
-            <a href="<?= base_url('arsinum/create') ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95 flex items-center gap-2 group">
-                <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform"></i> Tambah Data
+            <a href="<?= base_url('arsinum/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+                <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah Data
             </a>
             <?php endif; ?>
         </div>
     </div>
 
     <!-- Map Section -->
-    <div class="relative">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-100 dark:border-slate-800">
-            <div id="map" class="w-full h-[450px] z-10" style="background: #ececec;"></div>
-            <div class="absolute top-6 left-6 z-[1000] hidden md:block">
-                <div class="bg-blue-950/80 backdrop-blur-md text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] shadow-2xl border border-white/10 flex items-center gap-3">
-                    <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></div>
-                    Database Geospasial ARSINUM
-                </div>
-            </div>
+    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-3 shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+        <div class="absolute top-6 left-6 z-[1000]">
+            <span class="px-3 py-1 bg-blue-950/90 backdrop-blur-md rounded-lg text-[8px] font-bold uppercase tracking-widest shadow-sm border border-white/10 text-white flex items-center gap-2">
+                <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></div>
+                Geospasial ARSINUM
+            </span>
         </div>
+        <div id="map" class="h-[450px] w-full rounded-[2rem] z-0 bg-slate-50 dark:bg-slate-950"></div>
     </div>
 
     <!-- Filter & Search Card -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 p-3">
-        <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3 w-full lg:w-auto">
-                <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full md:w-auto">
-                    <button class="px-4 py-2 bg-white dark:bg-slate-700 text-blue-600 rounded-lg text-[9px] font-bold uppercase tracking-widest shadow-sm">Daftar Pekerjaan</button>
-                </div>
-            </div>
-
-            <form action="<?= base_url('arsinum') ?>" method="get" class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto" id="filter-form">
+    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden">
+        <div class="p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <form action="<?= base_url('arsinum') ?>" method="get" class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto" id="filter-form">
                 <input type="hidden" name="sort_by" value="<?= $sortBy ?>">
                 <input type="hidden" name="sort_order" value="<?= $sortOrder ?>">
                 
-                <div class="relative w-full md:w-28">
-                    <select name="per_page" onchange="submitWithScroll(this)" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none">
-                        <?php foreach([5, 10, 25, 50, 100] as $p): ?>
-                            <option value="<?= $p ?>" <?= $perPage == $p ? 'selected' : '' ?>><?= $p ?> Baris</option>
+                <div class="flex items-center gap-2 bg-blue-950/5 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-blue-950/10 focus-within:border-blue-950 transition-all">
+                    <span class="text-[9px] font-black text-blue-950/40 dark:text-slate-500 uppercase tracking-widest">Tampil</span>
+                    <select name="per_page" onchange="submitWithScroll(this)" class="bg-transparent border-none text-xs font-black text-blue-950 dark:text-white outline-none cursor-pointer appearance-none">
+                        <?php foreach([10, 25, 50, 100] as $p): ?>
+                            <option value="<?= $p ?>" <?= $perPage == $p ? 'selected' : '' ?>><?= $p ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                 </div>
 
-                <div class="relative w-full md:w-40">
-                    <select name="kecamatan" onchange="submitWithScroll(this)" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none">
-                        <option value="">Kecamatan</option>
+                <div class="flex items-center gap-2 bg-blue-950/5 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-blue-950/10 focus-within:border-blue-950 transition-all">
+                    <span class="text-[9px] font-black text-blue-950/40 dark:text-slate-500 uppercase tracking-widest">Wilayah</span>
+                    <select name="kecamatan" onchange="submitWithScroll(this)" class="bg-transparent border-none text-xs font-black text-blue-950 dark:text-white outline-none cursor-pointer appearance-none">
+                        <option value="">Semua Kecamatan</option>
                         <?php foreach($kecamatans as $k): ?>
                             <option value="<?= $k['kecamatan'] ?>" <?= $selected_kecamatan == $k['kecamatan'] ? 'selected' : '' ?>><?= $k['kecamatan'] ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                 </div>
 
-                <div class="relative w-full md:w-64">
-                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari pekerjaan..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 pl-10 focus:ring-2 focus:ring-blue-500 transition-all">
-                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <div class="relative w-full md:w-80 group">
+                    <input type="text" name="search" value="<?= $search ?>" placeholder="Cari Jenis Pekerjaan, Pelaksana, atau Desa..." class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-blue-600 transition-all outline-none">
+                    <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors"></i>
                 </div>
+                <button type="submit" class="w-full md:w-auto px-8 py-3 bg-blue-950 dark:bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:shadow-lg transition-all active:scale-95">Cari</button>
             </form>
         </div>
-    </div>
 
-    <!-- Table Section -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
-        <!-- Floating Bulk Action Bar -->
-        <div id="bulk-action-bar" class="absolute top-0 left-0 right-0 z-50 bg-blue-950 text-white p-4 transform -translate-y-full transition-transform duration-500 flex items-center justify-between px-8">
-            <div class="flex items-center gap-4">
-                <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-lg text-[9px] font-bold tracking-widest shadow-lg shadow-blue-600/20">0 TERPILIH</span>
-                <p class="text-[9px] font-bold uppercase tracking-widest opacity-70 hidden md:block">Aksi massal tersedia</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="handleBulkDelete()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-rose-600/20">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus
-                </button>
-                <button onclick="clearSelection()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all active:scale-95">Batal</button>
-            </div>
-        </div>
-
-        <div class="p-6 border-b border-slate-50 dark:border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
-                    <i data-lucide="database" class="w-5 h-5"></i>
+        <div class="overflow-x-auto relative">
+            <!-- Floating Bulk Action Bar -->
+            <div id="bulk-action-bar" class="absolute top-0 left-0 right-0 z-50 bg-blue-950 text-white p-4 transform -translate-y-full transition-transform duration-500 flex items-center justify-between px-8">
+                <div class="flex items-center gap-4">
+                    <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-lg text-[9px] font-bold tracking-widest shadow-lg shadow-blue-600/20">0 TERPILIH</span>
                 </div>
-                <div>
-                    <h3 class="text-sm font-bold text-blue-950 dark:text-white uppercase tracking-tight">Daftar Aset Arsinum</h3>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Manajemen Infrastruktur & Teknologi</p>
+                <div class="flex items-center gap-2">
+                    <button onclick="handleBulkDelete()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-rose-600/20">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus Massal
+                    </button>
+                    <button onclick="clearSelection()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all active:scale-95">Batal</button>
                 </div>
             </div>
-        </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse table-fixed">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                        <th class="px-6 py-4 w-16 text-center">
-                            <input type="checkbox" id="select-all" class="w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
+                    <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                        <th class="px-8 py-5 w-16 text-center">
+                            <input type="checkbox" id="select-all" class="w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-950 focus:ring-blue-900/20 cursor-pointer transition-all">
                         </th>
-                        <th class="px-4 py-4 w-64 cursor-pointer hover:text-blue-600 transition-colors" onclick="applySort('jenis_pekerjaan')">
-                            Jenis Pekerjaan
-                        </th>
-                        <th class="px-4 py-4 w-32 text-center">Volume</th>
-                        <th class="px-4 py-4 w-56">Wilayah Administratif</th>
-                        <th class="px-6 py-4 text-center w-40">Aksi</th>
+                        <th class="px-8 py-5 cursor-pointer hover:text-blue-950 transition-colors" onclick="applySort('jenis_pekerjaan')">Informasi Pekerjaan</th>
+                        <th class="px-8 py-5 text-center">Volume</th>
+                        <th class="px-8 py-5">Wilayah Administratif</th>
+                        <th class="px-8 py-5 text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]">
+                <tbody class="divide-y dark:divide-slate-800">
                     <?php if (!empty($arsinum)): foreach($arsinum as $item): ?>
-                    <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-200">
-                        <td class="px-6 py-3 text-center">
-                            <input type="checkbox" name="ids[]" value="<?= $item['id'] ?>" class="row-checkbox w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
+                    <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-300">
+                        <td class="px-8 py-6 text-center">
+                            <input type="checkbox" name="ids[]" value="<?= $item['id'] ?>" class="row-checkbox w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-950 focus:ring-blue-900/20 cursor-pointer transition-all">
                         </td>
-                        <td class="px-4 py-3">
-                            <span class="font-bold text-blue-950 dark:text-white uppercase truncate block text-xs mb-0.5" title="<?= $item['jenis_pekerjaan'] ?>"><?= $item['jenis_pekerjaan'] ?></span>
-                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Pelaksana: <?= $item['pelaksana'] ?: '-' ?></span>
+                        <td class="px-8 py-6">
+                            <p class="text-sm font-black text-blue-950 dark:text-white uppercase tracking-tight"><?= $item['jenis_pekerjaan'] ?></p>
+                            <p class="text-[10px] font-bold text-slate-400 tracking-widest mt-1 uppercase">Pelaksana: <?= $item['pelaksana'] ?: '-' ?></p>
                         </td>
-                        <td class="px-4 py-3 text-center">
-                            <span class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg font-bold text-[9px] border border-blue-100 dark:border-blue-800 shadow-sm uppercase">
+                        <td class="px-8 py-6 text-center">
+                            <span class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full font-black text-[9px] border border-blue-100 dark:border-blue-800 shadow-sm uppercase tracking-widest">
                                 <?= $item['volume'] ?>
                             </span>
                         </td>
-                        <td class="px-4 py-3">
-                            <div class="flex flex-col gap-0.5">
-                                <span class="font-bold text-slate-700 dark:text-slate-200 uppercase tracking-tight"><?= $item['desa'] ?></span>
-                                <span class="text-[8px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
-                                    <i data-lucide="map-pin" class="w-2.5 h-2.5 text-blue-500"></i> Kec. <?= $item['kecamatan'] ?>
-                                </span>
-                            </div>
+                        <td class="px-8 py-6">
+                            <p class="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase"><?= $item['desa'] ?></p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-tighter">Kec. <?= $item['kecamatan'] ?></p>
                         </td>
-                        <td class="px-6 py-3 text-center">
-                            <div class="flex items-center justify-center gap-1.5">
+                        <td class="px-8 py-6 text-right">
+                            <div class="flex justify-end gap-2">
                                 <?php if($item['koordinat']): ?>
-                                <button onclick="focusMap(<?= $item['koordinat'] ?>)" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Peta"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="focusMap(<?= $item['koordinat'] ?>)" class="p-2.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl shadow-lg border border-blue-100 dark:border-blue-800 hover:scale-110 active:scale-95 transition-all" title="Fokus Peta"><i data-lucide="map-pin" class="w-4 h-4"></i></button>
                                 <?php endif; ?>
-                                <a href="<?= base_url('arsinum/detail/'.$item['id']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
-                                <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                <a href="<?= base_url('arsinum/detail/'.$item['id']) ?>" class="p-2.5 bg-blue-950 dark:bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-950/20 hover:scale-110 active:scale-95 transition-all" title="Detail"><i data-lucide="eye" class="w-4 h-4"></i></a>
+                                <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2.5 bg-rose-500 text-white rounded-xl shadow-lg shadow-rose-500/20 hover:scale-110 active:scale-95 transition-all" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </td>
                     </tr>
                     <?php endforeach; else: ?>
                         <tr>
-                            <td colspan="5" class="px-8 py-16 text-center">
-                                <div class="flex flex-col items-center justify-center opacity-40">
-                                    <i data-lucide="package-search" class="w-12 h-12 mb-3"></i>
-                                    <p class="font-bold uppercase text-[9px] tracking-[0.3em]">Data Tidak Ditemukan</p>
+                            <td colspan="5" class="px-8 py-20 text-center">
+                                <div class="flex flex-col items-center justify-center opacity-20">
+                                    <i data-lucide="database-zap" class="w-16 h-16 mb-4 text-slate-400"></i>
+                                    <p class="font-black uppercase text-xs tracking-[0.2em] text-slate-500">Data Tidak Ditemukan</p>
                                 </div>
                             </td>
                         </tr>
@@ -186,8 +154,9 @@
                 </tbody>
             </table>
         </div>
+        
         <?php if (isset($pager)): ?>
-        <div class="p-6 bg-slate-50/50 dark:bg-slate-800/50 flex justify-center border-t border-slate-100 dark:border-slate-800">
+        <div class="p-8 border-t dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/50">
             <?= $pager->links('group1', 'tailwind_full') ?>
         </div>
         <?php endif; ?>

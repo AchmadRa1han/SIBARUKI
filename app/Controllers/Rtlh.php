@@ -524,8 +524,8 @@ class Rtlh extends BaseController
         $rekap = [];
         foreach($desaMaster as $dm) {
             $desaId = $dm['desa_id']; $desaNama = $dm['desa_nama'];
-            $totalRtlh = $db->table('perumahan_rtlh_rumah')->where('desa_id', $desaId)->where('status_bantuan', 'Belum Menerima')->countAllResults();
-            $rlhSurvei = $db->table('perumahan_rtlh_rumah')->where('desa_id', $desaId)->where('status_bantuan', 'Sudah Menerima')->countAllResults();
+            $totalRtlh = $db->table('perumahan_rtlh_rumah')->where('desa_id', $desaId)->whereIn('status_bantuan', ['Rtlh', 'Target'])->countAllResults();
+            $rlhSurvei = $db->table('perumahan_rtlh_rumah')->where('desa_id', $desaId)->whereIn('status_bantuan', ['Rlh', 'Sudah Menerima'])->countAllResults();
             $baseName = trim(str_replace(['DESA', 'KELURAHAN', 'KEL.', ' '], '', strtoupper($desaNama)));
             $bansosExtra = $db->query("
                 SELECT COUNT(*) as total FROM perumahan_rtlh_bansos b

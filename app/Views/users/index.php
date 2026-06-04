@@ -1,8 +1,7 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<div class="max-w-7xl mx-auto space-y-8 pb-12">
-    
+<div class="max-w-7xl mx-auto space-y-6 pb-24 text-slate-900 dark:text-slate-200">
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
@@ -11,21 +10,21 @@
     </nav>
 
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-10 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-        <div class="relative z-10 flex items-center gap-4">
-            <a href="<?= base_url('dashboard') ?>" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Kembali">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            </a>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-blue-950 p-7 rounded-[2.5rem] text-white shadow-2xl shadow-blue-950/20 relative overflow-hidden transition-all duration-500">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div class="relative z-10 flex items-center gap-5">
+            <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 shadow-inner">
+                <i data-lucide="users" class="w-6 h-6 text-blue-400"></i>
+            </div>
             <div>
-                <h1 class="text-3xl md:text-4xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Otoritas Pengguna</h1>
-                <p class="text-slate-500 dark:text-slate-400 font-medium text-sm mt-1">Kelola hak akses dan penugasan wilayah administratif petugas.</p>
+                <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter leading-none">Otoritas Pengguna</h1>
+                <p class="text-white/60 font-medium text-xs mt-2 tracking-wide">Kelola hak akses dan penugasan wilayah administratif petugas</p>
             </div>
         </div>
         <div class="flex items-center gap-3 relative z-10">
             <?php if (has_permission('manage_users')): ?>
-            <a href="<?= base_url('users/create') ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-blue-600/20 transition-all active:scale-95 flex items-center gap-3 group">
-                <i data-lucide="user-plus" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> Tambah Akun
+            <a href="<?= base_url('users/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+                <i data-lucide="user-plus" class="w-4 h-4 transition-transform group-hover:scale-110"></i> Tambah Akun
             </a>
             <?php endif; ?>
         </div>

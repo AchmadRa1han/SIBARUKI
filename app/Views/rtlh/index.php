@@ -10,21 +10,25 @@
 <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 
 <div class="space-y-6">
-    <!-- Header Page -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-blue-950 dark:text-white uppercase tracking-tighter">Master Data Perumahan</h1>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
-                <span class="w-8 h-[2px] bg-blue-600"></span> Registri Profil Rumah & Kondisi Hunian
-            </p>
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-blue-950 p-7 rounded-[2.5rem] text-white shadow-2xl shadow-blue-950/20 relative overflow-hidden transition-all duration-500">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div class="relative z-10 flex items-center gap-5">
+            <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 shadow-inner">
+                <i data-lucide="home" class="w-6 h-6 text-blue-400"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter leading-none">Master Data Perumahan</h1>
+                <p class="text-white/60 font-medium text-xs mt-2 tracking-wide">Registri Profil Rumah & Kondisi Hunian Kabupaten Sinjai</p>
+            </div>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <a href="<?= base_url('rtlh/export-excel') ?>" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2">
-                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Export Excel
+        <div class="flex flex-wrap items-center gap-3 relative z-10">
+            <a href="<?= base_url('rtlh/export-excel') ?>" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
             </a>
             <?php if (has_permission('create_rtlh')): ?>
-            <a href="<?= base_url('rtlh/create') ?>" class="bg-blue-950 text-white px-5 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-blue-950/20 transition-all active:scale-95 flex items-center gap-2 group border border-white/10">
-                <i data-lucide="plus" class="w-3.5 h-3.5 transition-transform group-hover:rotate-90"></i> Tambah Data Rumah
+            <a href="<?= base_url('rtlh/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+                <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah Data Rumah
             </a>
             <?php endif; ?>
         </div>

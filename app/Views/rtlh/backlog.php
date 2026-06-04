@@ -13,19 +13,19 @@
     </nav>
 
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-blue-950 p-10 rounded-[2.5rem] text-white shadow-2xl shadow-blue-950/20 relative overflow-hidden transition-all duration-500">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-blue-950 p-7 rounded-[2.5rem] text-white shadow-2xl shadow-blue-950/20 relative overflow-hidden transition-all duration-500">
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
         <div class="relative z-10 flex items-center gap-5">
-            <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 shadow-inner">
-                <i data-lucide="alert-triangle" class="w-7 h-7 text-amber-400"></i>
+            <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 shadow-inner">
+                <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-400"></i>
             </div>
             <div>
-                <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tighter leading-none">Manajemen Backlog</h1>
+                <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter leading-none">Manajemen Backlog</h1>
                 <p class="text-white/60 font-medium text-xs mt-2 tracking-wide">Data Individu Keluarga Belum Memiliki Rumah (By Name By Address)</p>
             </div>
         </div>
         <div class="flex items-center gap-3 relative z-10">
-            <button onclick="toggleModal('modal-add')" class="bg-white text-blue-950 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+            <button onclick="toggleModal('modal-add')" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
                 <i data-lucide="plus" class="w-4 h-4"></i> Tambah Individu
             </button>
         </div>
@@ -127,11 +127,11 @@
 </div>
 
 <!-- MODAL ADD -->
-<div id="modal-add" class="fixed inset-0 z-[2000] hidden">
-    <div class="absolute inset-0 bg-blue-950/60 backdrop-blur-sm transition-opacity"></div>
-    <div class="absolute inset-0 flex items-center justify-center p-4">
+<div id="modal-add" class="fixed inset-0 z-[2000] hidden overflow-y-auto py-10">
+    <div class="fixed inset-0 bg-blue-950/60 backdrop-blur-sm transition-opacity"></div>
+    <div class="relative flex items-center justify-center p-4 min-h-full">
         <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-300">
-            <div class="p-8 bg-blue-950 text-white flex justify-between items-center border-b border-white/10">
+            <div class="p-8 bg-blue-950 text-white flex justify-between items-center border-b border-white/10 sticky top-0 z-20">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-md"><i data-lucide="user-plus" class="w-6 h-6"></i></div>
                     <div>
@@ -142,6 +142,7 @@
                 <button onclick="toggleModal('modal-add')" class="p-2 hover:bg-white/10 rounded-xl transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <form action="<?= base_url('rtlh/backlog/store') ?>" method="post" class="p-10">
+                <?= csrf_field() ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
                         <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">NIK Calon Penerima</label>
@@ -193,11 +194,11 @@
 </div>
 
 <!-- MODAL EDIT -->
-<div id="modal-edit" class="fixed inset-0 z-[2000] hidden">
-    <div class="absolute inset-0 bg-blue-950/60 backdrop-blur-sm transition-opacity"></div>
-    <div class="absolute inset-0 flex items-center justify-center p-4">
+<div id="modal-edit" class="fixed inset-0 z-[2000] hidden overflow-y-auto py-10">
+    <div class="fixed inset-0 bg-blue-950/60 backdrop-blur-sm transition-opacity"></div>
+    <div class="relative flex items-center justify-center p-4 min-h-full">
         <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-300">
-            <div class="p-8 bg-amber-500 text-white flex justify-between items-center border-b border-white/10">
+            <div class="p-8 bg-amber-500 text-white flex justify-between items-center border-b border-white/10 sticky top-0 z-20">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-md"><i data-lucide="edit-3" class="w-6 h-6"></i></div>
                     <div>
@@ -208,6 +209,7 @@
                 <button onclick="toggleModal('modal-edit')" class="p-2 hover:bg-white/10 rounded-xl transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <form id="form-edit" action="" method="post" class="p-10">
+                <?= csrf_field() ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2 opacity-60">
                         <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">NIK (Tidak dapat diubah)</label>

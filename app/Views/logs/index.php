@@ -4,25 +4,33 @@
 <!-- External Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-<div class="space-y-8 pb-12 animate-in fade-in duration-700">
-    
-    <!-- 1. COMMAND HEADER & GLOBAL CONTROLS -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-            <div class="flex items-center gap-3 mb-2">
-                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">System Audit & Forensic Log v3.0</span>
+<div class="max-w-7xl mx-auto space-y-6 pb-24 text-slate-900 dark:text-slate-200">
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
+        <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <span class="text-blue-600">Audit Forensic</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-blue-950 p-7 rounded-[2.5rem] text-white shadow-2xl shadow-blue-950/20 relative overflow-hidden transition-all duration-500">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div class="relative z-10 flex items-center gap-5">
+            <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 shadow-inner">
+                <i data-lucide="activity" class="w-6 h-6 text-blue-400"></i>
             </div>
-            <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-blue-950 dark:text-white uppercase">Forensik Aktivitas</h1>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter leading-none">Audit Forensic</h1>
+                <p class="text-white/60 font-medium text-xs mt-2 tracking-wide">System Audit & Activity Tracking Log v3.0</p>
+            </div>
         </div>
-        
-        <div class="flex flex-wrap items-center gap-3 lg:justify-end">
-            <button id="btn-refresh" onclick="toggleAutoRefresh()" class="px-5 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center gap-2 transition-all hover:shadow-lg active:scale-95 group">
+        <div class="flex flex-wrap items-center gap-3 relative z-10">
+            <button id="btn-refresh" onclick="toggleAutoRefresh()" class="bg-white/10 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 backdrop-blur-md shadow-sm hover:bg-white hover:text-blue-950 transition-all active:scale-95 flex items-center gap-2">
                 <span id="refresh-status" class="w-2 h-2 bg-slate-300 rounded-full"></span>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Real-Time Stream</span>
+                <span>Real-Time Stream</span>
             </button>
-            <button onclick="confirmClearLogs()" class="px-5 py-3 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-2xl text-[10px] font-bold uppercase hover:bg-rose-100 transition-all border border-rose-100 dark:border-rose-900 flex items-center gap-2 shadow-sm active:scale-95">
-                <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i> Purge History
+            <button onclick="confirmClearLogs()" class="bg-rose-500 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:bg-rose-600 active:scale-95 transition-all flex items-center gap-2 group border border-white/10">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Purge History
             </button>
         </div>
     </div>
