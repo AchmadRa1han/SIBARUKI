@@ -169,16 +169,20 @@
                             </div>
                             <?php 
                                 $kompFields = [
-                                    ['st_pondasi', 'Pondasi'], ['st_tiang', 'Tiang / Kolom'], ['st_balok', 'Balok'], ['st_sloof', 'Sloof'],
+                                    ['st_pondasi', 'Pondasi'], ['st_kolom', 'Tiang / Kolom'], ['st_balok', 'Balok'], ['st_sloof', 'Sloof'],
                                     ['st_rangka_atap', 'Rangka Atap'], ['st_plafon', 'Plafon'], ['st_jendela', 'Jendela'], ['st_ventilasi', 'Ventilasi'],
-                                    ['st_dinding', 'Kondisi Dinding'], ['st_lantai', 'Kondisi Lantai'], ['st_atap', 'Kondisi Atap']
+                                    ['mat_atap', 'Material Atap', 'MATERIAL_ATAP'], ['st_atap', 'Kondisi Atap'], 
+                                    ['mat_dinding', 'Material Dinding', 'MATERIAL_DINDING'], ['st_dinding', 'Kondisi Dinding'],
+                                    ['mat_lantai', 'Material Lantai', 'MATERIAL_LANTAI'], ['st_lantai', 'Kondisi Lantai']
                                 ];
                                 foreach($kompFields as $k):
+                                    $cat = $k[2] ?? 'KONDISI';
                             ?>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1"><?= $k[1] ?></label>
                                 <select name="<?= $k[0] ?>" id="inp_<?= $k[0] ?>" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-[10px] outline-none focus:ring-2 focus:ring-blue-600">
-                                    <?php foreach(($master['KONDISI'] ?? []) as $opt): ?>
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master[$cat] ?? []) as $opt): ?>
                                         <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
@@ -225,211 +229,242 @@
 </div>
 
 <script>
-    // RTLH Modal Controller Object
-    window.rtlhModal = {
-        currentStep: 1,
-        map: null,
-        marker: null,
-        uploadUrl: '<?= base_url('uploads/rtlh/') ?>',
+    // RTLH Modal Controller Object - Hardened against PHP errors
+    (function() {
+        const RTLH_UPLOAD_URL = <?= json_encode(base_url('uploads/rtlh/')) ?>;
+        
+        window.rtlhModal = {
+            currentStep: 1,
+            map: null,
+            marker: null,
+            uploadUrl: RTLH_UPLOAD_URL.endsWith('/') ? RTLH_UPLOAD_URL : RTLH_UPLOAD_URL + '/',
 
-        init: function() {
-            // Listen to Modal Opened Event
-            window.addEventListener('modalOpened', (e) => {
-                if (e.detail.id === 'modal-rtlh') {
-                    this.initMap();
-                    this.showStep(1);
-                }
-            });
-
-            // Sync Desa Name
-            document.getElementById('inp_desa_id')?.addEventListener('change', function() {
-                const text = this.options[this.selectedIndex].text;
-                document.getElementById('inp_desa_nama').value = text;
-            });
-        },
-
-        initMap: function() {
-            if (this.map) {
-                setTimeout(() => this.map.invalidateSize(), 300);
-                return;
-            }
-            
-            this.map = L.map('modalMap', { zoomControl: false }).setView([-5.1245, 120.2536], 12);
-            L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-                maxZoom: 20,
-                subdomains:['mt0','mt1','mt2','mt3'],
-                attribution: '&copy; Google'
-            }).addTo(this.map);
-
-            this.map.on('click', (e) => this.setMarker(e.latlng.lat, e.latlng.lng));
-            
-            setTimeout(() => this.map.invalidateSize(), 300);
-        },
-
-        setMarker: function(lat, lng) {
-            if (this.marker) {
-                this.marker.setLatLng([lat, lng]);
-            } else {
-                this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
-                this.marker.on('dragend', (e) => {
-                    const pos = e.target.getLatLng();
-                    document.getElementById('inp_coords').value = `POINT(${pos.lng.toFixed(7)} ${pos.lat.toFixed(7)})`;
+            init: function() {
+                // Listen to Modal Opened Event
+                window.addEventListener('modalOpened', (e) => {
+                    if (e && e.detail && e.detail.id === 'modal-rtlh') {
+                        this.initMap();
+                        this.showStep(1);
+                    }
                 });
-            }
-            document.getElementById('inp_coords').value = `POINT(${lng.toFixed(7)} ${lat.toFixed(7)})`;
-            this.map.setView([lat, lng], 18);
-        },
 
-        openAdd: function() {
-            document.getElementById('form-rtlh').reset();
-            document.getElementById('form-rtlh').action = "<?= base_url('rtlh/store') ?>";
-            document.getElementById('modal-rtlh-title').innerText = "Tambah Data Rumah";
-            document.getElementById('inp_nik').readOnly = false;
-            document.getElementById('inp_nik').classList.remove('bg-slate-100', 'cursor-not-allowed', 'opacity-60');
-            
-            // Clear photos
-            ['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'].forEach(f => {
-                const prev = document.getElementById('prev_' + f);
-                const placeholder = document.getElementById('placeholder_' + f);
-                if (prev) prev.classList.add('hidden');
-                if (placeholder) placeholder.classList.remove('hidden');
-            });
-
-            if (this.marker) {
-                this.map.removeLayer(this.marker);
-                this.marker = null;
-            }
-
-            UI.openModal('modal-rtlh');
-        },
-
-        openEdit: function(data) {
-            if (!data) return;
-            const { r, p, c } = data;
-            
-            document.getElementById('form-rtlh').reset();
-            document.getElementById('form-rtlh').action = `<?= base_url('rtlh/update') ?>/${r.id_survei}`;
-            document.getElementById('modal-rtlh-title').innerText = "Perbarui Data Rumah";
-            
-            // Basic Fields
-            const fields = {
-                'inp_nama': p.nama_kepala_keluarga || '',
-                'inp_nik': r.nik_pemilik || '',
-                'inp_no_kk': p.no_kk || '',
-                'inp_desa_id': r.desa_id || '',
-                'inp_luas_rumah': r.luas_rumah_m2 || '',
-                'inp_alamat': r.alamat_detail || '',
-                'inp_coords': r.wkt || '',
-                'inp_milik_rumah': r.kepemilikan_rumah || '',
-                'inp_milik_tanah': r.kepemilikan_tanah || '',
-                'inp_kawasan': r.jenis_kawasan || '',
-                'inp_listrik': r.sumber_penerangan || '',
-                'inp_air': r.sumber_air_minum || '',
-                'inp_desil': r.desil_nasional || '',
-                'inp_bab': r.kamar_mandi_dan_jamban || 'SENDIRI',
-                'inp_tpa': r.jenis_tpa_tinja || ''
-            };
-
-            for (const [id, val] of Object.entries(fields)) {
-                const el = document.getElementById(id);
-                if (el) el.value = val;
-            }
-
-            // NIK read-only on edit
-            const nikEl = document.getElementById('inp_nik');
-            nikEl.readOnly = true;
-            nikEl.classList.add('bg-slate-100', 'cursor-not-allowed', 'opacity-60');
-
-            // Technical Fields
-            const tech = ['st_pondasi', 'st_balok', 'st_sloof', 'st_rangka_atap', 'st_plafon', 'st_jendela', 'st_ventilasi', 'st_dinding', 'st_lantai', 'st_atap'];
-            tech.forEach(f => {
-                const el = document.getElementById('inp_' + f);
-                if (el) el.value = c[f] || '';
-            });
-            
-            // Special st_kolom mapping
-            const tiangEl = document.getElementById('inp_st_tiang');
-            if (tiangEl) tiangEl.value = c.st_kolom || c.st_tiang || '';
-
-            // Photos
-            ['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'].forEach(f => {
-                const prev = document.getElementById('prev_' + f);
-                const placeholder = document.getElementById('placeholder_' + f);
-                if (prev) {
-                    if (r[f]) {
-                        prev.src = this.uploadUrl + r[f];
-                        prev.classList.remove('hidden');
-                        if (placeholder) placeholder.classList.add('hidden');
-                    } else {
-                        prev.classList.add('hidden');
-                        if (placeholder) placeholder.classList.remove('hidden');
-                    }
+                // Sync Desa Name
+                const elDesa = document.getElementById('inp_desa_id');
+                if (elDesa) {
+                    elDesa.addEventListener('change', function() {
+                        const text = this.options[this.selectedIndex].text;
+                        const elNama = document.getElementById('inp_desa_nama');
+                        if (elNama) elNama.value = text;
+                    });
                 }
-            });
+            },
 
-            // Map Position
-            UI.openModal('modal-rtlh');
-            
-            if (r.wkt && typeof wellknown !== 'undefined') {
+            initMap: function() {
+                if (this.map) {
+                    setTimeout(() => this.map.invalidateSize(), 300);
+                    return;
+                }
+                
                 try {
-                    const geo = wellknown.parse(r.wkt);
-                    if (geo && geo.coordinates) {
-                        setTimeout(() => this.setMarker(geo.coordinates[1], geo.coordinates[0]), 500);
-                    }
-                } catch(e) { console.error('Map parse error:', e); }
-            }
-        },
+                    this.map = L.map('modalMap', { zoomControl: false }).setView([-5.1245, 120.2536], 12);
+                    L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                        maxZoom: 20,
+                        subdomains:['mt0','mt1','mt2','mt3'],
+                        attribution: '&copy; Google'
+                    }).addTo(this.map);
 
-        moveStep: function(delta) {
-            const next = this.currentStep + delta;
-            if (next >= 1 && next <= 3) this.showStep(next);
-        },
+                    this.map.on('click', (e) => this.setMarker(e.latlng.lat, e.latlng.lng));
+                    setTimeout(() => this.map.invalidateSize(), 300);
+                } catch (err) { console.error('Modal map init error:', err); }
+            },
 
-        showStep: function(step) {
-            this.currentStep = step;
-            document.querySelectorAll('.modal-step').forEach(s => s.classList.add('hidden'));
-            document.getElementById('step-rtlh-' + step).classList.remove('hidden');
-
-            // Update Stepper UI
-            document.querySelectorAll('.step-dot').forEach(dot => {
-                const dStep = parseInt(dot.dataset.step);
-                if (dStep === step) {
-                    dot.className = "step-dot w-5 h-5 rounded-full bg-blue-600 text-[10px] font-black flex items-center justify-center text-white ring-4 ring-blue-500/20";
-                    dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white";
-                    dot.innerHTML = dStep;
-                } else if (dStep < step) {
-                    dot.className = "step-dot w-5 h-5 rounded-full bg-emerald-500 text-[10px] font-black flex items-center justify-center text-white";
-                    dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white/60";
-                    dot.innerHTML = '✓';
+            setMarker: function(lat, lng) {
+                if (this.marker) {
+                    this.marker.setLatLng([lat, lng]);
                 } else {
-                    dot.className = "step-dot w-5 h-5 rounded-full bg-white/10 text-[10px] font-black flex items-center justify-center text-white/40";
-                    dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white/40";
-                    dot.innerHTML = dStep;
+                    this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
+                    this.marker.on('dragend', (e) => {
+                        const pos = e.target.getLatLng();
+                        const elCoords = document.getElementById('inp_coords');
+                        if (elCoords) elCoords.value = `POINT(${pos.lng.toFixed(7)} ${pos.lat.toFixed(7)})`;
+                    });
                 }
-            });
+                const elCoords = document.getElementById('inp_coords');
+                if (elCoords) elCoords.value = `POINT(${lng.toFixed(7)} ${lat.toFixed(7)})`;
+                this.map.setView([lat, lng], 18);
+            },
 
-            // Update Buttons
-            document.getElementById('btn-rtlh-prev').classList.toggle('hidden', step === 1);
-            document.getElementById('btn-rtlh-next').classList.toggle('hidden', step === 3);
-            document.getElementById('btn-rtlh-save').classList.toggle('hidden', step !== 3);
-            
-            if (step === 1 && this.map) setTimeout(() => this.map.invalidateSize(), 100);
-        },
+            openAdd: function() {
+                const form = document.getElementById('form-rtlh');
+                if (!form) return;
+                
+                form.reset();
+                form.action = <?= json_encode(base_url('rtlh/store')) ?>;
+                
+                const title = document.getElementById('modal-rtlh-title');
+                if (title) title.innerText = "Tambah Data Rumah";
+                
+                const nik = document.getElementById('inp_nik');
+                if (nik) {
+                    nik.readOnly = false;
+                    nik.classList.remove('bg-slate-100', 'cursor-not-allowed', 'opacity-60');
+                }
+                
+                // Clear photos
+                ['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'].forEach(f => {
+                    const prev = document.getElementById('prev_' + f);
+                    const placeholder = document.getElementById('placeholder_' + f);
+                    if (prev) prev.classList.add('hidden');
+                    if (placeholder) placeholder.classList.remove('hidden');
+                });
 
-        previewImg: function(input, id) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const prev = document.getElementById('prev_' + id);
-                    const placeholder = document.getElementById('placeholder_' + id);
-                    if (prev) { prev.src = e.target.result; prev.classList.remove('hidden'); }
-                    if (placeholder) placeholder.classList.add('hidden');
+                if (this.marker && this.map) {
+                    this.map.removeLayer(this.marker);
+                    this.marker = null;
+                }
+
+                if (window.UI) UI.openModal('modal-rtlh');
+            },
+
+            openEdit: function(data) {
+                if (!data) return;
+                const r = data.r || {};
+                const p = data.p || {};
+                const c = data.c || {};
+                
+                const form = document.getElementById('form-rtlh');
+                if (!form) return;
+                
+                form.reset();
+                form.action = <?= json_encode(base_url('rtlh/update')) ?> + '/' + (r.id_survei || 0);
+                
+                const title = document.getElementById('modal-rtlh-title');
+                if (title) title.innerText = "Perbarui Data Rumah";
+                
+                // Basic Fields
+                const fields = {
+                    'inp_nama': p.nama_kepala_keluarga || '',
+                    'inp_nik': r.nik_pemilik || '',
+                    'inp_no_kk': p.no_kk || '',
+                    'inp_desa_id': r.desa_id || '',
+                    'inp_luas_rumah': r.luas_rumah_m2 || '',
+                    'inp_alamat': r.alamat_detail || '',
+                    'inp_coords': r.wkt || '',
+                    'inp_milik_rumah': r.kepemilikan_rumah || '',
+                    'inp_milik_tanah': r.kepemilikan_tanah || '',
+                    'inp_kawasan': r.jenis_kawasan || '',
+                    'inp_listrik': r.sumber_penerangan || '',
+                    'inp_air': r.sumber_air_minum || '',
+                    'inp_desil': r.desil_nasional || '',
+                    'inp_bab': r.kamar_mandi_dan_jamban || 'SENDIRI',
+                    'inp_tpa': r.jenis_tpa_tinja || ''
                 };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    };
 
-    // Initialize RTLH Modal
-    rtlhModal.init();
+                for (const id in fields) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = fields[id];
+                }
+
+                // NIK read-only on edit
+                const nikEl = document.getElementById('inp_nik');
+                if (nikEl) {
+                    nikEl.readOnly = true;
+                    nikEl.classList.add('bg-slate-100', 'cursor-not-allowed', 'opacity-60');
+                }
+
+                // Technical Fields
+                const tech = ['st_pondasi', 'st_kolom', 'st_balok', 'st_sloof', 'st_rangka_atap', 'st_plafon', 'st_jendela', 'st_ventilasi', 'mat_atap', 'st_atap', 'mat_dinding', 'st_dinding', 'mat_lantai', 'st_lantai'];
+                tech.forEach(f => {
+                    const el = document.getElementById('inp_' + f);
+                    if (el) el.value = c[f] || '';
+                });
+
+                // Photos
+                ['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'].forEach(f => {
+                    const prev = document.getElementById('prev_' + f);
+                    const placeholder = document.getElementById('placeholder_' + f);
+                    if (prev) {
+                        if (r[f]) {
+                            prev.src = this.uploadUrl + r[f];
+                            prev.classList.remove('hidden');
+                            if (placeholder) placeholder.classList.add('hidden');
+                        } else {
+                            prev.classList.add('hidden');
+                            if (placeholder) placeholder.classList.remove('hidden');
+                        }
+                    }
+                });
+
+                if (window.UI) UI.openModal('modal-rtlh');
+                
+                if (r.wkt && typeof wellknown !== 'undefined') {
+                    try {
+                        const geo = wellknown.parse(r.wkt);
+                        if (geo && geo.coordinates) {
+                            setTimeout(() => this.setMarker(geo.coordinates[1], geo.coordinates[0]), 500);
+                        }
+                    } catch(e) { console.error('Map parse error:', e); }
+                }
+            },
+
+            moveStep: function(delta) {
+                const next = this.currentStep + delta;
+                if (next >= 1 && next <= 3) this.showStep(next);
+            },
+
+            showStep: function(step) {
+                this.currentStep = step;
+                document.querySelectorAll('.modal-step').forEach(s => s.classList.add('hidden'));
+                const targetStep = document.getElementById('step-rtlh-' + step);
+                if (targetStep) targetStep.classList.remove('hidden');
+
+                // Update Stepper UI
+                document.querySelectorAll('.step-dot').forEach(dot => {
+                    const dStep = parseInt(dot.dataset.step);
+                    if (dStep === step) {
+                        dot.className = "step-dot w-5 h-5 rounded-full bg-blue-600 text-[10px] font-black flex items-center justify-center text-white ring-4 ring-blue-500/20";
+                        if (dot.nextElementSibling) dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white";
+                        dot.innerHTML = dStep;
+                    } else if (dStep < step) {
+                        dot.className = "step-dot w-5 h-5 rounded-full bg-emerald-500 text-[10px] font-black flex items-center justify-center text-white";
+                        if (dot.nextElementSibling) dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white/60";
+                        dot.innerHTML = '✓';
+                    } else {
+                        dot.className = "step-dot w-5 h-5 rounded-full bg-white/10 text-[10px] font-black flex items-center justify-center text-white/40";
+                        if (dot.nextElementSibling) dot.nextElementSibling.className = "text-[8px] font-bold uppercase tracking-widest text-white/40";
+                        dot.innerHTML = dStep;
+                    }
+                });
+
+                // Update Buttons
+                const btnPrev = document.getElementById('btn-rtlh-prev');
+                const btnNext = document.getElementById('btn-rtlh-next');
+                const btnSave = document.getElementById('btn-rtlh-save');
+                
+                if (btnPrev) btnPrev.classList.toggle('hidden', step === 1);
+                if (btnNext) btnNext.classList.toggle('hidden', step === 3);
+                if (btnSave) btnSave.classList.toggle('hidden', step !== 3);
+                
+                if (step === 1 && this.map) setTimeout(() => this.map.invalidateSize(), 100);
+            },
+
+            previewImg: function(input, id) {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const prev = document.getElementById('prev_' + id);
+                        const placeholder = document.getElementById('placeholder_' + id);
+                        if (prev) { prev.src = e.target.result; prev.classList.remove('hidden'); }
+                        if (placeholder) placeholder.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        };
+
+        // Initialize RTLH Modal
+        document.addEventListener('DOMContentLoaded', () => {
+            rtlhModal.init();
+        });
+    })();
 </script>

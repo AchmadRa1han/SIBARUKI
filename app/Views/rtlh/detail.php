@@ -25,6 +25,8 @@
 ?>
 
 <div id="report-content" class="max-w-7xl mx-auto space-y-6 pb-24 text-slate-900 dark:text-slate-200">
+    <!-- DEBUG MARKER: v2.0-REUSABLE-MODAL -->
+    <div class="hidden">SIBARUKI_DEBUG: REUSABLE_MODAL_ACTIVE</div>
     
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
@@ -75,7 +77,7 @@
                     <i data-lucide="check-circle" class="w-4 h-4"></i> Tandai Tuntas
                 </button>
                 <?php endif; ?>
-                <button onclick='openEditModal()' class="px-4 py-2 bg-white text-blue-950 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+                <button onclick="openEditModal()" class="px-4 py-2 bg-white text-blue-950 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
                     <i data-lucide="edit-3" class="w-4 h-4"></i> Perbarui Data
                 </button>
             <?php endif; ?>
@@ -147,16 +149,19 @@
                     <?php 
                         $struk = [
                             'st_pondasi' => 'Pondasi', 
-                            'st_tiang' => 'Tiang/Kolom', 
+                            'st_kolom' => 'Tiang/Kolom', 
                             'st_balok' => 'Balok', 
                             'st_sloof' => 'Sloof', 
                             'st_rangka_atap' => 'Rangka Atap', 
                             'st_plafon' => 'Plafon', 
                             'st_jendela' => 'Jendela', 
                             'st_ventilasi' => 'Ventilasi',
-                            'st_lantai' => 'Kondisi Lantai',
+                            'mat_atap' => 'Material Atap',
+                            'st_atap' => 'Kondisi Atap',
+                            'mat_dinding' => 'Material Dinding',
                             'st_dinding' => 'Kondisi Dinding',
-                            'st_atap' => 'Kondisi Atap'
+                            'mat_lantai' => 'Material Lantai',
+                            'st_lantai' => 'Kondisi Lantai'
                         ];
                         foreach($struk as $f => $l):
                             $val = $ref[$kondisi[$f] ?? ''] ?? 'BELUM DINILAI';
@@ -224,69 +229,88 @@
 </div>
 
 <script>
-    // Local Page Data
+    // Local Page Data with hard fallbacks to prevent SyntaxError
     const PAGE_DATA = {
-        rumah: <?= json_encode($rumah ?: (object)[]) ?>,
-        penerima: <?= json_encode($penerima ?: (object)[]) ?>,
-        kondisi: <?= json_encode($kondisi ?: (object)[]) ?>
+        rumah: <?= json_encode($rumah ?: (object)[], JSON_UNESCAPED_UNICODE) ?: '{}' ?>,
+        penerima: <?= json_encode($penerima ?: (object)[], JSON_UNESCAPED_UNICODE) ?: '{}' ?>,
+        kondisi: <?= json_encode($kondisi ?: (object)[], JSON_UNESCAPED_UNICODE) ?: '{}' ?>
     };
 
     let map;
 
     function initMap() {
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
-        const wkt = PAGE_DATA.rumah.wkt || '';
-        const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
-        if (!match) return;
-        
-        const lng = parseFloat(match[1]), lat = parseFloat(match[2]);
-        const el = document.getElementById('coords-text');
-        if (el) el.innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-        
-        const isDark = document.documentElement.classList.contains('dark');
-        const tile = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
-        
-        map = L.map('map-detail', { zoomControl: false, layers: [tile] }).setView([lat, lng], 18);
-        L.control.zoom({ position: 'topright' }).addTo(map);
-        L.circleMarker([lat, lng], { radius: 10, fillColor: '#2563eb', color: '#fff', weight: 4, fillOpacity: 1 }).addTo(map);
-        setTimeout(() => map.invalidateSize(), 500);
+        try {
+            const wkt = (PAGE_DATA.rumah && PAGE_DATA.rumah.wkt) || '';
+            const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+            if (!match) return;
+            
+            const lng = parseFloat(match[1]), lat = parseFloat(match[2]);
+            const el = document.getElementById('coords-text');
+            if (el) el.innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            
+            const isDark = document.documentElement.classList.contains('dark');
+            const tile = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
+            
+            map = L.map('map-detail', { zoomControl: false, layers: [tile] }).setView([lat, lng], 18);
+            L.control.zoom({ position: 'topright' }).addTo(map);
+            L.circleMarker([lat, lng], { radius: 10, fillColor: '#2563eb', color: '#fff', weight: 4, fillOpacity: 1 }).addTo(map);
+            setTimeout(() => map.invalidateSize(), 500);
+        } catch (e) { console.error('Map init error:', e); }
     }
 
     // Trigger Edit Modal using shared component
     function openEditModal() {
-        if (window.rtlhModal) {
-            rtlhModal.openEdit({
+        console.log('SIBARUKI DEBUG: openEditModal called');
+        if (window.rtlhModal && typeof window.rtlhModal.openEdit === 'function') {
+            window.rtlhModal.openEdit({
                 r: PAGE_DATA.rumah,
                 p: PAGE_DATA.penerima,
                 c: PAGE_DATA.kondisi
             });
         } else {
-            console.error('rtlhModal component not loaded');
+            console.error('rtlhModal component not ready');
+            alert('Gagal memuat modul edit. Silakan refresh halaman.');
         }
     }
 
     function viewImage(src, lbl) {
-        document.getElementById('viewer-img').src = src;
-        document.getElementById('viewer-lbl').innerText = lbl;
-        document.getElementById('image-viewer').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        const viewer = document.getElementById('image-viewer');
+        const img = document.getElementById('viewer-img');
+        const text = document.getElementById('viewer-lbl');
+        if (viewer && img) {
+            img.src = src;
+            if (text) text.innerText = lbl;
+            viewer.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     function closeImageViewer() {
-        document.getElementById('image-viewer').classList.add('hidden');
-        document.body.style.overflow = '';
+        const viewer = document.getElementById('image-viewer');
+        if (viewer) {
+            viewer.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
     }
 
     function focusMap() { if (map) map.setView(map.getCenter(), 18); }
-    function openModalTuntas() { document.getElementById('modal-tuntas').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
-    function closeModalTuntas() { document.getElementById('modal-tuntas').classList.add('hidden'); document.body.style.overflow = ''; }
+    function openModalTuntas() { 
+        const el = document.getElementById('modal-tuntas');
+        if (el) { el.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeModalTuntas() { 
+        const el = document.getElementById('modal-tuntas');
+        if (el) { el.classList.add('hidden'); document.body.style.overflow = ''; }
+    }
 
     function downloadPDF() {
+        if (typeof html2pdf === 'undefined') { alert('PDF library not loaded'); return; }
         const element = document.getElementById('report-content');
         document.body.classList.add('is-exporting');
         const opt = {
             margin: 0.5,
-            filename: `Laporan_RTLH_${PAGE_DATA.penerima.nama_kepala_keluarga || 'Data'}.pdf`,
+            filename: `Laporan_RTLH_${(PAGE_DATA.penerima && PAGE_DATA.penerima.nama_kepala_keluarga) || 'Data'}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
@@ -294,8 +318,10 @@
         html2pdf().set(opt).from(element).save().then(() => document.body.classList.remove('is-exporting'));
     }
 
-    window.addEventListener('load', initMap);
-    lucide.createIcons();
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        if (window.lucide) lucide.createIcons();
+    });
 </script>
 
 <style>
