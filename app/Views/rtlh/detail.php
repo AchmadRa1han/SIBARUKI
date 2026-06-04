@@ -91,7 +91,9 @@
                 <div class="p-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
-                        <span id="coords-text" class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Memuat koordinat...</span>
+                        <span id="coords-text" class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">
+                            <?= !empty($rumah['wkt']) ? htmlspecialchars($rumah['wkt']) : 'WKT KOSONG DARI PHP' ?>
+                        </span>
                     </div>
                     <button onclick="focusMap()" class="text-[9px] font-bold text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
                         <i data-lucide="target" class="w-3 h-3"></i> Focus Lokasi
@@ -256,10 +258,55 @@
             if (el) el.innerText = hasCoords ? `${lat.toFixed(6)}, ${lng.toFixed(6)}` : 'Koordinat belum tersedia';
             
             const isDark = document.documentElement.classList.contains('dark');
-            const tile = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
+            const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; CartoDB'
+            });
+            const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3'],
+                attribution: '&copy; Google'
+            });
             
-            map = L.map('map-detail', { zoomControl: false, layers: [tile] }).setView([lat, lng], hasCoords ? 18 : 12);
+            map = L.map('map-detail', { zoomControl: false, layers: [googleSat] }).setView([lat, lng], hasCoords ? 18 : 12);
             L.control.zoom({ position: 'topright' }).addTo(map);
+
+            let rot = 0;
+            const LayerToggle = L.Control.extend({
+                onAdd: function(map) {
+                    const btn = L.DomUtil.create('button', 'rounded-lg shadow-xl border transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                    btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
+                    btn.type = 'button';
+                    btn.style.backgroundColor = '#2563eb';
+                    const standardSvgColor = isDark ? '#60a5fa' : '#2563eb';
+                    
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                    L.DomEvent.disableClickPropagation(btn);
+                    L.DomEvent.on(btn, 'click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        L.DomEvent.preventDefault(e);
+                        rot += 360;
+                        const svg = btn.querySelector('svg');
+                        svg.style.transform = `rotate(${rot}deg)`;
+                        setTimeout(() => {
+                            if (map.hasLayer(googleSat)) { 
+                                map.removeLayer(googleSat); 
+                                map.addLayer(cartoDB); 
+                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
+                                svg.setAttribute('stroke', standardSvgColor); 
+                            }
+                            else { 
+                                map.removeLayer(cartoDB); 
+                                map.addLayer(googleSat); 
+                                btn.style.backgroundColor = '#2563eb'; 
+                                svg.setAttribute('stroke', '#ffffff'); 
+                            }
+                        }, 200);
+                    });
+                    return btn;
+                }
+            });
+            new LayerToggle({ position: 'topright' }).addTo(map);
+
             if (hasCoords) {
                 L.circleMarker([lat, lng], { radius: 10, fillColor: '#2563eb', color: '#fff', weight: 4, fillOpacity: 1 }).addTo(map);
             }
