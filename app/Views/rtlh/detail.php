@@ -1,8 +1,6 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<!-- Library for PDF Download -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <!-- Leaflet Assets -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -66,9 +64,9 @@
 
         <div class="flex flex-wrap items-center gap-2 relative z-10">
             <?php if (has_permission('export_data')) : ?>
-            <button onclick="downloadPDF()" class="p-2 bg-white/10 text-white rounded-xl hover:bg-white hover:text-blue-950 transition-all shadow-sm" title="Download PDF">
+            <a href="<?= base_url('rtlh/print/' . ($rumah['id_survei'] ?? 0)) ?>" target="_blank" class="p-2 bg-white/10 text-white rounded-xl hover:bg-white hover:text-blue-950 transition-all shadow-sm flex items-center justify-center" title="Cetak/Download Laporan PDF">
                 <i data-lucide="printer" class="w-4 h-4"></i>
-            </button>
+            </a>
             <?php endif; ?>
             
             <?php if (has_permission('edit_rtlh')) : ?>
@@ -242,19 +240,29 @@
         if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
         try {
             const wkt = (PAGE_DATA.rumah && PAGE_DATA.rumah.wkt) || '';
-            const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
-            if (!match) return;
+            let lat = -5.1245, lng = 120.2536; // Fallback Sinjai
+            let hasCoords = false;
+
+            if (wkt && typeof wellknown !== 'undefined') {
+                const geo = wellknown.parse(wkt);
+                if (geo && geo.coordinates) {
+                    lng = geo.coordinates[0];
+                    lat = geo.coordinates[1];
+                    hasCoords = true;
+                }
+            }
             
-            const lng = parseFloat(match[1]), lat = parseFloat(match[2]);
             const el = document.getElementById('coords-text');
-            if (el) el.innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            if (el) el.innerText = hasCoords ? `${lat.toFixed(6)}, ${lng.toFixed(6)}` : 'Koordinat belum tersedia';
             
             const isDark = document.documentElement.classList.contains('dark');
             const tile = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
             
-            map = L.map('map-detail', { zoomControl: false, layers: [tile] }).setView([lat, lng], 18);
+            map = L.map('map-detail', { zoomControl: false, layers: [tile] }).setView([lat, lng], hasCoords ? 18 : 12);
             L.control.zoom({ position: 'topright' }).addTo(map);
-            L.circleMarker([lat, lng], { radius: 10, fillColor: '#2563eb', color: '#fff', weight: 4, fillOpacity: 1 }).addTo(map);
+            if (hasCoords) {
+                L.circleMarker([lat, lng], { radius: 10, fillColor: '#2563eb', color: '#fff', weight: 4, fillOpacity: 1 }).addTo(map);
+            }
             setTimeout(() => map.invalidateSize(), 500);
         } catch (e) { console.error('Map init error:', e); }
     }
@@ -302,20 +310,6 @@
     function closeModalTuntas() { 
         const el = document.getElementById('modal-tuntas');
         if (el) { el.classList.add('hidden'); document.body.style.overflow = ''; }
-    }
-
-    function downloadPDF() {
-        if (typeof html2pdf === 'undefined') { alert('PDF library not loaded'); return; }
-        const element = document.getElementById('report-content');
-        document.body.classList.add('is-exporting');
-        const opt = {
-            margin: 0.5,
-            filename: `Laporan_RTLH_${(PAGE_DATA.penerima && PAGE_DATA.penerima.nama_kepala_keluarga) || 'Data'}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save().then(() => document.body.classList.remove('is-exporting'));
     }
 
     document.addEventListener('DOMContentLoaded', () => {
