@@ -164,7 +164,6 @@
                         <td class="px-6 py-5 text-right">
                             <div class="flex justify-end gap-2 transition-opacity">
                                 <a href="<?= base_url('rtlh/detail/'.$item['id_survei']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail Master Data"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
-                                <button onclick='editRtlh(<?= json_encode($item) ?>)' class="p-2 bg-amber-500 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Edit Data"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
                                 <?php if (has_permission('delete_rtlh')): ?>
                                 <button onclick="deleteConfirm(<?= $item['id_survei'] ?>)" class="p-2 bg-rose-500 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Hapus"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
@@ -515,85 +514,6 @@
             m_map.invalidateSize();
             if (m_marker) m_map.removeLayer(m_marker);
             m_marker = null;
-        }, 300);
-    }
-
-    async function editRtlh(item) {
-        m_currentStep = 1;
-        document.getElementById('form-rtlh').reset();
-        document.getElementById('form-rtlh').action = "<?= base_url('rtlh/update') ?>/" + item.id_survei;
-        document.getElementById('modal-title').innerText = "Edit Data Rumah";
-        
-        // Populate Step 1
-        document.getElementById('inp_nik').value = item.nik_pemilik;
-        document.getElementById('inp_nik').readOnly = true;
-        document.getElementById('inp_nik').classList.add('bg-slate-100', 'cursor-not-allowed');
-        document.getElementById('inp_nama').value = item.pemilik;
-        document.getElementById('inp_no_kk').value = item.no_kk || '';
-        document.getElementById('inp_desa_id').value = item.desa_id;
-        document.getElementById('inp_alamat').value = item.alamat_detail;
-        document.getElementById('inp_coords').value = item.wkt;
-
-        // Populate dynamic data (Receiver & Conditions) via Fetch
-        try {
-            const res = await fetch(`<?= base_url('api/rtlh-detail') ?>/${item.id_survei}`);
-            const data = await res.json();
-            if(data.status === 'success') {
-                const p = data.penerima;
-                const c = data.kondisi;
-                const r = data.rumah;
-
-                // Step 2
-                document.getElementById('inp_pendidikan').value = p.pendidikan_id;
-                document.getElementById('inp_pekerjaan').value = p.pekerjaan_id;
-                document.getElementById('inp_jml_kel').value = p.jumlah_anggota_keluarga;
-                document.getElementById('inp_desil').value = r.desil_nasional;
-                document.getElementById('inp_milik_rumah').value = r.kepemilikan_rumah;
-                document.getElementById('inp_milik_tanah').value = r.kepemilikan_tanah;
-                document.getElementById('inp_luas_r').value = r.luas_rumah_m2;
-                document.getElementById('inp_luas_t').value = r.luas_lahan_m2;
-                document.getElementById('inp_listrik').value = r.sumber_penerangan;
-                document.getElementById('inp_air').value = r.sumber_air_minum;
-                document.getElementById('inp_bantuan').value = r.bantuan_perumahan;
-                document.getElementById('inp_bab').value = r.kamar_mandi_dan_jamban;
-                document.getElementById('inp_kloset').value = r.jenis_jamban_kloset;
-                document.getElementById('inp_tpa').value = r.jenis_tpa_tinja;
-
-                // Step 3
-                const fields = ['st_pondasi', 'st_kolom', 'st_balok', 'st_sloof', 'st_rangka_atap', 'st_plafon', 'st_jendela', 'st_ventilasi', 'mat_atap', 'st_atap', 'mat_dinding', 'st_dinding', 'mat_lantai', 'st_lantai'];
-                fields.forEach(f => {
-                    const el = document.getElementById('inp_' + f);
-                    if(el) el.value = c[f];
-                });
-
-                // Photos
-                ['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'].forEach(f => {
-                    if(r[f]) {
-                        const img = document.getElementById('prev_' + f);
-                        img.src = `<?= base_url('uploads/rtlh/') ?>/${r[f]}`;
-                        img.classList.remove('hidden');
-                        document.getElementById('placeholder_' + f).classList.add('hidden');
-                    } else {
-                        document.getElementById('prev_' + f).classList.add('hidden');
-                        document.getElementById('placeholder_' + f).classList.remove('hidden');
-                    }
-                });
-            }
-        } catch(e) {}
-        
-        showStep(1);
-        document.getElementById('modal-rtlh').classList.remove('hidden');
-        
-        setTimeout(() => {
-            initModalMap();
-            m_map.invalidateSize();
-            if (item.wkt) {
-                const geo = wellknown.parse(item.wkt);
-                if (geo) {
-                    setMarker(geo.coordinates[1], geo.coordinates[0]);
-                    m_map.setView([geo.coordinates[1], geo.coordinates[0]], 18);
-                }
-            }
         }, 300);
     }
 

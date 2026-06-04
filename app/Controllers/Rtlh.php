@@ -462,8 +462,19 @@ class Rtlh extends BaseController
         $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
         $realisasi = $db->table('perumahan_rtlh_bansos')->select('*, ST_AsText(lokasi_realisasi) as wkt_realisasi')->where('id_survei', $id)->orderBy('id', 'DESC')->get()->getRowArray();
+        $master = []; foreach ($this->refModel->findAll() as $ref) $master[$ref['kategori']][] = $ref;
+        $allDesa = $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
+        $desaList = array_map(function($d) { return ['desa' => $d['desa_nama'], 'desa_id' => $d['desa_id']]; }, $allDesa);
+
         return view('rtlh/detail', [
-            'title' => 'Detail RTLH', 'rumah' => $rumah, 'kondisi' => $kondisi, 'penerima' => $penerima, 'realisasi' => $realisasi, 'ref' => $this->refModel->getAllMapped()
+            'title' => 'Detail RTLH', 
+            'rumah' => $rumah, 
+            'kondisi' => $kondisi, 
+            'penerima' => $penerima, 
+            'realisasi' => $realisasi, 
+            'ref' => $this->refModel->getAllMapped(),
+            'master' => $master,
+            'desa_list' => $desaList
         ]);
     }
 
