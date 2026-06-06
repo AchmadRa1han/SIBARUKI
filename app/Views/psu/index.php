@@ -270,4 +270,6 @@
     .leaflet-container { font-family: inherit; }
     .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
 </style>
+
+<?= view('psu/partials/_modal_edit') ?>
 <?= $this->endSection() ?>
