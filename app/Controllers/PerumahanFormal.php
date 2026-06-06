@@ -150,8 +150,7 @@ class PerumahanFormal extends BaseController
     }
     public function create()
     {
-        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
-        return view('perumahan_formal/create', ['title' => 'Tambah Perumahan']);
+        return redirect()->to('/perumahan-formal')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah Data.');
     }
 
     public function store()
@@ -188,10 +187,7 @@ class PerumahanFormal extends BaseController
 
     public function edit($id)
     {
-        $data['item'] = $this->perumahanModel->find($id);
-        if (!$data['item']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        $data['title'] = 'Edit Perumahan';
-        return view('perumahan_formal/edit', $data);
+        return redirect()->to('/perumahan-formal')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit Data pada tabel.');
     }
 
     public function update($id)

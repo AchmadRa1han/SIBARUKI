@@ -458,6 +458,10 @@ class Rtlh extends BaseController
         if (!has_permission('view_rtlh_detail')) return redirect()->to('/rtlh')->with('message', 'Akses ditolak.');
         $rumah = $this->rumahModel->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt')->find($id);
         if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        
+        // Remove raw binary geometry data to prevent json_encode failure in views
+        if (isset($rumah['lokasi_koordinat'])) unset($rumah['lokasi_koordinat']);
+
         $db = \Config\Database::connect();
         $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
