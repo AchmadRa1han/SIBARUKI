@@ -44,19 +44,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">NIK Penerima</label>
-                            <input type="text" name="nik" id="inp_bansos_nik" placeholder="Masukkan 16 digit NIK" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                            <input type="text" name="nik" id="inp_bansos_nik" placeholder="Masukkan 16 digit NIK" class="w-full p-4 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
                         </div>
                         <div class="space-y-2">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
-                            <input type="text" name="nama_penerima" id="inp_bansos_nama" placeholder="Nama sesuai KTP" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                            <input type="text" name="nama_penerima" id="inp_bansos_nama" placeholder="Nama sesuai KTP" class="w-full p-4 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
                         </div>
                         <div class="space-y-2">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Wilayah Desa</label>
-                            <input type="text" name="desa" id="inp_bansos_desa" placeholder="Nama Desa / Kelurahan" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                            <input type="text" name="desa" id="inp_bansos_desa" placeholder="Nama Desa / Kelurahan" class="w-full p-4 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
                         </div>
                         <div class="space-y-2">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Tahun Anggaran</label>
-                            <input type="number" name="tahun_anggaran" id="inp_bansos_tahun" value="<?= date('Y') ?>" min="2000" max="2099" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                            <input type="number" name="tahun_anggaran" id="inp_bansos_tahun" value="<?= date('Y') ?>" min="2000" max="2099" class="w-full p-4 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
                         </div>
                     </div>
                 </div>
@@ -69,18 +69,18 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sumber Dana / Nama Program</label>
-                            <input type="text" name="sumber_dana" id="inp_bansos_sumber" placeholder="Contoh: BSPS, APBD Sinjai, DAK Bidang Perumahan" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
+                            <input type="text" name="sumber_dana" id="inp_bansos_sumber" placeholder="Contoh: BSPS, APBD Sinjai, DAK Bidang Perumahan" class="w-full p-4 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold" required>
                         </div>
                         <div class="space-y-2">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Keterangan Tambahan</label>
-                            <input type="text" name="keterangan" id="inp_bansos_ket" placeholder="Informasi tambahan..." class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold">
+                            <input type="text" name="keterangan" id="inp_bansos_ket" placeholder="Informasi tambahan..." class="w-full p-4 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white outline-none transition-all font-bold">
                         </div>
                         <div class="md:col-span-2 space-y-2">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Koordinat Realisasi (Map Picker)</label>
                             <div class="rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner">
                                 <div id="modalMapBansos" class="w-full h-72 z-10"></div>
                             </div>
-                            <input type="text" name="lokasi_realisasi" id="inp_bansos_lokasi" placeholder="POINT(lng lat)" class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl font-mono text-xs font-bold text-emerald-600 outline-none" readonly>
+                            <input type="text" name="lokasi_realisasi" id="inp_bansos_lokasi" placeholder="POINT(lng lat)" class="w-full p-4 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl font-mono text-xs font-bold text-emerald-600 outline-none" readonly>
                         </div>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-3">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Foto Kondisi Awal (Before)</label>
-                            <div class="relative group aspect-video bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
+                            <div class="relative group aspect-video bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
                                 <input type="file" name="foto_before" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="bansosModal.previewImg(this, 'before')">
                                 <div id="placeholder_bansos_before" class="flex flex-col items-center justify-center">
                                     <i data-lucide="camera" class="w-6 h-6 text-slate-300 mb-2"></i>
@@ -105,7 +105,7 @@
 
                         <div class="space-y-3">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Foto Hasil Perbaikan (After)</label>
-                            <div class="relative group aspect-video bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
+                            <div class="relative group aspect-video bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
                                 <input type="file" name="foto_after" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="bansosModal.previewImg(this, 'after')">
                                 <div id="placeholder_bansos_after" class="flex flex-col items-center justify-center">
                                     <i data-lucide="camera" class="w-6 h-6 text-slate-300 mb-2"></i>

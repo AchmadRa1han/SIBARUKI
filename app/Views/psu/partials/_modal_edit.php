@@ -26,28 +26,28 @@
                         
                         <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Nama Jaringan Jalan / PSU</label>
-                            <input type="text" name="nama_jalan" id="inp_psu_nama" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="Contoh: Pembangunan Jalan Beton...">
+                            <input type="text" name="nama_jalan" id="inp_psu_nama" required class="w-full p-3.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="Contoh: Pembangunan Jalan Beton...">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Tahun Pembangunan</label>
-                                <input type="number" name="tahun" id="inp_psu_tahun" value="<?= date('Y') ?>" min="2000" max="2100" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold">
+                                <input type="number" name="tahun" id="inp_psu_tahun" value="<?= date('Y') ?>" min="2000" max="2100" required class="w-full p-3.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold">
                             </div>
                             <div>
                                 <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Panjang/Luas (Meter)</label>
-                                <input type="number" step="0.01" name="panjang_luas" id="inp_psu_panjang" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="0.00">
+                                <input type="number" step="0.01" name="panjang_luas" id="inp_psu_panjang" required class="w-full p-3.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="0.00">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Keterangan Wilayah / Lokasi</label>
-                            <input type="text" name="jalan" id="inp_psu_jalan" required class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="Contoh: Kelurahan Lappa, Kec. Sinjai Utara">
+                            <input type="text" name="jalan" id="inp_psu_jalan" required class="w-full p-3.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold" placeholder="Contoh: Kelurahan Lappa, Kec. Sinjai Utara">
                         </div>
 
                         <div>
                             <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-widest ml-1">Batas Koordinat / Garis (WKT LINESTRING)</label>
-                            <textarea name="wkt" id="inp_psu_wkt" rows="3" required readonly class="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs leading-relaxed" placeholder="LINESTRING(...)"></textarea>
+                            <textarea name="wkt" id="inp_psu_wkt" rows="3" required readonly class="w-full p-4 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-mono text-xs leading-relaxed" placeholder="LINESTRING(...)"></textarea>
                             <p class="text-[8px] text-slate-400 mt-1 italic">Klik pada peta di samping untuk mulai menggambar titik.</p>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
                                 <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Kondisi 0% (Before)</label>
-                                <div id="preview_psu_before" class="relative group aspect-video bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-blue-500/50">
+                                <div id="preview_psu_before" class="relative group aspect-video bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-blue-500/50">
                                     <img id="img_psu_before" class="absolute inset-0 w-full h-full object-cover hidden">
                                     <div id="placeholder_psu_before" class="text-center p-4">
                                         <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mx-auto mb-1 group-hover:scale-110 transition-transform"></i>
@@ -74,7 +74,7 @@
                             </div>
                             <div class="space-y-2">
                                 <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Kondisi 100% (After)</label>
-                                <div id="preview_psu_after" class="relative group aspect-video bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
+                                <div id="preview_psu_after" class="relative group aspect-video bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
                                     <img id="img_psu_after" class="absolute inset-0 w-full h-full object-cover hidden">
                                     <div id="placeholder_psu_after" class="text-center p-4">
                                         <i data-lucide="image-plus" class="w-6 h-6 text-slate-300 mx-auto mb-1 group-hover:scale-110 transition-transform"></i>
@@ -88,7 +88,7 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="p-6 bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-800 flex justify-end gap-3 rounded-b-[2.5rem]">
+                <div class="p-6 bg-slate-100 dark:bg-slate-900 border-t dark:border-slate-800 flex justify-end gap-3 rounded-b-[2.5rem]">
                     <button type="button" onclick="UI.closeModal('modal-psu')" class="px-6 py-2.5 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:text-rose-500 transition-colors">Batal</button>
                     <button type="submit" id="btn-submit-psu" class="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center gap-2">
                         <i data-lucide="save" class="w-4 h-4"></i> Simpan

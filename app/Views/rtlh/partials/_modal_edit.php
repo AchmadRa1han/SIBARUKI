@@ -42,22 +42,22 @@
                         <div class="space-y-6">
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Kepala Keluarga</label>
-                                <input type="text" name="nama_kepala_keluarga" id="inp_nama" required class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                                <input type="text" name="nama_kepala_keluarga" id="inp_nama" required class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">NIK (16 Digit)</label>
-                                    <input type="text" name="nik" id="inp_nik" maxlength="16" required class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                                    <input type="text" name="nik" id="inp_nik" maxlength="16" required class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
                                 </div>
                                 <div>
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">No. Kartu Keluarga</label>
-                                    <input type="text" name="no_kk" id="inp_no_kk" maxlength="16" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                                    <input type="text" name="no_kk" id="inp_no_kk" maxlength="16" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Desa/Kelurahan</label>
-                                    <select name="desa_id" id="inp_desa_id" required class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600">
+                                    <select name="desa_id" id="inp_desa_id" required class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600">
                                         <option value="">Pilih Lokasi</option>
                                         <?php foreach(($desa_list ?? []) as $d): ?>
                                             <option value="<?= $d['desa_id'] ?>"><?= $d['desa'] ?></option>
@@ -67,12 +67,12 @@
                                 </div>
                                 <div>
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Luas Rumah (m²)</label>
-                                    <input type="number" step="0.01" name="luas_rumah_m2" id="inp_luas_rumah" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                                    <input type="number" step="0.01" name="luas_rumah_m2" id="inp_luas_rumah" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
                                 </div>
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Alamat Detail</label>
-                                <textarea name="alamat_detail" id="inp_alamat" rows="2" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+                                <textarea name="alamat_detail" id="inp_alamat" rows="2" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600"></textarea>
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Koordinat (WKT Point)</label>
@@ -97,21 +97,21 @@
                             </h4>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Kepemilikan Rumah</label>
-                                <select name="kepemilikan_rumah" id="inp_milik_rumah" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                <select name="kepemilikan_rumah" id="inp_milik_rumah" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
                                     <option value="">Pilih</option>
                                     <?php foreach(($master['KEPEMILIKAN_RUMAH'] ?? []) as $rm): ?><option value="<?= $rm['id'] ?>"><?= $rm['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Kepemilikan Tanah</label>
-                                <select name="kepemilikan_tanah" id="inp_milik_tanah" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                <select name="kepemilikan_tanah" id="inp_milik_tanah" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
                                     <option value="">Pilih</option>
                                     <?php foreach(($master['KEPEMILIKAN_TANAH'] ?? []) as $rt): ?><option value="<?= $rt['id'] ?>"><?= $rt['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Jenis Kawasan</label>
-                                <select name="jenis_kawasan" id="inp_kawasan" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                <select name="jenis_kawasan" id="inp_kawasan" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
                                     <option value="">Pilih</option>
                                     <?php foreach(($master['JENIS_KAWASAN'] ?? []) as $jk): ?><option value="<?= $jk['id'] ?>"><?= $jk['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
@@ -123,21 +123,21 @@
                             </h4>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Sumber Penerangan</label>
-                                <select name="sumber_penerangan" id="inp_listrik" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                <select name="sumber_penerangan" id="inp_listrik" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
                                     <option value="">Pilih</option>
                                     <?php foreach(($master['SUMBER_PENERANGAN'] ?? []) as $sp): ?><option value="<?= $sp['id'] ?>"><?= $sp['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Sumber Air Minum</label>
-                                <select name="sumber_air_minum" id="inp_air" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                <select name="sumber_air_minum" id="inp_air" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
                                     <option value="">Pilih</option>
                                     <?php foreach(($master['SUMBER_AIR_MINUM'] ?? []) as $sa): ?><option value="<?= $sa['id'] ?>"><?= $sa['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Desil Nasional (Data P3KE)</label>
-                                <input type="text" name="desil_nasional" id="inp_desil" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
+                                <input type="text" name="desil_nasional" id="inp_desil" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
                             </div>
                         </div>
                         <div class="space-y-6">
@@ -146,7 +146,7 @@
                             </h4>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Fasilitas BAB</label>
-                                <select name="kamar_mandi_dan_jamban" id="inp_bab" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                <select name="kamar_mandi_dan_jamban" id="inp_bab" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
                                     <option value="SENDIRI">SENDIRI</option>
                                     <option value="BERSAMA">BERSAMA / UMUM</option>
                                     <option value="TIDAK ADA">TIDAK ADA</option>
@@ -154,7 +154,7 @@
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Tempat Pembuangan Akhir Tinja</label>
-                                <input type="text" name="jenis_tpa_tinja" id="inp_tpa" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none" placeholder="Misal: Septic Tank">
+                                <input type="text" name="jenis_tpa_tinja" id="inp_tpa" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none" placeholder="Misal: Septic Tank">
                             </div>
                         </div>
                     </div>
@@ -180,7 +180,7 @@
                             ?>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1"><?= $k[1] ?></label>
-                                <select name="<?= $k[0] ?>" id="inp_<?= $k[0] ?>" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl font-bold text-[10px] outline-none focus:ring-2 focus:ring-blue-600">
+                                <select name="<?= $k[0] ?>" id="inp_<?= $k[0] ?>" class="w-full mt-1.5 p-3 bg-slate-100 dark:bg-slate-800 border-none rounded-xl font-bold text-[10px] outline-none focus:ring-2 focus:ring-blue-600">
                                     <option value="">Pilih</option>
                                     <?php foreach(($master[$cat] ?? []) as $opt): ?>
                                         <option value="<?= $opt['id'] ?>"><?= $opt['nama_pilihan'] ?></option>
@@ -214,7 +214,7 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="p-8 bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-800 flex justify-between items-center">
+                <div class="p-8 bg-slate-100 dark:bg-slate-900 border-t dark:border-slate-800 flex justify-between items-center">
                     <button type="button" id="btn-rtlh-prev" onclick="rtlhModal.moveStep(-1)" class="hidden px-8 py-3 bg-white dark:bg-slate-800 text-slate-500 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-100 transition-all">Sebelumnya</button>
                     <div class="flex-grow"></div>
                     <div class="flex gap-4">
