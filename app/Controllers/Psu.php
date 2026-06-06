@@ -168,8 +168,7 @@ class Psu extends BaseController
 
     public function create()
     {
-        if (!has_permission('create_psu')) return redirect()->back()->with('error', 'Izin ditolak.');
-        return view('psu/create', ['title' => 'Tambah Jaringan Jalan']);
+        return redirect()->to('/psu')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah Data.');
     }
 
     public function store()
@@ -208,13 +207,7 @@ class Psu extends BaseController
 
     public function edit($id)
     {
-        if (!has_permission('edit_psu')) return redirect()->back()->with('error', 'Izin ditolak.');
-        
-        $data['jalan'] = $this->jalanModel->find($id);
-        if (!$data['jalan']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        
-        $data['title'] = 'Edit Jaringan Jalan';
-        return view('psu/edit', $data);
+        return redirect()->to('/psu')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit Data pada tabel.');
     }
 
     public function update($id)

@@ -31,9 +31,9 @@
         </div>
         <div class="flex items-center gap-2 relative z-10 no-print">
             <?php if (has_permission('edit_psu')) : ?>
-            <a href="<?= base_url('psu/edit/' . $jalan['id']) ?>" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+            <button onclick="psuModal.openEdit(<?= htmlspecialchars(json_encode($jalan), ENT_QUOTES, 'UTF-8') ?>)" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-indigo-600/20">
                 <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
-            </a>
+            </button>
             <?php endif; ?>
         </div>
     </div>
@@ -226,4 +226,6 @@
         initMap();
     });
 </script>
+
+<?= view('psu/partials/_modal_edit') ?>
 <?= $this->endSection() ?>

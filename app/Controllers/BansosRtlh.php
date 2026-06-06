@@ -48,18 +48,7 @@ class BansosRtlh extends BaseController
 
     public function create()
     {
-        // Cari data RTLH yang belum menerima bantuan untuk pilihan dropdown
-        $rtlh = $this->rumahModel->select('perumahan_rtlh_rumah.id_survei, perumahan_rtlh_rumah.desa, perumahan_rtlh_penerima.nama_kepala_keluarga, perumahan_rtlh_penerima.nik')
-                                ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik')
-                                ->where('perumahan_rtlh_rumah.status_bantuan', 'Belum Menerima')
-                                ->findAll();
-
-        $data = [
-            'title' => 'Input Realisasi Bansos',
-            'rtlh' => $rtlh
-        ];
-
-        return view('bansos_rtlh/create', $data);
+        return redirect()->to('/bansos-rtlh')->with('error', 'Halaman tidak tersedia. Gunakan tombol Input Realisasi.');
     }
 
     public function store()
@@ -218,24 +207,7 @@ class BansosRtlh extends BaseController
 
     public function edit($id)
     {
-        $db = \Config\Database::connect();
-        $bansos = $db->table('perumahan_rtlh_bansos')
-                     ->select('perumahan_rtlh_bansos.*, ST_AsText(lokasi_realisasi) as wkt_realisasi')
-                     ->where('id', $id)
-                     ->get()->getRowArray();
-
-        if (!$bansos) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-
-        // Data RTLH untuk pilihan dropdown (jika ingin mengubah link)
-        $rtlh = $this->rumahModel->select('perumahan_rtlh_rumah.id_survei, perumahan_rtlh_rumah.desa, perumahan_rtlh_penerima.nama_kepala_keluarga, perumahan_rtlh_penerima.nik')
-                                ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik')
-                                ->findAll();
-
-        return view('bansos_rtlh/edit', [
-            'title' => 'Edit Realisasi Bansos',
-            'bansos' => $bansos,
-            'rtlh' => $rtlh
-        ]);
+        return redirect()->to('/bansos-rtlh')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit pada halaman detail.');
     }
 
     public function update($id)

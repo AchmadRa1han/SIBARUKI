@@ -37,9 +37,9 @@
                 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
             </a>
             <?php if (has_permission('create_psu')): ?>
-            <a href="<?= base_url('psu/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+            <button type="button" onclick="psuModal.openAdd()" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
                 <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah Data
-            </a>
+            </button>
             <?php endif; ?>
         </div>
     </div>

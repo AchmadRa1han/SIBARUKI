@@ -26,9 +26,9 @@
                 <i data-lucide="home" class="w-4 h-4"></i> Lihat Unit RLH
             </a>
             <?php if (has_permission('edit_rtlh')): ?>
-            <a href="<?= base_url('bansos-rtlh/create') ?>" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2 group">
+            <button type="button" onclick="bansosModal.openAdd()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2 group">
                 <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Input Realisasi
-            </a>
+            </button>
             <?php endif; ?>
         </div>
     </div>
@@ -212,4 +212,6 @@
         }
     });
 </script>
+
+<?= view('bansos_rtlh/partials/_modal_edit') ?>
 <?= $this->endSection() ?>
