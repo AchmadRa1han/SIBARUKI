@@ -245,7 +245,14 @@ Setiap modul yang memiliki data koordinat (Point/Polygon/Linestring) wajib mengi
    - Wajib menyertakan tombol **"Focus to Location"** (Fly to) jika peta menampilkan banyak titik.
    - Pada form input koordinat, sertakan fitur **"Drag Marker to Pick"** atau pencarian lokasi (Geocoding).
 
-#### E. Elemen UI Pendukung (Reusable Components)
+#### E. Sistem Modal Tersentralisasi (Shared Modals)
+Untuk fitur *Add/Edit* yang bersifat *wizard* atau *multi-step*, wajib menggunakan sistem modal tersentralisasi agar bisa dipanggil secara *reusable* dari halaman *Index* maupun *Detail*:
+1. **File Partial:** Buat file *view* terpisah (misal: `app/Views/rtlh/partials/_modal_edit.php`).
+2. **Global UI Helper:** Panggil modal menggunakan fungsi global `UI.openModal('id-modal')` dan `UI.closeModal('id-modal')` yang sudah terpasang di `layout.php`.
+3. **Modal Controller (JS):** Buat objek *Javascript* tersendiri di dalam *partial view* (misal: `window.rtlhModal`) yang memiliki *method* `openAdd()` dan `openEdit(data)`.
+4. **Data Passing:** Pastikan data dilempar dengan aman dari PHP ke JS menggunakan blok `try...catch` dan flag `JSON_UNESCAPED_UNICODE` dengan fallback *object* kosong untuk menghindari `SyntaxError` (contoh: `<?= json_encode($data ?: (object)[], JSON_UNESCAPED_UNICODE) ?: '{}' ?>`).
+
+#### F. Elemen UI Pendukung (Reusable Components)
 1. **Badge Status:**
    - Gunakan padding `px-3 py-1`, `rounded-full`, `text-[10px]`, `font-bold`, `uppercase`.
    - **Warna:** Hijau (Sukses/Sudah), Kuning (Proses/Menunggu), Merah (Gagal/Belum), Biru (Info).
