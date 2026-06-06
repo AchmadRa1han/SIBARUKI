@@ -181,16 +181,18 @@
                 attribution: '&copy; Google'
             });
 
-            map = L.map('map', { zoomControl: false, layers: [standard] }).setView([-5.1245, 120.2536], 11);
+            map = L.map('map', { zoomControl: false, layers: [googleSat] }).setView([-5.1245, 120.2536], 11);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
             const LayerToggle = L.Control.extend({
                 onAdd: function(map) {
-                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                    const btn = L.DomUtil.create('button', 'rounded-lg shadow-xl border transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
                     btn.type = 'button';
                     btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
-                    const svgColor = isDark ? '#60a5fa' : '#2563eb';
-                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                    btn.style.backgroundColor = '#2563eb';
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const standardSvgColor = isDark ? '#60a5fa' : '#2563eb';
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
                     L.DomEvent.disableClickPropagation(btn);
                     L.DomEvent.on(btn, 'click', function(e) {
                         L.DomEvent.stopPropagation(e);
@@ -199,17 +201,17 @@
                         const svg = btn.querySelector('svg');
                         svg.style.transform = `rotate(${rot}deg)`;
                         setTimeout(() => {
-                            if (map.hasLayer(standard)) { 
+                            if (map.hasLayer(googleSat)) { 
+                                map.removeLayer(googleSat); 
+                                map.addLayer(standard); 
+                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
+                                svg.setAttribute('stroke', standardSvgColor); 
+                            }
+                            else { 
                                 map.removeLayer(standard); 
                                 map.addLayer(googleSat); 
                                 btn.style.backgroundColor = '#2563eb'; 
                                 svg.setAttribute('stroke', '#ffffff'); 
-                            }
-                            else { 
-                                map.removeLayer(googleSat); 
-                                map.addLayer(standard); 
-                                btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
-                                svg.setAttribute('stroke', svgColor); 
                             }
                         }, 200);
                     });
