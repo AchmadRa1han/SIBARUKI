@@ -36,8 +36,11 @@
                 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
             </a>
             <?php if (has_permission('create_rtlh')): ?>
+            <button onclick="UI.openModal('modal-import')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+                <i data-lucide="upload-cloud" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5"></i> Import
+            </button>
             <button type="button" onclick="perumahanModal.openAdd()" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
-                <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah Data
+                <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah
             </button>
             <?php endif; ?>
         </div>
@@ -183,6 +186,7 @@
 </div>
 
 <?= view('perumahan_formal/partials/_modal_edit') ?>
+<?= view('perumahan_formal/partials/_modal_import') ?>
 
 <form id="delete-form" action="" method="post" class="hidden"><?= csrf_field() ?></form>
 

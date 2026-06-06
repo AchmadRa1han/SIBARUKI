@@ -29,16 +29,19 @@
                 <p class="text-white/60 font-medium text-xs mt-2 tracking-wide">Monitoring Prasarana, Sarana, dan Utilitas (Jalan) Kabupaten Sinjai</p>
             </div>
         </div>
-        <div class="flex flex-wrap items-center gap-3 relative z-10">
+        <div class="flex flex-wrap items-center gap-2 relative z-10">
             <div class="bg-white/10 text-white px-3 py-1.5 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-white/10 backdrop-blur-md shadow-sm">
                 <?= number_format($total_panjang, 2, ',', '.') ?> m Terdata
             </div>
-            <a href="<?= base_url('psu/export-excel') ?>" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
+            <a href="<?= base_url('psu/export-excel') ?>" class="bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-1.5">
+                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Export
             </a>
             <?php if (has_permission('create_psu')): ?>
-            <button type="button" onclick="psuModal.openAdd()" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
-                <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah Data
+            <button type="button" onclick="UI.openModal('modal-import')" class="bg-indigo-600 text-white px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5"></i> Import
+            </button>
+            <button type="button" onclick="psuModal.openAdd()" class="bg-white text-blue-950 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
+                <i data-lucide="plus" class="w-3.5 h-3.5 transition-transform group-hover:rotate-90"></i> Tambah
             </button>
             <?php endif; ?>
         </div>
@@ -309,4 +312,5 @@
 </style>
 
 <?= view('psu/partials/_modal_edit') ?>
+<?= view('psu/partials/_modal_import') ?>
 <?= $this->endSection() ?>
