@@ -213,6 +213,7 @@
 
 <!-- SHARED RTLH MODAL COMPONENT -->
 <?= view('rtlh/partials/_modal_edit') ?>
+<?= view('rtlh/partials/_modal_import') ?>
 
 <!-- Map Scripts -->
 <script>
