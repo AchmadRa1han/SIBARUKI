@@ -450,114 +450,11 @@ class Rtlh extends BaseController
                 $count++;
             }
             $db->transComplete();
+            $this->logActivity('Import', 'RTLH', "Berhasil mengimpor $count data RTLH via Excel");
             return redirect()->back()->with('success', "$count data RTLH berhasil diimpor.");
         } catch (\Exception $e) {
             $db->transRollback();
             return redirect()->back()->with('error', 'Gagal Impor: ' . $e->getMessage());
-        }
-    }
-                            else if ($p1 <= 12 && $p2 <= 12) $tanggal = sprintf('%04d-%02d-%02d', $p3, $p2, $p1);
-                        }
-                    } else if (preg_match('/(\d{1,2})\s+([A-Z]+)\s+(\d{4})/', $ttl, $matches)) {
-                        $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
-                        $monthName = $matches[2];
-                        $year = $matches[3];
-                        $month = $monthsIndo[$monthName] ?? null;
-                        if ($month) {
-                            $tanggal = "$year-$month-$day";
-                            $tempat = trim(str_replace([$matches[0], ','], '', $ttl));
-                        }
-                    }
-                    if (!$tanggal) $tempat = $ttl;
-                }
-
-                $dataPenerima = [
-                    'nik' => $nik,
-                    'nama_kepala_keluarga' => $getVal('nama_kepala_keluarga'),
-                    'no_kk' => preg_replace('/[^0-9]/', '', $getVal('no_kk') ?? ''),
-                    'tempat_lahir' => $tempat,
-                    'tanggal_lahir' => $tanggal,
-                    'jenis_kelamin' => (stripos($getVal('jenis_kelamin') ?? '', 'PEREMPUAN') !== false) ? 'P' : 'L',
-                    'pendidikan_id' => $findId('PENDIDIKAN', $getVal('pendidikan_id')),
-                    'pekerjaan_id' => $findId('PEKERJAAN', $getVal('pekerjaan_id')),
-                    'penghasilan_per_bulan' => $findId('PENGHASILAN', $getVal('penghasilan_per_bulan')) ?: $getVal('penghasilan_per_bulan'),
-                    'jumlah_anggota_keluarga' => (int) preg_replace('/[^0-9]/', '', $getVal('jumlah_anggota_keluarga') ?? '0'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ];
-                if ($this->penerimaModel->find($nik)) $this->penerimaModel->update($nik, $dataPenerima);
-                else {
-                    $dataPenerima['created_at'] = date('Y-m-d H:i:s');
-                    $this->penerimaModel->insert($dataPenerima);
-                }
-
-                $desaName = strtoupper(trim($getVal('desa') ?? ''));
-                $dataRumah = [
-                    'nik_pemilik'   => $nik,
-                    'desa'          => $getVal('desa'),
-                    'desa_id'       => $desaLookup[$desaName] ?? null,
-                    'alamat_detail' => $getVal('alamat_detail'),
-                    'jenis_kawasan' => $getVal('jenis_kawasan'),
-                    'fungsi_ruang'  => $getVal('fungsi_ruang'),
-                    'kepemilikan_rumah' => $getVal('kepemilikan_rumah'),
-                    'aset_rumah_di_lokasi_lain' => $getVal('aset_rumah_di_lokasi_lain'),
-                    'kepemilikan_tanah' => $getVal('kepemilikan_tanah'),
-                    'sumber_penerangan' => $getVal('sumber_penerangan'),
-                    'sumber_penerangan_detail' => $getVal('sumber_penerangan_detail'),
-                    'bantuan_perumahan' => $getVal('bantuan_perumahan'),
-                    'luas_rumah_m2' => preg_replace('/[^0-9.]/', '', $getVal('luas_rumah_m2') ?? '0'),
-                    'luas_lahan_m2' => preg_replace('/[^0-9.]/', '', $getVal('luas_lahan_m2') ?? '0'),
-                    'sumber_air_minum' => $getVal('sumber_air_minum'),
-                    'jarak_sam_ke_tpa_tinja' => $getVal('jarak_sam_ke_tpa_tinja'),
-                    'kamar_mandi_dan_jamban' => $getVal('kamar_mandi_dan_jamban'),
-                    'jenis_jamban_kloset' => $getVal('jenis_jamban_kloset'),
-                    'jenis_tpa_tinja' => $getVal('jenis_tpa_tinja'),
-                    'status_bantuan' => 'Belum Menerima',
-                    'updated_at' => date('Y-m-d H:i:s')
-                ];
-                $existingRumah = $this->rumahModel->where('nik_pemilik', $nik)->first();
-                if ($existingRumah) {
-                    $this->rumahModel->update($existingRumah['id_survei'], $dataRumah);
-                    $surveiId = $existingRumah['id_survei'];
-                } else {
-                    $dataRumah['created_at'] = date('Y-m-d H:i:s');
-                    $this->rumahModel->insert($dataRumah);
-                    $surveiId = $this->rumahModel->getInsertID();
-                }
-
-                $dataKondisi = [
-                    'id_survei'  => $surveiId,
-                    'st_pondasi' => $findId('KONDISI', $getVal('st_pondasi')),
-                    'st_kolom'   => $findId('KONDISI', $getVal('st_kolom')),
-                    'st_balok'   => $findId('KONDISI', $getVal('st_balok')),
-                    'st_sloof'   => $findId('KONDISI', $getVal('st_sloof')),
-                    'st_rangka_atap' => $findId('KONDISI', $getVal('st_rangka_atap')),
-                    'st_plafon'  => $findId('KONDISI', $getVal('st_plafon')),
-                    'st_jendela' => $findId('KONDISI', $getVal('st_jendela')),
-                    'st_ventilasi' => $findId('KONDISI', $getVal('st_ventilasi')),
-                    'mat_lantai' => $findId('MATERIAL_LANTAI', $getVal('mat_lantai')),
-                    'st_lantai'  => $findId('KONDISI', $getVal('st_lantai')),
-                    'mat_dinding' => $findId('MATERIAL_DINDING', $getVal('mat_dinding')),
-                    'st_dinding' => $findId('KONDISI', $getVal('st_dinding')),
-                    'mat_atap'   => $findId('MATERIAL_ATAP', $getVal('mat_atap')),
-                    'st_atap'    => $findId('KONDISI', $getVal('st_atap')),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ];
-                if ($this->kondisiModel->find($surveiId)) $this->kondisiModel->update($surveiId, $dataKondisi);
-                else {
-                    $dataKondisi['created_at'] = date('Y-m-d H:i:s');
-                    $this->kondisiModel->insert($dataKondisi);
-                }
-                $count++;
-            }
-            $db->transComplete();
-            fclose($handle);
-            if ($count === 0) return redirect()->back()->with('error', 'Tidak ada data valid yang diimpor.');
-            $this->logActivity('Import', 'RTLH', "Berhasil mengimpor $count data RTLH via CSV");
-            return redirect()->to('/rtlh')->with('success', "Import Selesai: $count data RTLH berhasil diproses.");
-        } catch (\Exception $e) {
-            if (isset($handle)) fclose($handle);
-            $db->transRollback();
-            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
 

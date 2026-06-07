@@ -149,6 +149,7 @@ class Arsinum extends BaseController
             if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
             if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
 
+            $this->logActivity('Import', 'Arsinum', "Berhasil mengimpor $count data Arsinum via Excel");
             return redirect()->to('/arsinum')->with('success', "$count data Arsinum berhasil diimpor.");
         } catch (\Exception $e) {
             $db->transRollback();

@@ -146,6 +146,7 @@ class Pisew extends BaseController
             if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
             if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
 
+            $this->logActivity('Import', 'PISEW', "Berhasil mengimpor $count data PISEW via Excel");
             return redirect()->to('/permukiman_pisew')->with('success', "$count data PISEW berhasil diimpor.");
         } catch (\Exception $e) {
             $db->transRollback();

@@ -153,6 +153,7 @@ class WilayahKumuh extends BaseController
             if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
             if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
 
+            $this->logActivity('Import', 'Wilayah Kumuh', "Berhasil mengimpor $count data Wilayah Kumuh via Excel");
             return redirect()->to('/wilayah-kumuh')->with('success', "$count data Wilayah Kumuh berhasil diimpor.");
         } catch (\Exception $e) {
             $db->transRollback();
