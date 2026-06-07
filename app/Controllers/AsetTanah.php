@@ -249,34 +249,24 @@ class AsetTanah extends BaseController
 
     public function detail($id)
     {
-        $data['aset'] = $this->asetModel->find($id);
-        if (!$data['aset']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        $data['title'] = 'Detail Aset Tanah';
-        return view('aset_tanah/detail', $data);
+        $aset = $this->asetModel->find($id);
+        if (!$aset) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+
+        return view('aset_tanah/detail', [
+            'title' => 'Detail Aset Tanah',
+            'aset' => $aset,
+            'kecamatans' => (new AsetTanahModel())->select('kecamatan')->distinct()->findAll()
+        ]);
     }
 
     public function create()
     {
-        $db = \Config\Database::connect();
-        $kecamatans = $db->table('permukiman_wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
-        
-        return view('aset_tanah/create', [
-            'title' => 'Tambah Aset',
-            'kecamatans' => $kecamatans
-        ]);
+        return redirect()->to('/aset-tanah')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah.');
     }
 
     public function edit($id)
     {
-        $data['aset'] = $this->asetModel->find($id);
-        if (!$data['aset']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        
-        $db = \Config\Database::connect();
-        $data['kecamatans'] = $db->table('permukiman_wilayah_kumuh')->select('Kecamatan')->distinct()->get()->getResultArray();
-        $data['desas'] = $db->table('permukiman_wilayah_kumuh')->select('Kelurahan as desa')->where('Kecamatan', $data['aset']['kecamatan'])->distinct()->get()->getResultArray();
-        
-        $data['title'] = 'Edit Aset Tanah';
-        return view('aset_tanah/edit', $data);
+        return redirect()->to('/aset-tanah')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit pada halaman detail.');
     }
 
     public function getDesaByKecamatan()
@@ -284,7 +274,7 @@ class AsetTanah extends BaseController
         $kecamatan = $this->request->getGet('kecamatan');
         $db = \Config\Database::connect();
         $desas = $db->table('permukiman_wilayah_kumuh')
-                    ->select('Kelurahan as desa')
+                    ->select('Kelurahan as desa_nama')
                     ->where('Kecamatan', $kecamatan)
                     ->distinct()
                     ->get()
@@ -295,6 +285,7 @@ class AsetTanah extends BaseController
 
     public function store()
     {
+        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
         $data = $this->request->getPost();
         $this->asetModel->insert($data);
         $this->logActivity('Tambah', 'Aset Tanah', "Menambah aset tanah baru: {$data['nama_pemilik']}", $this->formatLogData($data));

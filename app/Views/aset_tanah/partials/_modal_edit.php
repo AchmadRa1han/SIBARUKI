@@ -97,7 +97,7 @@
                                 <select name="kecamatan" id="inp_aset_kecamatan" onchange="asetModal.loadDesa(this.value)" required class="w-full p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none font-bold uppercase appearance-none">
                                     <option value="">Pilih</option>
                                     <?php foreach(($kecamatans ?? []) as $k): ?>
-                                        <option value="<?= $k['Kecamatan'] ?>"><?= $k['Kecamatan'] ?></option>
+                                        <option value="<?= $k['kecamatan'] ?>"><?= $k['kecamatan'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
