@@ -104,79 +104,51 @@ class Pisew extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
-        $handle = fopen($file->getTempName(), 'r');
-        
-        // 1. Deteksi Delimiter (Semikolon vs Koma)
-        $firstLine = fgets($handle);
-        $secondLine = fgets($handle);
-        $thirdLine = fgets($handle); // Baris header NO.;JENIS PEKERJAAN;...
-        
-        $combined = $firstLine . $secondLine . $thirdLine;
-        $delimiter = (substr_count($combined, ';') > substr_count($combined, ',')) ? ';' : ',';
-        
-        rewind($handle);
+        try {
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getTempName());
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
+        }
 
         $count = 0;
         $db = \Config\Database::connect();
 
-        // Reset Auto Increment jika tabel kosong
         if ($db->table('permukiman_pisew')->countAllResults() === 0) {
             $db->query("ALTER TABLE permukiman_pisew AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
-
         try {
-            while (($row = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
-                // Lewati baris judul (biasanya kata 'PISEW' atau 'DATA KEGIATAN')
-                // Lewati baris header (berisi 'JENIS PEKERJAAN')
-                // Pastikan kolom pertama (NO) adalah angka
-                if (count($row) < 6 || stripos(implode(' ', $row), 'JENIS PEKERJAAN') !== false || !is_numeric($row[0])) {
+            foreach ($rows as $rowIndex => $row) {
+                if (count($row) < 6 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'JENIS PEKERJAAN') !== false || !is_numeric($row[0] ?? null)) {
                     continue;
                 }
 
-                /* 
-                   Berdasarkan analisis file PISEW KAB. SINJAI 2022-2025.csv:
-                   Index 0: NO.
-                   Index 1: JENIS PEKERJAAN
-                   Index 2: (KOSONG)
-                   Index 3: LOKASI (Desa)
-                   Index 4: KECAMATAN
-                   Index 5: PELAKSANA
-                   Index 6: ANGGARAN (Rp.) -> Contoh: 600.000.000
-                   Index 7: SUMBER DANA
-                   Index 8: TAHUN
-                */
-
-                $anggaran = (float)preg_replace('/[^0-9]/', '', $row[6] ?? '0');
+                $anggaran = (float)preg_replace('/[^0-9]/', '', (string)($row[6] ?? '0'));
 
                 $this->pisewModel->insert([
-                    'jenis_pekerjaan' => trim($row[1] ?? '-'),
-                    'lokasi_desa'     => trim($row[3] ?? '-'),
-                    'kecamatan'       => trim($row[4] ?? '-'),
-                    'pelaksana'       => trim($row[5] ?? '-'),
+                    'jenis_pekerjaan' => trim((string)($row[1] ?? '-')),
+                    'lokasi_desa'     => trim((string)($row[3] ?? '-')),
+                    'kecamatan'       => trim((string)($row[4] ?? '-')),
+                    'pelaksana'       => trim((string)($row[5] ?? '-')),
                     'anggaran'        => $anggaran,
-                    'tahun'           => trim($row[8] ?? date('Y')),
-                    'sumber_dana'     => trim($row[7] ?? '-'),
+                    'tahun'           => trim((string)($row[8] ?? date('Y'))),
+                    'sumber_dana'     => trim((string)($row[7] ?? '-')),
                 ]);
                 $count++;
             }
-            fclose($handle);
 
             $db->transComplete();
+            if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
 
-            if ($db->transStatus() === false) {
-                return redirect()->back()->with('error', 'Gagal menyimpan data ke database.');
-            }
-
-            if ($count == 0) {
-                return redirect()->back()->with('error', 'Tidak ada data valid yang diimpor. Periksa format CSV.');
-            }
-
-            return redirect()->to('/pisew')->with('success', "$count data PISEW berhasil diimpor.");
-
+            return redirect()->to('/permukiman_pisew')->with('success', "$count data PISEW berhasil diimpor.");
         } catch (\Exception $e) {
-            if (isset($handle)) fclose($handle);
+            $db->transRollback();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }

@@ -104,34 +104,31 @@ class Arsinum extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
-        $handle = fopen($file->getTempName(), 'r');
-        $firstLine = fgets($handle);
-        $secondLine = fgets($handle);
-        fclose($handle);
-
-        $combined = $firstLine . $secondLine;
-        $countSemicolon = substr_count($combined, ';');
-        $countComma = substr_count($combined, ',');
-        $delimiter = ($countSemicolon > $countComma) ? ';' : ',';
+        try {
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getTempName());
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
+        }
 
         $count = 0;
         $db = \Config\Database::connect();
 
-        // Reset Auto Increment jika tabel kosong
         if ($db->table('permukiman_arsinum')->countAllResults() === 0) {
             $db->query("ALTER TABLE permukiman_arsinum AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
-
         try {
-            $handle = fopen($file->getTempName(), 'r');
-            while (($row = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
-                if (count($row) < 8 || stripos(implode(' ', $row), 'JENIS PEKERJAAN') !== false || !is_numeric($row[0])) {
+            foreach ($rows as $rowIndex => $row) {
+                if (count($row) < 8 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'JENIS PEKERJAAN') !== false || !is_numeric($row[0] ?? null)) {
                     continue;
                 }
 
-                $anggaranRaw = $row[7] ?? '0';
+                $anggaranRaw = (string)($row[7] ?? '0');
                 $anggaran = (float)preg_replace('/[^0-9]/', '', $anggaranRaw);
 
                 $this->arsinumModel->insert([
@@ -143,26 +140,18 @@ class Arsinum extends BaseController
                     'anggaran'        => $anggaran,
                     'sumber_dana'     => $row[8] ?? '-',
                     'koordinat'       => $row[9] ?? null,
-                    'tahun'           => isset($row[10]) ? trim($row[10], " \t\n\r\0\x0B;") : date('Y')
+                    'tahun'           => isset($row[10]) ? trim((string)$row[10], " \t\n\r\0\x0B;") : date('Y')
                 ]);
                 $count++;
             }
-            fclose($handle);
 
             $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data ke database.');
-            }
-
-            if ($count == 0) {
-                return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
-            }
+            if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
 
             return redirect()->to('/arsinum')->with('success', "$count data Arsinum berhasil diimpor.");
-
         } catch (\Exception $e) {
-            if (isset($handle)) fclose($handle);
+            $db->transRollback();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }

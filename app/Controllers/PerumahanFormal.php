@@ -90,31 +90,28 @@ class PerumahanFormal extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
-        $handle = fopen($file->getTempName(), 'r');
-        $firstLine = fgets($handle);
-        $secondLine = fgets($handle);
-        fclose($handle);
-
-        $combined = $firstLine . $secondLine;
-        $countSemicolon = substr_count($combined, ';');
-        $countComma = substr_count($combined, ',');
-        $delimiter = ($countSemicolon > $countComma) ? ';' : ',';
+        try {
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getTempName());
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
+        }
 
         $count = 0;
         $db = \Config\Database::connect();
 
-        // Reset Auto Increment jika tabel kosong agar ID mulai dari 1 lagi
         if ($db->table('perumahan_formal')->countAllResults() === 0) {
             $db->query("ALTER TABLE perumahan_formal AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
-
         try {
-            $handle = fopen($file->getTempName(), 'r');
-            while (($row = fgetcsv($handle, 5000, $delimiter)) !== FALSE) {
-                // Lewati header atau baris yang tidak valid (Id biasanya numerik di baris data)
-                if (count($row) < 7 || stripos(implode(' ', $row), 'Keterangan') !== false || !is_numeric($row[1] ?? null)) {
+            foreach ($rows as $rowIndex => $row) {
+                // Header detection or data validation
+                if (count($row) < 7 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'Keterangan') !== false || !is_numeric($row[1] ?? null)) {
                     continue;
                 }
 
@@ -122,29 +119,21 @@ class PerumahanFormal extends BaseController
                     'nama_perumahan'    => $row[2] ?? '-',
                     'pengembang'        => $row[6] ?? '-',
                     'tahun_pembangunan' => (int)($row[7] ?? date('Y')),
-                    'luas_kawasan_ha'   => (float)str_replace(',', '.', $row[3] ?? '0'),
+                    'luas_kawasan_ha'   => (float)str_replace(',', '.', (string)($row[3] ?? '0')),
                     'longitude'         => $row[4] ?? null,
                     'latitude'          => $row[5] ?? null,
                     'wkt'               => $row[0] ?? null,
                 ]);
                 $count++;
             }
-            fclose($handle);
 
             $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data ke database.');
-            }
-
-            if ($count == 0) {
-                return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
-            }
+            if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
 
             return redirect()->to('/perumahan-formal')->with('success', "$count data Perumahan berhasil diimpor.");
-
         } catch (\Exception $e) {
-            if (isset($handle)) fclose($handle);
+            $db->transRollback();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }

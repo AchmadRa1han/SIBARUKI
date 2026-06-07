@@ -35,15 +35,15 @@
                     </div>
 
                     <div class="space-y-3">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Pilih File Data (.CSV)</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Pilih File Data (Excel/CSV)</label>
                         <div class="relative group aspect-video md:aspect-[21/9] bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10">
-                            <input type="file" name="csv_file" id="inp_import_csv" accept=".csv" required class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="updateFileName(this)">
+                            <input type="file" name="csv_file" id="inp_import_csv" accept=".xlsx, .xls, .csv" required class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="updateFileName(this)">
                             <div id="import_placeholder" class="flex flex-col items-center justify-center text-center p-6 transition-transform group-hover:scale-105">
                                 <div class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-slate-400 group-hover:text-emerald-500 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/30 transition-colors">
                                     <i data-lucide="upload-cloud" class="w-8 h-8"></i>
                                 </div>
                                 <h5 class="text-sm font-black text-slate-700 dark:text-white uppercase tracking-tight mb-1">Klik atau Drag File Kesini</h5>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Format yang didukung: .CSV</p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Format yang didukung: .XLSX, .XLS, .CSV</p>
                             </div>
                             <div id="import_file_info" class="hidden flex-col items-center justify-center text-center p-6">
                                 <i data-lucide="file-check-2" class="w-12 h-12 text-emerald-500 mb-3"></i>

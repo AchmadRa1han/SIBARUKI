@@ -162,15 +162,15 @@ class AsetTanah extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
-        $handle = fopen($file->getTempName(), 'r');
-        $firstLine = fgets($handle);
-        $secondLine = fgets($handle);
-        fclose($handle);
-
-        $combined = $firstLine . $secondLine;
-        $countSemicolon = substr_count($combined, ';');
-        $countComma = substr_count($combined, ',');
-        $delimiter = ($countSemicolon > $countComma) ? ';' : ',';
+        try {
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getTempName());
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
+        }
 
         $count = 0;
         $db = \Config\Database::connect();
@@ -180,79 +180,69 @@ class AsetTanah extends BaseController
         }
 
         $db->transStart();
-
         try {
-            $handle = fopen($file->getTempName(), 'r');
-            while (($row = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
-                if (count($row) < 10 || stripos(implode(' ', $row), 'Sertifikat') !== false || !is_numeric($row[0])) {
+            foreach ($rows as $rowIndex => $row) {
+                if (count($row) < 10 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'Sertifikat') !== false || !is_numeric($row[0] ?? null)) {
                     continue;
                 }
 
-                $luasRaw = $row[3] ?? '0';
+                $luasRaw = (string)($row[3] ?? '0');
                 $luas = (float)str_replace(',', '.', str_replace('.', '', $luasRaw));
 
-                $nilaiRaw = $row[12] ?? '0';
+                $nilaiRaw = (string)($row[12] ?? '0');
                 $nilai = (float)str_replace(',', '.', str_replace('.', '', $nilaiRaw));
 
                 $tglTerbit = null;
-                $tglRaw = trim($row[7] ?? '');
+                $tglRaw = trim((string)($row[7] ?? ''));
                 if ($tglRaw) {
                     $dt = \DateTime::createFromFormat('d-m-Y', $tglRaw);
+                    if (!$dt) $dt = \DateTime::createFromFormat('Y-m-d', $tglRaw);
                     if ($dt) $tglTerbit = $dt->format('Y-m-d');
                 }
 
-                $lonRaw = trim($row[10] ?? '');
-                $latRaw = trim($row[11] ?? '');
+                $lonRaw = trim((string)($row[10] ?? ''));
+                $latRaw = trim((string)($row[11] ?? ''));
                 
                 $lon = str_replace(',', '.', $lonRaw);
                 $lat = str_replace(',', '.', $latRaw);
                 
                 if (substr_count($lat, '.') > 1) {
                     $firstDot = strpos($lat, '.');
-                    $lat = substr($lat, 0, $firstDot) . substr($lat, $firstDot + 1);
+                    $lat = substr($lat, 0, $firstDot + 1) . str_replace('.', '', substr($lat, $firstDot + 1));
                 }
                 if (substr_count($lon, '.') > 1) {
                     $firstDot = strpos($lon, '.');
-                    $lon = substr($lon, 0, $firstDot) . substr($lon, $firstDot + 1);
+                    $lon = substr($lon, 0, $firstDot + 1) . str_replace('.', '', substr($lon, $firstDot + 1));
                 }
 
-                $coords = ($lat && $lon) ? "$lat, $lon" : null;
+                $coords = (is_numeric($lat) && is_numeric($lon)) ? "$lat, $lon" : null;
 
                 $this->asetModel->insert([
-                    'no_sertifikat'  => trim($row[1] ?? '-'),
-                    'nama_pemilik'   => trim($row[2] ?? '-'),
+                    'no_sertifikat'  => trim((string)($row[1] ?? '-')),
+                    'nama_pemilik'   => trim((string)($row[2] ?? '-')),
                     'luas_m2'        => $luas,
-                    'lokasi'         => trim($row[4] ?? '-'),
-                    'desa_kelurahan' => trim($row[5] ?? '-'),
-                    'kecamatan'      => trim($row[6] ?? '-'),
+                    'lokasi'         => trim((string)($row[4] ?? '-')),
+                    'desa_kelurahan' => trim((string)($row[5] ?? '-')),
+                    'kecamatan'      => trim((string)($row[6] ?? '-')),
                     'tgl_terbit'     => $tglTerbit,
-                    'nomor_hak'      => trim($row[8] ?? '-'),
-                    'peruntukan'     => trim($row[9] ?? '-'),
+                    'nomor_hak'      => trim((string)($row[8] ?? '-')),
+                    'peruntukan'     => trim((string)($row[9] ?? '-')),
                     'koordinat'      => $coords,
                     'nilai_aset'     => $nilai,
-                    'status_tanah'   => trim($row[13] ?? '-'),
-                    'keterangan'     => trim($row[14] ?? '-'),
+                    'status_tanah'   => trim((string)($row[13] ?? '-')),
+                    'keterangan'     => trim((string)($row[14] ?? '-')),
                 ]);
                 $count++;
             }
-            fclose($handle);
 
             $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data ke database.');
-            }
-
-            if ($count == 0) {
-                return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
-            }
+            if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
 
             $this->logActivity('Import', 'Aset Tanah', "Berhasil mengimpor $count data Aset Tanah");
-
-            return redirect()->to('/aset-tanah')->with('success', "$count data Aset Tanah berhasil diimpor.");
-
+            return redirect()->to('/aset-tanah')->with('success', "$count data Aset berhasil diimpor.");
         } catch (\Exception $e) {
-            if (isset($handle)) fclose($handle);
+            $db->transRollback();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }

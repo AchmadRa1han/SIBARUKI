@@ -29,13 +29,16 @@
                 <p class="text-white/60 font-medium text-xs mt-2 tracking-wide">Pengembangan Infrastruktur Sosial Ekonomi Wilayah</p>
             </div>
         </div>
-        <div class="flex flex-wrap items-center gap-3 relative z-10">
-            <a href="<?= base_url('pisew/export-excel') ?>" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
+        <div class="flex flex-wrap items-center gap-2 relative z-10">
+            <a href="<?= base_url('pisew/export-excel') ?>" class="bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-1.5">
+                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Export
             </a>
             <?php if (has_permission('create_rtlh')): ?>
-            <a href="<?= base_url('pisew/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
-                <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah Data
+            <button onclick="UI.openModal('modal-import')" class="bg-indigo-600 text-white px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5"></i> Import
+            </button>
+            <a href="<?= base_url('pisew/create') ?>" class="bg-white text-blue-950 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
+                <i data-lucide="plus" class="w-3.5 h-3.5 transition-transform group-hover:rotate-90"></i> Tambah
             </a>
             <?php endif; ?>
         </div>
@@ -343,4 +346,7 @@
     .leaflet-container { font-family: inherit; }
     .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
 </style>
+
+<?= view('pisew/partials/_modal_import') ?>
+
 <?= $this->endSection() ?>

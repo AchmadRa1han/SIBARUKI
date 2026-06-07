@@ -94,64 +94,47 @@ class Psu extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
-        $handle = fopen($file->getTempName(), 'r');
-        
-        // Baca baris pertama untuk deteksi delimiter
-        $firstLine = fgets($handle);
-        $delimiter = (substr_count($firstLine, ';') > substr_count($firstLine, ',')) ? ';' : ',';
-        rewind($handle);
+        try {
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getTempName());
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
+        }
 
         $count = 0;
         $db = \Config\Database::connect();
 
-        // Reset Auto Increment jika tabel kosong agar ID mulai dari 1 lagi
         if ($db->table('permukiman_psu_jalan')->countAllResults() === 0) {
             $db->query("ALTER TABLE permukiman_psu_jalan AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
-
         try {
-            while (($row = fgetcsv($handle, 10000, $delimiter)) !== FALSE) {
-                // Lewati header (berisi kata 'WKT' atau 'nama_jalan') atau baris kosong
-                if (count($row) < 3 || stripos(implode(' ', $row), 'WKT') !== false || empty(trim($row[0] ?? ''))) {
+            foreach ($rows as $rowIndex => $row) {
+                // Skip header or empty rows
+                if (count($row) < 3 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'WKT') !== false || empty(trim((string)($row[0] ?? '')))) {
                     continue;
                 }
 
-                /* 
-                   Struktur CSV Jaringan Jalan Baru:
-                   Index 0: WKT (Diharapkan POINT)
-                   Index 1: nama_jalan
-                   Index 2: tahun
-                   Index 3: panjang_luas
-                */
-
                 $this->jalanModel->insert([
                     'wkt'          => $row[0] ?? null,
-                    'nama_jalan'   => trim($row[1] ?? '-'),
+                    'nama_jalan'   => trim((string)($row[1] ?? '-')),
                     'tahun'        => (int)($row[2] ?? date('Y')),
-                    'panjang_luas' => (float)preg_replace('/[^0-9.]/', '', $row[3] ?? '0'),
+                    'panjang_luas' => (float)preg_replace('/[^0-9.]/', '', (string)($row[3] ?? '0')),
                 ]);
                 $count++;
             }
-            fclose($handle);
 
             $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data ke database.');
-            }
-
-            if ($count == 0) {
-                return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
-            }
+            if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
 
             $this->logActivity('Import', 'PSU Jalan', "Berhasil mengimpor $count data Jaringan Jalan");
-
             return redirect()->to('/psu')->with('success', "$count data PSU Jalan berhasil diimpor.");
-
         } catch (\Exception $e) {
-            if (isset($handle)) fclose($handle);
             $db->transRollback();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }

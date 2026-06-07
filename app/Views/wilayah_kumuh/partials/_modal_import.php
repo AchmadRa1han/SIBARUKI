@@ -1,4 +1,4 @@
-<!-- PERUMAHAN FORMAL IMPORT MODAL COMPONENT -->
+<!-- WILAYAH KUMUH IMPORT MODAL COMPONENT -->
 <div id="modal-import" class="fixed inset-0 z-[10002] hidden overflow-y-auto py-10 px-4">
     <div class="fixed inset-0 bg-blue-950/60 backdrop-blur-sm transition-opacity" onclick="UI.closeModal('modal-import')"></div>
     <div class="relative flex items-center justify-center p-4 min-h-full">
@@ -10,14 +10,14 @@
                         <i data-lucide="file-spreadsheet" class="w-6 h-6 text-emerald-400"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl font-black uppercase tracking-tighter">Import Data Massal</h3>
-                        <p class="text-[8px] font-bold uppercase tracking-widest text-white/60 mt-1">Registri Kawasan Perumahan Formal</p>
+                        <h3 class="text-xl font-black uppercase tracking-tighter">Import Data Wilayah Kumuh</h3>
+                        <p class="text-[8px] font-bold uppercase tracking-widest text-white/60 mt-1">Registri Deliniasi Wilayah Kumuh Massal</p>
                     </div>
                 </div>
                 <button type="button" onclick="UI.closeModal('modal-import')" class="p-2 hover:bg-white/10 rounded-xl transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
-            <form action="<?= base_url('perumahan-formal/importCsv') ?>" method="post" enctype="multipart/form-data">
+            <form action="<?= base_url('wilayah-kumuh/importCsv') ?>" method="post" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 
                 <div class="p-8 space-y-8 bg-slate-100 dark:bg-slate-950">
@@ -26,11 +26,10 @@
                             <i data-lucide="info" class="w-4 h-4"></i> Informasi Pintar
                         </h4>
                         <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed font-medium">
-                            Sistem akan memproses file CSV Anda untuk dimasukkan ke database Perumahan Formal secara massal.
+                            Pastikan file Anda memiliki kolom: <b>WKT, Provinsi, Kode Prov, Kab_Kota, Kode Kab, Kecamatan, Kode Kec, Kelurahan, Kode Kel, Kode RT_RW, Luas, Skor, Sumber Data, SK Kumuh, Kawasan</b>.
                         </p>
                         <div class="mt-4 p-3 bg-white/50 dark:bg-slate-900/50 rounded-xl text-[9px] font-mono text-blue-950 dark:text-blue-200">
-                            <b>Wajib ada di file Anda:</b> Kolom Nama Perumahan.<br>
-                            <b>Format File:</b> Silakan gunakan fitur <i>Save As -> CSV (Comma delimited)</i> di Excel Anda.
+                            <b>Format File:</b> .xlsx, .xls, .csv
                         </div>
                     </div>
 

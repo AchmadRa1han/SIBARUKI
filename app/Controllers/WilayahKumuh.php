@@ -105,78 +105,57 @@ class WilayahKumuh extends BaseController
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
 
-        $handle = fopen($file->getTempName(), 'r');
-        
-        // Deteksi Delimiter
-        $firstLine = fgets($handle);
-        $delimiter = (substr_count($firstLine, ';') > substr_count($firstLine, ',')) ? ';' : ',';
-        rewind($handle);
+        try {
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($file->getTempName());
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
+        }
 
         $count = 0;
         $db = \Config\Database::connect();
 
-        // Reset Auto Increment jika tabel kosong
         if ($db->table('permukiman_wilayah_kumuh')->countAllResults() === 0) {
             $db->query("ALTER TABLE permukiman_wilayah_kumuh AUTO_INCREMENT = 1");
         }
 
         $db->transStart();
-
         try {
-            while (($row = fgetcsv($handle, 10000, $delimiter)) !== FALSE) {
-                // Lewati header (berisi kata 'WKT' atau 'Kawasan')
-                if (count($row) < 10 || stripos(implode(' ', $row), 'WKT') !== false) {
+            foreach ($rows as $rowIndex => $row) {
+                if (count($row) < 10 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'WKT') !== false) {
                     continue;
                 }
 
-                /* 
-                   Berdasarkan analisis file Delineasi_Kumuh_AR.csv:
-                   Index 0: WKT
-                   Index 5: KECAMATAN
-                   Index 7: KELURAHAN
-                   Index 9: KODE_RT_RW
-                   Index 10: LUAS_KUMUH
-                   Index 11: skor_kumuh
-                   Index 12: SUMBR_DATA
-                   Index 13: SK_KUMUH
-                   Index 14: Kawasan
-                */
-
                 $this->kumuhModel->insert([
                     'WKT'         => $row[0] ?? null,
-                    'Provinsi'    => trim($row[1] ?? 'Sulawesi Selatan'),
-                    'Kode_Prov'   => trim($row[2] ?? '73'),
-                    'Kab_Kota'    => trim($row[3] ?? 'Sinjai'),
-                    'Kode_Kab'    => trim($row[4] ?? '07'),
-                    'Kecamatan'   => trim($row[5] ?? '-'),
-                    'Kode_Kec'    => trim($row[6] ?? '-'),
-                    'Kelurahan'   => trim($row[7] ?? '-'),
-                    'Kode_Kel'    => trim($row[8] ?? '-'),
-                    'Kode_RT_RW'  => trim($row[9] ?? '-'),
-                    'Luas_kumuh'  => (float)($row[10] ?? '0'),
-                    'skor_kumuh'  => (float)($row[11] ?? '0'),
-                    'Sumber_data' => trim($row[12] ?? '-'),
-                    'Sk_Kumuh'    => trim($row[13] ?? '-'),
-                    'Kawasan'     => trim($row[14] ?? '-'),
+                    'Provinsi'    => trim((string)($row[1] ?? 'Sulawesi Selatan')),
+                    'Kode_Prov'   => trim((string)($row[2] ?? '73')),
+                    'Kab_Kota'    => trim((string)($row[3] ?? 'Sinjai')),
+                    'Kode_Kab'    => trim((string)($row[4] ?? '07')),
+                    'Kecamatan'   => trim((string)($row[5] ?? '-')),
+                    'Kode_Kec'    => trim((string)($row[6] ?? '-')),
+                    'Kelurahan'   => trim((string)($row[7] ?? '-')),
+                    'Kode_Kel'    => trim((string)($row[8] ?? '-')),
+                    'Kode_RT_RW'  => trim((string)($row[9] ?? '-')),
+                    'Luas_kumuh'  => (float)str_replace(',', '.', (string)($row[10] ?? '0')),
+                    'skor_kumuh'  => (float)str_replace(',', '.', (string)($row[11] ?? '0')),
+                    'Sumber_data' => trim((string)($row[12] ?? '-')),
+                    'Sk_Kumuh'    => trim((string)($row[13] ?? '-')),
+                    'Kawasan'     => trim((string)($row[14] ?? '-')),
                 ]);
                 $count++;
             }
-            fclose($handle);
 
             $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data ke database.');
-            }
-
-            if ($count == 0) {
-                return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
-            }
+            if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
 
             return redirect()->to('/wilayah-kumuh')->with('success', "$count data Wilayah Kumuh berhasil diimpor.");
-
         } catch (\Exception $e) {
-            if (isset($handle)) fclose($handle);
+            $db->transRollback();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
