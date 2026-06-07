@@ -215,9 +215,7 @@ class AsetTanah extends BaseController
                     $lon = substr($lon, 0, $firstDot + 1) . str_replace('.', '', substr($lon, $firstDot + 1));
                 }
 
-                $coords = (is_numeric($lat) && is_numeric($lon)) ? "$lat, $lon" : null;
-
-                $this->asetModel->insert([
+                $this->asetModel->set([
                     'no_sertifikat'  => trim((string)($row[1] ?? '-')),
                     'nama_pemilik'   => trim((string)($row[2] ?? '-')),
                     'luas_m2'        => $luas,
@@ -227,11 +225,16 @@ class AsetTanah extends BaseController
                     'tgl_terbit'     => $tglTerbit,
                     'nomor_hak'      => trim((string)($row[8] ?? '-')),
                     'peruntukan'     => trim((string)($row[9] ?? '-')),
-                    'koordinat'      => $coords,
                     'nilai_aset'     => $nilai,
                     'status_tanah'   => trim((string)($row[13] ?? '-')),
                     'keterangan'     => trim((string)($row[14] ?? '-')),
                 ]);
+
+                if (is_numeric($lat) && is_numeric($lon)) {
+                    $this->asetModel->set('koordinat', "ST_GeomFromText('POINT($lon $lat)')", false);
+                }
+
+                $this->asetModel->insert();
                 $count++;
             }
 
@@ -252,10 +255,13 @@ class AsetTanah extends BaseController
         $aset = $this->asetModel->find($id);
         if (!$aset) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
+        $db = \Config\Database::connect();
+        $kecamatans = $db->table('permukiman_wilayah_kumuh')->select('Kecamatan as kecamatan')->distinct()->orderBy('Kecamatan', 'ASC')->get()->getResultArray();
+
         return view('aset_tanah/detail', [
             'title' => 'Detail Aset Tanah',
             'aset' => $aset,
-            'kecamatans' => (new AsetTanahModel())->select('kecamatan')->distinct()->findAll()
+            'kecamatans' => $kecamatans
         ]);
     }
 
@@ -287,21 +293,25 @@ class AsetTanah extends BaseController
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
         $data = $this->request->getPost();
+        
         $this->asetModel->insert($data);
-        $this->logActivity('Tambah', 'Aset Tanah', "Menambah aset tanah baru: {$data['nama_pemilik']}", $this->formatLogData($data));
+        $this->logActivity('Tambah', 'Aset Tanah', "Menambah aset tanah baru: " . ($data['nama_pemilik'] ?? 'Untitled'), $this->formatLogData($data));
         return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil ditambahkan.');
     }
 
     public function update($id)
     {
-        $oldData = $this->asetModel->find($id);
-        $newData = $this->request->getPost();
-        $this->asetModel->update($id, $newData);
+        if (!has_permission('edit_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
         
-        $diff = $this->generateDiff($oldData, $newData);
+        $oldData = $this->asetModel->find($id);
+        $data = $this->request->getPost();
+        
+        $this->asetModel->update($id, $data);
+        
+        $diff = $this->generateDiff($oldData, $data);
         $this->logActivity('Ubah', 'Aset Tanah', "Memperbarui data aset: " . ($oldData['nama_pemilik'] ?? 'Unknown'), $diff);
         
-        return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil diperbarui.');
+        return redirect()->to('/aset-tanah/detail/' . $id)->with('success', 'Data aset berhasil diperbarui.');
     }
 
     public function delete($id)
