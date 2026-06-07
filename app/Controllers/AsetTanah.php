@@ -24,7 +24,6 @@ class AsetTanah extends BaseController
         $sortBy = $this->request->getGet('sort_by') ?? 'id';
         $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
 
-        // 1. STATISTIK & SPASIAL: Gunakan instance BARU untuk setiap hitungan agar tidak merusak builder
         $db = \Config\Database::connect();
         $total_count = (new AsetTanahModel())->countAllResults();
         $count_bersertifikat = (new AsetTanahModel())->where('no_sertifikat !=', 'Belum Bersertifikat')->countAllResults();
@@ -33,15 +32,12 @@ class AsetTanah extends BaseController
         $pct_bersertifikat = $total_count > 0 ? ($count_bersertifikat / $total_count) * 100 : 0;
         $pct_belum_bersertifikat = $total_count > 0 ? ($count_belum_bersertifikat / $total_count) * 100 : 0;
 
-        // Ambil Data Kecamatan (WKT) untuk Background Map seperti di Dashboard
         $kecamatans_spasial = $db->table('permukiman_wilayah_kumuh')
             ->select('Kecamatan as nama, Kelurahan as desa, WKT as wkt')
             ->groupBy('Kelurahan')
             ->get()->getResultArray();
 
-        // 2. QUERY UTAMA: Gunakan instance BARU agar filter TERISOLASI sepenuhnya
         $mainQuery = new AsetTanahModel();
-
         if ($search) {
             $mainQuery->groupStart()
                 ->like('nama_pemilik', $search)
@@ -60,17 +56,23 @@ class AsetTanah extends BaseController
             $mainQuery->where('no_sertifikat', 'Belum Bersertifikat');
         }
 
-        // CLONE QUERY sebelum dieksekusi oleh paginate
         $mapQuery = clone $mainQuery;
+
+        // Fetch All Wilayah from Master Table (kode_kecamatan)
+        $kecamatans = $db->table('kode_kecamatan')
+                        ->select('kecamatan_nama as kecamatan')
+                        ->distinct()
+                        ->orderBy('kecamatan_nama', 'ASC')
+                        ->get()->getResultArray();
 
         $data = [
             'title' => 'Data Aset Tanah',
             'aset' => $mainQuery->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
-            'aset_all' => $mapQuery->select('id, nama_pemilik, no_sertifikat, koordinat')->findAll(), // Optimized Payload
+            'aset_all' => $mapQuery->select('id, nama_pemilik, no_sertifikat, koordinat')->findAll(),
             'pager' => $mainQuery->pager, 
             'perPage' => $perPage,
             'search' => $search,
-            'kecamatans' => (new AsetTanahModel())->select('kecamatan')->distinct()->findAll(),
+            'kecamatans' => $kecamatans,
             'selected_kecamatan' => $selected_kecamatan,
             'status_sertifikat' => $status_sertifikat,
             'sortBy' => $sortBy,
@@ -94,7 +96,7 @@ class AsetTanah extends BaseController
                     'count_belum_bersertifikat' => $count_belum_bersertifikat,
                     'pct_bersertifikat' => round($pct_bersertifikat, 1),
                     'pct_belum_bersertifikat' => round($pct_belum_bersertifikat, 1),
-                    'aset_all' => $data['aset_all'], // Already optimized above
+                    'aset_all' => $data['aset_all'],
                     'kecamatans_spasial' => $kecamatans_spasial
                 ]
             ]);
@@ -215,7 +217,7 @@ class AsetTanah extends BaseController
                     $lon = substr($lon, 0, $firstDot + 1) . str_replace('.', '', substr($lon, $firstDot + 1));
                 }
 
-                $this->asetModel->set([
+                $this->asetModel->insert([
                     'no_sertifikat'  => trim((string)($row[1] ?? '-')),
                     'nama_pemilik'   => trim((string)($row[2] ?? '-')),
                     'luas_m2'        => $luas,
@@ -225,16 +227,11 @@ class AsetTanah extends BaseController
                     'tgl_terbit'     => $tglTerbit,
                     'nomor_hak'      => trim((string)($row[8] ?? '-')),
                     'peruntukan'     => trim((string)($row[9] ?? '-')),
+                    'koordinat'      => (is_numeric($lat) && is_numeric($lon)) ? "$lat, $lon" : null,
                     'nilai_aset'     => $nilai,
                     'status_tanah'   => trim((string)($row[13] ?? '-')),
                     'keterangan'     => trim((string)($row[14] ?? '-')),
                 ]);
-
-                if (is_numeric($lat) && is_numeric($lon)) {
-                    $this->asetModel->set('koordinat', "ST_GeomFromText('POINT($lon $lat)')", false);
-                }
-
-                $this->asetModel->insert();
                 $count++;
             }
 
@@ -252,11 +249,12 @@ class AsetTanah extends BaseController
 
     public function detail($id)
     {
+        $db = \Config\Database::connect();
         $aset = $this->asetModel->find($id);
         if (!$aset) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
-        $db = \Config\Database::connect();
-        $kecamatans = $db->table('permukiman_wilayah_kumuh')->select('Kecamatan as kecamatan')->distinct()->orderBy('Kecamatan', 'ASC')->get()->getResultArray();
+        // Fetch All Wilayah from Master Table
+        $kecamatans = $db->table('kode_kecamatan')->select('kecamatan_nama as kecamatan')->distinct()->orderBy('kecamatan_nama', 'ASC')->get()->getResultArray();
 
         return view('aset_tanah/detail', [
             'title' => 'Detail Aset Tanah',
@@ -277,12 +275,17 @@ class AsetTanah extends BaseController
 
     public function getDesaByKecamatan()
     {
-        $kecamatan = $this->request->getGet('kecamatan');
+        $kecamatanNama = $this->request->getGet('kecamatan');
         $db = \Config\Database::connect();
-        $desas = $db->table('permukiman_wilayah_kumuh')
-                    ->select('Kelurahan as desa_nama')
-                    ->where('Kecamatan', $kecamatan)
-                    ->distinct()
+        
+        // Find kecamatan_id from name
+        $kec = $db->table('kode_kecamatan')->where('kecamatan_nama', $kecamatanNama)->get()->getRowArray();
+        if (!$kec) return $this->response->setJSON([]);
+
+        $desas = $db->table('kode_desa')
+                    ->select('desa_nama')
+                    ->where('kecamatan_id', $kec['kecamatan_id'])
+                    ->orderBy('desa_nama', 'ASC')
                     ->get()
                     ->getResultArray();
         
@@ -293,7 +296,6 @@ class AsetTanah extends BaseController
     {
         if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
         $data = $this->request->getPost();
-        
         $this->asetModel->insert($data);
         $this->logActivity('Tambah', 'Aset Tanah', "Menambah aset tanah baru: " . ($data['nama_pemilik'] ?? 'Untitled'), $this->formatLogData($data));
         return redirect()->to('/aset-tanah')->with('success', 'Data aset berhasil ditambahkan.');
