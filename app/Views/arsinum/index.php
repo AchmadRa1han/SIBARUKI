@@ -37,9 +37,9 @@
             <button onclick="UI.openModal('modal-import')" class="bg-indigo-600 text-white px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
                 <i data-lucide="upload-cloud" class="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5"></i> Import
             </button>
-            <a href="<?= base_url('arsinum/create') ?>" class="bg-white text-blue-950 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
+            <button onclick="arsinumModal.openAdd()" class="bg-white text-blue-950 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
                 <i data-lucide="plus" class="w-3.5 h-3.5 transition-transform group-hover:rotate-90"></i> Tambah
-            </a>
+            </button>
             <?php endif; ?>
         </div>
     </div>
@@ -140,6 +140,7 @@
                                 <button onclick="focusMap(<?= $item['koordinat'] ?>)" class="p-2.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl shadow-lg border border-blue-100 dark:border-blue-800 hover:scale-110 active:scale-95 transition-all" title="Fokus Peta"><i data-lucide="map-pin" class="w-4 h-4"></i></button>
                                 <?php endif; ?>
                                 <a href="<?= base_url('arsinum/detail/'.$item['id']) ?>" class="p-2.5 bg-blue-950 dark:bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-950/20 hover:scale-110 active:scale-95 transition-all" title="Detail"><i data-lucide="eye" class="w-4 h-4"></i></a>
+                                <button onclick="arsinumModal.openEdit(<?= htmlspecialchars(json_encode($item), ENT_QUOTES, 'UTF-8') ?>)" class="p-2.5 bg-white dark:bg-slate-800 text-slate-500 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 hover:text-blue-600 hover:scale-110 active:scale-95 transition-all" title="Edit"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                                 <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2.5 bg-rose-500 text-white rounded-xl shadow-lg shadow-rose-500/20 hover:scale-110 active:scale-95 transition-all" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </td>
@@ -343,5 +344,6 @@
 </style>
 
 <?= view('arsinum/partials/_modal_import') ?>
+<?= view('arsinum/partials/_modal_edit') ?>
 
 <?= $this->endSection() ?>

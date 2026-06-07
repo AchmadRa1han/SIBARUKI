@@ -37,9 +37,9 @@
             <button onclick="UI.openModal('modal-import')" class="bg-indigo-600 text-white px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
                 <i data-lucide="upload-cloud" class="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5"></i> Import
             </button>
-            <a href="<?= base_url('pisew/create') ?>" class="bg-white text-blue-950 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
+            <button onclick="pisewModal.openAdd()" class="bg-white text-blue-950 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 group">
                 <i data-lucide="plus" class="w-3.5 h-3.5 transition-transform group-hover:rotate-90"></i> Tambah
-            </a>
+            </button>
             <?php endif; ?>
         </div>
     </div>
@@ -348,5 +348,6 @@
 </style>
 
 <?= view('pisew/partials/_modal_import') ?>
+<?= view('pisew/partials/_modal_edit') ?>
 
 <?= $this->endSection() ?>

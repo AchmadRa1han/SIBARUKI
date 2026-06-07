@@ -35,9 +35,9 @@
         </div>
         <div class="flex items-center gap-2 relative z-10">
             <?php if (has_permission('edit_kumuh')) : ?>
-            <a href="<?= base_url('wilayah-kumuh/edit/' . $kumuh['FID']) ?>" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2">
+            <button onclick="kumuhModal.openEdit(<?= htmlspecialchars(json_encode($kumuh), ENT_QUOTES, 'UTF-8') ?>)" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2">
                 <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
-            </a>
+            </button>
             <?php endif; ?>
             <a href="<?= base_url('wilayah-kumuh/print/' . $kumuh['FID']) ?>" target="_blank" class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm no-print" title="Cetak Laporan Formal">
                 <i data-lucide="printer" class="w-5 h-5"></i>
@@ -239,6 +239,8 @@
         } catch (e) { console.error('Map Error:', e); }
     }
 </script>
+
+<?= view('wilayah_kumuh/partials/_modal_edit') ?>
 
 <style>
     @media print {

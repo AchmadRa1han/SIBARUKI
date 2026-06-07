@@ -33,11 +33,11 @@
                 </div>
             </div>
         </div>
-        <div class="flex items-center gap-2 relative z-10">
-            <a href="<?= base_url('pisew/edit/'.$item['id']) ?>" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2">
+        <div class="flex items-center gap-2 relative z-10 no-print">
+            <button onclick="pisewModal.openEdit(<?= htmlspecialchars(json_encode($pisew), ENT_QUOTES, 'UTF-8') ?>)" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2">
                 <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
-            </a>
-            <button onclick="confirmDelete(<?= $item['id'] ?>)" class="px-5 py-2.5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all active:scale-95 flex items-center gap-2">
+            </button>
+            <button onclick="confirmDelete(<?= $pisew['id'] ?>)" class="px-5 py-2.5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all active:scale-95 flex items-center gap-2">
                 <i data-lucide="trash-2" class="w-4 h-4"></i> Hapus
             </button>
         </div>
@@ -283,6 +283,8 @@
         initDetailMap();
     });
 </script>
+
+<?= view('pisew/partials/_modal_edit') ?>
 
 <style>
     @keyframes bounce-slow {

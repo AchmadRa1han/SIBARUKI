@@ -23,9 +23,6 @@
 ?>
 
 <div id="report-content" class="max-w-7xl mx-auto space-y-6 pb-24 text-slate-900 dark:text-slate-200">
-    <!-- DEBUG MARKER: v2.0-REUSABLE-MODAL -->
-    <div class="hidden">SIBARUKI_DEBUG: REUSABLE_MODAL_ACTIVE</div>
-    
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-blue-600 transition-colors">Dashboard</a>
