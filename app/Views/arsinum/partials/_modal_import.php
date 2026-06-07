@@ -17,7 +17,7 @@
                 <button type="button" onclick="UI.closeModal('modal-import')" class="p-2 hover:bg-white/10 rounded-xl transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
-            <form action="<?= base_url('arsinum/importCsv') ?>" method="post" enctype="multipart/form-data">
+            <form action="<?= base_url('arsinum/import-csv') ?>" method="post" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 
                 <div class="p-8 space-y-8 bg-slate-100 dark:bg-slate-950">
