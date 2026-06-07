@@ -155,9 +155,6 @@
                                 <button onclick="focusMap(<?= $item['latitude'] ?>, <?= $item['longitude'] ?>)" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Peta"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>
                                 <a href="<?= base_url('perumahan-formal/detail/'.$item['id']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail"><i data-lucide="eye" class="w-3.5 h-3.5"></i></a>
-                                <?php if (has_permission('edit_rtlh')): ?>
-                                <button onclick="perumahanModal.openEdit(<?= htmlspecialchars(json_encode($item), ENT_QUOTES, 'UTF-8') ?>)" class="p-2 bg-white dark:bg-slate-800 text-slate-500 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:text-blue-600 transition-all active:scale-95" title="Edit"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
-                                <?php endif; ?>
                                 <?php if (has_permission('delete_rtlh')): ?>
                                 <button onclick="confirmDelete(<?= $item['id'] ?>, '<?= addslashes($item['nama_perumahan']) ?>')" class="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                                 <?php endif; ?>

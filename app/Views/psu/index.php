@@ -141,9 +141,6 @@
                                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                                 </a>
                                 <?php if (has_permission('edit_psu')): ?>
-                                <a href="<?= base_url('psu/edit/' . $item['id']) ?>" class="p-2 bg-white dark:bg-slate-800 text-blue-600 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-amber-500 hover:text-white transition-all active:scale-95" title="Edit">
-                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                </a>
                                 <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus">
                                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                 </button>

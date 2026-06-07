@@ -140,7 +140,6 @@
                                 <button onclick="focusMap(<?= $item['koordinat'] ?>)" class="p-2.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl shadow-lg border border-blue-100 dark:border-blue-800 hover:scale-110 active:scale-95 transition-all" title="Fokus Peta"><i data-lucide="map-pin" class="w-4 h-4"></i></button>
                                 <?php endif; ?>
                                 <a href="<?= base_url('arsinum/detail/'.$item['id']) ?>" class="p-2.5 bg-blue-950 dark:bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-950/20 hover:scale-110 active:scale-95 transition-all" title="Detail"><i data-lucide="eye" class="w-4 h-4"></i></a>
-                                <button onclick="arsinumModal.openEdit(<?= htmlspecialchars(json_encode($item), ENT_QUOTES, 'UTF-8') ?>)" class="p-2.5 bg-white dark:bg-slate-800 text-slate-500 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 hover:text-blue-600 hover:scale-110 active:scale-95 transition-all" title="Edit"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                                 <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2.5 bg-rose-500 text-white rounded-xl shadow-lg shadow-rose-500/20 hover:scale-110 active:scale-95 transition-all" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </td>
