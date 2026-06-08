@@ -36,6 +36,9 @@
             </div>
         </div>
         <div class="flex items-center gap-2 relative z-10">
+            <a href="<?= base_url('aset-tanah/print/' . $aset['id']) ?>" target="_blank" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95 flex items-center gap-2">
+                <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan
+            </a>
             <?php if (has_permission('edit_rtlh')) : ?>
             <button onclick="asetModal.openEdit(<?= htmlspecialchars(json_encode($aset, JSON_UNESCAPED_UNICODE) ?: '{}', ENT_QUOTES, 'UTF-8') ?>)" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2">
                 <i data-lucide="edit-3" class="w-4 h-4"></i> Edit

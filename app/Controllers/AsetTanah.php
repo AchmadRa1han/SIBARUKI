@@ -263,6 +263,16 @@ class AsetTanah extends BaseController
         ]);
     }
 
+    public function print($id)
+    {
+        $aset = $this->asetModel->find($id);
+        if (!$aset) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+
+        return view('aset_tanah/print_report', [
+            'aset' => $aset
+        ]);
+    }
+
     public function create()
     {
         return redirect()->to('/aset-tanah')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah.');

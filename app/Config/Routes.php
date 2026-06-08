@@ -76,6 +76,7 @@ $routes->group('aset-tanah', function($routes) {
     $routes->get('create', 'AsetTanah::create');
     $routes->post('store', 'AsetTanah::store');
     $routes->get('detail/(:num)', 'AsetTanah::detail/$1');
+    $routes->get('print/(:num)', 'AsetTanah::print/$1');
     $routes->get('edit/(:num)', 'AsetTanah::edit/$1');
     $routes->post('update/(:num)', 'AsetTanah::update/$1');
     $routes->post('delete/(:num)', 'AsetTanah::delete/$1');
