@@ -22,44 +22,6 @@
     <!-- GRID MENU UTAMA -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         
-        <!-- Manajemen User -->
-        <?php if(has_permission('manage_users') || has_permission('view_users')): ?>
-        <a href="<?= base_url('sys_users') ?>" class="group relative bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-            <div class="absolute -right-4 -top-4 w-32 h-32 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 transition-colors"></div>
-            <div class="relative z-10 space-y-6">
-                <div class="w-16 h-16 bg-blue-900 dark:bg-blue-700 text-white rounded-3xl flex items-center justify-center shadow-lg shadow-blue-900/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                    <i data-lucide="users" class="w-8 h-8 text-white"></i>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-blue-950 dark:text-white uppercase tracking-tight mb-2">Manajemen User</h3>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">Kelola akun pengguna, reset password, dan pantau status aktif petugas lapangan.</p>
-                </div>
-                <div class="flex items-center text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest group-hover:gap-2 transition-all">
-                    Buka Menu <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </div>
-            </div>
-        </a>
-        <?php endif; ?>
-
-        <!-- Manajemen Role -->
-        <?php if(has_permission('manage_roles')): ?>
-        <a href="<?= base_url('sys_roles') ?>" class="group relative bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-            <div class="absolute -right-4 -top-4 w-32 h-32 bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-3xl group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/20 transition-colors"></div>
-            <div class="relative z-10 space-y-6">
-                <div class="w-16 h-16 bg-indigo-900 dark:bg-indigo-700 text-white rounded-3xl flex items-center justify-center shadow-lg shadow-indigo-900/30 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
-                    <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-blue-950 dark:text-white uppercase tracking-tight mb-2">Manajemen Role</h3>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">Atur hak akses secara dinamis untuk Admin, Pimpinan, Petugas, hingga Kepala Desa.</p>
-                </div>
-                <div class="flex items-center text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-widest group-hover:gap-2 transition-all">
-                    Konfigurasi Izin <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </div>
-            </div>
-        </a>
-        <?php endif; ?>
-
         <!-- Monitoring Aktivitas -->
         <?php if(has_permission('manage_roles')): ?>
         <a href="<?= base_url('logs') ?>" class="group relative bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">

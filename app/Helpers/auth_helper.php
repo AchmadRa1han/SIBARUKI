@@ -9,6 +9,11 @@ if (!function_exists('has_permission')) {
      */
     function has_permission(string $permission): bool
     {
+        // Fitur Export Data diatur default ON untuk semua user
+        if ($permission === 'export_data') {
+            return true;
+        }
+
         $session = session();
         $permissions = $session->get('sys_permissions') ?? [];
         

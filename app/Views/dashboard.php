@@ -39,23 +39,21 @@
             </div>
         </div>
     </div>
-
-    <!-- 2. METRICS GRID -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <?php 
-        $metrics = [
-            ['rumah', 'home', 'blue', 'TOTAL RUMAH', base_url('rtlh/rekap-desa')],
-            ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('rtlh/rekap-desa')],
-            ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('rtlh/rekap-desa')],
-            ['rtlh', 'home', 'amber', 'RTLH (SASARAN)', base_url('rtlh')],
-            ['kumuh', 'map-pin', 'rose', 'KUMUH', base_url('wilayah-kumuh')],
-            ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],
-            ['psu', 'route', 'slate', 'PSU', base_url('psu')],
-            ['pisew', 'map', 'orange', 'PISEW', base_url('pisew')],
-            ['aset', 'layers', 'emerald', 'ASET', base_url('aset-tanah')],
-            ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
-        ];
-        foreach($metrics as $m): ?>
+<!-- 2. METRICS GRID -->
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
+    <?php 
+    $metrics = [
+        ['rumah', 'home', 'blue', 'TOTAL RUMAH', base_url('rtlh/rekap-desa')],
+        ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('rtlh/rekap-desa')],
+        ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('rtlh/rekap-desa')],
+        ['rtlh', 'home', 'amber', 'RTLH (SASARAN)', base_url('rtlh')],
+        ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],
+        ['psu', 'route', 'slate', 'PSU', base_url('psu')],
+        ['pisew', 'map', 'orange', 'PISEW', base_url('pisew')],
+        ['aset', 'layers', 'emerald', 'ASET', base_url('aset-tanah')],
+        ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
+    ];
+    foreach($metrics as $m): ?>
         <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-500 group block relative overflow-hidden">
             <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-inner">
                 <i data-lucide="<?= $m[1] ?>" class="w-5 h-5" stroke-width="2"></i>
@@ -82,9 +80,9 @@
                 </div>
             </div>
             <div class="flex flex-wrap gap-1.5">
-                <?php foreach(['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'] as $l): ?>
+                <?php foreach(['rtlh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'] as $l): ?>
                 <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
-                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'check-circle':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= $l == 'formal' ? 'PERUMAHAN' : strtoupper($l) ?>
+                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))) ?>" class="w-3 h-3"></i> <?= $l == 'formal' ? 'PERUMAHAN' : strtoupper($l) ?>
                 </button>
                 <?php endforeach; ?>
             </div>
@@ -109,38 +107,6 @@
             </h3>
             <div id="asetLegalitasChart" class="flex justify-center"></div>
         </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- PRIORITAS KAWASAN KUMUH -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                <i data-lucide="alert-triangle" class="w-32 h-32 text-rose-600"></i>
-            </div>
-            <h3 class="text-[9px] font-bold text-rose-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
-                <span class="w-6 h-[2px] bg-rose-600"></span> Prioritas Kawasan Kumuh
-            </h3>
-            <div class="space-y-4 relative z-10">
-                <?php foreach($topKumuh as $k): ?>
-                <a href="<?= base_url('wilayah-kumuh/detail/' . $k['FID']) ?>" class="p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl transition-all duration-500 group shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <div class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs group-hover:scale-110 transition-all duration-500 shadow-lg shadow-rose-600/20"><?= substr($k['Kelurahan'], 0, 1) ?></div>
-                        <div>
-                            <p class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-tight"><?= $k['Kelurahan'] ?></p>
-                            <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-0.5 truncate w-24"><?= $k['Kawasan'] ?: 'Kawasan Kumuh' ?></p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-lg font-bold text-rose-600 leading-none italic"><?= number_format($k['skor_kumuh'], 0) ?></p>
-                        <p class="text-[6px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Skor</p>
-                    </div>
-                </a>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        
-        <!-- Placeholder or empty space to keep layout balanced if needed, 
-             but grid-cols-2 will handle two cards nicely. -->
     </div>
 </div>
 
