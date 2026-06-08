@@ -41,7 +41,7 @@ class Pisew extends BaseController
 
         $data = [
             'title' => 'Data PISEW',
-            'permukiman_pisew' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
+            'pisew' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
             'pisew_all' => $this->pisewModel->findAll(),
             'pager' => $this->pisewModel->pager,
             'perPage' => $perPage,

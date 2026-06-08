@@ -41,7 +41,7 @@ class Arsinum extends BaseController
 
         $data = [
             'title' => 'Data ARSINUM',
-            'permukiman_arsinum' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
+            'arsinum' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
             'arsinum_all' => $this->arsinumModel->findAll(),
             'pager' => $this->arsinumModel->pager,
             'perPage' => $perPage,
