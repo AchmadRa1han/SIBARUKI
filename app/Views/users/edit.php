@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <form action="<?= base_url('users/update/'.$user['id']) ?>" method="post">
+    <form action="<?= base_url('sys_users/update/'.$user['id']) ?>" method="post">
         <?= csrf_field() ?>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Data Profil -->

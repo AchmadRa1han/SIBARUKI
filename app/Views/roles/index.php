@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="flex items-center gap-3 relative z-10">
-            <a href="<?= base_url('roles/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+            <a href="<?= base_url('sys_roles/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
                 <i data-lucide="plus" class="w-4 h-4 transition-transform group-hover:rotate-90"></i> Tambah Role
             </a>
         </div>
@@ -57,11 +57,11 @@
                 </div>
 
                 <div class="flex gap-3 relative z-10">
-                    <a href="<?= base_url('roles/edit/' . $role['id']) ?>" class="flex-1 bg-blue-950 dark:bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-center shadow-lg shadow-blue-950/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    <a href="<?= base_url('sys_roles/edit/' . $role['id']) ?>" class="flex-1 bg-blue-950 dark:bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-center shadow-lg shadow-blue-950/20 hover:scale-[1.02] active:scale-95 transition-all">
                         Edit Matrix
                     </a>
                     <?php if ($role['id'] != 1) : ?>
-                        <button type="button" onclick="confirmDeleteRole('<?= base_url('roles/delete/' . $role['id']) ?>')" class="bg-rose-500 text-white p-4 rounded-2xl hover:bg-rose-600 active:scale-95 transition-all shadow-lg shadow-rose-500/20">
+                        <button type="button" onclick="confirmDeleteRole('<?= base_url('sys_roles/delete/' . $role['id']) ?>')" class="bg-rose-500 text-white p-4 rounded-2xl hover:bg-rose-600 active:scale-95 transition-all shadow-lg shadow-rose-500/20">
                             <i data-lucide="trash-2" class="w-5 h-5"></i>
                         </button>
                     <?php endif; ?>

@@ -131,7 +131,7 @@ $routes->group('bansos-rtlh', function($routes) {
 });
 
 // SISTEM & PENGATURAN
-$routes->group('roles', function($routes) {
+$routes->group('sys_roles', function($routes) {
     $routes->get('/', 'Roles::index');
     $routes->get('create', 'Roles::create');
     $routes->post('store', 'Roles::store');
@@ -140,7 +140,7 @@ $routes->group('roles', function($routes) {
     $routes->get('delete/(:num)', 'Roles::delete/$1');
 });
 
-$routes->group('users', function($routes) {
+$routes->group('sys_users', function($routes) {
     $routes->get('/', 'Users::index');
     $routes->get('create', 'Users::create');
     $routes->post('store', 'Users::store');

@@ -11,7 +11,7 @@
         <p class="text-slate-500 text-sm mt-1">Tentukan hak akses dan cakupan wilayah untuk role baru ini.</p>
     </div>
 
-    <form action="<?= base_url('roles/store') ?>" method="POST">
+    <form action="<?= base_url('sys_roles/store') ?>" method="POST">
         <div class="space-y-8">
             <!-- Informasi Dasar -->
             <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">

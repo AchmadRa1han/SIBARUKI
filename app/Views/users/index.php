@@ -23,7 +23,7 @@
         </div>
         <div class="flex items-center gap-3 relative z-10">
             <?php if (has_permission('manage_users')): ?>
-            <a href="<?= base_url('users/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
+            <a href="<?= base_url('sys_users/create') ?>" class="bg-white text-blue-950 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group">
                 <i data-lucide="user-plus" class="w-4 h-4 transition-transform group-hover:scale-110"></i> Tambah Akun
             </a>
             <?php endif; ?>
@@ -103,9 +103,9 @@
                         <td class="px-8 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
                                 <?php if(has_permission('manage_users')): ?>
-                                <a href="<?= base_url('users/edit/'.$user['id']) ?>" class="p-2.5 bg-white dark:bg-slate-800 text-blue-600 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Edit Akun"><i data-lucide="edit-3" class="w-4 h-4"></i></a>
+                                <a href="<?= base_url('sys_users/edit/'.$user['id']) ?>" class="p-2.5 bg-white dark:bg-slate-800 text-blue-600 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all active:scale-95" title="Edit Akun"><i data-lucide="edit-3" class="w-4 h-4"></i></a>
                                 <?php if($user['username'] !== 'admin'): ?>
-                                <button type="button" onclick="confirmDeleteUser(this)" data-url="<?= base_url('users/delete/'.$user['id']) ?>" class="p-2.5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus Akun"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="confirmDeleteUser(this)" data-url="<?= base_url('sys_users/delete/'.$user['id']) ?>" class="p-2.5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus Akun"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                                 <?php endif; ?>
                                 <?php else: ?>
                                     <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest italic">Protected</span>
@@ -183,7 +183,7 @@
             ids.forEach(id => formData.append('ids[]', id));
             formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
             try {
-                const response = await fetch('<?= base_url('users/bulk-delete') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const response = await fetch('<?= base_url('sys_users/bulk-delete') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                 const result = await response.json();
                 if (result.status === 'success') { showToast(result.message, 'success'); setTimeout(() => window.location.reload(), 1000); }
                 else { showToast(result.message, 'error'); }

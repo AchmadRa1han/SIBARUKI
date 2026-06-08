@@ -67,7 +67,7 @@ class Users extends BaseController
 
     public function create()
     {
-        if (!has_permission('create_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
+        if (!has_permission('create_users')) return redirect()->to('/sys_users')->with('message', 'Akses ditolak.');
 
         $db = \Config\Database::connect();
         $allDesa = $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
@@ -86,7 +86,7 @@ class Users extends BaseController
 
     public function store()
     {
-        if (!has_permission('create_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
+        if (!has_permission('create_users')) return redirect()->to('/sys_users')->with('message', 'Akses ditolak.');
 
         $rules = [
             'username' => 'required|is_unique[sys_users.username]',
@@ -113,12 +113,12 @@ class Users extends BaseController
         
         $this->logActivity('Tambah', 'Users', "Menambah user baru: {$savedData['username']}", $detailLog);
 
-        return redirect()->to('/users')->with('message', 'User berhasil ditambahkan');
+        return redirect()->to('/sys_users')->with('message', 'User berhasil ditambahkan');
     }
 
     public function edit($id)
     {
-        if (!has_permission('edit_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
+        if (!has_permission('edit_users')) return redirect()->to('/sys_users')->with('message', 'Akses ditolak.');
 
         $user = $this->userModel->find($id);
         if (!$user) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
@@ -152,7 +152,7 @@ class Users extends BaseController
 
     public function update($id)
     {
-        if (!has_permission('edit_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
+        if (!has_permission('edit_users')) return redirect()->to('/sys_users')->with('message', 'Akses ditolak.');
 
         $user = $this->userModel->find($id);
         $passwordInput = $this->request->getPost('password');
@@ -174,12 +174,12 @@ class Users extends BaseController
         $diff = $this->generateDiff($oldData, $newData, ['password', 'updated_at']);
         $this->logActivity('Ubah', 'Users', 'Memperbarui profil user: ' . $user['username'], $diff);
 
-        return redirect()->to('/users')->with('message', 'User berhasil diperbarui');
+        return redirect()->to('/sys_users')->with('message', 'User berhasil diperbarui');
     }
 
     public function delete($id)
     {
-        if (!has_permission('delete_users')) return redirect()->to('/users')->with('message', 'Akses ditolak.');
+        if (!has_permission('delete_users')) return redirect()->to('/sys_users')->with('message', 'Akses ditolak.');
         
         $user = $this->userModel->find($id);
         if (!$user) return redirect()->back()->with('message', 'User tidak ditemukan.');
@@ -217,7 +217,7 @@ class Users extends BaseController
         $detailLog = $this->formatLogData($user);
         $this->logActivity('Hapus', 'Users', 'Memindahkan user ke Recycle Bin: ' . $user['username'], $detailLog);
 
-        return redirect()->to('/users')->with('message', 'User telah dipindahkan ke Recycle Bin.');
+        return redirect()->to('/sys_users')->with('message', 'User telah dipindahkan ke Recycle Bin.');
     }
 
     public function bulkDelete()
