@@ -34,7 +34,7 @@ class AsetTanah extends BaseController
 
         $kecamatans_spasial = $db->table('permukiman_wilayah_kumuh')
             ->select('Kecamatan as nama, Kelurahan as desa, WKT as wkt')
-            ->groupBy('Kelurahan')
+            ->groupBy(['Kelurahan', 'Kecamatan', 'WKT'])
             ->get()->getResultArray();
 
         $mainQuery = new AsetTanahModel();
