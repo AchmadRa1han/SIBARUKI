@@ -95,8 +95,8 @@ class Home extends BaseController
                 'kumuh'   => $totalKumuh,
                 'formal'  => $totalFormal,
                 'psu'     => $totalPsu,
-                'permukiman_arsinum' => $totalArsinum,
-                'permukiman_pisew'   => $totalPisew,
+                'arsinum' => $totalArsinum,
+                'pisew'   => $totalPisew,
                 'aset'    => $totalAset
             ],
             'spasial' => [
@@ -105,8 +105,8 @@ class Home extends BaseController
                 'kumuh'     => $mapKumuh,
                 'formal'    => $mapFormal,
                 'psu'       => $mapPsu,
-                'permukiman_arsinum'   => $mapArsinum,
-                'permukiman_pisew'     => $mapPisew,
+                'arsinum'   => $mapArsinum,
+                'pisew'     => $mapPisew,
                 'aset'      => $mapAset,
                 'bansos'    => $mapBansos
             ]

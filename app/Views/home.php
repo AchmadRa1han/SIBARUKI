@@ -101,6 +101,7 @@
                     ['rlh', 'check-circle', 'emerald', 'Rumah Layak'],
                     ['backlog', 'alert-triangle', 'rose', 'Backlog'],
                     ['rtlh', 'home', 'amber', 'RTLH'],
+                    ['kumuh', 'map-pin', 'rose', 'Kumuh'],
                     ['formal', 'building-2', 'indigo', 'Perumahan'],
                     ['psu', 'route', 'emerald', 'PSU'],
                     ['arsinum', 'droplets', 'blue', 'Arsinum'],
@@ -170,10 +171,10 @@
                 </div>
 
                 <div class="absolute top-8 left-8 z-[1001] flex flex-col gap-2">
-                    <?php foreach(['rtlh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
+                    <?php foreach(['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
                     <button type="button" onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg" data-layer="<?= $l ?>">
                         <?php 
-                            $labels = ['rtlh'=>'RTLH', 'formal'=>'Perumahan', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
+                            $labels = ['rtlh'=>'RTLH', 'bansos'=>'Bansos', 'kumuh'=>'Kumuh', 'formal'=>'Perumahan', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
                             echo $labels[$l];
                         ?>
                     </button>
@@ -295,17 +296,18 @@
                 attribution: '&copy; Google'
             });
             
-            map = L.map('publicMap', { zoomControl: false, layers: [cartoDB] }).setView([-5.1245, 120.2536], 11);
+            map = L.map('publicMap', { zoomControl: false, layers: [googleSat] }).setView([-5.1245, 120.2536], 11);
             
             let rot = 0;
             const LayerToggle = L.Control.extend({
                 onAdd: function(map) {
-                    const btn = L.DomUtil.create('button', 'bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
+                    const btn = L.DomUtil.create('button', 'rounded-lg shadow-xl border transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
                     btn.type = 'button';
                     btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
+                    btn.style.backgroundColor = '#2563eb'; // Default to blue for satellite
                     const isDark = document.documentElement.classList.contains('dark');
                     const svgColor = isDark ? '#60a5fa' : '#2563eb';
-                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${svgColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
                     L.DomEvent.disableClickPropagation(btn);
                     L.DomEvent.on(btn, 'click', function(e) {
                         L.DomEvent.stopPropagation(e);
@@ -314,17 +316,17 @@
                         const svg = btn.querySelector('svg');
                         svg.style.transform = `rotate(${rot}deg)`;
                         setTimeout(() => {
-                            if (map.hasLayer(cartoDB)) { 
-                                map.removeLayer(cartoDB); 
-                                map.addLayer(googleSat); 
-                                btn.style.backgroundColor = '#2563eb'; 
-                                svg.setAttribute('stroke', '#ffffff'); 
-                            }
-                            else { 
+                            if (map.hasLayer(googleSat)) { 
                                 map.removeLayer(googleSat); 
                                 map.addLayer(cartoDB); 
                                 btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
                                 svg.setAttribute('stroke', svgColor); 
+                            }
+                            else { 
+                                map.removeLayer(cartoDB); 
+                                map.addLayer(googleSat); 
+                                btn.style.backgroundColor = '#2563eb'; 
+                                svg.setAttribute('stroke', '#ffffff'); 
                             }
                         }, 200);
                     });
@@ -373,17 +375,29 @@
             try {
                 let geojson = null;
                 let lat = null, lon = null;
-                if (item.latitude && item.longitude) { lat = parseFloat(item.latitude); lon = parseFloat(item.longitude); }
-                else if (item.coords) {
+                
+                // 1. Try Direct Lat/Lng
+                if (item.latitude && item.longitude) { 
+                    lat = parseFloat(item.latitude); 
+                    lon = parseFloat(item.longitude); 
+                } 
+                // 2. Try Comma-Separated Coords
+                else if (item.coords && item.coords.includes(',')) {
                     let p = item.coords.toString().split(',');
-                    if (p.length === 2) { lat = healCoordinate(p[0], true); lon = healCoordinate(p[1], false); }
+                    if (p.length === 2) { 
+                        lat = healCoordinate(p[0], true); 
+                        lon = healCoordinate(p[1], false); 
+                    }
                 }
 
+                // 3. Build Point GeoJSON or parse WKT
                 if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) { 
                     geojson = { type: 'Point', coordinates: [lon, lat] }; 
-                } else if (item.wkt) {
-                    geojson = parseWKTUniversal(item.wkt);
+                } else {
+                    const wktSource = item.wkt || item.coords || item.koordinat;
+                    if (wktSource) geojson = parseWKTUniversal(wktSource);
                 }
+
                 if (!geojson) return;
 
                 let markerColor = colorMap[type] || '#ef4444';
