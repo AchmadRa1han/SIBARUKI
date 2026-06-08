@@ -36,6 +36,9 @@ class Pisew extends BaseController
             $query = $query->where('kecamatan', $selected_kecamatan);
         }
 
+        $db = \Config\Database::connect();
+        $kecamatans = $db->table('kode_kecamatan')->select('kecamatan_nama as kecamatan')->distinct()->orderBy('kecamatan_nama', 'ASC')->get()->getResultArray();
+
         $data = [
             'title' => 'Data PISEW',
             'permukiman_pisew' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
@@ -43,7 +46,7 @@ class Pisew extends BaseController
             'pager' => $this->pisewModel->pager,
             'perPage' => $perPage,
             'search' => $search,
-            'kecamatans' => $this->pisewModel->select('kecamatan')->distinct()->findAll(),
+            'kecamatans' => $kecamatans,
             'selected_kecamatan' => $selected_kecamatan,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
@@ -99,7 +102,7 @@ class Pisew extends BaseController
 
     public function importCsv()
     {
-        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        if (!has_permission('manage_pisew')) return redirect()->back()->with('error', 'Izin ditolak.');
         
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
@@ -164,36 +167,12 @@ class Pisew extends BaseController
 
     public function create()
     {
-        return view('pisew/create', ['title' => 'Tambah PISEW']);
-    }
-
-    public function store()
-    {
-        $data = $this->request->getPost();
-
-        // Handle Foto Before & After
-        $uploadPath = FCPATH . 'uploads/pisew/';
-        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
-
-        foreach (['foto_before', 'foto_after'] as $field) {
-            $img = $this->request->getFile($field);
-            if ($img && $img->isValid() && !$img->hasMoved()) {
-                $newName = $img->getRandomName();
-                $img->move($uploadPath, $newName);
-                $data[$field] = $newName;
-            }
-        }
-
-        $this->pisewModel->insert($data);
-        $this->logActivity('Tambah', 'PISEW', "Menambah data PISEW: {$data['jenis_pekerjaan']}", $this->formatLogData($data));
-        return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil ditambahkan.');
+        return redirect()->to('/permukiman_pisew')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah.');
     }
 
     public function edit($id)
     {
-        $data['item'] = $this->pisewModel->find($id);
-        $data['title'] = 'Edit PISEW';
-        return view('pisew/edit', $data);
+        return redirect()->to('/permukiman_pisew')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit pada tabel.');
     }
 
     public function update($id)

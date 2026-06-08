@@ -42,53 +42,66 @@
 <!-- 2. METRICS GRID -->
 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
     <?php 
+    $role = session()->get('role_name');
     $metrics = [
         ['rumah', 'home', 'blue', 'TOTAL RUMAH', base_url('rtlh/rekap-desa')],
         ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('rtlh/rekap-desa')],
         ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('rtlh/rekap-desa')],
         ['rtlh', 'home', 'amber', 'RTLH (SASARAN)', base_url('rtlh')],
-        ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],
-        ['psu', 'route', 'slate', 'PSU', base_url('psu')],
-        ['pisew', 'map', 'orange', 'PISEW', base_url('pisew')],
-        ['aset', 'layers', 'emerald', 'ASET', base_url('aset-tanah')],
-        ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
     ];
-    foreach($metrics as $m): ?>
-        <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-500 group block relative overflow-hidden">
-            <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-inner">
-                <i data-lucide="<?= $m[1] ?>" class="w-5 h-5" stroke-width="2"></i>
-            </div>
-            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-0.5"><?= $m[3] ?></p>
-            <h3 class="text-xl font-bold text-blue-950 dark:text-white tracking-tighter"><?= number_format($rekap[$m[0]]) ?></h3>
-        </a>
-        <?php endforeach; ?>
-    </div>
 
-    <!-- 3. TACTICAL COMMAND MAP -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col transition-all duration-500 relative">
-        <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white dark:bg-slate-900 relative z-10">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
-                    <i data-lucide="map" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h3 class="text-base font-bold text-blue-950 dark:text-white uppercase tracking-tight">Database Spasial Terpadu</h3>
-                    <div class="flex items-center gap-2 mt-0.5">
-                        <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div>
-                        <span id="activeLayerLabel" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Memuat...</span>
-                    </div>
-                </div>
+    // Add more metrics only for admin
+    if ($role === 'admin') {
+        $metrics = array_merge($metrics, [
+            ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],
+            ['psu', 'route', 'slate', 'PSU', base_url('psu')],
+            ['pisew', 'map', 'orange', 'PISEW', base_url('pisew')],
+            ['aset', 'layers', 'emerald', 'ASET', base_url('aset-tanah')],
+            ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
+        ]);
+    }
+
+    foreach($metrics as $m): ?>
+    <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-500 group block relative overflow-hidden">
+        <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-inner">
+            <i data-lucide="<?= $m[1] ?>" class="w-5 h-5" stroke-width="2"></i>
+        </div>
+        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-0.5"><?= $m[3] ?></p>
+        <h3 class="text-xl font-bold text-blue-950 dark:text-white tracking-tighter"><?= number_format($rekap[$m[0]]) ?></h3>
+    </a>
+    <?php endforeach; ?>
+</div>
+
+<!-- 3. TACTICAL COMMAND MAP -->
+<div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col transition-all duration-500 relative">
+    <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white dark:bg-slate-900 relative z-10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                <i data-lucide="map" class="w-6 h-6"></i>
             </div>
-            <div class="flex flex-wrap gap-1.5">
-                <?php foreach(['rtlh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'] as $l): ?>
-                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
-                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))) ?>" class="w-3 h-3"></i> <?= $l == 'formal' ? 'PERUMAHAN' : strtoupper($l) ?>
-                </button>
-                <?php endforeach; ?>
+            <div>
+                <h3 class="text-base font-bold text-blue-950 dark:text-white uppercase tracking-tight">Database Spasial Terpadu</h3>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div>
+                    <span id="activeLayerLabel" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Memuat...</span>
+                </div>
             </div>
         </div>
-        <div id="tacticalMap" class="h-[55vh] lg:h-[65vh] w-full z-0 bg-slate-50 dark:bg-slate-950"></div>
+        <div class="flex flex-wrap gap-1.5">
+            <?php 
+            $layers = ['rtlh'];
+            if ($role === 'admin') {
+                $layers = ['rtlh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'];
+            }
+            foreach($layers as $l): ?>
+            <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
+                <i data-lucide="<?= $l=='rtlh'?'home':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))) ?>" class="w-3 h-3"></i> <?= $l == 'formal' ? 'PERUMAHAN' : strtoupper($l) ?>
+            </button>
+            <?php endforeach; ?>
+        </div>
     </div>
+    <div id="tacticalMap" class="h-[55vh] lg:h-[65vh] w-full z-0 bg-slate-50 dark:bg-slate-950"></div>
+</div>
 
     <!-- 4. BOTTOM ANALYTICS -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

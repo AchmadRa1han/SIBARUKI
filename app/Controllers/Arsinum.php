@@ -36,6 +36,9 @@ class Arsinum extends BaseController
             $query = $query->where('kecamatan', $selected_kecamatan);
         }
 
+        $db = \Config\Database::connect();
+        $kecamatans = $db->table('kode_kecamatan')->select('kecamatan_nama as kecamatan')->distinct()->orderBy('kecamatan_nama', 'ASC')->get()->getResultArray();
+
         $data = [
             'title' => 'Data ARSINUM',
             'permukiman_arsinum' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
@@ -43,7 +46,7 @@ class Arsinum extends BaseController
             'pager' => $this->arsinumModel->pager,
             'perPage' => $perPage,
             'search' => $search,
-            'kecamatans' => $this->arsinumModel->select('kecamatan')->distinct()->findAll(),
+            'kecamatans' => $kecamatans,
             'selected_kecamatan' => $selected_kecamatan,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
@@ -99,7 +102,7 @@ class Arsinum extends BaseController
 
     public function importCsv()
     {
-        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        if (!has_permission('manage_arsinum')) return redirect()->back()->with('error', 'Izin ditolak.');
         
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
@@ -167,7 +170,7 @@ class Arsinum extends BaseController
 
     public function create()
     {
-        return view('arsinum/create', ['title' => 'Tambah Arsinum']);
+        return redirect()->to('/arsinum')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah.');
     }
 
     public function store()
@@ -194,10 +197,7 @@ class Arsinum extends BaseController
 
     public function edit($id)
     {
-        $data['item'] = $this->arsinumModel->find($id);
-        if (!$data['item']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        $data['title'] = 'Edit Arsinum';
-        return view('arsinum/edit', $data);
+        return redirect()->to('/arsinum')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit pada tabel.');
     }
 
     public function update($id)

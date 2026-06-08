@@ -85,7 +85,7 @@ class PerumahanFormal extends BaseController
 
     public function importCsv()
     {
-        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        if (!has_permission('manage_formal')) return redirect()->back()->with('error', 'Izin ditolak.');
 
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
@@ -144,7 +144,7 @@ class PerumahanFormal extends BaseController
 
     public function store()
     {
-        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        if (!has_permission('manage_formal')) return redirect()->back()->with('error', 'Izin ditolak.');
 
         $rules = [
             'nama_perumahan' => 'required',

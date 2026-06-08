@@ -159,7 +159,7 @@ class AsetTanah extends BaseController
 
     public function importCsv()
     {
-        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        if (!has_permission('manage_asettanah')) return redirect()->back()->with('error', 'Izin ditolak.');
         
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
@@ -294,7 +294,7 @@ class AsetTanah extends BaseController
 
     public function store()
     {
-        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        if (!has_permission('manage_asettanah')) return redirect()->back()->with('error', 'Izin ditolak.');
         $data = $this->request->getPost();
         $this->asetModel->insert($data);
         $this->logActivity('Tambah', 'Aset Tanah', "Menambah aset tanah baru: " . ($data['nama_pemilik'] ?? 'Untitled'), $this->formatLogData($data));
@@ -303,7 +303,7 @@ class AsetTanah extends BaseController
 
     public function update($id)
     {
-        if (!has_permission('edit_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        if (!has_permission('manage_asettanah')) return redirect()->back()->with('error', 'Izin ditolak.');
         
         $oldData = $this->asetModel->find($id);
         $data = $this->request->getPost();

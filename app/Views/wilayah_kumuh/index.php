@@ -107,6 +107,16 @@
                     <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                 </div>
 
+                <div class="relative w-full md:w-40">
+                    <select name="kecamatan" onchange="submitWithScroll(this)" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none">
+                        <option value="">Semua Wilayah</option>
+                        <?php foreach(($kecamatans ?? []) as $k): ?>
+                            <option value="<?= $k['kecamatan'] ?>" <?= (service('request')->getGet('kecamatan') == $k['kecamatan']) ? 'selected' : '' ?>><?= $k['kecamatan'] ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+
                 <div class="relative w-full md:w-64">
                     <input type="text" name="keyword" value="<?= service('request')->getGet('keyword') ?? '' ?>" placeholder="Cari Kelurahan / Kawasan..." class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[9px] font-bold uppercase px-3 py-2 pl-10 focus:ring-2 focus:ring-blue-500 transition-all">
                     <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>

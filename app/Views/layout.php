@@ -119,17 +119,18 @@
                         <div id="dropdown-perumahan" class="dropdown-container">
                             <div class="dropdown-content pl-20 mt-1 space-y-1 text-slate-400">
                                 <a href="<?= base_url('rtlh') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh') || (url_is('rtlh/*') && !url_is('rtlh/rekap-desa') && !url_is('rtlh/backlog'))) ? 'text-blue-400 font-bold' : '' ?>">Data Rumah</a>
-                                <?php if (session()->get('role_id') == 1): ?>
+                                <?php if (session()->get('role_name') === 'admin'): ?>
                                 <a href="<?= base_url('rtlh/rekap-desa') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh/rekap-desa*')) ? 'text-blue-400 font-bold' : '' ?>">Rekapitulasi Desa</a>
                                 <a href="<?= base_url('rtlh/backlog') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('rtlh/backlog*')) ? 'text-blue-400 font-bold' : '' ?>">Manajemen Backlog</a>
-                                <?php endif; ?>
                                 <a href="<?= base_url('psu') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('psu*')) ? 'text-blue-400 font-bold' : '' ?>">PSU Terbangun</a>
                                 <a href="<?= base_url('perumahan-formal') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('perumahan-formal*')) ? 'text-blue-400 font-bold' : '' ?>">Perumahan</a>
+                                <?php endif; ?>
                                 <a href="<?= base_url('bansos-rtlh') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('bansos-rtlh*')) ? 'text-blue-400 font-bold' : '' ?>">Bansos RTLH</a>
                             </div>
                         </div>
                     </div>
 
+                    <?php if (session()->get('role_name') === 'admin'): ?>
                     <div class="pt-1">
                         <button onclick="toggleDropdown('dropdown-permukiman', 'arrow-permukiman')" class="w-full flex items-center h-11 transition-all duration-300 hover:bg-slate-800/50 hover:text-white group">
                             <div class="sidebar-icon-box"><i data-lucide="map" class="w-4.5 h-4.5"></i></div>
@@ -138,6 +139,7 @@
                         </button>
                         <div id="dropdown-permukiman" class="dropdown-container">
                             <div class="dropdown-content pl-20 mt-1 space-y-1 text-slate-400">
+                                <a href="<?= base_url('wilayah-kumuh') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('wilayah-kumuh')) ? 'text-blue-400 font-bold' : '' ?>">Wilayah Kumuh</a>
                                 <a href="<?= base_url('permukiman_pisew') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('pisew*')) ? 'text-blue-400 font-bold' : '' ?>">PISEW</a>
                                 <a href="<?= base_url('arsinum') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('arsinum*')) ? 'text-blue-400 font-bold' : '' ?>">Arsinum</a>
                             </div>
@@ -156,11 +158,14 @@
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
 
+                    <?php if (session()->get('role_name') === 'admin'): ?>
                     <a href="<?= base_url('sys_settings') ?>" class="flex items-center h-11 w-full transition-all duration-300 <?= (url_is('sys_settings*')) ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800/50 hover:text-white' ?>">
                         <div class="sidebar-icon-box"><i data-lucide="settings" class="w-4.5 h-4.5"></i></div>
                         <span class="text-sm font-bold sidebar-text">Pengaturan</span>
                     </a>
+                    <?php endif; ?>
                 </nav>
 
                 <!-- Footer -->

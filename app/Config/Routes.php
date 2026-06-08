@@ -104,7 +104,6 @@ $routes->group('rtlh', function($routes) {
     $routes->get('api-detail/(:num)', 'Rtlh::getApiDetail/$1');
 });
 
-/** 
 $routes->group('wilayah-kumuh', function($routes) {
     $routes->get('/', 'WilayahKumuh::index');
     $routes->get('export-excel', 'WilayahKumuh::exportExcel');
@@ -119,7 +118,6 @@ $routes->group('wilayah-kumuh', function($routes) {
     $routes->post('delete/(:num)', 'WilayahKumuh::delete/$1');
     $routes->post('bulk-delete', 'WilayahKumuh::bulkDelete');
 });
-**/
 
 $routes->group('bansos-rtlh', function($routes) {
     $routes->get('/', 'BansosRtlh::index');
@@ -133,7 +131,6 @@ $routes->group('bansos-rtlh', function($routes) {
 });
 
 // SISTEM & PENGATURAN
-/**
 $routes->group('sys_roles', function($routes) {
     $routes->get('/', 'Roles::index');
     $routes->get('create', 'Roles::create');
@@ -150,7 +147,6 @@ $routes->group('sys_users', function($routes) {
     $routes->post('delete/(:num)', 'Users::delete/$1');
     $routes->post('bulk-delete', 'Users::bulkDelete');
 });
-**/
 
 $routes->get('logs', 'Logs::index');
 $routes->get('logs/clear', 'Logs::clear');

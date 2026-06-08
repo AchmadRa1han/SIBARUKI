@@ -30,6 +30,9 @@ class WilayahKumuh extends BaseController
 
         $kumuh = $query->paginate($perPage, 'group1');
         
+        $db = \Config\Database::connect();
+        $kecamatans = $db->table('kode_kecamatan')->select('kecamatan_nama as kecamatan')->distinct()->orderBy('kecamatan_nama', 'ASC')->get()->getResultArray();
+
         $data = [
             'title' => 'Data Wilayah Kumuh',
             'kumuh' => $kumuh,
@@ -37,6 +40,7 @@ class WilayahKumuh extends BaseController
             'pager' => $this->kumuhModel->pager,
             'perPage' => $perPage,
             'keyword' => $keyword,
+            'kecamatans' => $kecamatans
         ];
 
         return view('wilayah_kumuh/index', $data);
@@ -100,7 +104,7 @@ class WilayahKumuh extends BaseController
 
     public function importCsv()
     {
-        if (!has_permission('create_rtlh')) return redirect()->back()->with('error', 'Izin ditolak.');
+        if (!has_permission('manage_kumuh')) return redirect()->back()->with('error', 'Izin ditolak.');
         
         $file = $this->request->getFile('csv_file');
         if (!$file || !$file->isValid()) return redirect()->back()->with('error', 'File tidak valid.');
