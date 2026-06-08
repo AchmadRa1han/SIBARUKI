@@ -23,7 +23,7 @@ class Roles extends BaseController
     {
         $data = [
             'title' => 'Manajemen Role',
-            'sys_roles' => $this->roleModel->findAll(),
+            'roles' => $this->roleModel->findAll(),
         ];
         return view('roles/index', $data);
     }
@@ -32,7 +32,7 @@ class Roles extends BaseController
     {
         $data = [
             'title' => 'Tambah Role Baru',
-            'sys_permissions' => $this->permissionModel->findAll(),
+            'permissions' => $this->permissionModel->findAll(),
         ];
         return view('roles/create', $data);
     }
@@ -50,7 +50,7 @@ class Roles extends BaseController
         $this->roleModel->insert($roleData);
         $roleId = $this->roleModel->insertID();
 
-        $permissions = $this->request->getPost('sys_permissions');
+        $permissions = $this->request->getPost('permissions');
         if (!empty($permissions)) {
             $pivotData = [];
             foreach ($permissions as $permId) {
@@ -85,7 +85,7 @@ class Roles extends BaseController
         $data = [
             'title'         => 'Edit Role: ' . $role['role_name'],
             'role'          => $role,
-            'sys_permissions'   => $this->permissionModel->findAll(),
+            'permissions'   => $this->permissionModel->findAll(),
             'activePerms'   => $activePermIds,
         ];
         return view('roles/edit', $data);
@@ -103,10 +103,10 @@ class Roles extends BaseController
 
         $this->roleModel->update($id, $roleData);
 
-        // Reset and update sys_permissions
+        // Reset and update permissions
         $this->rolePermissionModel->where('role_id', $id)->delete();
 
-        $permissions = $this->request->getPost('sys_permissions');
+        $permissions = $this->request->getPost('permissions');
         if (!empty($permissions)) {
             $pivotData = [];
             foreach ($permissions as $permId) {

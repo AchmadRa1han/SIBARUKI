@@ -37,7 +37,7 @@ class RefMaster extends BaseController
 
         $data = [
             'title' => 'Referensi Master',
-            'sys_ref_master' => $builder->paginate(25, 'group1'),
+            'ref_master' => $builder->paginate(25, 'group1'),
             'pager' => $this->refModel->pager
         ];
 
