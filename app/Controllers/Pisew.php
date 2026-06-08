@@ -150,7 +150,7 @@ class Pisew extends BaseController
             if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
 
             $this->logActivity('Import', 'PISEW', "Berhasil mengimpor $count data PISEW via Excel");
-            return redirect()->to('/permukiman_pisew')->with('success', "$count data PISEW berhasil diimpor.");
+            return redirect()->to('/pisew')->with('success', "$count data PISEW berhasil diimpor.");
         } catch (\Exception $e) {
             $db->transRollback();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
@@ -167,12 +167,12 @@ class Pisew extends BaseController
 
     public function create()
     {
-        return redirect()->to('/permukiman_pisew')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah.');
+        return redirect()->to('/pisew')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah.');
     }
 
     public function edit($id)
     {
-        return redirect()->to('/permukiman_pisew')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit pada tabel.');
+        return redirect()->to('/pisew')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit pada tabel.');
     }
 
     public function update($id)
