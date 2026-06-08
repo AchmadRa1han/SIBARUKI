@@ -55,6 +55,11 @@ $routes->group('pisew', function($routes) {
     $routes->post('bulk-delete', 'Pisew::bulkDelete');
 });
 
+// Alias redirect untuk route lama
+$routes->get('permukiman_pisew', 'Pisew::index');
+$routes->get('permukiman_pisew/(:any)', 'Pisew::$1');
+$routes->post('permukiman_pisew/(:any)', 'Pisew::$1');
+
 $routes->group('arsinum', function($routes) {
     $routes->get('/', 'Arsinum::index');
     $routes->get('export-excel', 'Arsinum::exportExcel');
@@ -67,6 +72,11 @@ $routes->group('arsinum', function($routes) {
     $routes->post('delete/(:num)', 'Arsinum::delete/$1');
     $routes->post('bulk-delete', 'Arsinum::bulkDelete');
 });
+
+// Alias redirect untuk route lama
+$routes->get('permukiman_arsinum', 'Arsinum::index');
+$routes->get('permukiman_arsinum/(:any)', 'Arsinum::$1');
+$routes->post('permukiman_arsinum/(:any)', 'Arsinum::$1');
 
 $routes->group('aset-tanah', function($routes) {
     $routes->get('get-desa', 'AsetTanah::getDesaByKecamatan');
@@ -119,6 +129,11 @@ $routes->group('wilayah-kumuh', function($routes) {
     $routes->post('delete/(:num)', 'WilayahKumuh::delete/$1');
     $routes->post('bulk-delete', 'WilayahKumuh::bulkDelete');
 });
+
+// Alias redirect untuk route lama
+$routes->get('wilayah_kumuh', 'WilayahKumuh::index');
+$routes->get('wilayah_kumuh/(:any)', 'WilayahKumuh::$1');
+$routes->post('wilayah_kumuh/(:any)', 'WilayahKumuh::$1');
 
 $routes->group('bansos-rtlh', function($routes) {
     $routes->get('/', 'BansosRtlh::index');

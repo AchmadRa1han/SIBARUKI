@@ -140,7 +140,7 @@
                         <div id="dropdown-permukiman" class="dropdown-container">
                             <div class="dropdown-content pl-20 mt-1 space-y-1 text-slate-400">
                                 <a href="<?= base_url('wilayah-kumuh') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('wilayah-kumuh')) ? 'text-blue-400 font-bold' : '' ?>">Wilayah Kumuh</a>
-                                <a href="<?= base_url('permukiman_pisew') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('pisew*')) ? 'text-blue-400 font-bold' : '' ?>">PISEW</a>
+                                <a href="<?= base_url('pisew') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('pisew*')) ? 'text-blue-400 font-bold' : '' ?>">PISEW</a>
                                 <a href="<?= base_url('arsinum') ?>" class="block py-1.5 text-xs hover:text-white <?= (url_is('arsinum*')) ? 'text-blue-400 font-bold' : '' ?>">Arsinum</a>
                             </div>
                         </div>
