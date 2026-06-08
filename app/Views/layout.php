@@ -313,7 +313,7 @@
             const sidebar = document.getElementById('main-sidebar');
             if (localStorage.getItem('sidebarState') === 'collapsed' && window.innerWidth >= 1024) { sidebar.classList.add('sidebar-collapsed', 'lg:w-20'); sidebar.classList.remove('lg:w-64'); updateToggleIcon(true); }
             const path = window.location.pathname;
-            const dropdowns = [ { id: 'dropdown-perumahan', arrow: 'arrow-perumahan', paths: ['rtlh', 'psu', 'perumahan-formal', 'bansos-rtlh'] }, { id: 'dropdown-permukiman', arrow: 'arrow-permukiman', paths: ['permukiman_pisew', 'arsinum'] }, { id: 'dropdown-pertanahan', arrow: 'arrow-pertanahan', paths: ['aset-tanah'] } ];
+            const dropdowns = [ { id: 'dropdown-perumahan', arrow: 'arrow-perumahan', paths: ['rtlh', 'psu', 'perumahan-formal', 'bansos-rtlh'] }, { id: 'dropdown-permukiman', arrow: 'arrow-permukiman', paths: ['wilayah-kumuh', 'pisew', 'arsinum'] }, { id: 'dropdown-pertanahan', arrow: 'arrow-pertanahan', paths: ['aset-tanah'] } ];
             dropdowns.forEach(item => { if (item.paths.some(p => path.includes(p)) || localStorage.getItem(item.id) === 'open') openDropdown(item.id, item.arrow); });
             <?php if (session()->getFlashdata('success')): ?> showToast("<?= session()->getFlashdata('success') ?>", 'success'); <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?> showToast("<?= session()->getFlashdata('error') ?>", 'error'); <?php endif; ?>
