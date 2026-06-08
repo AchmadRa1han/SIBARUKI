@@ -164,7 +164,7 @@
         
         <?php if (isset($pager)): ?>
         <div class="p-8 border-t dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/50">
-            <?= $pager->links('group1', 'tailwind_full') ?>
+            <?= $pager->links('default', 'tailwind_full') ?>
         </div>
         <?php endif; ?>
     </div>

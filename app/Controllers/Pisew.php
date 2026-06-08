@@ -23,35 +23,38 @@ class Pisew extends BaseController
         $sortBy = $this->request->getGet('sort_by') ?? 'id';
         $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
 
-        $query = $this->pisewModel;
+        $model = new PisewModel();
 
-        if ($search) {
-            $query = $query->groupStart()
+        if (!empty($search)) {
+            $model->groupStart()
                 ->like('jenis_pekerjaan', $search)
                 ->orLike('lokasi_desa', $search)
                 ->groupEnd();
         }
 
-        if ($selected_kecamatan) {
-            $query = $query->where('kecamatan', $selected_kecamatan);
+        if (!empty($selected_kecamatan)) {
+            $model->where('kecamatan', $selected_kecamatan);
         }
+
+        $pisew = $model->orderBy($sortBy, $sortOrder)->paginate($perPage);
+        $pager = $model->pager;
 
         $db = \Config\Database::connect();
         $kecamatans = $db->table('kode_kecamatan')->select('kecamatan_nama as kecamatan')->distinct()->orderBy('kecamatan_nama', 'ASC')->get()->getResultArray();
 
         $data = [
             'title' => 'Data PISEW',
-            'pisew' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
-            'pisew_all' => $this->pisewModel->findAll(),
-            'pager' => $this->pisewModel->pager,
+            'pisew' => $pisew,
+            'pager' => $pager,
+            'pisew_all' => (new PisewModel())->findAll(),
             'perPage' => $perPage,
             'search' => $search,
             'kecamatans' => $kecamatans,
             'selected_kecamatan' => $selected_kecamatan,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
-            'total_kegiatan' => $this->pisewModel->countAllResults(false),
-            'total_anggaran' => $this->pisewModel->selectSum('anggaran')->get()->getRow()->anggaran ?? 0,
+            'total_kegiatan' => (new PisewModel())->countAllResults(false),
+            'total_anggaran' => (new PisewModel())->selectSum('anggaran')->get()->getRow()->anggaran ?? 0,
         ];
 
         return view('pisew/index', $data);

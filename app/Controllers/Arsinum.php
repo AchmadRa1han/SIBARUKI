@@ -23,35 +23,38 @@ class Arsinum extends BaseController
         $sortBy = $this->request->getGet('sort_by') ?? 'id';
         $sortOrder = $this->request->getGet('sort_order') ?? 'desc';
 
-        $query = $this->arsinumModel;
+        $model = new ArsinumModel();
 
-        if ($search) {
-            $query = $query->groupStart()
+        if (!empty($search)) {
+            $model->groupStart()
                 ->like('jenis_pekerjaan', $search)
                 ->orLike('desa', $search)
                 ->groupEnd();
         }
 
-        if ($selected_kecamatan) {
-            $query = $query->where('kecamatan', $selected_kecamatan);
+        if (!empty($selected_kecamatan)) {
+            $model->where('kecamatan', $selected_kecamatan);
         }
+
+        $arsinum = $model->orderBy($sortBy, $sortOrder)->paginate($perPage);
+        $pager = $model->pager;
 
         $db = \Config\Database::connect();
         $kecamatans = $db->table('kode_kecamatan')->select('kecamatan_nama as kecamatan')->distinct()->orderBy('kecamatan_nama', 'ASC')->get()->getResultArray();
 
         $data = [
             'title' => 'Data ARSINUM',
-            'arsinum' => $query->orderBy($sortBy, $sortOrder)->paginate($perPage, 'group1'),
-            'arsinum_all' => $this->arsinumModel->findAll(),
-            'pager' => $this->arsinumModel->pager,
+            'arsinum' => $arsinum,
+            'pager' => $pager,
+            'arsinum_all' => (new ArsinumModel())->findAll(),
             'perPage' => $perPage,
             'search' => $search,
             'kecamatans' => $kecamatans,
             'selected_kecamatan' => $selected_kecamatan,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
-            'total_unit' => $this->arsinumModel->countAllResults(false),
-            'total_anggaran' => $this->arsinumModel->selectSum('anggaran')->get()->getRow()->anggaran ?? 0,
+            'total_unit' => (new ArsinumModel())->countAllResults(false),
+            'total_anggaran' => (new ArsinumModel())->selectSum('anggaran')->get()->getRow()->anggaran ?? 0,
         ];
 
         return view('arsinum/index', $data);
