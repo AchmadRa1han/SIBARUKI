@@ -38,25 +38,28 @@ class AsetTanah extends BaseController
             ->get()->getResultArray();
 
         $mainQuery = new AsetTanahModel();
-        if ($search) {
-            $mainQuery->groupStart()
-                ->like('nama_pemilik', $search)
-                ->orLike('no_sertifikat', $search)
-                ->orLike('lokasi', $search)
-                ->groupEnd();
-        }
+        $mapQuery = new AsetTanahModel();
 
-        if ($selected_kecamatan) {
-            $mainQuery->where('kecamatan', $selected_kecamatan);
-        }
+        // 2. APPLY FILTERS (Consistent for both Table and Map)
+        foreach ([$mainQuery, $mapQuery] as $q) {
+            if ($search) {
+                $q->groupStart()
+                    ->like('nama_pemilik', $search)
+                    ->orLike('no_sertifikat', $search)
+                    ->orLike('lokasi', $search)
+                    ->groupEnd();
+            }
 
-        if ($status_sertifikat === 'Bersertifikat') {
-            $mainQuery->where('no_sertifikat !=', 'Belum Bersertifikat');
-        } elseif ($status_sertifikat === 'Belum Bersertifikat') {
-            $mainQuery->where('no_sertifikat', 'Belum Bersertifikat');
-        }
+            if ($selected_kecamatan) {
+                $q->where('kecamatan', $selected_kecamatan);
+            }
 
-        $mapQuery = clone $mainQuery;
+            if ($status_sertifikat === 'Bersertifikat') {
+                $q->where('no_sertifikat !=', 'Belum Bersertifikat');
+            } elseif ($status_sertifikat === 'Belum Bersertifikat') {
+                $q->where('no_sertifikat', 'Belum Bersertifikat');
+            }
+        }
 
         // Fetch All Wilayah from Master Table (kode_kecamatan)
         $kecamatans = $db->table('kode_kecamatan')
