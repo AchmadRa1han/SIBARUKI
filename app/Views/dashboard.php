@@ -40,7 +40,8 @@
         </div>
     </div>
 <!-- 2. METRICS GRID -->
-<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
+<!-- 2. METRICS GRID -->
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
     <?php 
     $role = session()->get('role_name');
     $metrics = [
@@ -48,11 +49,13 @@
         ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('rtlh/rekap-desa')],
         ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('rtlh/rekap-desa')],
         ['rtlh', 'home', 'amber', 'RTLH (SASARAN)', base_url('rtlh')],
+        ['bansos', 'gift', 'indigo', 'BANSOS RTLH', base_url('bansos-rtlh')],
     ];
 
     // Add more metrics only for admin
     if ($role === 'admin') {
         $metrics = array_merge($metrics, [
+            ['kumuh', 'map-pin', 'rose', 'KUMUH', base_url('wilayah-kumuh')],
             ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],
             ['psu', 'route', 'slate', 'PSU', base_url('psu')],
             ['pisew', 'map', 'orange', 'PISEW', base_url('pisew')],
@@ -91,11 +94,11 @@
             <?php 
             $layers = ['rtlh'];
             if ($role === 'admin') {
-                $layers = ['rtlh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'];
+                $layers = ['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'];
             }
             foreach($layers as $l): ?>
             <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
-                <i data-lucide="<?= $l=='rtlh'?'home':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))) ?>" class="w-3 h-3"></i> <?= $l == 'formal' ? 'PERUMAHAN' : strtoupper($l) ?>
+                <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'check-circle':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= ($l == 'formal' ? 'PERUMAHAN' : ($l == 'rtlh' ? 'RTLH' : strtoupper($l))) ?>
             </button>
             <?php endforeach; ?>
         </div>
@@ -120,6 +123,36 @@
             </h3>
             <div id="asetLegalitasChart" class="flex justify-center"></div>
         </div>
+
+        <!-- DATA INTEGRITY (ADMIN ONLY) -->
+        <?php if ($role === 'admin'): ?>
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-32 h-32 bg-rose-50 dark:bg-rose-900/10 rounded-full blur-3xl"></div>
+            <h3 class="text-[9px] font-bold text-rose-600 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+                <span class="w-6 h-[2px] bg-rose-600"></span> Integritas & Kualitas Data
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                <div class="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                    <div class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-rose-500 shadow-lg">
+                        <i data-lucide="map-pin-off" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-blue-950 dark:text-white leading-tight"><?= number_format($health['coords']) ?></p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Koordinat Kosong / Titik Nol</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                    <div class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-amber-500 shadow-lg">
+                        <i data-lucide="file-warning" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-blue-950 dark:text-white leading-tight"><?= number_format($health['kk']) ?></p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Data NIK / No. KK Tidak Lengkap</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 

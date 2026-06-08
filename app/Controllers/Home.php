@@ -63,6 +63,7 @@ class Home extends BaseController
         $totalArsinum = $db->table('permukiman_arsinum')->countAllResults();
         $totalPisew = $db->table('permukiman_pisew')->countAllResults();
         $totalAset = $db->table('pertanahan_aset')->countAllResults();
+        $totalBansos = $db->table('perumahan_rtlh_bansos')->countAllResults();
 
         // Data Spasial Publik (Limit untuk performa)
         $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
@@ -213,6 +214,9 @@ class Home extends BaseController
         // PISEW
         $totalPisew = $db->table('permukiman_pisew')->countAllResults();
 
+        // Bansos RTLH
+        $totalBansos = $db->table('perumahan_rtlh_bansos')->countAllResults();
+
         // Aset Tanah
         $totalAset = $db->table('pertanahan_aset')->countAllResults();
 
@@ -339,7 +343,8 @@ class Home extends BaseController
                 'psu'       => $totalPsu,
                 'pisew'     => $totalPisew,
                 'aset'      => $totalAset,
-                'arsinum'   => $totalArsinum
+                'arsinum'   => $totalArsinum,
+                'bansos'    => $totalBansos
             ],
             'statusLayak'   => $statusLayak,
             'statusAset'    => $statusAset,
