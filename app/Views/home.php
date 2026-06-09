@@ -410,7 +410,23 @@
 
                 let detailsHtml = '';
                 let imgHtml = '';
-                if (item.image) {
+
+                if (type === 'rtlh') {
+                    let photos = [];
+                    if (item.image) photos.push(item.image);
+                    if (item.foto_samping) photos.push(item.foto_samping);
+                    if (item.foto_belakang) photos.push(item.foto_belakang);
+                    if (item.foto_dalam) photos.push(item.foto_dalam);
+                    
+                    if (photos.length > 0) {
+                        let gridClass = photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2';
+                        imgHtml = `<div class="grid ${gridClass} gap-1 mb-3">`;
+                        photos.slice(0, 4).forEach(p => {
+                            imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`;
+                        });
+                        imgHtml += `</div>`;
+                    }
+                } else if (item.image) {
                     let folder = 'rtlh';
                     if (type === 'psu') folder = 'psu';
                     else if (type === 'bansos') folder = 'rtlh'; // Bansos uses same upload path

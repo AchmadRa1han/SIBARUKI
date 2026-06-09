@@ -56,7 +56,7 @@ class Rtlh extends BaseController
         // Data untuk Map
         $db = \Config\Database::connect();
         $rumah_all = $db->table('perumahan_rtlh_rumah')
-                        ->select('id_survei, desa, ST_AsText(lokasi_koordinat) as wkt, nik_pemilik, status_bantuan')
+                        ->select('id_survei, desa, ST_AsText(lokasi_koordinat) as wkt, nik_pemilik, status_bantuan, foto_depan, foto_samping, foto_belakang, foto_dalam')
                         ->where('lokasi_koordinat IS NOT NULL')
                         ->where('lokasi_koordinat !=', '')
                         ->limit(1000)

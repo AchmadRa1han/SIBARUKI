@@ -68,7 +68,7 @@ class Home extends BaseController
         // Data Spasial Publik (Limit untuk performa)
         $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
         $mapRtlh = $db->table('perumahan_rtlh_rumah')
-                       ->select('perumahan_rtlh_rumah.id_survei as id, perumahan_rtlh_penerima.nama_kepala_keluarga as name, perumahan_rtlh_rumah.desa, ST_AsText(perumahan_rtlh_rumah.lokasi_koordinat) as wkt, perumahan_rtlh_rumah.foto_depan as image')
+                       ->select('perumahan_rtlh_rumah.id_survei as id, perumahan_rtlh_penerima.nama_kepala_keluarga as name, perumahan_rtlh_rumah.desa, ST_AsText(perumahan_rtlh_rumah.lokasi_koordinat) as wkt, "rtlh" as type, perumahan_rtlh_rumah.foto_depan as image, perumahan_rtlh_rumah.foto_samping, perumahan_rtlh_rumah.foto_belakang, perumahan_rtlh_rumah.foto_dalam')
                        ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left')
                        ->where('perumahan_rtlh_rumah.lokasi_koordinat IS NOT NULL')
                        ->where('perumahan_rtlh_rumah.lokasi_koordinat !=', '')
@@ -290,10 +290,11 @@ class Home extends BaseController
 
         // Markers RTLH (Tipe: POINT/GEOMETRY -> WAJIB ST_AsText)
         $mapRtlh = $db->table('perumahan_rtlh_rumah')
-            ->select('perumahan_rtlh_rumah.id_survei as id, perumahan_rtlh_penerima.nama_kepala_keluarga as name, perumahan_rtlh_rumah.desa, ST_AsText(perumahan_rtlh_rumah.lokasi_koordinat) as wkt, "rtlh" as type, perumahan_rtlh_rumah.foto_depan as image')
+            ->select('perumahan_rtlh_rumah.id_survei as id, perumahan_rtlh_penerima.nama_kepala_keluarga as name, perumahan_rtlh_rumah.desa, ST_AsText(perumahan_rtlh_rumah.lokasi_koordinat) as wkt, "rtlh" as type, perumahan_rtlh_rumah.foto_depan as image, perumahan_rtlh_rumah.foto_samping, perumahan_rtlh_rumah.foto_belakang, perumahan_rtlh_rumah.foto_dalam')
             ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left')
             ->where('perumahan_rtlh_rumah.lokasi_koordinat IS NOT NULL')
             ->where('perumahan_rtlh_rumah.lokasi_koordinat !=', '')
+            ->orderBy('perumahan_rtlh_rumah.id_survei', 'DESC')
             ->limit(100)->get()->getResultArray();
 
         // Markers Kumuh (Tipe: LONGTEXT -> Ambil Langsung)

@@ -298,8 +298,24 @@
                             iconAnchor: [10, 10]
                         });
                         
+                        let photos = [];
+                        if (item.foto_depan) photos.push(item.foto_depan);
+                        if (item.foto_samping) photos.push(item.foto_samping);
+                        if (item.foto_belakang) photos.push(item.foto_belakang);
+                        if (item.foto_dalam) photos.push(item.foto_dalam);
+
+                        let imgHtml = '';
+                        if (photos.length > 0) {
+                            let gridClass = photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2';
+                            imgHtml = `<div class="grid ${gridClass} gap-1 mt-2 mb-2">`;
+                            photos.forEach(p => {
+                                imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`;
+                            });
+                            imgHtml += `</div>`;
+                        }
+
                         const popup = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><p class="text-[7px] font-bold uppercase tracking-[0.2em] opacity-60 mb-1">${item.status_bantuan}</p><h5 class="text-[11px] font-bold uppercase leading-tight">${item.pemilik}</h5></div>
-                                       <div class="p-3 bg-white dark:bg-slate-900 space-y-2 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700 dark:text-slate-300 italic">📍 ${item.desa}</p><a href="<?= base_url('rtlh/detail/') ?>/${item.id_survei}" class="block w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-lg transition-all shadow-md shadow-blue-600/20">Profil Lengkap</a></div>`;
+                                       <div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl"><p class="text-[9px] font-bold text-slate-700 dark:text-slate-300 italic mb-2">📍 ${item.desa}</p>${imgHtml}<a href="<?= base_url('rtlh/detail/') ?>/${item.id_survei}" class="block w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-center text-[9px] font-black uppercase tracking-widest rounded-lg transition-all shadow-md shadow-blue-600/20">Profil Lengkap</a></div>`;
                         
                         L.marker([geo.coordinates[1], geo.coordinates[0]], { icon: icon }).bindPopup(popup).addTo(cluster);
                     }
