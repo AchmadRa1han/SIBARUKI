@@ -224,6 +224,8 @@ class Rtlh extends BaseController
             'fungsi_ruang'         => ['fungsi ruang'],
             'luas_rumah_m2'        => ['*luas rumah (m2)', 'luas rumah (m2)'],
             'luas_lahan_m2'        => ['luah lahan (m2)', 'luas lahan (m2)'],
+            'jumlah_penghuni_jiwa' => ['jumlah penghuni', 'jumlah penghuni (jiwa)', 'penghuni'],
+            'status_backlog'       => ['status backlog', 'backlog'],
             'pendidikan_id'        => ['*pendidikan', 'pendidikan'],
             'pekerjaan_id'         => ['*pekerjaan', 'pekerjaan'],
             'penghasilan_per_bulan'=> ['*penghasilan perbulan', 'penghasilan perbulan'],
@@ -808,7 +810,9 @@ class Rtlh extends BaseController
                 'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? null,
                 'bantuan_perumahan' => $post['bantuan_perumahan'] ?? null,
                 'desil_nasional' => $post['desil_nasional'] ?? null,
-                'status_bantuan' => 'Belum Menerima', 
+                'status_backlog' => $post['status_backlog'] ?? 'TIDAK BACKLOG',
+                'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? 0,
+                'status_bantuan' => $post['status_bantuan'] ?? 'Belum Menerima', 
                 'created_at' => date('Y-m-d H:i:s'), 
                 'updated_at' => date('Y-m-d H:i:s')
             ];
@@ -864,6 +868,7 @@ class Rtlh extends BaseController
                 'luas_rumah_m2' => $post['luas_rumah_m2'] ?? $rumahLama['luas_rumah_m2'],
                 'luas_lahan_m2' => $post['luas_lahan_m2'] ?? $rumahLama['luas_lahan_m2'],
                 'fungsi_ruang' => $post['fungsi_ruang'] ?? $rumahLama['fungsi_ruang'],
+                'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? $rumahLama['jumlah_penghuni_jiwa'],
                 'kepemilikan_rumah' => $this->resolveMasterId('kepemilikan_rumah', $post, 'KEPEMILIKAN_RUMAH', $rumahLama['kepemilikan_rumah']),
                 'kepemilikan_tanah' => $this->resolveMasterId('kepemilikan_tanah', $post, 'KEPEMILIKAN_TANAH', $rumahLama['kepemilikan_tanah']),
                 'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? $rumahLama['aset_rumah_di_lokasi_lain'],
@@ -875,7 +880,10 @@ class Rtlh extends BaseController
                 'jenis_jamban_kloset' => $this->resolveMasterId('jenis_jamban_kloset', $post, 'JENIS_JAMBAN', $rumahLama['jenis_jamban_kloset']),
                 'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? $rumahLama['jenis_tpa_tinja'],
                 'bantuan_perumahan' => $post['bantuan_perumahan'] ?? $rumahLama['bantuan_perumahan'],
-                'desil_nasional' => $post['desil_nasional'] ?? $rumahLama['desil_nasional']
+                'desil_nasional' => $post['desil_nasional'] ?? $rumahLama['desil_nasional'],
+                'status_backlog' => $post['status_backlog'] ?? $rumahLama['status_backlog'],
+                'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? $rumahLama['jumlah_penghuni_jiwa'],
+                'status_bantuan' => $post['status_bantuan'] ?? $rumahLama['status_bantuan']
             ];
 
             if (!empty($post['lokasi_koordinat']) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $post['lokasi_koordinat'])) {

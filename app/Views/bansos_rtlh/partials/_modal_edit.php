@@ -90,30 +90,35 @@
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-3">
                         <span class="w-8 h-[2px] bg-slate-200 dark:bg-slate-800"></span> Dokumentasi Realisasi (Before & After)
                     </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="space-y-3">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Foto Kondisi Awal (Before)</label>
-                            <div class="relative group aspect-video bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Kondisi Awal (Before)</label>
+                            <div class="relative group aspect-square bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
                                 <input type="file" name="foto_before" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="bansosModal.previewImg(this, 'before')">
                                 <div id="placeholder_bansos_before" class="flex flex-col items-center justify-center">
                                     <i data-lucide="camera" class="w-6 h-6 text-slate-300 mb-2"></i>
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase">Pilih Foto Sebelum</span>
+                                    <span class="text-[7px] font-bold text-slate-400 uppercase">Pilih Foto</span>
                                 </div>
                                 <img id="img_bansos_before" class="absolute inset-0 w-full h-full object-cover hidden">
                             </div>
                         </div>
 
+                        <?php 
+                            $afterFotos = [['foto_setelah_depan', 'Tampak Depan (After)'], ['foto_setelah_samping', 'Samping (After)'], ['foto_setelah_dalam', 'Interior (After)']];
+                            foreach($afterFotos as $f):
+                        ?>
                         <div class="space-y-3">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Foto Hasil Perbaikan (After)</label>
-                            <div class="relative group aspect-video bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
-                                <input type="file" name="foto_after" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="bansosModal.previewImg(this, 'after')">
-                                <div id="placeholder_bansos_after" class="flex flex-col items-center justify-center">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1"><?= $f[1] ?></label>
+                            <div class="relative group aspect-square bg-slate-100 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all hover:border-emerald-500/50">
+                                <input type="file" name="<?= $f[0] ?>" accept="image/*" class="absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="bansosModal.previewImg(this, '<?= $f[0] ?>')">
+                                <div id="placeholder_bansos_<?= $f[0] ?>" class="flex flex-col items-center justify-center">
                                     <i data-lucide="camera" class="w-6 h-6 text-slate-300 mb-2"></i>
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase">Pilih Foto Sesudah</span>
+                                    <span class="text-[7px] font-bold text-slate-400 uppercase">Pilih Foto</span>
                                 </div>
-                                <img id="img_bansos_after" class="absolute inset-0 w-full h-full object-cover hidden">
+                                <img id="img_bansos_<?= $f[0] ?>" class="absolute inset-0 w-full h-full object-cover hidden">
                             </div>
                         </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 
@@ -256,7 +261,7 @@
                     if (el) { el.readOnly = false; el.classList.remove('opacity-60'); }
                 });
                 
-                ['before', 'after'].forEach(p => {
+                ['before', 'foto_setelah_depan', 'foto_setelah_samping', 'foto_setelah_dalam'].forEach(p => {
                     const img = document.getElementById('img_bansos_' + p);
                     const ph = document.getElementById('placeholder_bansos_' + p);
                     if (img) img.classList.add('hidden');
@@ -301,10 +306,10 @@
                     });
                 }
 
-                ['before', 'after'].forEach(p => {
+                ['before', 'foto_setelah_depan', 'foto_setelah_samping', 'foto_setelah_dalam'].forEach(p => {
                     const img = document.getElementById('img_bansos_' + p);
                     const ph = document.getElementById('placeholder_bansos_' + p);
-                    const file = data['foto_' + p];
+                    const file = (p === 'before') ? data.foto_before : data[p];
                     if (img) {
                         if (file) {
                             img.src = this.uploadUrl + file;

@@ -56,6 +56,52 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Jenis Kelamin</label>
+                                    <select name="jenis_kelamin" id="inp_jk" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
+                                        <option value="L">Laki-laki</option>
+                                        <option value="P">Perempuan</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Jumlah Anggota Keluarga</label>
+                                    <input type="number" name="jumlah_anggota_keluarga" id="inp_jml_keluarga" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Tempat Lahir</label>
+                                    <input type="text" name="tempat_lahir" id="inp_tempat_lahir" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Lahir</label>
+                                    <input type="date" name="tanggal_lahir" id="inp_tgl_lahir" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Pendidikan</label>
+                                    <select name="pendidikan_id" id="inp_pendidikan_id" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
+                                        <option value="">Pilih</option>
+                                        <?php foreach(($master['PENDIDIKAN'] ?? []) as $edu): ?><option value="<?= $edu['id'] ?>"><?= $edu['nama_pilihan'] ?></option><?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Pekerjaan</label>
+                                    <select name="pekerjaan_id" id="inp_pekerjaan_id" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
+                                        <option value="">Pilih</option>
+                                        <?php foreach(($master['PEKERJAAN'] ?? []) as $job): ?><option value="<?= $job['id'] ?>"><?= $job['nama_pilihan'] ?></option><?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Penghasilan Per Bulan</label>
+                                <select name="penghasilan_per_bulan" id="inp_penghasilan" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
+                                    <option value="">Pilih</option>
+                                    <?php foreach(($master['PENGHASILAN'] ?? []) as $inc): ?><option value="<?= $inc['id'] ?>"><?= $inc['nama_pilihan'] ?></option><?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Desa/Kelurahan</label>
                                     <select name="desa_id" id="inp_desa_id" required class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600">
                                         <option value="">Pilih Lokasi</option>
@@ -69,6 +115,14 @@
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Luas Rumah (m²)</label>
                                     <input type="number" step="0.01" name="luas_rumah_m2" id="inp_luas_rumah" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
                                 </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Luas Lahan (m²)</label>
+                                    <input type="number" step="0.01" name="luas_lahan_m2" id="inp_luas_lahan" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Jumlah Penghuni (Jiwa)</label>
+                                <input type="number" name="jumlah_penghuni_jiwa" id="inp_penghuni_jiwa" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Alamat Detail</label>
@@ -116,6 +170,10 @@
                                     <?php foreach(($master['JENIS_KAWASAN'] ?? []) as $jk): ?><option value="<?= $jk['id'] ?>"><?= $jk['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
                             </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Fungsi Ruang</label>
+                                <input type="text" name="fungsi_ruang" id="inp_fungsi_ruang" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none" placeholder="Misal: Rumah Tinggal">
+                            </div>
                         </div>
                         <div class="space-y-6">
                             <h4 class="text-[10px] font-black text-blue-600 uppercase border-b pb-3 tracking-widest flex items-center gap-2">
@@ -123,7 +181,7 @@
                             </h4>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Sumber Penerangan</label>
-                                <select name="sumber_penerangan" id="inp_listrik" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                <select name="sumber_penerangan" id="inp_listric" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
                                     <option value="">Pilih</option>
                                     <?php foreach(($master['SUMBER_PENERANGAN'] ?? []) as $sp): ?><option value="<?= $sp['id'] ?>"><?= $sp['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
@@ -136,8 +194,19 @@
                                 </select>
                             </div>
                             <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Jarak SAM ke TPA Tinja</label>
+                                <input type="text" name="jarak_sam_ke_tpa_tinja" id="inp_jarak_sam" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none" placeholder="Misal: < 10 Meter">
+                            </div>
+                            <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Desil Nasional (Data P3KE)</label>
                                 <input type="text" name="desil_nasional" id="inp_desil" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Status Backlog</label>
+                                <select name="status_backlog" id="inp_status_backlog" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
+                                    <option value="TIDAK BACKLOG">TIDAK BACKLOG</option>
+                                    <option value="BACKLOG">BACKLOG (BUTUH RUMAH)</option>
+                                </select>
                             </div>
                         </div>
                         <div class="space-y-6">
@@ -155,6 +224,16 @@
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Tempat Pembuangan Akhir Tinja</label>
                                 <input type="text" name="jenis_tpa_tinja" id="inp_tpa" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none" placeholder="Misal: Septic Tank">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Status Verifikasi / Bantuan</label>
+                                <select name="status_bantuan" id="inp_status_bantuan" required class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none">
+                                    <option value="Target">Target Bantuan</option>
+                                    <option value="Rtlh">RTLH (Belum Penanganan)</option>
+                                    <option value="Rlh">RLH (Sudah Layak)</option>
+                                    <option value="Sudah Menerima">Sudah Menerima Bansos</option>
+                                    <option value="Belum Menerima">Belum Diverifikasi</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -346,18 +425,30 @@
                     'inp_nama': p.nama_kepala_keluarga || '',
                     'inp_nik': r.nik_pemilik || '',
                     'inp_no_kk': p.no_kk || '',
+                    'inp_jk': p.jenis_kelamin || 'L',
+                    'inp_jml_keluarga': p.jumlah_anggota_keluarga || '',
+                    'inp_tempat_lahir': p.tempat_lahir || '',
+                    'inp_tgl_lahir': p.tanggal_lahir || '',
+                    'inp_pendidikan_id': p.pendidikan_id || '',
+                    'inp_pekerjaan_id': p.pekerjaan_id || '',
+                    'inp_penghasilan': p.penghasilan_per_bulan || '',
                     'inp_desa_id': r.desa_id || '',
                     'inp_luas_rumah': r.luas_rumah_m2 || '',
+                    'inp_luas_lahan': r.luas_lahan_m2 || '',
+                    'inp_penghuni_jiwa': r.jumlah_penghuni_jiwa || '',
                     'inp_alamat': r.alamat_detail || '',
                     'inp_coords': r.wkt || '',
                     'inp_milik_rumah': r.kepemilikan_rumah || '',
                     'inp_milik_tanah': r.kepemilikan_tanah || '',
                     'inp_kawasan': r.jenis_kawasan || '',
-                    'inp_listrik': r.sumber_penerangan || '',
+                    'inp_fungsi_ruang': r.fungsi_ruang || '',
+                    'inp_listric': r.sumber_penerangan || '',
                     'inp_air': r.sumber_air_minum || '',
+                    'inp_jarak_sam': r.jarak_sam_ke_tpa_tinja || '',
                     'inp_desil': r.desil_nasional || '',
                     'inp_bab': r.kamar_mandi_dan_jamban || 'SENDIRI',
-                    'inp_tpa': r.jenis_tpa_tinja || ''
+                    'inp_tpa': r.jenis_tpa_tinja || '',
+                    'inp_status_bantuan': r.status_bantuan || 'Belum Menerima'
                 };
 
                 for (const id in fields) {

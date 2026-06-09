@@ -77,17 +77,23 @@ class BansosRtlh extends BaseController
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        // Handle Upload Foto Before & After
+        // Handle Upload Foto Before & After (3 Positions)
         $uploadPath = FCPATH . 'uploads/rtlh/';
         if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
 
-        foreach(['foto_before', 'foto_after'] as $field) {
+        $photoFields = ['foto_before', 'foto_after', 'foto_setelah_depan', 'foto_setelah_samping', 'foto_setelah_dalam'];
+        foreach($photoFields as $field) {
             $img = $this->request->getFile($field);
             if ($img && $img->isValid() && !$img->hasMoved()) {
                 $prefix = strtoupper(str_replace('foto_', '', $field));
                 $newName = $prefix . '_' . $img->getRandomName();
                 $img->move($uploadPath, $newName);
                 $dataBansos[$field] = $newName;
+                
+                // Sync foto_after with foto_setelah_depan if not provided
+                if ($field === 'foto_setelah_depan' && empty($dataBansos['foto_after'])) {
+                    $dataBansos['foto_after'] = $newName;
+                }
             }
         }
 
@@ -239,18 +245,24 @@ class BansosRtlh extends BaseController
 
         // Handle Upload Foto
         $uploadPath = FCPATH . 'uploads/rtlh/';
-        foreach(['foto_before', 'foto_after'] as $field) {
+        $photoFields = ['foto_before', 'foto_after', 'foto_setelah_depan', 'foto_setelah_samping', 'foto_setelah_dalam'];
+        foreach($photoFields as $field) {
             $img = $this->request->getFile($field);
             if ($img && $img->isValid() && !$img->hasMoved()) {
                 // Hapus foto lama
                 if (!empty($oldData[$field]) && file_exists($uploadPath . $oldData[$field])) {
-                    unlink($uploadPath . $oldData[$field]);
+                    @unlink($uploadPath . $oldData[$field]);
                 }
                 
                 $prefix = strtoupper(str_replace('foto_', '', $field));
                 $newName = $prefix . '_' . $img->getRandomName();
                 $img->move($uploadPath, $newName);
                 $dataBansos[$field] = $newName;
+
+                // Sync foto_after with foto_setelah_depan if not provided
+                if ($field === 'foto_setelah_depan' && empty($dataBansos['foto_after'])) {
+                    $dataBansos['foto_after'] = $newName;
+                }
             }
         }
 
