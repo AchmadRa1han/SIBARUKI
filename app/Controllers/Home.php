@@ -234,7 +234,8 @@ class Home extends BaseController
                 SUM(CASE WHEN status_bantuan = 'Target' THEN 1 ELSE 0 END) as target,
                 SUM(CASE WHEN status_bantuan = 'Rtlh' THEN 1 ELSE 0 END) as rtlh,
                 SUM(CASE WHEN status_bantuan = 'Rlh' THEN 1 ELSE 0 END) as rlh,
-                SUM(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 ELSE 0 END) as sudah_menerima
+                SUM(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 ELSE 0 END) as sudah_menerima,
+                SUM(CASE WHEN status_bantuan IS NULL OR status_bantuan = '' OR status_bantuan NOT IN ('Target', 'Rtlh', 'Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as belum_terdata
             FROM perumahan_rtlh_rumah
         ";
         if ($roleScope === 'local') {
@@ -244,7 +245,8 @@ class Home extends BaseController
                     SUM(CASE WHEN status_bantuan = 'Target' THEN 1 ELSE 0 END) as target,
                     SUM(CASE WHEN status_bantuan = 'Rtlh' THEN 1 ELSE 0 END) as rtlh,
                     SUM(CASE WHEN status_bantuan = 'Rlh' THEN 1 ELSE 0 END) as rlh,
-                    SUM(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 ELSE 0 END) as sudah_menerima
+                    SUM(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 ELSE 0 END) as sudah_menerima,
+                    SUM(CASE WHEN status_bantuan IS NULL OR status_bantuan = '' OR status_bantuan NOT IN ('Target', 'Rtlh', 'Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as belum_terdata
                 FROM perumahan_rtlh_rumah
                 WHERE desa_id IN ($desaList)
             ";
