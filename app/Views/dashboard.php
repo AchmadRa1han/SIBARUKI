@@ -124,7 +124,36 @@
             <div id="asetLegalitasChart" class="flex justify-center"></div>
         </div>
 
-        <!-- DATA INTEGRITY (ADMIN ONLY) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- PRIORITAS KAWASAN KUMUH -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                <i data-lucide="alert-triangle" class="w-32 h-32 text-rose-600"></i>
+            </div>
+            <h3 class="text-[9px] font-bold text-rose-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                <span class="w-6 h-[2px] bg-rose-600"></span> Prioritas Kawasan Kumuh
+            </h3>
+            <div class="space-y-4 relative z-10">
+                <?php foreach($topKumuh as $k): ?>
+                <a href="<?= base_url('wilayah-kumuh/detail/' . $k['FID']) ?>" class="p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl transition-all duration-500 group shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs group-hover:scale-110 transition-all duration-500 shadow-lg shadow-rose-600/20"><?= substr($k['Kelurahan'], 0, 1) ?></div>
+                        <div>
+                            <p class="text-[10px] font-bold text-blue-950 dark:text-white uppercase tracking-tight"><?= $k['Kelurahan'] ?></p>
+                            <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-0.5 truncate w-24"><?= $k['Kawasan'] ?: 'Kawasan Kumuh' ?></p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold text-rose-600 leading-none italic"><?= number_format($k['skor_kumuh'], 0) ?></p>
+                        <p class="text-[6px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Skor</p>
+                    </div>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATA INTEGRITY (ADMIN ONLY) -->
         <?php if ($role === 'admin'): ?>
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
             <div class="absolute -right-4 -top-4 w-32 h-32 bg-rose-50 dark:bg-rose-900/10 rounded-full blur-3xl"></div>
