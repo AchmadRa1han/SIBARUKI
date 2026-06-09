@@ -131,23 +131,14 @@
             <h3 class="text-[9px] font-bold text-rose-600 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
                 <span class="w-6 h-[2px] bg-rose-600"></span> Integritas & Kualitas Data
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                <div class="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+            <div class="grid grid-cols-1 relative z-10">
+                <div class="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 max-w-xl">
                     <div class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-rose-500 shadow-lg">
                         <i data-lucide="map-pin-off" class="w-7 h-7"></i>
                     </div>
                     <div>
                         <p class="text-2xl font-black text-blue-950 dark:text-white leading-tight"><?= number_format($health['coords']) ?></p>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Koordinat Kosong / Titik Nol</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800">
-                    <div class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-amber-500 shadow-lg">
-                        <i data-lucide="file-warning" class="w-7 h-7"></i>
-                    </div>
-                    <div>
-                        <p class="text-2xl font-black text-blue-950 dark:text-white leading-tight"><?= number_format($health['kk']) ?></p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Data NIK / No. KK Tidak Lengkap</p>
                     </div>
                 </div>
             </div>
