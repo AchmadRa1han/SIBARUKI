@@ -231,16 +231,20 @@ class Home extends BaseController
         // 2. RLH = status_bantuan 'Rlh' atau 'Sudah Menerima'
         $layakQuery = "
             SELECT 
-                SUM(CASE WHEN status_bantuan IN ('Rtlh', 'Target') THEN 1 ELSE 0 END) as rtlh,
-                SUM(CASE WHEN status_bantuan IN ('Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as rlh
+                SUM(CASE WHEN status_bantuan = 'Target' THEN 1 ELSE 0 END) as target,
+                SUM(CASE WHEN status_bantuan = 'Rtlh' THEN 1 ELSE 0 END) as rtlh,
+                SUM(CASE WHEN status_bantuan = 'Rlh' THEN 1 ELSE 0 END) as rlh,
+                SUM(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 ELSE 0 END) as sudah_menerima
             FROM perumahan_rtlh_rumah
         ";
         if ($roleScope === 'local') {
             $desaList = "'" . implode("','", (!empty($desaRtlh) ? $desaRtlh : ['0'])) . "'";
             $layakQuery = "
                 SELECT 
-                    SUM(CASE WHEN status_bantuan IN ('Rtlh', 'Target') THEN 1 ELSE 0 END) as rtlh,
-                    SUM(CASE WHEN status_bantuan IN ('Rlh', 'Sudah Menerima') THEN 1 ELSE 0 END) as rlh
+                    SUM(CASE WHEN status_bantuan = 'Target' THEN 1 ELSE 0 END) as target,
+                    SUM(CASE WHEN status_bantuan = 'Rtlh' THEN 1 ELSE 0 END) as rtlh,
+                    SUM(CASE WHEN status_bantuan = 'Rlh' THEN 1 ELSE 0 END) as rlh,
+                    SUM(CASE WHEN status_bantuan = 'Sudah Menerima' THEN 1 ELSE 0 END) as sudah_menerima
                 FROM perumahan_rtlh_rumah
                 WHERE desa_id IN ($desaList)
             ";
