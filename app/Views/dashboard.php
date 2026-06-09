@@ -327,13 +327,29 @@
             try {
                 let geojson = null;
                 let lat = null, lon = null;
-                if (item.latitude && item.longitude) { lat = parseFloat(item.latitude); lon = parseFloat(item.longitude); }
-                else if (item.coords) {
+                
+                // 1. Try Direct Lat/Lng
+                if (item.latitude && item.longitude) { 
+                    lat = parseFloat(item.latitude); 
+                    lon = parseFloat(item.longitude); 
+                } 
+                // 2. Try Comma-Separated Coords
+                else if (item.coords && item.coords.includes(',')) {
                     let p = item.coords.toString().split(',');
-                    if (p.length === 2) { lat = healCoordinate(p[0], true); lon = healCoordinate(p[1], false); }
+                    if (p.length === 2) { 
+                        lat = healCoordinate(p[0], true); 
+                        lon = healCoordinate(p[1], false); 
+                    }
                 }
-                if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) { geojson = { type: 'Point', coordinates: [lon, lat] }; }
-                else if (item.wkt) { geojson = parseWKTUniversal(item.wkt); }
+
+                // 3. Build Point GeoJSON or parse WKT
+                if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) { 
+                    geojson = { type: 'Point', coordinates: [lon, lat] }; 
+                } else {
+                    const wktSource = item.wkt || item.coords || item.koordinat;
+                    if (wktSource) geojson = parseWKTUniversal(wktSource);
+                }
+
                 if (!geojson) return;
 
                 let detailsHtml = '';

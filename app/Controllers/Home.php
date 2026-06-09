@@ -357,8 +357,8 @@ class Home extends BaseController
                 'formal'    => $mapFormal,
                 'psu'       => $mapPsu,
                 'aset'      => $mapAset,
-                'permukiman_arsinum'   => $mapArsinum,
-                'permukiman_pisew'     => $mapPisew,
+                'arsinum'   => $mapArsinum,
+                'pisew'     => $mapPisew,
                 'bansos'    => $mapBansos
             ],
             'assignedDesa'  => $assignedDesaNames
