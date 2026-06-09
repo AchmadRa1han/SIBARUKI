@@ -68,20 +68,20 @@ class Home extends BaseController
         // Data Spasial Publik (Limit untuk performa)
         $desaPolygons = $db->query("SELECT desa_id, TRIM(desa_nama) as desa_nama, wkt FROM kode_desa WHERE wkt IS NOT NULL AND wkt != ''")->getResultArray();
         $mapRtlh = $db->table('perumahan_rtlh_rumah')
-                       ->select('perumahan_rtlh_rumah.id_survei as id, perumahan_rtlh_penerima.nama_kepala_keluarga as name, perumahan_rtlh_rumah.desa, ST_AsText(perumahan_rtlh_rumah.lokasi_koordinat) as wkt')
+                       ->select('perumahan_rtlh_rumah.id_survei as id, perumahan_rtlh_penerima.nama_kepala_keluarga as name, perumahan_rtlh_rumah.desa, ST_AsText(perumahan_rtlh_rumah.lokasi_koordinat) as wkt, perumahan_rtlh_rumah.foto_depan as image')
                        ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left')
                        ->where('perumahan_rtlh_rumah.lokasi_koordinat IS NOT NULL')
                        ->where('perumahan_rtlh_rumah.lokasi_koordinat !=', '')
                        ->limit(200)->get()->getResultArray();
-        $mapKumuh = $db->table('permukiman_wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt, skor_kumuh, Luas_kumuh, Kode_RT_RW')->where('WKT IS NOT NULL')->get()->getResultArray();
-        $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude')->get()->getResultArray();
-        $mapPsu = $db->table('permukiman_psu_jalan')->select('id, nama_jalan as name, wkt, panjang_luas as nilai, tahun')->limit(100)->get()->getResultArray();
-        $mapArsinum = $db->table('permukiman_arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, anggaran, tahun')->get()->getResultArray();
-        $mapPisew = $db->table('permukiman_pisew')->select('id, jenis_pekerjaan as name, koordinat as coords')->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
-        $mapAset = $db->table('pertanahan_aset')->select('id, nama_pemilik as name, no_sertifikat, koordinat as coords, luas_m2, tgl_terbit')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
+        $mapKumuh = $db->table('permukiman_wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt, skor_kumuh, Luas_kumuh, Sk_Kumuh')->where('WKT IS NOT NULL')->get()->getResultArray();
+        $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude, pengembang')->get()->getResultArray();
+        $mapPsu = $db->table('permukiman_psu_jalan')->select('id, nama_jalan as name, wkt, panjang_luas as nilai, tahun, foto_after as image')->limit(100)->get()->getResultArray();
+        $mapArsinum = $db->table('permukiman_arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun')->get()->getResultArray();
+        $mapPisew = $db->table('permukiman_pisew')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun')->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
+        $mapAset = $db->table('pertanahan_aset')->select('id, nama_pemilik as name, nomor_hak, koordinat as coords, luas_m2')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
 
         // Markers Bansos (Tambahkan ini untuk homepage)
-        $mapBansos = $db->table('perumahan_rtlh_bansos')->select('id, nama_penerima as name, desa, ST_AsText(lokasi_realisasi) as wkt, "bansos" as type')
+        $mapBansos = $db->table('perumahan_rtlh_bansos')->select('id, nama_penerima as name, desa, ST_AsText(lokasi_realisasi) as wkt, tahun_anggaran, sumber_dana, foto_after as image')
             ->where('lokasi_realisasi IS NOT NULL')->get()->getResultArray();
 
         $data = [
@@ -290,36 +290,37 @@ class Home extends BaseController
 
         // Markers RTLH (Tipe: POINT/GEOMETRY -> WAJIB ST_AsText)
         $mapRtlh = $db->table('perumahan_rtlh_rumah')
-            ->select('perumahan_rtlh_rumah.id_survei as id, perumahan_rtlh_penerima.nama_kepala_keluarga as name, perumahan_rtlh_rumah.desa, ST_AsText(perumahan_rtlh_rumah.lokasi_koordinat) as wkt, "rtlh" as type')
+            ->select('perumahan_rtlh_rumah.id_survei as id, perumahan_rtlh_penerima.nama_kepala_keluarga as name, perumahan_rtlh_rumah.desa, ST_AsText(perumahan_rtlh_rumah.lokasi_koordinat) as wkt, "rtlh" as type, perumahan_rtlh_rumah.foto_depan as image')
             ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left')
             ->where('perumahan_rtlh_rumah.lokasi_koordinat IS NOT NULL')
             ->where('perumahan_rtlh_rumah.lokasi_koordinat !=', '')
             ->limit(100)->get()->getResultArray();
 
         // Markers Kumuh (Tipe: LONGTEXT -> Ambil Langsung)
-        $mapKumuh = $db->table('permukiman_wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt, skor_kumuh, Luas_kumuh, Kode_RT_RW, "kumuh" as type')
+        $mapKumuh = $db->table('permukiman_wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt, skor_kumuh, Luas_kumuh, Sk_Kumuh, "kumuh" as type')
             ->where('WKT IS NOT NULL')->get()->getResultArray();
 
         // Markers Perumahan Formal (Gunakan Lat/Lng asli)
-        $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude, "formal" as type')->get()->getResultArray();
+        $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude, pengembang, "formal" as type')->get()->getResultArray();
 
         // Linestrings PSU (Tipe: TEXT -> Ambil Langsung)
-        $mapPsu = $db->table('permukiman_psu_jalan')->select('id, nama_jalan as name, wkt, panjang_luas as nilai, tahun, "psu" as type')->get()->getResultArray();
+        $mapPsu = $db->table('permukiman_psu_jalan')->select('id, nama_jalan as name, wkt, panjang_luas as nilai, tahun, foto_after as image, "psu" as type')->get()->getResultArray();
 
         // Markers Aset Tanah
         $mapAset = $db->table('pertanahan_aset')
-            ->select('id, nama_pemilik as name, koordinat as coords, luas_m2, tgl_terbit, "aset" as type')
+            ->select('id, nama_pemilik as name, nomor_hak, koordinat as coords, luas_m2, "aset" as type')
+            ->where('koordinat IS NOT NULL')->where('koordinat !=', '')
             ->get()->getResultArray();
 
         // Markers Arsinum
-        $mapArsinum = $db->table('permukiman_arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, anggaran, tahun, "arsinum" as type')->get()->getResultArray();
+        $mapArsinum = $db->table('permukiman_arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun, "arsinum" as type')->get()->getResultArray();
 
         // Markers PISEW
-        $mapPisew = $db->table('permukiman_pisew')->select('id, jenis_pekerjaan as name, koordinat as coords, "pisew" as type')
+        $mapPisew = $db->table('permukiman_pisew')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun, "pisew" as type')
             ->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
 
         // Markers Bansos
-        $mapBansos = $db->table('perumahan_rtlh_bansos')->select('id, nama_penerima as name, desa, ST_AsText(lokasi_realisasi) as wkt, "bansos" as type')
+        $mapBansos = $db->table('perumahan_rtlh_bansos')->select('id, nama_penerima as name, desa, ST_AsText(lokasi_realisasi) as wkt, tahun_anggaran, sumber_dana, foto_after as image, "bansos" as type')
             ->where('lokasi_realisasi IS NOT NULL')->get()->getResultArray();
 
         // --- 4. DATA LAINNYA ---

@@ -409,24 +409,34 @@
                 }
 
                 let detailsHtml = '';
+                let imgHtml = '';
+                if (item.image) {
+                    let folder = 'rtlh';
+                    if (type === 'psu') folder = 'psu';
+                    else if (type === 'bansos') folder = 'rtlh'; // Bansos uses same upload path
+                    imgHtml = `<img src="<?= base_url('uploads/') ?>${folder}/${item.image}" class="w-full h-24 object-cover rounded-lg mb-3 border border-slate-200 dark:border-slate-700">`;
+                }
+
                 if (type === 'kumuh') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luasan: ${item.Luas_kumuh || '-'} Ha</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">RT/RW: ${item.Kode_RT_RW || '-'}</p>`;
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status: ${item.Sk_Kumuh || 'Belum Ditetapkan'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Luasan: ${item.Luas_kumuh || '-'} Ha</p>`;
                 } else if (type === 'aset') {
-                    const year = item.tgl_terbit ? new Date(item.tgl_terbit).getFullYear() : '-';
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luasan: ${item.luas_m2 || '-'} m²</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${year}</p>`;
-                } else if (type === 'arsinum') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran: Rp ${item.anggaran ? parseInt(item.anggaran).toLocaleString('id-ID') : '-'}</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luas: ${item.luas_m2 || '-'} m²</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status Hak: ${item.nomor_hak || '-'}</p>`;
+                } else if (type === 'arsinum' || type === 'pisew') {
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'psu') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Anggaran/Nilai: Rp ${item.nilai ? parseInt(item.nilai).toLocaleString('id-ID') : '-'}</p>
+                    detailsHtml = `${imgHtml}
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Panjang/Luas: ${item.nilai || '-'} m/m²</p>
                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'formal') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
-                } else if (type === 'rtlh' || type === 'bansos') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa: ${item.desa || '-'}</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status: ${type === 'rtlh' ? 'Belum Menerima' : 'Sudah Menerima'}</p>`;
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pengembang: ${item.pengembang || '-'}</p>`;
+                } else if (type === 'bansos') {
+                    detailsHtml = `${imgHtml}
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tahun: ${item.tahun_anggaran || '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Sumber Dana: ${item.sumber_dana || '-'}</p>`;
+                } else if (type === 'rtlh') {
+                    detailsHtml = `${imgHtml}`;
                 } else {
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
                 }
