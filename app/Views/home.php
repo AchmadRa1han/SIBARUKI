@@ -431,7 +431,12 @@
                         let gridClass = photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2';
                         imgHtml = `<div class="grid ${gridClass} gap-1 mb-3">`;
                         photos.slice(0, 4).forEach(p => {
-                            imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`;
+                            const imgUrl = `<?= base_url('uploads/rtlh/') ?>${p}`;
+                            imgHtml += `
+                                <a href="${imgUrl}" target="_blank" class="block overflow-hidden rounded-md border border-slate-200 dark:border-slate-700 hover:opacity-90 transition-opacity">
+                                    <img src="${imgUrl}" class="w-full h-16 object-cover">
+                                </a>
+                            `;
                         });
                         imgHtml += `</div>`;
                     }
@@ -439,7 +444,12 @@
                     let folder = 'rtlh';
                     if (type === 'psu') folder = 'psu';
                     else if (type === 'bansos') folder = 'rtlh'; // Bansos uses same upload path
-                    imgHtml = `<img src="<?= base_url('uploads/') ?>${folder}/${item.image}" class="w-full h-24 object-cover rounded-lg mb-3 border border-slate-200 dark:border-slate-700">`;
+                    const imgUrl = `<?= base_url('uploads/') ?>${folder}/${item.image}`;
+                    imgHtml = `
+                        <a href="${imgUrl}" target="_blank" class="block overflow-hidden rounded-lg mb-3 border border-slate-200 dark:border-slate-700 hover:opacity-90 transition-opacity">
+                            <img src="${imgUrl}" class="w-full h-24 object-cover">
+                        </a>
+                    `;
                 }
 
                 if (type === 'kumuh') {
@@ -548,7 +558,12 @@
                             <div class="grid ${gridClass} gap-1">
                     `;
                     photos.slice(0, 4).forEach(p => {
-                        imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`;
+                        const imgUrl = `<?= base_url('uploads/rtlh/') ?>${p}`;
+                        imgHtml += `
+                            <a href="${imgUrl}" target="_blank" class="block overflow-hidden rounded-md border border-slate-200 dark:border-slate-700 hover:opacity-90 transition-opacity">
+                                <img src="${imgUrl}" class="w-full h-16 object-cover">
+                            </a>
+                        `;
                     });
                     imgHtml += `
                             </div>

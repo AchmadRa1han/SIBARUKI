@@ -311,7 +311,7 @@
                 if (!geojson) return;
 
                 let detailsHtml = '', imgHtml = '';
-                if (type === 'rtlh') {
+                 if (type === 'rtlh') {
                     let photos = [];
                     if (item.image) photos.push(item.image);
                     if (item.foto_samping) photos.push(item.foto_samping);
@@ -319,13 +319,25 @@
                     if (item.foto_dalam) photos.push(item.foto_dalam);
                     if (photos.length > 0) {
                         imgHtml = `<div class="grid ${photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-1 mb-3">`;
-                        photos.slice(0, 4).forEach(p => { imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`; });
+                        photos.slice(0, 4).forEach(p => { 
+                            const imgUrl = `<?= base_url('uploads/rtlh/') ?>${p}`;
+                            imgHtml += `
+                                <a href="${imgUrl}" target="_blank" class="block overflow-hidden rounded-md border border-slate-200 dark:border-slate-700 hover:opacity-90 transition-opacity">
+                                    <img src="${imgUrl}" class="w-full h-16 object-cover">
+                                </a>
+                            `; 
+                        });
                         imgHtml += `</div>`;
                     }
                     detailsHtml = imgHtml;
                 } else if (item.image) {
                     let folder = (type === 'psu') ? 'psu' : 'rtlh';
-                    imgHtml = `<img src="<?= base_url('uploads/') ?>${folder}/${item.image}" class="w-full h-24 object-cover rounded-lg mb-3 border border-slate-200 dark:border-slate-700">`;
+                    const imgUrl = `<?= base_url('uploads/') ?>${folder}/${item.image}`;
+                    imgHtml = `
+                        <a href="${imgUrl}" target="_blank" class="block overflow-hidden rounded-lg mb-3 border border-slate-200 dark:border-slate-700 hover:opacity-90 transition-opacity">
+                            <img src="${imgUrl}" class="w-full h-24 object-cover">
+                        </a>
+                    `;
                     detailsHtml = imgHtml;
                 }
 
