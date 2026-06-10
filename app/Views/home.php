@@ -46,12 +46,12 @@
 
             <!-- Carousel Section -->
             <div class="relative reveal hidden lg:block">
-                <div class="swiper heroSwiper w-full max-w-[560px] h-[350px] ml-auto rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-slate-900 bg-white dark:bg-slate-900 relative z-10">
+                <div class="swiper heroSwiper w-full max-w-[380px] h-[520px] ml-auto rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-slate-900 bg-white dark:bg-slate-900 relative z-10">
                     <div class="swiper-wrapper">
                         <?php if(!empty($carousel)): ?>
                             <?php foreach($carousel as $item): ?>
-                            <div class="swiper-slide relative h-[350px]">
-                                <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover" style="object-position: center <?= $item['position'] ?? '50%' ?>;">
+                            <div class="swiper-slide relative h-[520px]">
+                                <img src="<?= base_url($item['image']) ?>" class="w-full h-full object-cover" style="object-position: <?= $item['position'] ?? '50%' ?> center;">
                                 <div class="absolute inset-x-0 bottom-0 p-6 bg-black/25 backdrop-blur-[1px] border-t border-white/10">
                                     <p class="text-blue-400 font-black uppercase tracking-[0.3em] text-[10px] mb-1">Dokumentasi</p>
                                     <h4 class="text-white font-black uppercase tracking-tight text-lg leading-tight drop-shadow-[0_2px_3px_rgba(0,0,0,1)]"><?= $item['caption'] ?></h4>
@@ -59,7 +59,7 @@
                             </div>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <div class="swiper-slide relative h-[350px] flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                            <div class="swiper-slide relative h-[520px] flex items-center justify-center bg-slate-100 dark:bg-slate-800">
                                 <div class="text-center">
                                     <i data-lucide="image" class="w-8 h-8 text-slate-300 mx-auto mb-3"></i>
                                     <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[8px]">Visualisasi Database</p>
