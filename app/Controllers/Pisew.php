@@ -173,6 +173,28 @@ class Pisew extends BaseController
         return redirect()->to('/pisew')->with('error', 'Halaman tidak tersedia. Gunakan tombol Tambah.');
     }
 
+    public function store()
+    {
+        $data = $this->request->getPost();
+        
+        // Handle Foto Before & After
+        $uploadPath = FCPATH . 'uploads/pisew/';
+        if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+
+        foreach (['foto_before', 'foto_after'] as $field) {
+            $img = $this->request->getFile($field);
+            if ($img && $img->isValid() && !$img->hasMoved()) {
+                $newName = $img->getRandomName();
+                $img->move($uploadPath, $newName);
+                $data[$field] = $newName;
+            }
+        }
+
+        $this->pisewModel->insert($data);
+        $this->logActivity('Tambah', 'PISEW', "Menambah data PISEW: " . ($data['jenis_pekerjaan'] ?? 'Unknown'));
+        return redirect()->to('/pisew')->with('success', 'Data PISEW berhasil ditambahkan.');
+    }
+
     public function edit($id)
     {
         return redirect()->to('/pisew')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit pada tabel.');

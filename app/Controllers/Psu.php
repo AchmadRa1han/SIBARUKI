@@ -159,9 +159,10 @@ class Psu extends BaseController
         if (!has_permission('create_psu')) return redirect()->back()->with('error', 'Izin ditolak.');
         
         $rules = [
-            'nama_jalan' => 'required',
-            'wkt'        => 'required',
-            'jalan'      => 'required|numeric'
+            'nama_jalan'   => 'required',
+            'wkt'          => 'required',
+            'panjang_luas' => 'required|numeric',
+            'jalan'        => 'required'
         ];
 
         if (!$this->validate($rules)) return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
@@ -198,9 +199,10 @@ class Psu extends BaseController
         if (!has_permission('edit_psu')) return redirect()->back()->with('error', 'Izin ditolak.');
 
         $rules = [
-            'nama_jalan' => 'required',
-            'wkt'        => 'required',
-            'jalan'      => 'required|numeric'
+            'nama_jalan'   => 'required',
+            'wkt'          => 'required',
+            'panjang_luas' => 'required|numeric',
+            'jalan'        => 'required'
         ];
 
         if (!$this->validate($rules)) return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());

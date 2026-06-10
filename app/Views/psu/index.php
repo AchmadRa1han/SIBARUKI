@@ -283,16 +283,18 @@
     }
 
     function confirmDelete(id) {
-        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `<?= base_url('psu/delete') ?>/${id}`;
-            const csrf = document.createElement('input');
-            csrf.type = 'hidden'; csrf.name = '<?= csrf_token() ?>'; csrf.value = '<?= csrf_hash() ?>';
-            form.appendChild(csrf);
-            document.body.appendChild(form);
-            form.submit();
-        }
+        customConfirm('Hapus PSU?', 'Apakah Anda yakin ingin menghapus data ini?', 'danger').then(conf => {
+            if (conf) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `<?= base_url('psu/delete') ?>/${id}`;
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden'; csrf.name = '<?= csrf_token() ?>'; csrf.value = '<?= csrf_hash() ?>';
+                form.appendChild(csrf);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 
     window.addEventListener('load', () => {

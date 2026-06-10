@@ -316,10 +316,14 @@
                 }
             });
             map.addLayer(clusterGroup);
-            debug.innerHTML = count + " Kawasan";
-            debug.className = "bg-emerald-50 text-emerald-600 px-3 py-1 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-sm border border-emerald-100";
+            if (debug) {
+                debug.innerHTML = count + " Kawasan";
+                debug.className = "bg-emerald-50 text-emerald-600 px-3 py-1 rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-sm border border-emerald-100";
+            }
             if (typeof lucide !== 'undefined') lucide.createIcons();
-        } catch (err) { debug.innerHTML = "Error Peta"; }
+        } catch (err) { 
+            if (debug) debug.innerHTML = "Error Peta"; 
+        }
     }
 
     function focusMap(fid) {
