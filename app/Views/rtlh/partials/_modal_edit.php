@@ -33,7 +33,7 @@
                 <button onclick="UI.closeModal('modal-rtlh')" class="p-2 hover:bg-white/10 rounded-xl transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
-            <form id="form-rtlh" action="<?= base_url('rtlh/store') ?>" method="post" enctype="multipart/form-data">
+            <form id="form-rtlh" action="<?= base_url('rtlh/store') ?>" method="post" enctype="multipart/form-data" autocomplete="off">
                 <?= csrf_field() ?>
                 
                 <!-- STEP 1: IDENTITAS & LOKASI -->
@@ -119,10 +119,6 @@
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Luas Lahan (m²)</label>
                                     <input type="number" step="0.01" name="luas_lahan_m2" id="inp_luas_lahan" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
                                 </div>
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Jumlah Penghuni (Jiwa)</label>
-                                <input type="number" name="jumlah_penghuni_jiwa" id="inp_penghuni_jiwa" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-600">
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Alamat Detail</label>
@@ -231,8 +227,7 @@
                                     <option value="Target">Target Bantuan</option>
                                     <option value="Rtlh">RTLH (Belum Penanganan)</option>
                                     <option value="Rlh">RLH (Sudah Layak)</option>
-                                    <option value="Sudah Menerima">Sudah Menerima Bansos</option>
-                                    <option value="Belum Menerima">Belum Diverifikasi</option>
+                                    <option value="Unknown">Belum Diverifikasi / Unknown</option>
                                 </select>
                             </div>
                         </div>
@@ -358,10 +353,15 @@
             },
 
             setMarker: function(lat, lng) {
+                if (!this.map) return;
+                const parsedLat = parseFloat(lat);
+                const parsedLng = parseFloat(lng);
+                if (isNaN(parsedLat) || isNaN(parsedLng)) return;
+
                 if (this.marker) {
-                    this.marker.setLatLng([lat, lng]);
+                    this.marker.setLatLng([parsedLat, parsedLng]);
                 } else {
-                    this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
+                    this.marker = L.marker([parsedLat, parsedLng], { draggable: true }).addTo(this.map);
                     this.marker.on('dragend', (e) => {
                         const pos = e.target.getLatLng();
                         const elCoords = document.getElementById('inp_coords');
@@ -369,8 +369,8 @@
                     });
                 }
                 const elCoords = document.getElementById('inp_coords');
-                if (elCoords) elCoords.value = `POINT(${lng.toFixed(7)} ${lat.toFixed(7)})`;
-                this.map.setView([lat, lng], 18);
+                if (elCoords) elCoords.value = `POINT(${parsedLng.toFixed(7)} ${parsedLat.toFixed(7)})`;
+                this.map.setView([parsedLat, parsedLng], 18);
             },
 
             openAdd: function() {
@@ -411,6 +411,12 @@
                 const p = data.p || {};
                 const c = data.c || {};
                 
+                if (!r || !r.id_survei) {
+                    console.error('rtlhModal: Invalid or empty house data passed to openEdit', data);
+                    alert('Gagal memuat data edit rumah. Silakan refresh halaman dan coba lagi.');
+                    return;
+                }
+                
                 const form = document.getElementById('form-rtlh');
                 if (!form) return;
                 
@@ -433,9 +439,9 @@
                     'inp_pekerjaan_id': p.pekerjaan_id || '',
                     'inp_penghasilan': p.penghasilan_per_bulan || '',
                     'inp_desa_id': r.desa_id || '',
+                    'inp_desa_nama': r.desa || '',
                     'inp_luas_rumah': r.luas_rumah_m2 || '',
                     'inp_luas_lahan': r.luas_lahan_m2 || '',
-                    'inp_penghuni_jiwa': r.jumlah_penghuni_jiwa || '',
                     'inp_alamat': r.alamat_detail || '',
                     'inp_coords': r.wkt || '',
                     'inp_milik_rumah': r.kepemilikan_rumah || '',
@@ -446,9 +452,10 @@
                     'inp_air': r.sumber_air_minum || '',
                     'inp_jarak_sam': r.jarak_sam_ke_tpa_tinja || '',
                     'inp_desil': r.desil_nasional || '',
+                    'inp_status_backlog': r.status_backlog || 'TIDAK BACKLOG',
                     'inp_bab': r.kamar_mandi_dan_jamban || 'SENDIRI',
                     'inp_tpa': r.jenis_tpa_tinja || '',
-                    'inp_status_bantuan': r.status_bantuan || 'Belum Menerima'
+                    'inp_status_bantuan': (r.status_bantuan === 'Belum Menerima' ? 'Rtlh' : (r.status_bantuan === 'Sudah Menerima' ? 'Rlh' : (r.status_bantuan || 'Unknown')))
                 };
 
                 for (const id in fields) {
