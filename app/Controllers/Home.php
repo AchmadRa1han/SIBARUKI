@@ -138,7 +138,7 @@ class Home extends BaseController
 
         $db = \Config\Database::connect();
         $builder = $db->table('perumahan_rtlh_penerima p');
-        $builder->select('p.nama_kepala_keluarga, p.nik, r.desa, r.alamat_detail, r.status_bantuan, r.id_survei, ST_AsText(r.lokasi_koordinat) as wkt');
+        $builder->select('p.nama_kepala_keluarga, p.nik, r.desa, r.status_bantuan, r.id_survei, ST_AsText(r.lokasi_koordinat) as wkt, r.foto_depan, r.foto_samping, r.foto_belakang, r.foto_dalam');
         $builder->join('perumahan_rtlh_rumah r', 'p.nik = r.nik_pemilik');
         $builder->where('p.nik', $nik);
         

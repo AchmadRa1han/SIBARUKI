@@ -526,6 +526,36 @@
 
             if (res.status === 'success') {
                 const d = res.data;
+                const statusLower = (d.status_bantuan || '').toLowerCase();
+                const isRtlh = (statusLower === 'rtlh' || statusLower === 'target');
+                const displayStatus = isRtlh ? 'RTLH' : 'RLH';
+                const statusClass = isRtlh 
+                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' 
+                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400';
+
+                let photos = [];
+                if (d.foto_depan) photos.push(d.foto_depan);
+                if (d.foto_samping) photos.push(d.foto_samping);
+                if (d.foto_belakang) photos.push(d.foto_belakang);
+                if (d.foto_dalam) photos.push(d.foto_dalam);
+
+                let imgHtml = '';
+                if (photos.length > 0) {
+                    let gridClass = photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2';
+                    imgHtml = `
+                        <div class="mt-3">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Dokumentasi Rumah</p>
+                            <div class="grid ${gridClass} gap-1">
+                    `;
+                    photos.slice(0, 4).forEach(p => {
+                        imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`;
+                    });
+                    imgHtml += `
+                            </div>
+                        </div>
+                    `;
+                }
+
                 content.innerHTML = `
                     <div class="space-y-4">
                         <div>
@@ -534,19 +564,15 @@
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa</p>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa/Kelurahan</p>
                                 <p class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">${d.desa}</p>
                             </div>
                             <div>
                                 <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold rounded-full uppercase">${d.status_bantuan}</span>
+                                <span class="px-2 py-0.5 ${statusClass} text-[8px] font-bold rounded-full uppercase">${displayStatus}</span>
                             </div>
                         </div>
-                        <div>
-                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Alamat</p>
-                            <p class="text-[10px] font-medium text-slate-500 leading-tight">${d.alamat_detail || '-'}</p>
-                        </div>
-                        ${isLoggedIn ? `<a href="<?= base_url('rtlh/detail') ?>/${d.id_survei}" class="block w-full py-3 bg-blue-600 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all">Lihat Detail Lengkap</a>` : ''}
+                        ${imgHtml}
                     </div>
                 `;
 
