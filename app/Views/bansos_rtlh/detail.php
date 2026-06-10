@@ -131,7 +131,33 @@
                             <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Hasil Pekerjaan (After)
                         </p>
                         
-                        <?php if (!empty($bansos['foto_after'])): ?>
+                        <?php 
+                            $hasAfterPhotos = !empty($bansos['foto_setelah_depan']) || !empty($bansos['foto_setelah_samping']) || !empty($bansos['foto_setelah_dalam']);
+                            if ($hasAfterPhotos): 
+                        ?>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <?php 
+                                    $afterList = [
+                                        'foto_setelah_depan' => 'Tampak Depan (After)', 
+                                        'foto_setelah_samping' => 'Samping (After)', 
+                                        'foto_setelah_dalam' => 'Interior (After)'
+                                    ];
+                                    foreach($afterList as $f => $lbl): 
+                                ?>
+                                    <div class="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 group relative">
+                                        <?php if (!empty($bansos[$f])): ?>
+                                            <img src="<?= base_url('uploads/rtlh/'.$bansos[$f]) ?>" class="w-full h-full object-cover transition-transform group-hover:scale-110">
+                                            <div class="absolute inset-0 bg-emerald-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <a href="<?= base_url('uploads/rtlh/'.$bansos[$f]) ?>" target="_blank" class="p-2 bg-white/20 backdrop-blur-md rounded-full text-white"><i data-lucide="maximize" class="w-4 h-4"></i></a>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="w-full h-full flex items-center justify-center opacity-30"><i data-lucide="image-off" class="w-6 h-6 text-slate-300"></i></div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <p class="mt-3 text-[9px] text-slate-400 italic font-bold uppercase tracking-widest text-center">*Menampilkan foto setelah perbaikan</p>
+                        <?php elseif (!empty($bansos['foto_after'])): ?>
                             <div class="aspect-video rounded-2xl overflow-hidden bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 group relative max-w-2xl mx-auto shadow-xl shadow-emerald-900/10">
                                 <img src="<?= base_url('uploads/rtlh/'.$bansos['foto_after']) ?>" class="w-full h-full object-cover transition-transform group-hover:scale-105">
                                 <div class="absolute inset-0 bg-emerald-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

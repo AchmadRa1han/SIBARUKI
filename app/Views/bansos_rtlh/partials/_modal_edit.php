@@ -135,7 +135,7 @@
 
 <script>
     (function() {
-        const BANSOS_UPLOAD_URL = <?= json_encode(base_url('uploads/bansos/')) ?>;
+        const BANSOS_UPLOAD_URL = <?= json_encode(base_url('uploads/rtlh/')) ?>;
         
         window.bansosModal = {
             map: null,
