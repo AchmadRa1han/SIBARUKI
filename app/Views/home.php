@@ -444,7 +444,6 @@
 
                 if (type === 'kumuh') {
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Skor Kekumuhan: ${item.skor_kumuh || '-'}</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status: ${item.Sk_Kumuh || 'Belum Ditetapkan'}</p>
                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Luasan: ${item.Luas_kumuh || '-'} Ha</p>`;
                 } else if (type === 'aset') {
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luas: ${item.luas_m2 || '-'} m²</p>
