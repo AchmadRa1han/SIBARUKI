@@ -100,6 +100,7 @@ class Rtlh extends BaseController
         $tahun = $post['tahun_bansos'] ?? date('Y');
         $program = $post['program_bansos'];
         $koordinat = $post['lokasi_realisasi'] ?? null;
+        $tanggalBantuan = $post['tanggal_bantuan'] ?? date('Y-m-d');
 
         if (!$id) return redirect()->back()->with('error', 'ID Survei tidak valid.');
 
@@ -123,6 +124,7 @@ class Rtlh extends BaseController
         $db->transStart();
         try {
             $now = date('Y-m-d H:i:s');
+            $created_at = !empty($tanggalBantuan) ? $tanggalBantuan . ' ' . date('H:i:s') : $now;
             
             // 1. Update Tabel Utama
             $db->table('perumahan_rtlh_rumah')->where('id_survei', $id)->update([
@@ -142,7 +144,7 @@ class Rtlh extends BaseController
                 'sumber_dana' => $program ?: 'Bansos RTLH',
                 'keterangan' => $post['keterangan_realisasi'] ?? 'Ditandai tuntas dari modul RTLH',
                 'foto_before' => $rumah['foto_depan'] ?? null, // Ambil foto depan lama sebagai bukti awal
-                'created_at' => $now,
+                'created_at' => $created_at,
                 'updated_at' => $now
             ];
 
@@ -168,10 +170,17 @@ class Rtlh extends BaseController
             $this->bansosModel->insert($dataBansos);
             $bansosId = $this->bansosModel->getInsertID();
 
-            // Simpan Koordinat Realisasi jika ada
+            // Simpan Koordinat Realisasi jika ada, fallback ke koordinat rumah asal jika ada
+            $geomText = null;
             if (!empty($koordinat) && preg_match('/POINT\s*\(\s*-?\\d+\\.?\\d*\\s+-?\\d+\\.?\\d*\\s*\\)/i', $koordinat)) {
+                $geomText = $koordinat;
+            } elseif (!empty($rumah['lokasi_koordinat_text'])) {
+                $geomText = $rumah['lokasi_koordinat_text'];
+            }
+
+            if ($geomText) {
                 $db->table('perumahan_rtlh_bansos')->where('id', $bansosId)
-                   ->set('lokasi_realisasi', "ST_GeomFromText('{$koordinat}')", false)
+                   ->set('lokasi_realisasi', "ST_GeomFromText('{$geomText}')", false)
                    ->update();
             }
 
@@ -192,7 +201,7 @@ class Rtlh extends BaseController
             if ($db->transStatus() === false) throw new \Exception('Database Error');
 
             $this->logActivity('Tuntas Bansos', 'RTLH', "Realisasi bantuan ID $id tahun $tahun berhasil dicatat");
-            return redirect()->to('/rtlh?status=Rlh')->with('success', "Realisasi Program berhasil dicatat. Foto Before-After tersedia di halaman detail.");
+            return redirect()->to('/rtlh/detail/' . $id)->with('success', "Realisasi Program berhasil dicatat. Foto Before-After tersedia di halaman detail.");
         } catch (\Exception $e) {
             $db->transRollback();
             return redirect()->back()->with('error', 'Gagal memproses realisasi: ' . $e->getMessage());

@@ -116,6 +116,55 @@ describe('RTLH CRUD Testing - Pure UI Interaction Flow', () => {
     cy.contains('Data RTLH berhasil diperbarui', { timeout: 15000 }).should('be.visible');
   });
 
+  it('Should mark the record as tuntas and verify it appears in both bansos and data rumah', () => {
+    // Navigate to RTLH detail page of the record
+    cy.get('nav#sidebar-nav').contains('Perumahan').click({ force: true });
+    cy.get('#dropdown-perumahan').contains('Data Rumah').click({ force: true });
+    cy.get('input[name="keyword"]').type(newNama + '{enter}');
+    cy.contains(newNama).parents('tr').find('a[title="Detail Master Data"]').click();
+    cy.url().should('include', '/rtlh/detail/');
+
+    // Click Tandai Tuntas to open modal
+    cy.get('button').contains('Tandai Tuntas').click();
+    cy.get('#modal-tuntas').should('be.visible');
+
+    // Fill form
+    cy.get('#modal-tuntas input[name="program_bansos"]').type('Cypress BSPS Test');
+    cy.get('#modal-tuntas input[name="tanggal_bantuan"]').type('2026-06-10');
+    cy.get('#modal-tuntas input[name="tahun_bansos"]').clear().type('2026');
+    cy.get('#modal-tuntas input[name="keterangan_realisasi"]').type('Dikerjakan oleh Cypress E2E');
+
+    // Submit
+    cy.get('#modal-tuntas button[type="submit"]').click();
+
+    // Verify success and details on detail page
+    cy.url().should('include', '/rtlh/detail/');
+    cy.contains('Realisasi Program berhasil dicatat', { timeout: 15000 }).should('be.visible');
+    cy.contains('TUNTAS (RLH) - 2026').should('be.visible');
+    
+    // Verify realisasi card details
+    cy.contains('Realisasi Bantuan').should('exist');
+    cy.contains('Cypress BSPS Test').should('exist');
+    cy.contains('10/06/2026').should('exist');
+    cy.contains('Dikerjakan oleh Cypress E2E').should('exist');
+
+    // Navigate to Realisasi Bansos to verify it shows there
+    cy.get('nav#sidebar-nav').contains('Perumahan').click({ force: true });
+    cy.get('#dropdown-perumahan').contains('Bansos RTLH').click({ force: true });
+    cy.url().should('include', '/bansos-rtlh');
+    cy.get('input[name="keyword"]').type(newNama + '{enter}');
+    cy.contains(newNama).should('be.visible');
+    cy.contains('Cypress BSPS Test').should('be.visible');
+
+    // Navigate to Data Rumah to verify it still remains there with status Rlh
+    cy.get('nav#sidebar-nav').contains('Perumahan').click({ force: true });
+    cy.get('#dropdown-perumahan').contains('Data Rumah').click({ force: true });
+    cy.url().should('include', '/rtlh');
+    cy.get('input[name="keyword"]').type(newNama + '{enter}');
+    cy.contains(newNama).should('be.visible');
+    cy.contains('Rlh').should('be.visible');
+  });
+
   it('Should delete the updated record from list page', () => {
     // Navigate to RTLH list
     cy.get('nav#sidebar-nav').contains('Perumahan').click({ force: true });
