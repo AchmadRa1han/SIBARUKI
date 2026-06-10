@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="flex flex-wrap items-center gap-3 relative z-10">
-            <a href="<?= base_url('rtlh?status=Sudah Menerima') ?>" class="bg-white/10 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-white/10 backdrop-blur-md shadow-sm hover:bg-white hover:text-blue-950 transition-all active:scale-95 flex items-center gap-2">
+            <a href="<?= base_url('rtlh?status=Rlh') ?>" class="bg-white/10 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-white/10 backdrop-blur-md shadow-sm hover:bg-white hover:text-blue-950 transition-all active:scale-95 flex items-center gap-2">
                 <i data-lucide="home" class="w-4 h-4"></i> Lihat Unit RLH
             </a>
             <?php if (has_permission('edit_rtlh')): ?>

@@ -130,7 +130,7 @@ class BansosRtlh extends BaseController
 
                 // Update Status RTLH
                 $db->table('perumahan_rtlh_rumah')->where('id_survei', $targetId)->update([
-                    'status_bantuan' => 'Sudah Menerima',
+                    'status_bantuan' => 'Rlh',
                     'tahun_bansos' => $tahun,
                     'bantuan_perumahan' => $sumber,
                     'updated_at' => date('Y-m-d H:i:s')
