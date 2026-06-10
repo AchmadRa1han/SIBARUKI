@@ -174,7 +174,16 @@
                     <?php foreach(['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'arsinum', 'pisew', 'aset'] as $l): ?>
                     <button type="button" onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg" data-layer="<?= $l ?>">
                         <?php 
-                            $labels = ['rtlh'=>'RTLH', 'bansos'=>'Bansos', 'kumuh'=>'Kumuh', 'formal'=>'Perumahan', 'psu'=>'PSU', 'arsinum'=>'Arsinum', 'pisew'=>'PISEW', 'aset'=>'Aset'];
+                            $labels = [
+                                'rtlh'=>'RTLH', 
+                                'bansos'=>'Bansos RTLH', 
+                                'kumuh'=>'Wilayah Kumuh', 
+                                'formal'=>'Perumahan', 
+                                'psu'=>'PSU Terbangun', 
+                                'arsinum'=>'Arsinum', 
+                                'pisew'=>'PISEW', 
+                                'aset'=>'Aset Tanah Pemda'
+                            ];
                             echo $labels[$l];
                         ?>
                     </button>
@@ -434,13 +443,16 @@
                 }
 
                 if (type === 'kumuh') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status: ${item.Sk_Kumuh || 'Belum Ditetapkan'}</p>
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Skor Kekumuhan: ${item.skor_kumuh || '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status: ${item.Sk_Kumuh || 'Belum Ditetapkan'}</p>
                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Luasan: ${item.Luas_kumuh || '-'} Ha</p>`;
                 } else if (type === 'aset') {
                     detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luas: ${item.luas_m2 || '-'} m²</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status Hak: ${item.nomor_hak || '-'}</p>`;
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status Hak: ${item.status_tanah || '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nomor Hak: ${item.nomor_hak || '-'}</p>`;
                 } else if (type === 'arsinum' || type === 'pisew') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
+                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lokasi: Desa ${item.desa || '-'}, Kec. ${item.kecamatan || '-'}</p>
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'psu') {
                     detailsHtml = `${imgHtml}
                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Panjang/Luas: ${item.nilai || '-'} m/m²</p>
@@ -450,7 +462,7 @@
                 } else if (type === 'bansos') {
                     detailsHtml = `${imgHtml}
                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tahun: ${item.tahun_anggaran || '-'}</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Sumber Dana: ${item.sumber_dana || '-'}</p>`;
+                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Sumber Anggaran: ${item.sumber_dana || '-'}</p>`;
                 } else if (type === 'rtlh') {
                     detailsHtml = `${imgHtml}`;
                 } else {

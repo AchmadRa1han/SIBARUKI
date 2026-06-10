@@ -80,9 +80,9 @@ class Home extends BaseController
         $mapKumuh = $db->table('permukiman_wilayah_kumuh')->select('FID as id, Kawasan as name, WKT as wkt, skor_kumuh, Luas_kumuh, Sk_Kumuh')->where('WKT IS NOT NULL')->get()->getResultArray();
         $mapFormal = $db->table('perumahan_formal')->select('id, nama_perumahan as name, latitude, longitude, pengembang')->get()->getResultArray();
         $mapPsu = $db->table('permukiman_psu_jalan')->select('id, nama_jalan as name, wkt, panjang_luas as nilai, tahun, foto_after as image')->limit(100)->get()->getResultArray();
-        $mapArsinum = $db->table('permukiman_arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun')->get()->getResultArray();
-        $mapPisew = $db->table('permukiman_pisew')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun')->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
-        $mapAset = $db->table('pertanahan_aset')->select('id, nama_pemilik as name, nomor_hak, koordinat as coords, luas_m2')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
+        $mapArsinum = $db->table('permukiman_arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun, kecamatan, desa')->get()->getResultArray();
+        $mapPisew = $db->table('permukiman_pisew')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun, kecamatan, lokasi_desa as desa')->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
+        $mapAset = $db->table('pertanahan_aset')->select('id, nama_pemilik as name, nomor_hak, status_tanah, koordinat as coords, luas_m2')->where('koordinat IS NOT NULL')->where('koordinat !=', '')->get()->getResultArray();
 
         // Markers Bansos (Tambahkan ini untuk homepage)
         $mapBansos = $db->table('perumahan_rtlh_bansos')->select('id, nama_penerima as name, desa, ST_AsText(lokasi_realisasi) as wkt, tahun_anggaran, sumber_dana, foto_after as image')
@@ -319,15 +319,15 @@ class Home extends BaseController
 
         // Markers Aset Tanah
         $mapAset = $db->table('pertanahan_aset')
-            ->select('id, nama_pemilik as name, nomor_hak, koordinat as coords, luas_m2, "aset" as type')
+            ->select('id, nama_pemilik as name, nomor_hak, status_tanah, koordinat as coords, luas_m2, "aset" as type')
             ->where('koordinat IS NOT NULL')->where('koordinat !=', '')
             ->get()->getResultArray();
 
         // Markers Arsinum
-        $mapArsinum = $db->table('permukiman_arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun, "arsinum" as type')->get()->getResultArray();
+        $mapArsinum = $db->table('permukiman_arsinum')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun, kecamatan, desa, "arsinum" as type')->get()->getResultArray();
 
         // Markers PISEW
-        $mapPisew = $db->table('permukiman_pisew')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun, "pisew" as type')
+        $mapPisew = $db->table('permukiman_pisew')->select('id, jenis_pekerjaan as name, koordinat as coords, tahun, kecamatan, lokasi_desa as desa, "pisew" as type')
             ->where('koordinat IS NOT NULL AND koordinat != ""')->get()->getResultArray();
 
         // Markers Bansos

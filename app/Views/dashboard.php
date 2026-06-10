@@ -85,9 +85,19 @@
                 if ($role === 'admin') {
                     $layers = ['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'];
                 }
+                $labels = [
+                    'rtlh' => 'RTLH',
+                    'bansos' => 'BANSOS RTLH',
+                    'kumuh' => 'WILAYAH KUMUH',
+                    'formal' => 'PERUMAHAN',
+                    'psu' => 'PSU TERBANGUN',
+                    'aset' => 'ASET TANAH PEMDA',
+                    'arsinum' => 'ARSINUM',
+                    'pisew' => 'PISEW'
+                ];
                 foreach($layers as $l): ?>
                 <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
-                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'gift':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= ($l == 'formal' ? 'PERUMAHAN' : ($l == 'rtlh' ? 'RTLH' : strtoupper($l))) ?>
+                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'gift':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= $labels[$l] ?>
                 </button>
                 <?php endforeach; ?>
             </div>
@@ -320,17 +330,24 @@
                 }
 
                 if (type === 'kumuh') {
-                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Status: ${item.Sk_Kumuh || '-'}</p><p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Luasan: ${item.Luas_kumuh || '-'} Ha</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Skor Kekumuhan: ${item.skor_kumuh || '-'}</p>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Status: ${item.Sk_Kumuh || 'Belum Ditetapkan'}</p>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Luasan: ${item.Luas_kumuh || '-'} Ha</p>`;
                 } else if (type === 'aset') {
-                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Luas: ${item.luas_m2 || '-'} m²</p><p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Status Hak: ${item.nomor_hak || '-'}</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Luas: ${item.luas_m2 || '-'} m²</p>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Status Hak: ${item.status_tanah || '-'}</p>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Nomor Hak: ${item.nomor_hak || '-'}</p>`;
                 } else if (type === 'arsinum' || type === 'pisew') {
-                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Tahun: ${item.tahun || '-'}</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Lokasi: Desa ${item.desa || '-'}, Kec. ${item.kecamatan || '-'}</p>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'psu') {
-                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Panjang/Luas: ${item.nilai || '-'} m/m²</p><p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Tahun: ${item.tahun || '-'}</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Panjang/Luas: ${item.nilai || '-'} m/m²</p>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'formal') {
                     detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Pengembang: ${item.pengembang || '-'}</p>`;
                 } else if (type === 'bansos') {
-                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Tahun: ${item.tahun_anggaran || '-'}</p><p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Sumber Dana: ${item.sumber_dana || '-'}</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Tahun: ${item.tahun_anggaran || '-'}</p>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Sumber Anggaran: ${item.sumber_dana || '-'}</p>`;
                 } else if (type !== 'rtlh') {
                     detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Informasi Terverifikasi</p>`;
                 }
