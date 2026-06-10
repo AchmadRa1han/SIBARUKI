@@ -48,6 +48,7 @@ class Settings extends BaseController
         $settingsModel = new SettingsModel();
         $captions = $this->request->getPost('caption') ?? [];
         $oldImages = $this->request->getPost('old_image') ?? [];
+        $positions = $this->request->getPost('position') ?? [];
         
         // Ambil SEMUA file yang diupload (baik index baru atau lama)
         $uploadedFiles = $this->request->getFiles();
@@ -80,14 +81,21 @@ class Settings extends BaseController
                 $imageUrl = 'uploads/carousel/' . $newName;
             }
 
+            // Pastikan format posisi memiliki simbol persen (%) agar valid untuk CSS object-position
+            $positionVal = $positions[$index] ?? '50%';
+            if (is_numeric($positionVal)) {
+                $positionVal .= '%';
+            }
+
             // Hanya simpan jika ada gambar (baik yang baru atau yang lama tetap dipertahankan)
             if (!empty($imageUrl)) {
                 $relativePath = str_replace(base_url(), '', $imageUrl);
                 $relativePath = ltrim($relativePath, '/');
 
                 $carouselData[] = [
-                    'image'   => $relativePath,
-                    'caption' => $caption
+                    'image'    => $relativePath,
+                    'caption'  => $caption,
+                    'position' => $positionVal
                 ];
             }
         }

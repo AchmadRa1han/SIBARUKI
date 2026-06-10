@@ -119,7 +119,7 @@
 
         <!-- Pengaturan Carousel -->
         <?php if(has_permission('manage_roles')): ?>
-        <a href="<?= base_url('settings/carousel') ?>" class="group relative bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+        <a href="<?= base_url('sys_settings/carousel') ?>" class="group relative bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
             <div class="absolute -right-4 -top-4 w-32 h-32 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 transition-colors"></div>
             <div class="relative z-10 space-y-6">
                 <div class="w-16 h-16 bg-blue-600 dark:bg-blue-700 text-white rounded-3xl flex items-center justify-center shadow-lg shadow-blue-900/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
