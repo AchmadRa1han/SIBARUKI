@@ -35,6 +35,8 @@ class Rtlh extends BaseController
         $keyword = $this->request->getGet('keyword');
         $perPage = $this->request->getGet('per_page') ?? 10;
         $status = $this->request->getGet('status') ?? 'semua';
+        if ($status === 'Sudah Menerima') $status = 'Rlh';
+        if ($status === 'Belum Menerima') $status = 'Rtlh';
 
         $query = $this->rumahModel->select('perumahan_rtlh_rumah.*, ST_AsText(lokasi_koordinat) as wkt, perumahan_rtlh_penerima.nama_kepala_keluarga as pemilik')
                                   ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left');
@@ -124,7 +126,7 @@ class Rtlh extends BaseController
             
             // 1. Update Tabel Utama
             $db->table('perumahan_rtlh_rumah')->where('id_survei', $id)->update([
-                'status_bantuan' => 'Sudah Menerima',
+                'status_bantuan' => 'Rlh',
                 'tahun_bansos' => $tahun,
                 'bantuan_perumahan' => $program ?: 'Bansos RTLH',
                 'updated_at' => $now
@@ -190,7 +192,7 @@ class Rtlh extends BaseController
             if ($db->transStatus() === false) throw new \Exception('Database Error');
 
             $this->logActivity('Tuntas Bansos', 'RTLH', "Realisasi bantuan ID $id tahun $tahun berhasil dicatat");
-            return redirect()->to('/rtlh?status=Sudah Menerima')->with('success', "Realisasi Program berhasil dicatat. Foto Before-After tersedia di halaman detail.");
+            return redirect()->to('/rtlh?status=Rlh')->with('success', "Realisasi Program berhasil dicatat. Foto Before-After tersedia di halaman detail.");
         } catch (\Exception $e) {
             $db->transRollback();
             return redirect()->back()->with('error', 'Gagal memproses realisasi: ' . $e->getMessage());
@@ -410,7 +412,7 @@ class Rtlh extends BaseController
                     'kamar_mandi_dan_jamban'=> $getVal('kamar_mandi_dan_jamban'),
                     'jenis_jamban_kloset' => $findId('JENIS_JAMBAN', $getVal('jenis_jamban_kloset')),
                     'jenis_tpa_tinja'     => $getVal('jenis_tpa_tinja'),
-                    'status_bantuan'      => 'Belum Menerima',
+                    'status_bantuan'      => 'Rtlh',
                     'updated_at'          => date('Y-m-d H:i:s')
                 ];
                 
@@ -470,6 +472,15 @@ class Rtlh extends BaseController
         if (isset($rumah['lokasi_koordinat'])) unset($rumah['lokasi_koordinat']);
 
         $db = \Config\Database::connect();
+        
+        // Ensure desa name is populated from kode_desa if it is empty/null in perumahan_rtlh_rumah
+        if (empty($rumah['desa']) && !empty($rumah['desa_id'])) {
+            $desaRow = $db->table('kode_desa')->where('desa_id', $rumah['desa_id'])->get()->getRowArray();
+            if ($desaRow) {
+                $rumah['desa'] = $desaRow['desa_nama'];
+            }
+        }
+
         $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
         $penerima = $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first();
         $realisasi = $db->table('perumahan_rtlh_bansos')->select('*, ST_AsText(lokasi_realisasi) as wkt_realisasi')->where('id_survei', $id)->orderBy('id', 'DESC')->get()->getRowArray();
@@ -790,10 +801,19 @@ class Rtlh extends BaseController
                 'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? 0
             ]);
             
+            // Resolve Desa Name from kode_desa if it is empty
+            $desaId = $post['desa_id'] ?? null;
+            $desaNama = !empty($post['desa']) ? $post['desa'] : null;
+            if (empty($desaNama) && !empty($desaId)) {
+                $desaRow = $db->table('kode_desa')->where('desa_id', $desaId)->get()->getRowArray();
+                if ($desaRow) $desaNama = $desaRow['desa_nama'];
+            }
+            if (empty($desaNama)) $desaNama = null;
+
             $dataRumah = [
                 'nik_pemilik' => $nik, 
-                'desa' => $post['desa'] ?? null, 
-                'desa_id' => $post['desa_id'] ?? null, 
+                'desa' => $desaNama, 
+                'desa_id' => $desaId, 
                 'alamat_detail' => $post['alamat_detail'] ?? null, 
                 'jenis_kawasan' => $this->resolveMasterId('jenis_kawasan', $post, 'JENIS_KAWASAN'), 
                 'luas_rumah_m2' => $post['luas_rumah_m2'] ?? 0, 
@@ -812,7 +832,7 @@ class Rtlh extends BaseController
                 'desil_nasional' => $post['desil_nasional'] ?? null,
                 'status_backlog' => $post['status_backlog'] ?? 'TIDAK BACKLOG',
                 'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? 0,
-                'status_bantuan' => $post['status_bantuan'] ?? 'Belum Menerima', 
+                'status_bantuan' => (isset($post['status_bantuan']) && $post['status_bantuan'] === 'Belum Menerima') ? 'Rtlh' : ((isset($post['status_bantuan']) && $post['status_bantuan'] === 'Sudah Menerima') ? 'Rlh' : ($post['status_bantuan'] ?? 'Rtlh')), 
                 'created_at' => date('Y-m-d H:i:s'), 
                 'updated_at' => date('Y-m-d H:i:s')
             ];
@@ -831,72 +851,117 @@ class Rtlh extends BaseController
 
     public function edit($id)
     {
-        $db = \Config\Database::connect(); $rumah = $this->rumahModel->find($id); if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        $master = []; foreach ($this->refModel->findAll() as $ref) $master[$ref['kategori']][] = $ref;
+        $db = \Config\Database::connect(); 
+        $rumah = $this->rumahModel->select('*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')->find($id); 
+        if (!$rumah) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        
+        $master = []; 
+        foreach ($this->refModel->findAll() as $ref) $master[$ref['kategori']][] = $ref;
+        
         $allDesa = $db->table('kode_desa')->orderBy('desa_nama', 'ASC')->get()->getResultArray();
         $desaList = array_map(function($d) { return ['desa' => $d['desa_nama'], 'desa_id' => $d['desa_id']]; }, $allDesa);
-        return view('rtlh/edit', ['title' => 'Edit RTLH', 'rumah' => $rumah, 'penerima' => $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first(), 'kondisi' => $this->kondisiModel->where('id_survei', $id)->first(), 'master' => $master, 'desa_list' => $desaList]);
+        
+        return view('rtlh/edit', [
+            'title' => 'Edit RTLH', 
+            'rumah' => $rumah, 
+            'penerima' => $this->penerimaModel->where('nik', $rumah['nik_pemilik'])->first(), 
+            'kondisi' => $this->kondisiModel->where('id_survei', $id)->first(), 
+            'master' => $master, 
+            'desa_list' => $desaList
+        ]);
     }
 
     public function update($id)
     {
-        $db = \Config\Database::connect(); $rumahLama = $this->rumahModel->find($id); if (!$rumahLama) return redirect()->back()->with('error', 'Data tidak ditemukan.');
-        $post = $this->request->getPost(); $nik = $rumahLama['nik_pemilik']; $penerima = $this->penerimaModel->where('nik', $nik)->first(); $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
+        $db = \Config\Database::connect(); 
+        $rumahLama = $this->rumahModel->select('*, ST_AsText(lokasi_koordinat) as lokasi_koordinat')->find($id); 
+        if (!$rumahLama) return redirect()->back()->with('error', 'Data tidak ditemukan.');
+        
+        $post = $this->request->getPost(); 
+        $nik = $rumahLama['nik_pemilik']; 
+        $penerima = $this->penerimaModel->where('nik', $nik)->first(); 
+        $kondisi = $this->kondisiModel->where('id_survei', $id)->first();
+        
         try {
             $db->transException(true)->transStart();
             
-            // Data Penerima - Preserve if missing
+            // Data Penerima - Preserve if missing or empty
             $dataPenerima = [
-                'nama_kepala_keluarga' => $post['nama_kepala_keluarga'] ?? $penerima['nama_kepala_keluarga'],
-                'no_kk' => isset($post['no_kk']) ? preg_replace('/[^0-9]/', '', $post['no_kk']) : $penerima['no_kk'],
-                'tempat_lahir' => $post['tempat_lahir'] ?? $penerima['tempat_lahir'],
-                'tanggal_lahir' => $post['tanggal_lahir'] ?? $penerima['tanggal_lahir'],
-                'jenis_kelamin' => $post['jenis_kelamin'] ?? $penerima['jenis_kelamin'],
-                'jumlah_anggota_keluarga' => $post['jumlah_anggota_keluarga'] ?? $penerima['jumlah_anggota_keluarga'],
+                'nama_kepala_keluarga' => !empty($post['nama_kepala_keluarga']) ? $post['nama_kepala_keluarga'] : ($penerima['nama_kepala_keluarga'] ?? null),
+                'no_kk' => !empty($post['no_kk']) ? preg_replace('/[^0-9]/', '', $post['no_kk']) : ($penerima['no_kk'] ?? null),
+                'tempat_lahir' => !empty($post['tempat_lahir']) ? $post['tempat_lahir'] : ($penerima['tempat_lahir'] ?? null),
+                'tanggal_lahir' => !empty($post['tanggal_lahir']) ? $post['tanggal_lahir'] : ($penerima['tanggal_lahir'] ?? null),
+                'jenis_kelamin' => !empty($post['jenis_kelamin']) ? $post['jenis_kelamin'] : ($penerima['jenis_kelamin'] ?? null),
+                'jumlah_anggota_keluarga' => isset($post['jumlah_anggota_keluarga']) && $post['jumlah_anggota_keluarga'] !== '' ? $post['jumlah_anggota_keluarga'] : ($penerima['jumlah_anggota_keluarga'] ?? 0),
                 'pendidikan_id' => $this->resolveMasterId('pendidikan_id', $post, 'PENDIDIKAN', $penerima['pendidikan_id'] ?? null),
                 'pekerjaan_id' => $this->resolveMasterId('pekerjaan_id', $post, 'PEKERJAAN', $penerima['pekerjaan_id'] ?? null),
                 'penghasilan_per_bulan' => $this->resolveMasterId('penghasilan_per_bulan', $post, 'PENGHASILAN', $penerima['penghasilan_per_bulan'] ?? null)
             ];
-            $this->penerimaModel->update($nik, $dataPenerima);
 
-            // Data Rumah - Preserve if missing
+            // Up-sert Penerima (Insert if not exists, Update if exists)
+            $penerimaExists = $this->penerimaModel->where('nik', $nik)->countAllResults() > 0;
+            if ($penerimaExists) {
+                $this->penerimaModel->update($nik, $dataPenerima);
+            } else {
+                $dataPenerima['nik'] = $nik;
+                $this->penerimaModel->insert($dataPenerima);
+            }
+
+            // Resolve Desa Name from kode_desa if it is empty on update
+            $desaId = !empty($post['desa_id']) ? $post['desa_id'] : $rumahLama['desa_id'];
+            $desaNama = !empty($post['desa']) ? $post['desa'] : null;
+            if (empty($desaNama) && !empty($desaId)) {
+                $desaRow = $db->table('kode_desa')->where('desa_id', $desaId)->get()->getRowArray();
+                if ($desaRow) $desaNama = $desaRow['desa_nama'];
+            }
+            if (empty($desaNama)) $desaNama = $rumahLama['desa'];
+
+            // Data Rumah - Preserve if missing or empty
             $dataRumah = [
-                'alamat_detail' => $post['alamat_detail'] ?? $rumahLama['alamat_detail'],
-                'desa' => $post['desa'] ?? $rumahLama['desa'],
-                'desa_id' => $post['desa_id'] ?? $rumahLama['desa_id'],
+                'alamat_detail' => !empty($post['alamat_detail']) ? $post['alamat_detail'] : $rumahLama['alamat_detail'],
+                'desa' => $desaNama,
+                'desa_id' => $desaId,
                 'jenis_kawasan' => $this->resolveMasterId('jenis_kawasan', $post, 'JENIS_KAWASAN', $rumahLama['jenis_kawasan']),
-                'luas_rumah_m2' => $post['luas_rumah_m2'] ?? $rumahLama['luas_rumah_m2'],
-                'luas_lahan_m2' => $post['luas_lahan_m2'] ?? $rumahLama['luas_lahan_m2'],
-                'fungsi_ruang' => $post['fungsi_ruang'] ?? $rumahLama['fungsi_ruang'],
-                'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? $rumahLama['jumlah_penghuni_jiwa'],
+                'luas_rumah_m2' => isset($post['luas_rumah_m2']) && $post['luas_rumah_m2'] !== '' ? $post['luas_rumah_m2'] : $rumahLama['luas_rumah_m2'],
+                'luas_lahan_m2' => isset($post['luas_lahan_m2']) && $post['luas_lahan_m2'] !== '' ? $post['luas_lahan_m2'] : $rumahLama['luas_lahan_m2'],
+                'fungsi_ruang' => !empty($post['fungsi_ruang']) ? $post['fungsi_ruang'] : $rumahLama['fungsi_ruang'],
+                'jumlah_penghuni_jiwa' => isset($post['jumlah_penghuni_jiwa']) && $post['jumlah_penghuni_jiwa'] !== '' ? $post['jumlah_penghuni_jiwa'] : $rumahLama['jumlah_penghuni_jiwa'],
                 'kepemilikan_rumah' => $this->resolveMasterId('kepemilikan_rumah', $post, 'KEPEMILIKAN_RUMAH', $rumahLama['kepemilikan_rumah']),
                 'kepemilikan_tanah' => $this->resolveMasterId('kepemilikan_tanah', $post, 'KEPEMILIKAN_TANAH', $rumahLama['kepemilikan_tanah']),
-                'aset_rumah_di_lokasi_lain' => $post['aset_rumah_di_lokasi_lain'] ?? $rumahLama['aset_rumah_di_lokasi_lain'],
+                'aset_rumah_di_lokasi_lain' => !empty($post['aset_rumah_di_lokasi_lain']) ? $post['aset_rumah_di_lokasi_lain'] : $rumahLama['aset_rumah_di_lokasi_lain'],
                 'sumber_penerangan' => $this->resolveMasterId('sumber_penerangan', $post, 'SUMBER_PENERANGAN', $rumahLama['sumber_penerangan']),
-                'sumber_penerangan_detail' => $post['sumber_penerangan_detail'] ?? $rumahLama['sumber_penerangan_detail'],
+                'sumber_penerangan_detail' => !empty($post['sumber_penerangan_detail']) ? $post['sumber_penerangan_detail'] : $rumahLama['sumber_penerangan_detail'],
                 'sumber_air_minum' => $this->resolveMasterId('sumber_air_minum', $post, 'SUMBER_AIR_MINUM', $rumahLama['sumber_air_minum']),
-                'jarak_sam_ke_tpa_tinja' => $post['jarak_sam_ke_tpa_tinja'] ?? $rumahLama['jarak_sam_ke_tpa_tinja'],
-                'kamar_mandi_dan_jamban' => $post['kamar_mandi_dan_jamban'] ?? $rumahLama['kamar_mandi_dan_jamban'],
+                'jarak_sam_ke_tpa_tinja' => !empty($post['jarak_sam_ke_tpa_tinja']) ? $post['jarak_sam_ke_tpa_tinja'] : $rumahLama['jarak_sam_ke_tpa_tinja'],
+                'kamar_mandi_dan_jamban' => !empty($post['kamar_mandi_dan_jamban']) ? $post['kamar_mandi_dan_jamban'] : $rumahLama['kamar_mandi_dan_jamban'],
                 'jenis_jamban_kloset' => $this->resolveMasterId('jenis_jamban_kloset', $post, 'JENIS_JAMBAN', $rumahLama['jenis_jamban_kloset']),
-                'jenis_tpa_tinja' => $post['jenis_tpa_tinja'] ?? $rumahLama['jenis_tpa_tinja'],
-                'bantuan_perumahan' => $post['bantuan_perumahan'] ?? $rumahLama['bantuan_perumahan'],
-                'desil_nasional' => $post['desil_nasional'] ?? $rumahLama['desil_nasional'],
-                'status_backlog' => $post['status_backlog'] ?? $rumahLama['status_backlog'],
-                'jumlah_penghuni_jiwa' => $post['jumlah_penghuni_jiwa'] ?? $rumahLama['jumlah_penghuni_jiwa'],
-                'status_bantuan' => $post['status_bantuan'] ?? $rumahLama['status_bantuan']
+                'jenis_tpa_tinja' => !empty($post['jenis_tpa_tinja']) ? $post['jenis_tpa_tinja'] : $rumahLama['jenis_tpa_tinja'],
+                'bantuan_perumahan' => !empty($post['bantuan_perumahan']) ? $post['bantuan_perumahan'] : $rumahLama['bantuan_perumahan'],
+                'desil_nasional' => !empty($post['desil_nasional']) ? $post['desil_nasional'] : $rumahLama['desil_nasional'],
+                'status_backlog' => !empty($post['status_backlog']) ? $post['status_backlog'] : $rumahLama['status_backlog'],
+                'status_bantuan' => (($post['status_bantuan'] ?? '') === 'Belum Menerima') ? 'Rtlh' : ((($post['status_bantuan'] ?? '') === 'Sudah Menerima') ? 'Rlh' : (!empty($post['status_bantuan']) ? $post['status_bantuan'] : $rumahLama['status_bantuan']))
             ];
 
             if (!empty($post['lokasi_koordinat']) && preg_match('/POINT\s*\(\s*-?\d+\.?\d*\s+-?\d+\.?\d*\s*\)/i', $post['lokasi_koordinat'])) {
                 $this->rumahModel->set('lokasi_koordinat', "ST_GeomFromText('{$post['lokasi_koordinat']}')", false);
             }
             
-            $uploadPath = FCPATH . 'uploads/rtlh/'; if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
+            $uploadPath = FCPATH . 'uploads/rtlh/'; 
+            if (!is_dir($uploadPath)) mkdir($uploadPath, 0777, true);
             foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $field) {
-                $img = $this->request->getFile($field); if ($img && $img->isValid() && !$img->hasMoved()) { if (!empty($rumahLama[$field]) && file_exists($uploadPath . $rumahLama[$field])) { @unlink($uploadPath . $rumahLama[$field]); } $newName = $img->getRandomName(); $img->move($uploadPath, $newName); $dataRumah[$field] = $newName; }
+                $img = $this->request->getFile($field); 
+                if ($img && $img->isValid() && !$img->hasMoved()) { 
+                    if (!empty($rumahLama[$field]) && file_exists($uploadPath . $rumahLama[$field])) { 
+                        @unlink($uploadPath . $rumahLama[$field]); 
+                    } 
+                    $newName = $img->getRandomName(); 
+                    $img->move($uploadPath, $newName); 
+                    $dataRumah[$field] = $newName; 
+                }
             }
             $this->rumahModel->update($id, $dataRumah);
             
-            // Data Kondisi - Preserve if missing
+            // Data Kondisi - Preserve if missing or empty
             $dataKondisi = [
                 'st_pondasi' => $this->resolveMasterId('st_pondasi', $post, 'KONDISI', $kondisi['st_pondasi'] ?? null),
                 'st_kolom' => $this->resolveMasterId('st_kolom', $post, 'KONDISI', $kondisi['st_kolom'] ?? null),
@@ -914,11 +979,24 @@ class Rtlh extends BaseController
                 'st_lantai' => $this->resolveMasterId('st_lantai', $post, 'KONDISI', $kondisi['st_lantai'] ?? null),
                 'updated_at' => date('Y-m-d H:i:s')
             ];
-            $this->kondisiModel->update($id, $dataKondisi);
             
-            $db->transComplete(); $this->logActivity('Ubah', 'RTLH', "Memperbarui data RTLH ID: $id");
+            // Up-sert Kondisi (Insert if not exists, Update if exists)
+            $kondisiExists = $this->kondisiModel->where('id_survei', $id)->countAllResults() > 0;
+            if ($kondisiExists) {
+                $this->kondisiModel->update($id, $dataKondisi);
+            } else {
+                $dataKondisi['id_survei'] = $id;
+                $dataKondisi['created_at'] = date('Y-m-d H:i:s');
+                $this->kondisiModel->insert($dataKondisi);
+            }
+            
+            $db->transComplete(); 
+            $this->logActivity('Ubah', 'RTLH', "Memperbarui data RTLH ID: $id");
             return redirect()->to('/rtlh/detail/' . $id)->with('success', 'Data RTLH berhasil diperbarui.');
-        } catch (\Exception $e) { $db->transRollback(); return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage())->withInput(); }
+        } catch (\Exception $e) { 
+            $db->transRollback(); 
+            return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage())->withInput(); 
+        }
     }
 
     public function delete($id)

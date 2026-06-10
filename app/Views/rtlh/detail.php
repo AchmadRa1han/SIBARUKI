@@ -123,7 +123,7 @@
                 </div>
                 <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
                     <div class="md:col-span-2"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Alamat Lengkap</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase leading-relaxed"><?= $rumah['alamat_detail'] ?? '-' ?></p></div>
-                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa / Kelurahan</p><p class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase"><?= $rumah['desa'] ?? '-' ?></p></div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa / Kelurahan</p><p class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase"><?= !empty($rumah['desa']) ? $rumah['desa'] : '-' ?></p></div>
                     <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kepemilikan Rumah</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['kepemilikan_rumah'] ?? ''] ?? '-' ?></p></div>
                     <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kepemilikan Tanah</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['kepemilikan_tanah'] ?? ''] ?? '-' ?></p></div>
                     <div class="bg-blue-600 p-6 rounded-[2rem] text-white shadow-xl shadow-blue-600/20">
@@ -228,9 +228,9 @@
 <script>
     // Local Page Data with hard fallbacks to prevent SyntaxError
     const PAGE_DATA = {
-        rumah: <?= json_encode($rumah ?: (object)[], JSON_UNESCAPED_UNICODE) ?: '{}' ?>,
-        penerima: <?= json_encode($penerima ?: (object)[], JSON_UNESCAPED_UNICODE) ?: '{}' ?>,
-        kondisi: <?= json_encode($kondisi ?: (object)[], JSON_UNESCAPED_UNICODE) ?: '{}' ?>
+        rumah: <?= json_encode($rumah ?: (object)[], JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR) ?: '{}' ?>,
+        penerima: <?= json_encode($penerima ?: (object)[], JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR) ?: '{}' ?>,
+        kondisi: <?= json_encode($kondisi ?: (object)[], JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR) ?: '{}' ?>
     };
 
     let map;

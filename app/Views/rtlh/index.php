@@ -356,6 +356,13 @@
             if (ok) {
                 const f = document.createElement('form');
                 f.method = 'POST'; f.action = `<?= base_url('rtlh/delete') ?>/${id}`;
+                
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '<?= csrf_token() ?>';
+                csrfInput.value = '<?= csrf_hash() ?>';
+                f.appendChild(csrfInput);
+                
                 document.body.appendChild(f); f.submit();
             }
         };
