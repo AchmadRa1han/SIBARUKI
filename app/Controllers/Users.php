@@ -59,7 +59,7 @@ class Users extends BaseController
 
         $data = [
             'title' => 'Daftar Pengguna / Petugas',
-            'sys_users' => $builder->findAll()
+            'users' => $builder->findAll()
         ];
 
         return view('users/index', $data);
@@ -77,7 +77,7 @@ class Users extends BaseController
 
         $data = [
             'title' => 'Tambah Pengguna Baru',
-            'sys_roles' => $this->roleModel->findAll(),
+            'roles' => $this->roleModel->findAll(),
             'desa_list' => $desaList
         ];
 
@@ -105,11 +105,29 @@ class Users extends BaseController
             'role_id'  => $this->request->getPost('role_id')
         ];
 
+        $db = \Config\Database::connect();
+        $db->transStart();
+
         $userId = $this->userModel->insert($userData);
+        
+        $desaIds = $this->request->getPost('desa_ids') ?: [];
+        foreach ($desaIds as $desaId) {
+            $this->userDesaModel->insert([
+                'user_id' => $userId,
+                'desa_id' => $desaId,
+                'category' => 'rtlh'
+            ]);
+            $this->userDesaModel->insert([
+                'user_id' => $userId,
+                'desa_id' => $desaId,
+                'category' => 'kumuh'
+            ]);
+        }
+
+        $db->transComplete();
+
         $savedData = $this->userModel->find($userId);
         $detailLog = $this->formatLogData($savedData);
-
-        // ... (simpan assignments desa) ...
         
         $this->logActivity('Tambah', 'Users', "Menambah user baru: {$savedData['username']}", $detailLog);
 
@@ -141,9 +159,10 @@ class Users extends BaseController
         $data = [
             'title'             => 'Edit Pengguna',
             'user'              => $user,
-            'sys_roles'             => $this->roleModel->findAll(),
+            'roles'             => $this->roleModel->findAll(),
             'assigned_rtlh'     => $assignedRtlh,
             'assigned_kumuh'    => $assignedKumuh,
+            'user_desa'         => array_unique(array_merge($assignedRtlh, $assignedKumuh)),
             'desa_list'         => $desaList
         ];
 
@@ -158,7 +177,6 @@ class Users extends BaseController
         $passwordInput = $this->request->getPost('password');
 
         $updateData = [
-            'username' => $this->request->getPost('username'),
             'instansi' => $this->request->getPost('instansi'),
             'role_id'  => $this->request->getPost('role_id')
         ];
@@ -167,9 +185,30 @@ class Users extends BaseController
             $updateData['password'] = password_hash($passwordInput, PASSWORD_DEFAULT);
         }
 
+        $db = \Config\Database::connect();
+        $db->transStart();
+
         $oldData = $this->userModel->find($id);
         $this->userModel->update($id, $updateData);
         $newData = $this->userModel->find($id);
+
+        // Update assignments desa
+        $this->userDesaModel->where('user_id', $id)->delete();
+        $desaIds = $this->request->getPost('desa_ids') ?: [];
+        foreach ($desaIds as $desaId) {
+            $this->userDesaModel->insert([
+                'user_id' => $id,
+                'desa_id' => $desaId,
+                'category' => 'rtlh'
+            ]);
+            $this->userDesaModel->insert([
+                'user_id' => $id,
+                'desa_id' => $desaId,
+                'category' => 'kumuh'
+            ]);
+        }
+
+        $db->transComplete();
 
         $diff = $this->generateDiff($oldData, $newData, ['password', 'updated_at']);
         $this->logActivity('Ubah', 'Users', 'Memperbarui profil user: ' . $user['username'], $diff);

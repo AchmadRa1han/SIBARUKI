@@ -12,7 +12,7 @@ class UserDesaModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['user_id', 'desa_id'];
+    protected $allowedFields    = ['user_id', 'desa_id', 'category'];
 
     // Dates
     protected $useTimestamps = true;
