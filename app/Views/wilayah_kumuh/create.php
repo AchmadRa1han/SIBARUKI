@@ -1,6 +1,14 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
+<!-- GIS & Map Drawing Assets -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoman-io/leaflet-geoman-free@2.17.0/dist/leaflet-geoman.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@geoman-io/leaflet-geoman-free@2.17.0/dist/leaflet-geoman.min.js"></script>
+
 <div class="max-w-7xl mx-auto space-y-6 pb-32 text-slate-900 dark:text-slate-200">
     
     <!-- Breadcrumbs -->
@@ -114,7 +122,7 @@
                 <div class="p-8 space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">No. SK Penetapan</label>
+                            <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">No. SK Penetapan (Opsional)</label>
                             <input type="text" name="Sk_Kumuh" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
                         </div>
                         <div>
@@ -122,6 +130,19 @@
                             <input type="text" name="Sumber_data" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-slate-200 outline-none transition-all font-bold uppercase">
                         </div>
                     </div>
+
+                    <!-- PETA INTERAKTIF GAMBAR POLYGON -->
+                    <div class="space-y-3">
+                        <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Gambar Poligon Kumuh Pada Peta</label>
+                        <div id="map-editor" class="w-full h-[450px] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner relative overflow-hidden z-10 bg-slate-100 dark:bg-slate-950"></div>
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-[10px] font-medium text-slate-400 leading-normal">
+                            <p>💡 <span class="font-bold">Panduan:</span> Gunakan ikon poligon di kanan atas peta untuk menggambar batas wilayah kumuh. Hasil gambar akan terkonversi otomatis menjadi format WKT.</p>
+                            <button type="button" onclick="loadPolygonFromWkt()" class="shrink-0 text-[10px] font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 uppercase tracking-widest flex items-center gap-1.5 transition-all">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Plot Dari Textarea
+                            </button>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest ml-1">Data Poligon (WKT)</label>
                         <div class="relative">
@@ -153,8 +174,210 @@
 </div>
 
 <script>
+    let map = null;
+    let editLayer = null;
+
+    function calculateAreaInHectares(polygon) {
+        const latlngs = polygon.getLatLngs()[0]; // Outer ring
+        const pts = Array.isArray(latlngs[0]) ? latlngs[0] : latlngs;
+        if (pts.length < 3) return 0;
+        
+        // Sinjai local conversion factors
+        const latToMeters = 110820; // 1 degree lat ≈ 110.82 km
+        const lngToMeters = 110900; // 1 degree lng at -5 degrees lat ≈ 110.9 km
+        
+        let area = 0;
+        for (let i = 0; i < pts.length; i++) {
+            const p1 = pts[i];
+            const p2 = pts[(i + 1) % pts.length];
+            
+            const x1 = p1.lng * lngToMeters;
+            const y1 = p1.lat * latToMeters;
+            const x2 = p2.lng * lngToMeters;
+            const y2 = p2.lat * latToMeters;
+            
+            area += (x1 * y2) - (x2 * y1);
+        }
+        
+        const areaSqMeters = Math.abs(area / 2);
+        return areaSqMeters / 10000;
+    }
+
+    function updateWktFromMap() {
+        let polygons = [];
+        map.eachLayer(function(l) {
+            if (l instanceof L.Polygon && !(l instanceof L.Rectangle)) {
+                polygons.push(l);
+            }
+        });
+
+        const textarea = document.querySelector('textarea[name="WKT"]');
+        const inputLuas = document.querySelector('input[name="Luas_kumuh"]');
+
+        if (polygons.length > 0) {
+            const poly = polygons[0];
+            const geojson = poly.toGeoJSON();
+            const wkt = wellknown.stringify(geojson);
+            textarea.value = wkt;
+
+            // Auto calculate area
+            const areaHa = calculateAreaInHectares(poly);
+            if (inputLuas) {
+                inputLuas.value = areaHa.toFixed(2);
+            }
+        } else {
+            textarea.value = '';
+        }
+    }
+
+    function loadPolygonFromWkt() {
+        const textarea = document.querySelector('textarea[name="WKT"]');
+        if (!textarea || !textarea.value) return;
+
+        // Clear existing drawn polygons on the map
+        map.eachLayer(function(l) {
+            if (l instanceof L.Polygon) {
+                map.removeLayer(l);
+            }
+        });
+
+        try {
+            const geojson = wellknown.parse(textarea.value);
+            if (geojson) {
+                // Add geojson layer to map
+                editLayer = L.geoJSON(geojson, {
+                    style: { color: '#e11d48', fillColor: '#e11d48', fillOpacity: 0.3 }
+                }).addTo(map);
+
+                // Zoom map to layer bounds
+                const bounds = editLayer.getBounds();
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                }
+
+                // Bind pm events to the new sub-layers
+                editLayer.eachLayer(function(layer) {
+                    layer.on('pm:edit', updateWktFromMap);
+                    layer.on('pm:dragend', updateWktFromMap);
+                    layer.on('pm:remove', updateWktFromMap);
+                });
+            }
+        } catch (e) {
+            console.error("Gagal parsing WKT:", e);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
+
+        // 1. Inisialisasi Peta
+        const isDark = document.documentElement.classList.contains('dark');
+        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CartoDB' 
+        });
+        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: '&copy; Google'
+        });
+
+        map = L.map('map-editor', { zoomControl: false, layers: [googleSat] }).setView([-5.1245, 120.2536], 12);
+        
+        // Tambahkan tombol toggle satelit
+        let rot = 0;
+        const LayerToggle = L.Control.extend({
+            onAdd: function(map) {
+                const btn = L.DomUtil.create('button', 'rounded-lg shadow-xl border transition-all duration-300 active:scale-90 flex items-center justify-center bg-blue-600');
+                btn.type = 'button';
+                btn.style.width = '34px'; btn.style.height = '34px'; btn.style.cursor = 'pointer';
+                btn.style.margin = '10px';
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                
+                L.DomEvent.disableClickPropagation(btn);
+                L.DomEvent.on(btn, 'click', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    L.DomEvent.preventDefault(e);
+                    rot += 360;
+                    const svg = btn.querySelector('svg');
+                    svg.style.transform = `rotate(${rot}deg)`;
+                    setTimeout(() => {
+                        if (map.hasLayer(googleSat)) { 
+                            map.removeLayer(googleSat); 
+                            map.addLayer(cartoDB); 
+                            btn.className = 'rounded-lg shadow-xl border transition-all duration-300 active:scale-90 flex items-center justify-center ' + (isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200');
+                            svg.setAttribute('stroke', isDark ? '#60a5fa' : '#2563eb'); 
+                        }
+                        else { 
+                            map.removeLayer(cartoDB); 
+                            map.addLayer(googleSat); 
+                            btn.className = 'rounded-lg shadow-xl border transition-all duration-300 active:scale-90 flex items-center justify-center bg-blue-600 border-transparent';
+                            svg.setAttribute('stroke', '#ffffff'); 
+                        }
+                    }, 200);
+                });
+                return btn;
+            }
+        });
+        map.addControl(new LayerToggle({ position: 'topleft' }));
+        L.control.zoom({ position: 'topleft' }).addTo(map);
+
+        // 2. Konfigurasi Leaflet Geoman
+        map.pm.addControls({
+            position: 'topright',
+            drawMarker: false,
+            drawCircleMarker: false,
+            drawPolyline: false,
+            drawRectangle: false,
+            drawCircle: false,
+            drawText: false,
+            cutPolygon: false,
+            dragMode: true,
+            editMode: true,
+            removalMode: true,
+            drawPolygon: true
+        });
+
+        map.pm.setGlobalOptions({
+            allowSelfIntersection: false,
+            templineStyle: { color: '#e11d48' },
+            hintlineStyle: { color: '#e11d48', dashArray: [5, 5] },
+            pathOptions: { color: '#e11d48', fillColor: '#e11d48', fillOpacity: 0.3 }
+        });
+
+        // 3. Listener Event Geoman
+        map.on('pm:create', function(e) {
+            const layer = e.layer;
+            
+            // Hapus poligon lain agar selalu hanya ada satu
+            map.eachLayer(function(l) {
+                if (l instanceof L.Polygon && l !== layer) {
+                    map.removeLayer(l);
+                }
+            });
+
+            // Tambahkan event handler untuk modifikasi layer baru
+            layer.on('pm:edit', updateWktFromMap);
+            layer.on('pm:dragend', updateWktFromMap);
+            layer.on('pm:remove', updateWktFromMap);
+
+            updateWktFromMap();
+        });
+
+        map.on('pm:remove', function(e) {
+            updateWktFromMap();
+        });
+
+        // 4. Load WKT Awal (jika ada data lama)
+        loadPolygonFromWkt();
+
+        // 5. Update jika user mengetik WKT secara manual
+        document.querySelector('textarea[name="WKT"]').addEventListener('input', function() {
+            // Debounce load dari textarea
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                loadPolygonFromWkt();
+            }, 1000);
+        });
     });
 </script>
 <?= $this->endSection() ?>

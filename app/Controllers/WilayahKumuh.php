@@ -226,7 +226,7 @@ class WilayahKumuh extends BaseController
         $diff = $this->generateDiff($oldData, $newData);
         $this->logActivity('Ubah', 'Wilayah Kumuh', "Memperbarui data wilayah kumuh: " . ($oldData['Kawasan'] ?? 'Unknown'), $diff);
         
-        return redirect()->to('/wilayah-kumuh')->with('success', 'Data berhasil diperbarui.');
+        return redirect()->to('/wilayah-kumuh/detail/' . $id)->with('success', 'Data berhasil diperbarui.');
     }
 
     public function delete($id)
