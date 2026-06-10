@@ -13,6 +13,9 @@ class Home extends BaseController
     {
         $db = \Config\Database::connect();
         $settingsModel = new SettingsModel();
+        $roleScope = session()->get('role_scope');
+        $desaRtlh = session()->get('desa_ids_rtlh') ?? [];
+        $desaKumuh = session()->get('desa_ids_kumuh') ?? [];
 
         // Carousel Dinamis
         $carouselJson = $settingsModel->getSetting('carousel_images', '[]');
@@ -21,12 +24,12 @@ class Home extends BaseController
         // --- 1. DATA STATISTIK (REKAP) ---
         // a. RTLH (Sasaran)
         $rtlhTargetBuilder = $db->table('perumahan_rtlh_rumah')->whereIn('status_bantuan', ['Rtlh', 'Target']);
-        if (isset($roleScope) && $roleScope === 'local') $rtlhTargetBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        if ($roleScope === 'local') $rtlhTargetBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
         $totalRtlh = $rtlhTargetBuilder->countAllResults();
 
         // b. RLH (Sudah Layak)
         $rlhSurveiBuilder = $db->table('perumahan_rtlh_rumah')->whereIn('status_bantuan', ['Rlh', 'Sudah Menerima']);
-        if (isset($roleScope) && $roleScope === 'local') $rlhSurveiBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        if ($roleScope === 'local') $rlhSurveiBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
         $rlhSurvei = $rlhSurveiBuilder->countAllResults();
 
         // c. RLH Bansos (Bansos yang tidak terhubung ke survei)
@@ -36,8 +39,9 @@ class Home extends BaseController
             AND b.nik NOT IN (SELECT nik_pemilik FROM perumahan_rtlh_rumah)
         ";
         // Filter desa for bansos if local scope
-        if (isset($roleScope) && $roleScope === 'local') {
+        if ($roleScope === 'local') {
             $desaList = "'" . implode("','", (!empty($desaRtlh) ? $desaRtlh : ['0'])) . "'";
+            $bansosExtraQuery .= " AND b.desa_id IN ($desaList)";
         }
         $bansosExtra = $db->query($bansosExtraQuery)->getRowArray()['total'] ?? 0;
 
@@ -45,17 +49,17 @@ class Home extends BaseController
         
         // d. Total Rumah (Semua record di database spasial)
         $totalRumahBuilder = $db->table('perumahan_rtlh_rumah');
-        if (isset($roleScope) && $roleScope === 'local') $totalRumahBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        if ($roleScope === 'local') $totalRumahBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
         $totalRumah = $totalRumahBuilder->countAllResults();
 
         // d. Backlog dari tabel individu (By Name By Address)
         $backlogBuilder = $db->table('perumahan_backlog_individu');
-        if (isset($roleScope) && $roleScope === 'local') $backlogBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
+        if ($roleScope === 'local') $backlogBuilder->whereIn('desa_id', !empty($desaRtlh) ? $desaRtlh : ['0']);
         $totalBacklog = $backlogBuilder->countAllResults();
 
         // Statistik Lainnya
         $totalKumuhBuilder = $db->table('permukiman_wilayah_kumuh');
-        if (isset($roleScope) && $roleScope === 'local') $totalKumuhBuilder->whereIn('desa_id', !empty($desaKumuh) ? $desaKumuh : ['0']);
+        if ($roleScope === 'local') $totalKumuhBuilder->whereIn('desa_id', !empty($desaKumuh) ? $desaKumuh : ['0']);
         $totalKumuh = $totalKumuhBuilder->countAllResults();
 
         $totalFormal = $db->table('perumahan_formal')->countAllResults();
@@ -252,6 +256,9 @@ class Home extends BaseController
             ";
         }
         $statusLayak = $db->query($layakQuery)->getRowArray();
+        foreach(['target', 'rtlh', 'rlh', 'sudah_menerima', 'belum_terdata'] as $k) {
+            $statusLayak[$k] = (int)($statusLayak[$k] ?? 0);
+        }
 
         // --- NEW: ANALISIS ASET TANAH PEMDA ---
         // a. Status Sertifikat
@@ -262,6 +269,9 @@ class Home extends BaseController
             FROM pertanahan_aset
         ";
         $statusAset = $db->query($asetSertifQuery)->getRowArray();
+        foreach(['belum_sertifikat', 'bersertifikat'] as $k) {
+            $statusAset[$k] = (int)($statusAset[$k] ?? 0);
+        }
 
         // Top Kumuh
         $topKumuhBuilder = $db->table('permukiman_wilayah_kumuh');

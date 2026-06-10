@@ -3,108 +3,97 @@
 <?= $this->section('content') ?>
 <!-- External Assets -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-<?php 
-    $hour = date('H');
-    $greet = ($hour < 12) ? 'Selamat Pagi' : (($hour < 17) ? 'Selamat Siang' : 'Selamat Malam');
-?>
-
-<div class="space-y-6 pb-12 animate-in fade-in duration-700">
+<div class="space-y-6 pb-24">
     
-    <!-- 1. HEADER -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+    <!-- 1. HEADER SECTION -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <div class="flex items-center gap-2 mb-1.5 ml-1">
-                <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></div>
-                <span class="text-[9px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Command Center SIBARUKI v1.0</span>
-            </div>
-            <h1 class="text-2xl lg:text-4xl font-bold tracking-tighter text-blue-950 dark:text-white uppercase leading-none">
-                <?= $greet ?>, <span class="text-blue-600"><?= explode(' ', session()->get('username'))[0] ?>.</span>
-            </h1>
+            <h2 class="text-3xl font-black text-blue-950 dark:text-white uppercase tracking-tighter">Executive Dashboard</h2>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1">SIBARUKI Sinjai Integrated Intelligence</p>
         </div>
-        <div class="flex items-center gap-3 bg-white dark:bg-slate-900 px-5 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
-            <div class="flex flex-col items-end">
-                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]"><?= date('l') ?></span>
-                <span class="text-xs font-bold text-blue-950 dark:text-white"><?= date('d F Y') ?></span>
+        <div class="flex items-center gap-3">
+            <div class="text-right hidden sm:block">
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Update Terakhir</p>
+                <p class="text-xs font-bold text-blue-950 dark:text-white"><?= date('d F Y, H:i') ?></p>
             </div>
-            <div class="w-px h-6 bg-slate-100 dark:bg-slate-800"></div>
-            <div class="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600">
-                <i data-lucide="calendar" class="w-4 h-4"></i>
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100 dark:border-blue-800">
+                <i data-lucide="clock" class="w-5 h-5"></i>
             </div>
         </div>
     </div>
-<!-- 2. METRICS GRID -->
-<!-- 2. METRICS GRID -->
-<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-    <?php 
-    $role = session()->get('role_name');
-    $metrics = [
-        ['rumah', 'home', 'blue', 'TOTAL RUMAH', base_url('rtlh/rekap-desa')],
-        ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('rtlh/rekap-desa')],
-        ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('rtlh/rekap-desa')],
-        ['rtlh', 'home', 'amber', 'RTLH (SASARAN)', base_url('rtlh')],
-        ['bansos', 'gift', 'indigo', 'BANSOS RTLH', base_url('bansos-rtlh')],
-    ];
 
-    // Add more metrics only for admin
-    if ($role === 'admin') {
-        $metrics = array_merge($metrics, [
-            ['kumuh', 'map-pin', 'rose', 'KUMUH', base_url('wilayah-kumuh')],
-            ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],
-            ['psu', 'route', 'slate', 'PSU', base_url('psu')],
-            ['pisew', 'map', 'orange', 'PISEW', base_url('pisew')],
-            ['aset', 'layers', 'emerald', 'ASET', base_url('aset-tanah')],
-            ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
-        ]);
-    }
+    <!-- 2. METRICS GRID -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        <?php 
+        $role = session()->get('role_name');
+        $rekapData = $rekap ?? [];
+        $metrics = [
+            ['rumah', 'home', 'blue', 'TOTAL RUMAH', base_url('rtlh/rekap-desa')],
+            ['rlh', 'check-circle', 'emerald', 'RUMAH LAYAK', base_url('rtlh/rekap-desa')],
+            ['backlog', 'alert-triangle', 'rose', 'BACKLOG', base_url('rtlh/rekap-desa')],
+            ['rtlh', 'home', 'amber', 'RTLH (SASARAN)', base_url('rtlh')],
+            ['bansos', 'gift', 'indigo', 'BANSOS RTLH', base_url('bansos-rtlh')],
+        ];
 
-    foreach($metrics as $m): ?>
-    <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-500 group block relative overflow-hidden">
-        <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-inner">
-            <i data-lucide="<?= $m[1] ?>" class="w-5 h-5" stroke-width="2"></i>
-        </div>
-        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-0.5"><?= $m[3] ?></p>
-        <h3 class="text-xl font-bold text-blue-950 dark:text-white tracking-tighter"><?= number_format($rekap[$m[0]]) ?></h3>
-    </a>
-    <?php endforeach; ?>
-</div>
+        if ($role === 'admin') {
+            $metrics = array_merge($metrics, [
+                ['kumuh', 'map-pin', 'rose', 'KUMUH', base_url('wilayah-kumuh')],
+                ['formal', 'building-2', 'indigo', 'PERUMAHAN', base_url('perumahan-formal')],
+                ['psu', 'route', 'slate', 'PSU', base_url('psu')],
+                ['pisew', 'map', 'orange', 'PISEW', base_url('pisew')],
+                ['aset', 'layers', 'emerald', 'ASET', base_url('aset-tanah')],
+                ['arsinum', 'droplet', 'cyan', 'ARSINUM', base_url('arsinum')],
+            ]);
+        }
 
-<!-- 3. TACTICAL COMMAND MAP -->
-<div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col transition-all duration-500 relative">
-    <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white dark:bg-slate-900 relative z-10">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
-                <i data-lucide="map" class="w-6 h-6"></i>
+        foreach($metrics as $m): ?>
+        <a href="<?= $m[4] ?>" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-500 group block relative overflow-hidden">
+            <div class="w-10 h-10 rounded-xl bg-<?= $m[2] ?>-50 dark:bg-<?= $m[2] ?>-950/30 text-<?= $m[2] ?>-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-inner">
+                <i data-lucide="<?= $m[1] ?>" class="w-5 h-5" stroke-width="2.5"></i>
             </div>
-            <div>
-                <h3 class="text-base font-bold text-blue-950 dark:text-white uppercase tracking-tight">Database Spasial Terpadu</h3>
-                <div class="flex items-center gap-2 mt-0.5">
-                    <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div>
-                    <span id="activeLayerLabel" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Memuat...</span>
+            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-0.5"><?= $m[3] ?></p>
+            <h3 class="text-xl font-bold text-blue-950 dark:text-white tracking-tighter"><?= number_format($rekapData[$m[0]] ?? 0) ?></h3>
+        </a>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- 3. TACTICAL COMMAND MAP -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col transition-all duration-500 relative">
+        <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white dark:bg-slate-900 relative z-10">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                    <i data-lucide="map" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-blue-950 dark:text-white uppercase tracking-tight">Database Spasial Terpadu</h3>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div>
+                        <span id="activeLayerLabel" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Memuat...</span>
+                    </div>
                 </div>
             </div>
+            <div class="flex flex-wrap gap-1.5">
+                <?php 
+                $layers = ['rtlh'];
+                if ($role === 'admin') {
+                    $layers = ['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'];
+                }
+                foreach($layers as $l): ?>
+                <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
+                    <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'gift':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= ($l == 'formal' ? 'PERUMAHAN' : ($l == 'rtlh' ? 'RTLH' : strtoupper($l))) ?>
+                </button>
+                <?php endforeach; ?>
+            </div>
         </div>
-        <div class="flex flex-wrap gap-1.5">
-            <?php 
-            $layers = ['rtlh'];
-            if ($role === 'admin') {
-                $layers = ['rtlh', 'bansos', 'kumuh', 'formal', 'psu', 'aset', 'arsinum', 'pisew'];
-            }
-            foreach($layers as $l): ?>
-            <button onclick="switchLayer('<?= $l ?>')" class="layer-btn <?= $l=='rtlh'?'active':'' ?> px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center gap-1.5 hover:border-blue-200 active:scale-95" data-layer="<?= $l ?>">
-                <i data-lucide="<?= $l=='rtlh'?'home':($l=='bansos'?'check-circle':($l=='kumuh'?'map-pin':($l=='formal'?'building-2':($l=='psu'?'route':($l=='aset'?'layers':($l=='arsinum'?'droplet':'map')))))) ?>" class="w-3 h-3"></i> <?= ($l == 'formal' ? 'PERUMAHAN' : ($l == 'rtlh' ? 'RTLH' : strtoupper($l))) ?>
-            </button>
-            <?php endforeach; ?>
-        </div>
+        <div id="tacticalMap" class="h-[55vh] lg:h-[65vh] w-full z-0 bg-slate-50 dark:bg-slate-950"></div>
     </div>
-    <div id="tacticalMap" class="h-[55vh] lg:h-[65vh] w-full z-0 bg-slate-50 dark:bg-slate-950"></div>
-</div>
 
     <!-- 4. BOTTOM ANALYTICS -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -125,6 +114,7 @@
         </div>
 
         <!-- PRIORITAS KAWASAN KUMUH -->
+        <?php if ($role === 'admin' && !empty($topKumuh)): ?>
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
             <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
                 <i data-lucide="alert-triangle" class="w-32 h-32 text-rose-600"></i>
@@ -150,6 +140,7 @@
                 <?php endforeach; ?>
             </div>
         </div>
+        <?php endif; ?>
 
         <!-- DATA INTEGRITY (ADMIN ONLY) -->
         <?php if ($role === 'admin'): ?>
@@ -164,7 +155,7 @@
                         <i data-lucide="map-pin-off" class="w-7 h-7"></i>
                     </div>
                     <div>
-                        <p class="text-2xl font-black text-blue-950 dark:text-white leading-tight"><?= number_format($health['coords']) ?></p>
+                        <p class="text-2xl font-black text-blue-950 dark:text-white leading-tight"><?= number_format($health['coords'] ?? 0) ?></p>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Koordinat Kosong / Titik Nol</p>
                     </div>
                 </div>
@@ -176,11 +167,10 @@
 
 <style>
     .layer-btn.active { background: #1e1b4b !important; color: white !important; border-color: #1e1b4b !important; box-shadow: 0 10px 20px -5px rgba(30, 27, 75, 0.4); transform: translateY(-1px); }
-    .dark .layer-btn.active { background: #2563eb !important; border-color: #2563eb !important; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4); }
-    .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2); border: none; }
-    .leaflet-popup-content { margin: 0; width: 200px !important; }
-    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background-color: rgba(30, 27, 75, 0.9); color: white; font-weight: 900; font-size: 10px; }
-
+    .dark .layer-btn.active { background: #2563eb !important; border-color: #2563eb !important; }
+    .custom-div-icon { background: none; border: none; }
+    .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0; overflow: hidden; border: none; }
+    .leaflet-popup-content { margin: 0; width: 220px !important; }
     .custom-tooltip {
         background: rgba(15, 23, 42, 0.9) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -193,15 +183,11 @@
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
         padding: 4px 8px !important;
     }
-    .leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before {
-        border: none !important;
-    }
 </style>
 
 <script>
     const spasialData = <?= json_encode($spasial) ?>;
-    let map, clusterGroup, kecLayerGroup, activeDataGroup;
-    let standard, satellite;
+    let map, clusterGroup, activeDataGroup, kecLayerGroup;
 
     function utmToLatLng(easting, northing) {
         const a = 6378137, f = 1 / 298.257223563;
@@ -224,18 +210,7 @@
             let cleanWkt = wkt.includes(';') ? wkt.split(';')[1] : wkt;
             let geojson = wellknown.parse(cleanWkt);
             if (!geojson) return null;
-            
-            // Intelligent UTM detection
-            const convert = (c) => {
-                if (typeof c[0] === 'number') {
-                    if (Math.abs(c[0]) > 500) { // Likely UTM Easting/Northing
-                        const [lat, lon] = utmToLatLng(c[0], c[1]);
-                        return [lon, lat];
-                    }
-                    return c;
-                }
-                return c.map(convert);
-            };
+            const convert = (c) => { if (typeof c[0] === 'number') { if (Math.abs(c[0]) > 500) { const [la, lo] = utmToLatLng(c[0], c[1]); return [lo, la]; } return c; } return c.map(convert); };
             geojson.coordinates = convert(geojson.coordinates);
             return geojson;
         } catch(e) { return null; }
@@ -247,30 +222,17 @@
         let digits = s.replace(/[^0-9-]/g, '');
         if (digits.length > 3) {
             let dotPos = digits.startsWith('-') ? 2 : 3;
+            if (isLat && digits.startsWith('-5')) dotPos = 2;
+            else if (!isLat && digits.startsWith('120')) dotPos = 3;
             return parseFloat(digits.substring(0, dotPos) + '.' + digits.substring(dotPos));
         }
         return parseFloat(s);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
-        initMap();
-        initChart();
-        setTimeout(() => switchLayer('rtlh'), 600);
-    });
-
-    let rot = 0;
     function initMap() {
-        if (typeof L === 'undefined') { setTimeout(initMap, 100); return; }
         const isDark = document.documentElement.classList.contains('dark');
-        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
-            attribution: '&copy; CartoDB' 
-        });
-        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-            maxZoom: 20,
-            subdomains:['mt0','mt1','mt2','mt3'],
-            attribution: '&copy; Google'
-        });
+        const cartoDB = L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CartoDB' });
+        const googleSat = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], attribution: '&copy; Google' });
         
         map = L.map('tacticalMap', { zoomControl: false, layers: [googleSat] }).setView([-5.1245, 120.2536], 11);
         
@@ -279,37 +241,19 @@
                 const btn = L.DomUtil.create('button', 'rounded-lg shadow-xl border transition-all duration-300 active:scale-90 mt-2 flex items-center justify-center');
                 btn.type = 'button';
                 btn.style.width = '38px'; btn.style.height = '38px'; btn.style.cursor = 'pointer';
-                btn.style.backgroundColor = '#2563eb'; // Default satellite blue
-                const isDark = document.documentElement.classList.contains('dark');
+                btn.style.backgroundColor = '#2563eb';
                 const svgColor = isDark ? '#60a5fa' : '#2563eb';
-                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
                 L.DomEvent.disableClickPropagation(btn);
                 L.DomEvent.on(btn, 'click', function(e) {
                     L.DomEvent.stopPropagation(e);
-                    L.DomEvent.preventDefault(e);
-                    rot += 360;
-                    const svg = btn.querySelector('svg');
-                    svg.style.transform = `rotate(${rot}deg)`;
-                    setTimeout(() => {
-                        if (map.hasLayer(googleSat)) { 
-                            map.removeLayer(googleSat); 
-                            map.addLayer(cartoDB); 
-                            btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; 
-                            svg.setAttribute('stroke', svgColor); 
-                        }
-                        else { 
-                            map.removeLayer(cartoDB); 
-                            map.addLayer(googleSat); 
-                            btn.style.backgroundColor = '#2563eb'; 
-                            svg.setAttribute('stroke', '#ffffff'); 
-                        }
-                    }, 200);
+                    if (map.hasLayer(googleSat)) { map.removeLayer(googleSat); map.addLayer(cartoDB); btn.style.backgroundColor = isDark ? '#0f172a' : '#ffffff'; btn.querySelector('svg').setAttribute('stroke', svgColor); }
+                    else { map.removeLayer(cartoDB); map.addLayer(googleSat); btn.style.backgroundColor = '#2563eb'; btn.querySelector('svg').setAttribute('stroke', '#ffffff'); }
                 });
                 return btn;
             }
         });
         map.addControl(new LayerToggle({ position: 'topright' }));
-
         L.control.zoom({ position: 'topright' }).addTo(map);
 
         clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 }).addTo(map);
@@ -317,25 +261,28 @@
         kecLayerGroup = L.featureGroup().addTo(map);
 
         const kecColors = ['#1e1b4b', '#1e40af', '#2563eb', '#1d4ed8', '#0ea5e9'];
-        spasialData.kecamatan.forEach((k, idx) => {
-            try {
-                const geojson = parseWKTUniversal(k.wkt);
-                if (geojson) {
-                    L.geoJSON(geojson, { 
-                        style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.4 } 
-                    }).addTo(kecLayerGroup).bindTooltip(`<p class="font-bold uppercase text-[8px] text-white">${k.desa_nama}</p>`, { sticky: true, className: 'custom-tooltip' });
-                }
-            } catch (e) {}
-        });
+        if (spasialData.kecamatan) {
+            spasialData.kecamatan.forEach((k, idx) => {
+                try {
+                    const geojson = wellknown.parse(k.wkt);
+                    if (geojson) {
+                        L.geoJSON(geojson, { style: { color: isDark ? '#0f172a' : '#ffffff', fillColor: kecColors[idx % 5], weight: 0.5, fillOpacity: 0.15 } })
+                         .addTo(kecLayerGroup).bindTooltip(`<p class="font-bold uppercase text-[8px] text-white">${k.desa_nama}</p>`, { sticky: true, className: 'custom-tooltip' });
+                    }
+                } catch(e) {}
+            });
+        }
         kecLayerGroup.bringToBack();
+        switchLayer('rtlh');
     }
 
     function switchLayer(type) {
+        if (!map) return;
         clusterGroup.clearLayers();
         activeDataGroup.clearLayers();
         document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[data-layer="${type}"]`)?.classList.add('active');
-        document.getElementById('activeLayerLabel').innerText = `Database: ${type === 'formal' ? 'PERUMAHAN' : type.toUpperCase()}`;
+        document.getElementById('activeLayerLabel').innerText = type.toUpperCase() + ' TERDETEKSI';
 
         const items = spasialData[type] || [];
         const colorMap = { rtlh: '#f59e0b', bansos: '#10b981', kumuh: '#ef4444', formal: '#6366f1', psu: '#3b82f6', arsinum: '#06b6d4', pisew: '#f97316', aset: '#1e1b4b' };
@@ -343,110 +290,59 @@
 
         items.forEach(item => {
             try {
-                let geojson = null;
-                let lat = null, lon = null;
-                
-                // 1. Try Direct Lat/Lng
-                if (item.latitude && item.longitude) { 
-                    lat = parseFloat(item.latitude); 
-                    lon = parseFloat(item.longitude); 
-                } 
-                // 2. Try Comma-Separated Coords
+                let geojson = null, lat = null, lon = null;
+                if (item.latitude && item.longitude) { lat = parseFloat(item.latitude); lon = parseFloat(item.longitude); }
                 else if (item.coords && item.coords.includes(',')) {
                     let p = item.coords.toString().split(',');
-                    if (p.length === 2) { 
-                        lat = healCoordinate(p[0], true); 
-                        lon = healCoordinate(p[1], false); 
-                    }
+                    if (p.length === 2) { lat = healCoordinate(p[0], true); lon = healCoordinate(p[1], false); }
                 }
-
-                // 3. Build Point GeoJSON or parse WKT
-                if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) { 
-                    geojson = { type: 'Point', coordinates: [lon, lat] }; 
-                } else {
-                    const wktSource = item.wkt || item.coords || item.koordinat;
-                    if (wktSource) geojson = parseWKTUniversal(wktSource);
-                }
-
+                if (lat && lon && !isNaN(lat) && !isNaN(lon) && Math.abs(lat) < 90) { geojson = { type: 'Point', coordinates: [lon, lat] }; }
+                else { const wktSource = item.wkt || item.coords || item.koordinat; if (wktSource) geojson = parseWKTUniversal(wktSource); }
                 if (!geojson) return;
 
-                let detailsHtml = '';
-                let imgHtml = '';
-
+                let detailsHtml = '', imgHtml = '';
                 if (type === 'rtlh') {
                     let photos = [];
                     if (item.image) photos.push(item.image);
                     if (item.foto_samping) photos.push(item.foto_samping);
                     if (item.foto_belakang) photos.push(item.foto_belakang);
                     if (item.foto_dalam) photos.push(item.foto_dalam);
-                    
                     if (photos.length > 0) {
-                        let gridClass = photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2';
-                        imgHtml = `<div class="grid ${gridClass} gap-1 mb-3">`;
-                        photos.slice(0, 4).forEach(p => {
-                            imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`;
-                        });
-                        let detailsHtml = '';
-                        let imgHtml = '';
+                        imgHtml = `<div class="grid ${photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-1 mb-3">`;
+                        photos.slice(0, 4).forEach(p => { imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`; });
+                        imgHtml += `</div>`;
+                    }
+                    detailsHtml = imgHtml;
+                } else if (item.image) {
+                    let folder = (type === 'psu') ? 'psu' : 'rtlh';
+                    imgHtml = `<img src="<?= base_url('uploads/') ?>${folder}/${item.image}" class="w-full h-24 object-cover rounded-lg mb-3 border border-slate-200 dark:border-slate-700">`;
+                    detailsHtml = imgHtml;
+                }
 
-                        if (type === 'rtlh') {
-                            let photos = [];
-                            if (item.image) photos.push(item.image);
-                            if (item.foto_samping) photos.push(item.foto_samping);
-                            if (item.foto_belakang) photos.push(item.foto_belakang);
-                            if (item.foto_dalam) photos.push(item.foto_dalam);
-
-                            if (photos.length > 0) {
-                                let gridClass = photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2';
-                                imgHtml = `<div class="grid ${gridClass} gap-1 mb-3">`;
-                                photos.slice(0, 4).forEach(p => {
-                                    imgHtml += `<img src="<?= base_url('uploads/rtlh/') ?>${p}" class="w-full h-16 object-cover rounded-md border border-slate-200 dark:border-slate-700">`;
-                                });
-                                imgHtml += `</div>`;
-                            }
-                        } else if (item.image) {
-                            let folder = 'rtlh';
-                            if (type === 'psu') folder = 'psu';
-                            else if (type === 'bansos') folder = 'rtlh'; // Bansos uses same upload path
-                            imgHtml = `<img src="<?= base_url('uploads/') ?>${folder}/${item.image}" class="w-full h-24 object-cover rounded-lg mb-3 border border-slate-200 dark:border-slate-700">`;
-                        }
-
-                        if (type === 'kumuh') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status: ${item.Sk_Kumuh || 'Belum Ditetapkan'}</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Luasan: ${item.Luas_kumuh || '-'} Ha</p>`;
+                if (type === 'kumuh') {
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Status: ${item.Sk_Kumuh || '-'}</p><p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Luasan: ${item.Luas_kumuh || '-'} Ha</p>`;
                 } else if (type === 'aset') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Luas: ${item.luas_m2 || '-'} m²</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status Hak: ${item.nomor_hak || '-'}</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Luas: ${item.luas_m2 || '-'} m²</p><p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Status Hak: ${item.nomor_hak || '-'}</p>`;
                 } else if (type === 'arsinum' || type === 'pisew') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'psu') {
-                    detailsHtml = `${imgHtml}
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Panjang/Luas: ${item.nilai || '-'} m/m²</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tahun: ${item.tahun || '-'}</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Panjang/Luas: ${item.nilai || '-'} m/m²</p><p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Tahun: ${item.tahun || '-'}</p>`;
                 } else if (type === 'formal') {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pengembang: ${item.pengembang || '-'}</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Pengembang: ${item.pengembang || '-'}</p>`;
                 } else if (type === 'bansos') {
-                    detailsHtml = `${imgHtml}
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tahun: ${item.tahun_anggaran || '-'}</p>
-                                   <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Sumber Dana: ${item.sumber_dana || '-'}</p>`;
-                } else if (type === 'rtlh') {
-                    detailsHtml = `${imgHtml}`;
-                } else {
-                    detailsHtml = `<p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informasi Terverifikasi</p>`;
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Tahun: ${item.tahun_anggaran || '-'}</p><p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Sumber Dana: ${item.sumber_dana || '-'}</p>`;
+                } else if (type !== 'rtlh') {
+                    detailsHtml += `<p class="text-[8px] font-bold text-slate-400 uppercase mb-2">Informasi Terverifikasi</p>`;
                 }
 
                 const popupContent = `<div class="bg-blue-950 text-white p-3 rounded-t-xl"><h5 class="text-[11px] font-bold uppercase leading-tight">${item.name}</h5></div><div class="p-3 bg-white dark:bg-slate-900 rounded-b-xl border-t border-slate-50 dark:border-slate-800">${detailsHtml}<a href="${detailUrls[type]}/${item.id}" class="block w-full py-2.5 bg-blue-950 hover:bg-blue-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl transition-all">Detail</a></div>`;
 
                 if (geojson.type === 'Point') { 
-                    const icon = L.divIcon({
-                        className: 'custom-div-icon',
-                        html: `<div class="w-6 h-6 rounded-full border-4 border-white shadow-xl flex items-center justify-center" style="background-color: ${colorMap[type] || '#ef4444'};"><div class="w-1 h-1 bg-white rounded-full"></div></div>`,
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
-                    });
+                    const icon = L.divIcon({ className: 'custom-div-icon', html: `<div class="w-6 h-6 rounded-full border-4 border-white shadow-xl flex items-center justify-center" style="background-color: ${colorMap[type] || '#ef4444'};"><div class="w-1 h-1 bg-white rounded-full"></div></div>`, iconSize: [24, 24], iconAnchor: [12, 12] });
                     L.marker([geojson.coordinates[1], geojson.coordinates[0]], { icon: icon }).bindPopup(popupContent).addTo(clusterGroup); 
+                } else {
+                    L.geoJSON(geojson, { style: { color: colorMap[type] || '#ef4444', weight: 3, fillOpacity: 0.5 } }).bindPopup(popupContent).addTo(activeDataGroup);
                 }
-                else { L.geoJSON(geojson, { style: { color: colorMap[type] || '#ef4444', weight: 3, fillOpacity: 0.5 } }).bindPopup(popupContent).addTo(activeDataGroup); }
             } catch (e) {}
         });
 
@@ -457,9 +353,8 @@
     }
 
     function initChart() {
-        // 1. Analisis RTLH & RLH (5 Status)
         const s = <?= json_encode($statusLayak) ?>;
-        // series: [Sudah Menerima, RLH, Target, RTLH, Belum Terdata]
+        console.log("Chart RTLH Data:", s);
         new ApexCharts(document.querySelector("#conditionChart"), {
             series: [parseInt(s.sudah_menerima||0), parseInt(s.rlh||0), parseInt(s.target||0), parseInt(s.rtlh||0), parseInt(s.belum_terdata||0)],
             chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
@@ -470,8 +365,8 @@
             stroke: { show: false }
         }).render();
 
-        // 2. Legalitas Aset Tanah
         const a = <?= json_encode($statusAset) ?>;
+        console.log("Chart Aset Data:", a);
         new ApexCharts(document.querySelector("#asetLegalitasChart"), {
             series: [parseInt(a.bersertifikat||0), parseInt(a.belum_sertifikat||0)],
             chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
@@ -482,5 +377,11 @@
             stroke: { show: false }
         }).render();
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        initChart();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
 </script>
 <?= $this->endSection() ?>
