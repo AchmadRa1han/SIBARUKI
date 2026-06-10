@@ -22,8 +22,11 @@
 - **Interactive Mapping:** Point-to-Pin untuk RTLH dan Polygon Drawing untuk area kumuh.
 - **Standardized Visualization:** Tampilan peta Satelit default untuk akurasi monitoring fisik.
 - **Geospatial Import:** Dukungan import data WKT (Well-Known Text) secara massal.
+- **Aligned Map Legends:** Standardisasi informasi pop-up koordinat peta publik (RTLH, PSU, Perumahan, Bansos, Kumuh, PISEW/Arsinum, Aset Pemda).
+- **Click-to-Enlarge Photos:** Integrasi tautan foto dokumentasi yang dapat diklik langsung untuk memperbesar gambar di tab baru.
 
 ### 🛡️ Keamanan & Integritas
+- **Secure NIK Search:** Proteksi privasi data pada pencarian NIK publik dengan menyembunyikan detail alamat dan tombol detail lengkap.
 - **Audit Trail Forensic:** Pencatatan setiap perubahan data (Data Diff), alamat IP, dan User Agent.
 - **Bulk Operations:** Fitur **Hapus Massal** di seluruh tabel utama dengan konfirmasi keamanan.
 - **Recycle Bin System:** Data yang dihapus (individu maupun massal) otomatis masuk ke tempat sampah untuk pemulihan.

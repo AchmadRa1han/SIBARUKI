@@ -261,6 +261,21 @@ Untuk fitur *Add/Edit* yang bersifat *wizard* atau *multi-step*, wajib menggunak
 3. **Loading State:**
    - Gunakan skeleton screen atau spinner halus di tengah kontainer card utama saat mengambil data via Fetch API.
 
+#### G. Ketentuan Publik & Keamanan Data (Map & Pencarian NIK)
+1. **Peta Publik (Homepage Map):**
+   - **RTLH (Data Rumah):** Menampilkan Nama Kepala Keluarga dan Dokumentasi Foto.
+   - **PSU Terbangun:** Menampilkan Nama, Tahun, Panjang/Luas, dan Dokumentasi.
+   - **Perumahan:** Menampilkan Nama Perumahan dan Pengembang.
+   - **Bansos RTLH:** Menampilkan Nama Penerima, Tahun, Sumber Anggaran, dan Dokumentasi.
+   - **Wilayah Kumuh:** Menampilkan Nama Lokasi (Kawasan), Skor Kekumuhan, dan Luasan (kolom Status/SK Kumuh dihilangkan).
+   - **PISEW & Arsinum:** Menampilkan Nama Lokasi (Desa/Kecamatan) dan Tahun.
+   - **Aset Tanah Pemda:** Menampilkan Nama Pemilik, Luas, Status Hak (Hak Pakai, HGB, dll), dan Nomor Hak.
+2. **Pencarian NIK Publik:**
+   - **Data Privacy & Security:** Dilarang menampilkan tombol "Lihat Detail Lengkap" dan Alamat Detail untuk pengguna umum demi keamanan data.
+   - **Tampilan Informasi:** Hanya menampilkan informasi umum berupa Nama, Desa/Kelurahan, Status (RTLH atau RLH), dan Dokumentasi Foto.
+3. **Interaksi Gambar:**
+   - Semua dokumentasi foto/gambar pada popup peta publik dan hasil pencarian NIK wajib dibungkus dengan tautan (`target="_blank"`) agar bisa diklik untuk memperbesar gambar di tab baru.
+
 ---
 *Dokumen ini merupakan kitab panduan final (Single Source of Truth) untuk SIBARUKI. Pembaruan arsitektur wajib direfleksikan di dalam file ini.*
 
