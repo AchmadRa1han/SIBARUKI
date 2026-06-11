@@ -27,6 +27,7 @@ class BansosRtlh extends BaseController
 
     public function index()
     {
+        $db = \Config\Database::connect();
         $keyword = $this->request->getGet('keyword');
         $query = $this->bansosModel->orderBy('tahun_anggaran', 'DESC');
 
@@ -36,11 +37,18 @@ class BansosRtlh extends BaseController
                   ->orLike('nik', $keyword);
         }
 
+        $rtlh = $db->table('perumahan_rtlh_rumah')
+                   ->select('perumahan_rtlh_rumah.id_survei, perumahan_rtlh_rumah.nik_pemilik as nik, perumahan_rtlh_rumah.desa, perumahan_rtlh_penerima.nama_kepala_keluarga')
+                   ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left')
+                   ->whereIn('perumahan_rtlh_rumah.status_bantuan', ['Belum Menerima', 'Target', 'Rtlh'])
+                   ->get()->getResultArray();
+
         $data = [
             'title' => 'Bansos Perbaikan RTLH',
             'bansos' => $query->paginate(10, 'default'),
             'pager' => $this->bansosModel->pager,
-            'keyword' => $keyword
+            'keyword' => $keyword,
+            'rtlh' => $rtlh
         ];
 
         return view('bansos_rtlh/index', $data);
@@ -172,15 +180,26 @@ class BansosRtlh extends BaseController
 
         if (!$bansos) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
+        // Overwrite binary geometry data with string WKT to prevent json_encode failures
+        $bansos['lokasi_realisasi'] = $bansos['wkt_realisasi'];
+
         $rumah = null;
         if ($bansos['id_survei']) {
             $rumah = $this->rumahModel->find($bansos['id_survei']);
         }
 
+        // Fetch candidate RTLH records for the modal edit dropdown
+        $rtlh = $db->table('perumahan_rtlh_rumah')
+                   ->select('perumahan_rtlh_rumah.id_survei, perumahan_rtlh_rumah.nik_pemilik as nik, perumahan_rtlh_rumah.desa, perumahan_rtlh_penerima.nama_kepala_keluarga')
+                   ->join('perumahan_rtlh_penerima', 'perumahan_rtlh_penerima.nik = perumahan_rtlh_rumah.nik_pemilik', 'left')
+                   ->whereIn('perumahan_rtlh_rumah.status_bantuan', ['Belum Menerima', 'Target', 'Rtlh'])
+                   ->get()->getResultArray();
+
         return view('bansos_rtlh/detail', [
             'title' => 'Detail Realisasi Bansos',
             'bansos' => $bansos,
-            'rumah' => $rumah
+            'rumah' => $rumah,
+            'rtlh' => $rtlh
         ]);
     }
 

@@ -4,6 +4,7 @@
 <!-- Leaflet Assets -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
 
 <div class="max-w-7xl mx-auto space-y-6 pb-12 text-slate-900 dark:text-slate-200">
     
@@ -306,4 +307,5 @@
         .shadow-sm, .shadow-xl { shadow: none !important; }
     }
 </style>
+<?= view('bansos_rtlh/partials/_modal_edit') ?>
 <?= $this->endSection() ?>

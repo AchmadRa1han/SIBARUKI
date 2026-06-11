@@ -1,6 +1,11 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
+<!-- Leaflet & Wellknown Assets for Modal Map -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.js"></script>
+
 <div class="max-w-7xl mx-auto space-y-6 pb-24 text-slate-900 dark:text-slate-200">
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 no-print">
