@@ -119,6 +119,59 @@ class WilayahKumuh extends BaseController
             return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
         }
 
+        $aliasMap = [
+            'WKT'         => ['wkt', 'geometry', 'geom', 'koordinat'],
+            'Provinsi'    => ['provinsi', 'prov'],
+            'Kode_Prov'   => ['kode prov', 'kode_prov', 'kode provinsi'],
+            'Kab_Kota'    => ['kab_kota', 'kabupaten/kota', 'kabupaten', 'kota', 'kab_kota'],
+            'Kode_Kab'    => ['kode kab', 'kode_kab', 'kode kabupaten'],
+            'Kecamatan'   => ['kecamatan', 'kec'],
+            'Kode_Kec'    => ['kode kec', 'kode_kec', 'kode kecamatan'],
+            'Kelurahan'   => ['kelurahan', 'desa', 'kelurahan/desa', 'desa/kelurahan'],
+            'Kode_Kel'    => ['kode kel', 'kode_kel', 'kode kelurahan'],
+            'Kode_RT_RW'  => ['kode rt/rw', 'kode_rt_rw', 'rt/rw', 'rt rw', 'rt_rw'],
+            'Luas_kumuh'  => ['luas kumuh', 'luas_kumuh', 'luas (ha)', 'luas'],
+            'skor_kumuh'  => ['skor kumuh', 'skor_kumuh', 'skor', 'nilai'],
+            'Sumber_data' => ['sumber data', 'sumber_data', 'sumber'],
+            'Sk_Kumuh'    => ['sk kumuh', 'sk_kumuh', 'sk_penetapan', 'sk'],
+            'Kawasan'     => ['kawasan', 'nama kawasan', 'nama_kawasan'],
+        ];
+
+        $headerPos = [];
+        $foundHeader = false;
+        $dataStartIndex = 0;
+
+        foreach ($rows as $rowIndex => $row) {
+            $rowClean = array_map(function($v) { return strtolower(trim((string)($v ?? ''))); }, $row);
+            
+            $isHeader = false;
+            foreach ($rowClean as $cell) {
+                if (in_array($cell, ['wkt', 'geometry', 'kawasan', 'nama kawasan', 'skor kumuh'])) {
+                    $isHeader = true;
+                    break;
+                }
+            }
+            
+            if ($isHeader) {
+                foreach ($rowClean as $index => $colName) {
+                    foreach ($aliasMap as $field => $aliases) {
+                        if ($colName === $field || in_array($colName, $aliases)) {
+                            if (!isset($headerPos[$field])) {
+                                $headerPos[$field] = $index;
+                            }
+                        }
+                    }
+                }
+                $foundHeader = true;
+                $dataStartIndex = $rowIndex + 1;
+                break;
+            }
+        }
+
+        if (!$foundHeader || !isset($headerPos['Kawasan'])) {
+            return redirect()->back()->with('error', 'Format Header Excel/CSV tidak dikenali. Pastikan kolom Kawasan tersedia.');
+        }
+
         $count = 0;
         $db = \Config\Database::connect();
 
@@ -126,36 +179,63 @@ class WilayahKumuh extends BaseController
             $db->query("ALTER TABLE permukiman_wilayah_kumuh AUTO_INCREMENT = 1");
         }
 
+        // Get desa lookup
+        $allDesa = $db->table('kode_desa')->select('desa_id, desa_nama')->get()->getResultArray();
+        $desaLookup = [];
+        foreach ($allDesa as $d) {
+            $desaLookup[strtoupper(trim($d['desa_nama']))] = $d['desa_id'];
+        }
+
         $db->transStart();
         try {
-            foreach ($rows as $rowIndex => $row) {
-                if (count($row) < 10 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'WKT') !== false) {
-                    continue;
+            $getVal = function($row, $field) use ($headerPos) {
+                return isset($headerPos[$field]) ? trim((string)($row[$headerPos[$field]] ?? '')) : null;
+            };
+
+            for ($i = $dataStartIndex; $i < count($rows); $i++) {
+                $row = $rows[$i];
+                
+                $kawasan = $getVal($row, 'Kawasan');
+                if (empty($kawasan) || $kawasan === '-') continue;
+
+                $wkt = $getVal($row, 'WKT') ?? '';
+                if (is_numeric($wkt) && strlen($wkt) < 5) {
+                    $wkt = null;
                 }
 
+                $kelurahan = $getVal($row, 'Kelurahan') ?? '-';
+                $desaId = $desaLookup[strtoupper(trim($kelurahan))] ?? null;
+
+                $luasRaw = $getVal($row, 'Luas_kumuh');
+                $luas = $luasRaw ? (float)str_replace(',', '.', $luasRaw) : 0.0;
+
+                $skorRaw = $getVal($row, 'skor_kumuh');
+                $skor = $skorRaw ? (float)str_replace(',', '.', $skorRaw) : 0.0;
+
                 $this->kumuhModel->insert([
-                    'WKT'         => $row[0] ?? null,
-                    'Provinsi'    => trim((string)($row[1] ?? 'Sulawesi Selatan')),
-                    'Kode_Prov'   => trim((string)($row[2] ?? '73')),
-                    'Kab_Kota'    => trim((string)($row[3] ?? 'Sinjai')),
-                    'Kode_Kab'    => trim((string)($row[4] ?? '07')),
-                    'Kecamatan'   => trim((string)($row[5] ?? '-')),
-                    'Kode_Kec'    => trim((string)($row[6] ?? '-')),
-                    'Kelurahan'   => trim((string)($row[7] ?? '-')),
-                    'Kode_Kel'    => trim((string)($row[8] ?? '-')),
-                    'Kode_RT_RW'  => trim((string)($row[9] ?? '-')),
-                    'Luas_kumuh'  => (float)str_replace(',', '.', (string)($row[10] ?? '0')),
-                    'skor_kumuh'  => (float)str_replace(',', '.', (string)($row[11] ?? '0')),
-                    'Sumber_data' => trim((string)($row[12] ?? '-')),
-                    'Sk_Kumuh'    => trim((string)($row[13] ?? '-')),
-                    'Kawasan'     => trim((string)($row[14] ?? '-')),
+                    'WKT'         => $wkt,
+                    'Provinsi'    => $getVal($row, 'Provinsi') ?? 'Sulawesi Selatan',
+                    'Kode_Prov'   => $getVal($row, 'Kode_Prov') ?? '73',
+                    'Kab_Kota'    => $getVal($row, 'Kab_Kota') ?? 'Sinjai',
+                    'Kode_Kab'    => $getVal($row, 'Kode_Kab') ?? '07',
+                    'Kecamatan'   => $getVal($row, 'Kecamatan') ?? '-',
+                    'Kode_Kec'    => $getVal($row, 'Kode_Kec') ?? '-',
+                    'Kelurahan'   => $kelurahan,
+                    'desa_id'     => $desaId,
+                    'Kode_Kel'    => $getVal($row, 'Kode_Kel') ?? '-',
+                    'Kode_RT_RW'  => $getVal($row, 'Kode_RT_RW') ?? '-',
+                    'Luas_kumuh'  => $luas,
+                    'skor_kumuh'  => $skor,
+                    'Sumber_data' => $getVal($row, 'Sumber_data') ?? '-',
+                    'Sk_Kumuh'    => $getVal($row, 'Sk_Kumuh') ?? '-',
+                    'Kawasan'     => $kawasan,
                 ]);
                 $count++;
             }
 
             $db->transComplete();
             if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
-            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan data tidak kosong.');
 
             $this->logActivity('Import', 'Wilayah Kumuh', "Berhasil mengimpor $count data Wilayah Kumuh via Excel");
             return redirect()->to('/wilayah-kumuh')->with('success', "$count data Wilayah Kumuh berhasil diimpor.");

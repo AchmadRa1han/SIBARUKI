@@ -104,6 +104,49 @@ class Psu extends BaseController
             return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
         }
 
+        $aliasMap = [
+            'wkt'          => ['wkt', 'geometry', 'geom', 'koordinat', 'koordinat_jalan', 'koordinat jalan'],
+            'nama_jalan'   => ['nama jalan', 'nama_jalan', 'nama'],
+            'jalan'        => ['jalan', 'lokasi', 'alamat', 'desa', 'kecamatan', 'keterangan lokasi', 'lokasi jalan', 'kecamatan/desa', 'desa/kecamatan'],
+            'tahun'        => ['tahun', 'tahun pembangunan', 'tahun_pembangunan', 'tahun bangun'],
+            'panjang_luas' => ['panjang/luas', 'panjang luas', 'panjang_luas', 'panjang', 'luas', 'panjang (m)', 'luas (m2)', 'panjang/luas jalan'],
+        ];
+
+        $headerPos = [];
+        $foundHeader = false;
+        $dataStartIndex = 0;
+
+        foreach ($rows as $rowIndex => $row) {
+            $rowClean = array_map(function($v) { return strtolower(trim((string)($v ?? ''))); }, $row);
+            
+            $isHeader = false;
+            foreach ($rowClean as $cell) {
+                if (in_array($cell, ['wkt', 'geometry', 'nama jalan', 'nama_jalan', 'nama_perumahan', 'nama perumahan', 'jenis pekerjaan', 'jenis_pekerjaan'])) {
+                    $isHeader = true;
+                    break;
+                }
+            }
+            
+            if ($isHeader) {
+                foreach ($rowClean as $index => $colName) {
+                    foreach ($aliasMap as $field => $aliases) {
+                        if ($colName === $field || in_array($colName, $aliases)) {
+                            if (!isset($headerPos[$field])) {
+                                $headerPos[$field] = $index;
+                            }
+                        }
+                    }
+                }
+                $foundHeader = true;
+                $dataStartIndex = $rowIndex + 1;
+                break;
+            }
+        }
+
+        if (!$foundHeader || !isset($headerPos['nama_jalan'])) {
+            return redirect()->back()->with('error', 'Format Header Excel/CSV tidak dikenali. Pastikan kolom Nama Jalan tersedia.');
+        }
+
         $count = 0;
         $db = \Config\Database::connect();
 
@@ -113,24 +156,42 @@ class Psu extends BaseController
 
         $db->transStart();
         try {
-            foreach ($rows as $rowIndex => $row) {
-                // Skip header or empty rows
-                if (count($row) < 3 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'WKT') !== false || empty(trim((string)($row[0] ?? '')))) {
-                    continue;
+            $getVal = function($row, $field) use ($headerPos) {
+                return isset($headerPos[$field]) ? trim((string)($row[$headerPos[$field]] ?? '')) : null;
+            };
+
+            for ($i = $dataStartIndex; $i < count($rows); $i++) {
+                $row = $rows[$i];
+                
+                $namaJalan = $getVal($row, 'nama_jalan');
+                if (empty($namaJalan) || $namaJalan === '-') continue;
+
+                $wkt = $getVal($row, 'wkt') ?? '';
+                if (is_numeric($wkt) && strlen($wkt) < 5) {
+                    $wkt = null;
                 }
 
+                $tahunRaw = $getVal($row, 'tahun');
+                $tahun = ($tahunRaw && is_numeric($tahunRaw)) ? (int)$tahunRaw : date('Y');
+
+                $panjangLuasRaw = $getVal($row, 'panjang_luas');
+                $panjangLuas = $panjangLuasRaw ? (float)preg_replace('/[^0-9.]/', '', str_replace(',', '.', $panjangLuasRaw)) : 0.0;
+
+                $jalan = $getVal($row, 'jalan') ?? '-';
+
                 $this->jalanModel->insert([
-                    'wkt'          => $row[0] ?? null,
-                    'nama_jalan'   => trim((string)($row[1] ?? '-')),
-                    'tahun'        => (int)($row[2] ?? date('Y')),
-                    'panjang_luas' => (float)preg_replace('/[^0-9.]/', '', (string)($row[3] ?? '0')),
+                    'wkt'          => $wkt,
+                    'nama_jalan'   => $namaJalan,
+                    'jalan'        => $jalan,
+                    'tahun'        => $tahun,
+                    'panjang_luas' => $panjangLuas,
                 ]);
                 $count++;
             }
 
             $db->transComplete();
             if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
-            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan data tidak kosong.');
 
             $this->logActivity('Import', 'PSU Jalan', "Berhasil mengimpor $count data Jaringan Jalan");
             return redirect()->to('/psu')->with('success', "$count data PSU Jalan berhasil diimpor.");

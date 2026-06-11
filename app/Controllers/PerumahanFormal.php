@@ -100,6 +100,51 @@ class PerumahanFormal extends BaseController
             return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
         }
 
+        $aliasMap = [
+            'nama_perumahan'    => ['nama perumahan', 'nama_perumahan', 'perumahan', 'nama'],
+            'pengembang'        => ['pengembang', 'developer', 'pt/cv'],
+            'tahun_pembangunan' => ['tahun pembangunan', 'tahun_pembangunan', 'tahun', 'tahun bangun'],
+            'luas_kawasan_ha'   => ['luas kawasan (ha)', 'luas kawasan', 'luas_kawasan_ha', 'luas (ha)', 'luas'],
+            'longitude'         => ['longitude', 'long', 'lon'],
+            'latitude'          => ['latitude', 'lat'],
+            'wkt'               => ['wkt', 'geometry', 'geom', 'koordinat'],
+        ];
+
+        $headerPos = [];
+        $foundHeader = false;
+        $dataStartIndex = 0;
+
+        foreach ($rows as $rowIndex => $row) {
+            $rowClean = array_map(function($v) { return strtolower(trim((string)($v ?? ''))); }, $row);
+            
+            $isHeader = false;
+            foreach ($rowClean as $cell) {
+                if (in_array($cell, ['nama perumahan', 'nama_perumahan', 'perumahan', 'pengembang'])) {
+                    $isHeader = true;
+                    break;
+                }
+            }
+            
+            if ($isHeader) {
+                foreach ($rowClean as $index => $colName) {
+                    foreach ($aliasMap as $field => $aliases) {
+                        if ($colName === $field || in_array($colName, $aliases)) {
+                            if (!isset($headerPos[$field])) {
+                                $headerPos[$field] = $index;
+                            }
+                        }
+                    }
+                }
+                $foundHeader = true;
+                $dataStartIndex = $rowIndex + 1;
+                break;
+            }
+        }
+
+        if (!$foundHeader || !isset($headerPos['nama_perumahan'])) {
+            return redirect()->back()->with('error', 'Format Header Excel/CSV tidak dikenali. Pastikan kolom Nama Perumahan tersedia.');
+        }
+
         $count = 0;
         $db = \Config\Database::connect();
 
@@ -109,27 +154,42 @@ class PerumahanFormal extends BaseController
 
         $db->transStart();
         try {
-            foreach ($rows as $rowIndex => $row) {
-                // Header detection or data validation
-                if (count($row) < 7 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'Keterangan') !== false || !is_numeric($row[1] ?? null)) {
-                    continue;
+            $getVal = function($row, $field) use ($headerPos) {
+                return isset($headerPos[$field]) ? trim((string)($row[$headerPos[$field]] ?? '')) : null;
+            };
+
+            for ($i = $dataStartIndex; $i < count($rows); $i++) {
+                $row = $rows[$i];
+                
+                $namaPerumahan = $getVal($row, 'nama_perumahan');
+                if (empty($namaPerumahan) || $namaPerumahan === '-') continue;
+
+                $wkt = $getVal($row, 'wkt') ?? '';
+                if (is_numeric($wkt) && strlen($wkt) < 5) {
+                    $wkt = null;
                 }
 
+                $tahunRaw = $getVal($row, 'tahun_pembangunan');
+                $tahun = ($tahunRaw && is_numeric($tahunRaw)) ? (int)$tahunRaw : date('Y');
+
+                $luasRaw = $getVal($row, 'luas_kawasan_ha');
+                $luas = $luasRaw ? (float)str_replace(',', '.', $luasRaw) : 0.0;
+
                 $this->perumahanModel->insert([
-                    'nama_perumahan'    => $row[2] ?? '-',
-                    'pengembang'        => $row[6] ?? '-',
-                    'tahun_pembangunan' => (int)($row[7] ?? date('Y')),
-                    'luas_kawasan_ha'   => (float)str_replace(',', '.', (string)($row[3] ?? '0')),
-                    'longitude'         => $row[4] ?? null,
-                    'latitude'          => $row[5] ?? null,
-                    'wkt'               => $row[0] ?? null,
+                    'nama_perumahan'    => $namaPerumahan,
+                    'pengembang'        => $getVal($row, 'pengembang') ?? '-',
+                    'tahun_pembangunan' => $tahun,
+                    'luas_kawasan_ha'   => $luas,
+                    'longitude'         => $getVal($row, 'longitude'),
+                    'latitude'          => $getVal($row, 'latitude'),
+                    'wkt'               => $wkt,
                 ]);
                 $count++;
             }
 
             $db->transComplete();
             if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
-            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan format file sesuai.');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan data tidak kosong.');
 
             return redirect()->to('/perumahan-formal')->with('success', "$count data Perumahan berhasil diimpor.");
         } catch (\Exception $e) {

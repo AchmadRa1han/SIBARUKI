@@ -177,6 +177,59 @@ class AsetTanah extends BaseController
             return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
         }
 
+        $aliasMap = [
+            'no_sertifikat'  => ['no sertifikat', 'no_sertifikat', 'sertifikat', 'no. sertifikat'],
+            'nama_pemilik'   => ['nama pemilik', 'nama_pemilik', 'pemilik', 'nama'],
+            'luas_m2'        => ['luas m2', 'luas_m2', 'luas', 'luas (m2)', 'luas_lahan'],
+            'lokasi'         => ['lokasi', 'alamat lokasi', 'alamat'],
+            'desa_kelurahan' => ['desa_kelurahan', 'desa/kelurahan', 'kelurahan/desa', 'desa', 'kelurahan'],
+            'kecamatan'      => ['kecamatan', 'kec'],
+            'tgl_terbit'     => ['tgl terbit', 'tgl_terbit', 'tanggal terbit', 'tanggal_terbit'],
+            'nomor_hak'      => ['nomor hak', 'nomor_hak', 'no hak', 'no_hak'],
+            'peruntukan'     => ['peruntukan', 'penggunaan', 'fungsi'],
+            'koordinat'      => ['koordinat', 'wkt', 'lokasi koordinat'],
+            'latitude'       => ['latitude', 'lat'],
+            'longitude'      => ['longitude', 'long', 'lon'],
+            'nilai_aset'     => ['nilai aset', 'nilai_aset', 'nilai', 'harga', 'nilai (rp)'],
+            'status_tanah'   => ['status tanah', 'status_tanah', 'status'],
+            'keterangan'     => ['keterangan', 'ket'],
+        ];
+
+        $headerPos = [];
+        $foundHeader = false;
+        $dataStartIndex = 0;
+
+        foreach ($rows as $rowIndex => $row) {
+            $rowClean = array_map(function($v) { return strtolower(trim((string)($v ?? ''))); }, $row);
+            
+            $isHeader = false;
+            foreach ($rowClean as $cell) {
+                if (in_array($cell, ['no sertifikat', 'no_sertifikat', 'sertifikat', 'nama pemilik', 'nama_pemilik'])) {
+                    $isHeader = true;
+                    break;
+                }
+            }
+            
+            if ($isHeader) {
+                foreach ($rowClean as $index => $colName) {
+                    foreach ($aliasMap as $field => $aliases) {
+                        if ($colName === $field || in_array($colName, $aliases)) {
+                            if (!isset($headerPos[$field])) {
+                                $headerPos[$field] = $index;
+                            }
+                        }
+                    }
+                }
+                $foundHeader = true;
+                $dataStartIndex = $rowIndex + 1;
+                break;
+            }
+        }
+
+        if (!$foundHeader || !isset($headerPos['no_sertifikat'])) {
+            return redirect()->back()->with('error', 'Format Header Excel/CSV tidak dikenali. Pastikan kolom No Sertifikat tersedia.');
+        }
+
         $count = 0;
         $db = \Config\Database::connect();
 
@@ -186,61 +239,94 @@ class AsetTanah extends BaseController
 
         $db->transStart();
         try {
-            foreach ($rows as $rowIndex => $row) {
-                if (count($row) < 10 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'Sertifikat') !== false || !is_numeric($row[0] ?? null)) {
-                    continue;
-                }
+            $getVal = function($row, $field) use ($headerPos) {
+                return isset($headerPos[$field]) ? trim((string)($row[$headerPos[$field]] ?? '')) : null;
+            };
 
-                $luasRaw = (string)($row[3] ?? '0');
+            for ($i = $dataStartIndex; $i < count($rows); $i++) {
+                $row = $rows[$i];
+                
+                $noSertifikat = $getVal($row, 'no_sertifikat');
+                if (empty($noSertifikat) || $noSertifikat === '-') continue;
+
+                $luasRaw = $getVal($row, 'luas_m2') ?? '0';
                 $luas = (float)str_replace(',', '.', str_replace('.', '', $luasRaw));
 
-                $nilaiRaw = (string)($row[12] ?? '0');
+                $nilaiRaw = $getVal($row, 'nilai_aset') ?? '0';
                 $nilai = (float)str_replace(',', '.', str_replace('.', '', $nilaiRaw));
 
                 $tglTerbit = null;
-                $tglRaw = trim((string)($row[7] ?? ''));
+                $tglRaw = trim($getVal($row, 'tgl_terbit') ?? '');
                 if ($tglRaw) {
                     $dt = \DateTime::createFromFormat('d-m-Y', $tglRaw);
                     if (!$dt) $dt = \DateTime::createFromFormat('Y-m-d', $tglRaw);
                     if ($dt) $tglTerbit = $dt->format('Y-m-d');
                 }
 
-                $lonRaw = trim((string)($row[10] ?? ''));
-                $latRaw = trim((string)($row[11] ?? ''));
-                
-                $lon = str_replace(',', '.', $lonRaw);
-                $lat = str_replace(',', '.', $latRaw);
-                
-                if (substr_count($lat, '.') > 1) {
-                    $firstDot = strpos($lat, '.');
-                    $lat = substr($lat, 0, $firstDot + 1) . str_replace('.', '', substr($lat, $firstDot + 1));
-                }
-                if (substr_count($lon, '.') > 1) {
-                    $firstDot = strpos($lon, '.');
-                    $lon = substr($lon, 0, $firstDot + 1) . str_replace('.', '', substr($lon, $firstDot + 1));
+                // Coordinate parsing
+                $lat = null;
+                $lon = null;
+
+                $latRaw = $getVal($row, 'latitude');
+                $lonRaw = $getVal($row, 'longitude');
+                if ($latRaw !== null && $lonRaw !== null) {
+                    $lat = str_replace(',', '.', $latRaw);
+                    $lon = str_replace(',', '.', $lonRaw);
+                } else {
+                    $koordinatRaw = $getVal($row, 'koordinat');
+                    if (!empty($koordinatRaw)) {
+                        // Check if it is WKT POINT
+                        if (preg_match('/POINT\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*\)/i', $koordinatRaw, $matches)) {
+                            // WKT has Longitude first, then Latitude
+                            $lon = $matches[1];
+                            $lat = $matches[2];
+                        } elseif (strpos($koordinatRaw, ',') !== false) {
+                            $parts = explode(',', $koordinatRaw);
+                            if (count($parts) === 2) {
+                                $lat = trim($parts[0]);
+                                $lon = trim($parts[1]);
+                            }
+                        }
+                    }
                 }
 
+                // Sanitize lat / lon strings to handle multiple dots
+                if ($lat !== null) {
+                    if (substr_count($lat, '.') > 1) {
+                        $firstDot = strpos($lat, '.');
+                        $lat = substr($lat, 0, $firstDot + 1) . str_replace('.', '', substr($lat, $firstDot + 1));
+                    }
+                }
+                if ($lon !== null) {
+                    if (substr_count($lon, '.') > 1) {
+                        $firstDot = strpos($lon, '.');
+                        $lon = substr($lon, 0, $firstDot + 1) . str_replace('.', '', substr($lon, $firstDot + 1));
+                    }
+                }
+
+                $koordinat = (is_numeric($lat) && is_numeric($lon)) ? "$lat, $lon" : null;
+
                 $this->asetModel->insert([
-                    'no_sertifikat'  => trim((string)($row[1] ?? '-')),
-                    'nama_pemilik'   => trim((string)($row[2] ?? '-')),
+                    'no_sertifikat'  => $noSertifikat,
+                    'nama_pemilik'   => $getVal($row, 'nama_pemilik') ?? '-',
                     'luas_m2'        => $luas,
-                    'lokasi'         => trim((string)($row[4] ?? '-')),
-                    'desa_kelurahan' => trim((string)($row[5] ?? '-')),
-                    'kecamatan'      => trim((string)($row[6] ?? '-')),
+                    'lokasi'         => $getVal($row, 'lokasi') ?? '-',
+                    'desa_kelurahan' => $getVal($row, 'desa_kelurahan') ?? '-',
+                    'kecamatan'      => $getVal($row, 'kecamatan') ?? '-',
                     'tgl_terbit'     => $tglTerbit,
-                    'nomor_hak'      => trim((string)($row[8] ?? '-')),
-                    'peruntukan'     => trim((string)($row[9] ?? '-')),
-                    'koordinat'      => (is_numeric($lat) && is_numeric($lon)) ? "$lat, $lon" : null,
+                    'nomor_hak'      => $getVal($row, 'nomor_hak') ?? '-',
+                    'peruntukan'     => $getVal($row, 'peruntukan') ?? '-',
+                    'koordinat'      => $koordinat,
                     'nilai_aset'     => $nilai,
-                    'status_tanah'   => trim((string)($row[13] ?? '-')),
-                    'keterangan'     => trim((string)($row[14] ?? '-')),
+                    'status_tanah'   => $getVal($row, 'status_tanah') ?? '-',
+                    'keterangan'     => $getVal($row, 'keterangan') ?? '-',
                 ]);
                 $count++;
             }
 
             $db->transComplete();
             if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
-            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan data tidak kosong.');
 
             $this->logActivity('Import', 'Aset Tanah', "Berhasil mengimpor $count data Aset Tanah");
             return redirect()->to('/aset-tanah')->with('success', "$count data Aset berhasil diimpor.");

@@ -120,6 +120,53 @@ class Arsinum extends BaseController
             return redirect()->back()->with('error', 'Gagal membaca file: ' . $e->getMessage());
         }
 
+        $aliasMap = [
+            'jenis_pekerjaan' => ['jenis pekerjaan', 'jenis_pekerjaan', 'pekerjaan', 'kegiatan'],
+            'volume'          => ['volume', 'vol', 'satuan'],
+            'kecamatan'       => ['kecamatan', 'kec'],
+            'desa'            => ['desa', 'kelurahan', 'desa/kelurahan', 'lokasi'],
+            'pelaksana'       => ['pelaksana', 'kontraktor', 'pihak ketiga'],
+            'anggaran'        => ['anggaran', 'pagu', 'nilai', 'harga', 'anggaran (rp)'],
+            'sumber_dana'     => ['sumber dana', 'sumber_dana', 'dana', 'asal dana'],
+            'koordinat'       => ['koordinat', 'wkt', 'latitude', 'longitude', 'lokasi koordinat'],
+            'tahun'           => ['tahun', 'tahun pembangunan', 'tahun_pembangunan'],
+        ];
+
+        $headerPos = [];
+        $foundHeader = false;
+        $dataStartIndex = 0;
+
+        foreach ($rows as $rowIndex => $row) {
+            $rowClean = array_map(function($v) { return strtolower(trim((string)($v ?? ''))); }, $row);
+            
+            $isHeader = false;
+            foreach ($rowClean as $cell) {
+                if (in_array($cell, ['jenis pekerjaan', 'jenis_pekerjaan', 'pekerjaan', 'kegiatan'])) {
+                    $isHeader = true;
+                    break;
+                }
+            }
+            
+            if ($isHeader) {
+                foreach ($rowClean as $index => $colName) {
+                    foreach ($aliasMap as $field => $aliases) {
+                        if ($colName === $field || in_array($colName, $aliases)) {
+                            if (!isset($headerPos[$field])) {
+                                $headerPos[$field] = $index;
+                            }
+                        }
+                    }
+                }
+                $foundHeader = true;
+                $dataStartIndex = $rowIndex + 1;
+                break;
+            }
+        }
+
+        if (!$foundHeader || !isset($headerPos['jenis_pekerjaan'])) {
+            return redirect()->back()->with('error', 'Format Header Excel/CSV tidak dikenali. Pastikan kolom Jenis Pekerjaan tersedia.');
+        }
+
         $count = 0;
         $db = \Config\Database::connect();
 
@@ -129,31 +176,39 @@ class Arsinum extends BaseController
 
         $db->transStart();
         try {
-            foreach ($rows as $rowIndex => $row) {
-                if (count($row) < 8 || stripos(implode(' ', array_map(function($v) { return (string)$v; }, $row)), 'JENIS PEKERJAAN') !== false || !is_numeric($row[0] ?? null)) {
-                    continue;
-                }
+            $getVal = function($row, $field) use ($headerPos) {
+                return isset($headerPos[$field]) ? trim((string)($row[$headerPos[$field]] ?? '')) : null;
+            };
 
-                $anggaranRaw = (string)($row[7] ?? '0');
+            for ($i = $dataStartIndex; $i < count($rows); $i++) {
+                $row = $rows[$i];
+                
+                $jenisPekerjaan = $getVal($row, 'jenis_pekerjaan');
+                if (empty($jenisPekerjaan) || $jenisPekerjaan === '-') continue;
+
+                $anggaranRaw = $getVal($row, 'anggaran') ?? '0';
                 $anggaran = (float)preg_replace('/[^0-9]/', '', $anggaranRaw);
 
+                $tahunRaw = $getVal($row, 'tahun');
+                $tahun = ($tahunRaw && is_numeric($tahunRaw)) ? (int)$tahunRaw : date('Y');
+
                 $this->arsinumModel->insert([
-                    'jenis_pekerjaan' => $row[1] ?? '-',
-                    'volume'          => $row[3] ?? '-',
-                    'kecamatan'       => $row[4] ?? '-',
-                    'desa'            => $row[5] ?? '-',
-                    'pelaksana'       => $row[6] ?? '-',
+                    'jenis_pekerjaan' => $jenisPekerjaan,
+                    'volume'          => $getVal($row, 'volume') ?? '-',
+                    'kecamatan'       => $getVal($row, 'kecamatan') ?? '-',
+                    'desa'            => $getVal($row, 'desa') ?? '-',
+                    'pelaksana'       => $getVal($row, 'pelaksana') ?? '-',
                     'anggaran'        => $anggaran,
-                    'sumber_dana'     => $row[8] ?? '-',
-                    'koordinat'       => $row[9] ?? null,
-                    'tahun'           => isset($row[10]) ? trim((string)$row[10], " \t\n\r\0\x0B;") : date('Y')
+                    'sumber_dana'     => $getVal($row, 'sumber_dana') ?? '-',
+                    'koordinat'       => $getVal($row, 'koordinat'),
+                    'tahun'           => $tahun
                 ]);
                 $count++;
             }
 
             $db->transComplete();
             if ($db->transStatus() === false) throw new \Exception('Database Transaction Failed');
-            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan.');
+            if ($count == 0) return redirect()->back()->with('error', 'Tidak ada data valid yang ditemukan. Pastikan data tidak kosong.');
 
             $this->logActivity('Import', 'Arsinum', "Berhasil mengimpor $count data Arsinum via Excel");
             return redirect()->to('/arsinum')->with('success', "$count data Arsinum berhasil diimpor.");
