@@ -234,9 +234,10 @@ class Rtlh extends BaseController
             'jenis_kawasan'        => ['jenis kawasan', 'kawasan'],
             'fungsi_ruang'         => ['fungsi ruang'],
             'luas_rumah_m2'        => ['*luas rumah (m2)', 'luas rumah (m2)'],
-            'luas_lahan_m2'        => ['luah lahan (m2)', 'luas lahan (m2)'],
+            'luas_lahan_m2'        => ['luah lahan (m2)', 'luas lahan (m2)', 'luas tanah (m2)', 'luas tanah', 'luas lahan', 'luas_lahan'],
             'jumlah_penghuni_jiwa' => ['jumlah penghuni', 'jumlah penghuni (jiwa)', 'penghuni'],
-            'status_backlog'       => ['status backlog', 'backlog'],
+            'status_backlog'       => ['status backlog', 'backlog', 'status_backlog'],
+            'desil_nasional'       => ['desil nasional', 'desil', 'desil_nasional', 'desil p3ke', 'desil (p3ke)'],
             'pendidikan_id'        => ['*pendidikan', 'pendidikan'],
             'pekerjaan_id'         => ['*pekerjaan', 'pekerjaan'],
             'penghasilan_per_bulan'=> ['*penghasilan perbulan', 'penghasilan perbulan'],
@@ -266,7 +267,8 @@ class Rtlh extends BaseController
             'jarak_sam_ke_tpa_tinja'=> ['*jarak sam ke tpa tinja', 'jarak sam ke tpa tinja'],
             'kamar_mandi_dan_jamban'=> ['*kamar mandi dan jamban', 'kamar mandi dan jamban'],
             'jenis_jamban_kloset'  => ['jenis jamban/ kloset', 'jenis jamban'],
-            'jenis_tpa_tinja'      => ['jenis tpa tinja'],
+            'jenis_tpa_tinja'      => ['jenis tpa tinja', 'tempat pembuangan akhir tinja', 'tpa tinja'],
+            'sumber_penerangan_detail' => ['detail penerangan', 'sumber penerangan detail', 'id pelanggan listrik', 'id pelanggan'],
         ];
 
         $db = \Config\Database::connect();
@@ -406,13 +408,13 @@ class Rtlh extends BaseController
                     'desa'                => $desaNama,
                     'desa_id'             => $desaId,
                     'alamat_detail'       => $getVal('alamat_detail'),
-                    'jenis_kawasan'       => $getVal('jenis_kawasan'),
+                    'jenis_kawasan'       => $findId('JENIS_KAWASAN', $getVal('jenis_kawasan')) ?? $getVal('jenis_kawasan'),
                     'fungsi_ruang'        => $getVal('fungsi_ruang'),
                     'luas_rumah_m2'       => (float)str_replace(',', '.', $getVal('luas_rumah_m2') ?? '0'),
                     'luas_lahan_m2'       => (float)str_replace(',', '.', $getVal('luas_lahan_m2') ?? '0'),
                     'kepemilikan_rumah'   => $findId('KEPEMILIKAN_RUMAH', $getVal('kepemilikan_rumah')),
                     'aset_rumah_di_lokasi_lain' => $getVal('aset_rumah_di_lokasi_lain'),
-                    'kepemilikan_tanah'   => $findId('KEPEMILIKAN_TANAH', $getVal('kepemilikan_tanah')),
+                    'kepemilikan_tanah'   => $findId('KEPEMILIKAN_TANAH', $getVal('kepemipinan_tanah') ?? $getVal('kepemilikan_tanah')),
                     'bantuan_perumahan'   => $getVal('bantuan_perumahan'),
                     'sumber_penerangan'   => $findId('SUMBER_PENERANGAN', $getVal('sumber_penerangan')),
                     'sumber_penerangan_detail' => $getVal('sumber_penerangan_detail'),
@@ -421,6 +423,8 @@ class Rtlh extends BaseController
                     'kamar_mandi_dan_jamban'=> $getVal('kamar_mandi_dan_jamban'),
                     'jenis_jamban_kloset' => $findId('JENIS_JAMBAN', $getVal('jenis_jamban_kloset')),
                     'jenis_tpa_tinja'     => $getVal('jenis_tpa_tinja'),
+                    'status_backlog'      => $getVal('status_backlog') ?: 'TIDAK BACKLOG',
+                    'desil_nasional'      => $getVal('desil_nasional'),
                     'status_bantuan'      => 'Rtlh',
                     'updated_at'          => date('Y-m-d H:i:s')
                 ];
@@ -739,20 +743,20 @@ class Rtlh extends BaseController
             $sheet->setCellValue('K' . $rowNum, $row['jumlah_anggota_keluarga']);
             $sheet->setCellValue('L' . $rowNum, $row['alamat_detail']);
             $sheet->setCellValue('M' . $rowNum, $row['desa']);
-            $sheet->setCellValue('N' . $rowNum, $row['jenis_kawasan']);
+            $sheet->setCellValue('N' . $rowNum, $refMap[$row['jenis_kawasan']] ?? $row['jenis_kawasan'] ?? '-');
             $sheet->setCellValue('O' . $rowNum, $row['fungsi_ruang']);
-            $sheet->setCellValue('P' . $rowNum, $row['kepemilikan_rumah']);
+            $sheet->setCellValue('P' . $rowNum, $refMap[$row['kepemilikan_rumah']] ?? $row['kepemilikan_rumah'] ?? '-');
             $sheet->setCellValue('Q' . $rowNum, $row['aset_rumah_di_lokasi_lain']);
-            $sheet->setCellValue('R' . $rowNum, $row['kepemilikan_tanah']);
-            $sheet->setCellValue('S' . $rowNum, $row['sumber_penerangan']);
+            $sheet->setCellValue('R' . $rowNum, $refMap[$row['kepemilikan_tanah']] ?? $row['kepemilikan_tanah'] ?? '-');
+            $sheet->setCellValue('S' . $rowNum, $refMap[$row['sumber_penerangan']] ?? $row['sumber_penerangan'] ?? '-');
             $sheet->setCellValue('T' . $rowNum, $row['sumber_penerangan_detail']);
             $sheet->setCellValue('U' . $rowNum, $row['bantuan_perumahan']);
             $sheet->setCellValue('V' . $rowNum, $row['luas_rumah_m2']);
             $sheet->setCellValue('W' . $rowNum, $row['luas_lahan_m2']);
-            $sheet->setCellValue('X' . $rowNum, $row['sumber_air_minum']);
+            $sheet->setCellValue('X' . $rowNum, $refMap[$row['sumber_air_minum']] ?? $row['sumber_air_minum'] ?? '-');
             $sheet->setCellValue('Y' . $rowNum, $row['jarak_sam_ke_tpa_tinja']);
             $sheet->setCellValue('Z' . $rowNum, $row['kamar_mandi_dan_jamban']);
-            $sheet->setCellValue('AA' . $rowNum, $row['jenis_jamban_kloset']);
+            $sheet->setCellValue('AA' . $rowNum, $refMap[$row['jenis_jamban_kloset']] ?? $row['jenis_jamban_kloset'] ?? '-');
             $sheet->setCellValue('AB' . $rowNum, $row['jenis_tpa_tinja']);
             $sheet->setCellValue('AC' . $rowNum, $refMap[$row['st_pondasi']] ?? '-');
             $sheet->setCellValue('AD' . $rowNum, $refMap[$row['st_kolom']] ?? '-');
@@ -770,6 +774,8 @@ class Rtlh extends BaseController
             $sheet->setCellValue('AP' . $rowNum, $refMap[$row['st_atap']] ?? '-');
             $sheet->setCellValue('AQ' . $rowNum, $row['status_bantuan']);
             $sheet->setCellValue('AR' . $rowNum, $row['tahun_bansos']);
+            $sheet->setCellValue('AS' . $rowNum, $row['status_backlog']);
+            $sheet->setCellValue('AT' . $rowNum, $row['desil_nasional']);
             $sheet->setCellValue('AU' . $rowNum, $row['wkt_text']);
             $rowNum++;
         }

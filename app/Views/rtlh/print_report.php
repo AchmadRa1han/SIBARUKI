@@ -97,12 +97,12 @@
             <td class="label">ID Desa (Kemendagri)</td><td class="val"><?= $rumah['desa_id'] ?: '-' ?></td>
         </tr>
         <tr>
-            <td class="label">Kepemilikan Rumah</td><td class="val"><?= $rumah['kepemilikan_rumah'] ?></td>
-            <td class="label">Kepemilikan Tanah</td><td class="val"><?= $rumah['kepemilikan_tanah'] ?></td>
+            <td class="label">Kepemilikan Rumah</td><td class="val"><?= $ref[$rumah['kepemilikan_rumah'] ?? ''] ?? $rumah['kepemilikan_rumah'] ?? '-' ?></td>
+            <td class="label">Kepemilikan Tanah</td><td class="val"><?= $ref[$rumah['kepemilikan_tanah'] ?? ''] ?? $rumah['kepemilikan_tanah'] ?? '-' ?></td>
         </tr>
         <tr>
-            <td class="label">Jenis Kawasan</td><td class="val"><?= $rumah['jenis_kawasan'] ?></td>
-            <td class="label">Fungsi Ruang</td><td class="val"><?= $rumah['fungsi_ruang'] ?></td>
+            <td class="label">Jenis Kawasan</td><td class="val"><?= $ref[$rumah['jenis_kawasan'] ?? ''] ?? $rumah['jenis_kawasan'] ?? '-' ?></td>
+            <td class="label">Fungsi Ruang</td><td class="val"><?= $rumah['fungsi_ruang'] ?: '-' ?></td>
         </tr>
         <tr>
             <td class="label">Luas Rumah (m2)</td><td class="val"><?= $rumah['luas_rumah_m2'] ?> m2</td>
@@ -117,15 +117,15 @@
     <div class="section-header">III. Fasilitas & Sanitasi</div>
     <table>
         <tr>
-            <td class="label">Sumber Air Minum</td><td class="val"><?= $rumah['sumber_air_minum'] ?></td>
-            <td class="label">Jarak SAM ke TPA Tinja</td><td class="val"><?= $rumah['jarak_sam_ke_tpa_tinja'] ?></td>
+            <td class="label">Sumber Air Minum</td><td class="val"><?= $ref[$rumah['sumber_air_minum'] ?? ''] ?? $rumah['sumber_air_minum'] ?? '-' ?></td>
+            <td class="label">Jarak SAM ke TPA Tinja</td><td class="val"><?= $rumah['jarak_sam_ke_tpa_tinja'] ?: '-' ?></td>
         </tr>
         <tr>
-            <td class="label">Kamar Mandi & Jamban</td><td class="val"><?= $rumah['kamar_mandi_dan_jamban'] ?></td>
-            <td class="label">Jenis Jamban/Kloset</td><td class="val"><?= $rumah['jenis_jamban_kloset'] ?></td>
+            <td class="label">Kamar Mandi & Jamban</td><td class="val"><?= $rumah['kamar_mandi_dan_jamban'] ?: '-' ?></td>
+            <td class="label">Jenis Jamban/Kloset</td><td class="val"><?= $ref[$rumah['jenis_jamban_kloset'] ?? ''] ?? $rumah['jenis_jamban_kloset'] ?? '-' ?></td>
         </tr>
         <tr>
-            <td class="label">Sumber Penerangan</td><td class="val"><?= $rumah['sumber_penerangan'] ?></td>
+            <td class="label">Sumber Penerangan</td><td class="val"><?= $ref[$rumah['sumber_penerangan'] ?? ''] ?? $rumah['sumber_penerangan'] ?? '-' ?></td>
             <td class="label">ID Pelanggan Listrik</td><td class="val"><?= $rumah['sumber_penerangan_detail'] ?: '-' ?></td>
         </tr>
     </table>
