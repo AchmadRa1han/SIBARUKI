@@ -106,6 +106,7 @@
         window.psuModal = {
             map: null,
             polyLine: null,
+            marker: null,
             points: [],
             uploadUrl: PSU_UPLOAD_URL.endsWith('/') ? PSU_UPLOAD_URL : PSU_UPLOAD_URL + '/',
 
@@ -178,11 +179,47 @@
                 this.updateWKT();
             },
 
+            utmToLatLng: function(easting, northing) {
+                const a = 6378137, f = 1 / 298.257223563;
+                const b = a * (1 - f), e = Math.sqrt(1 - (b * b) / (a * a)), e1sq = (e * e) / (1 - e * e);
+                const k0 = 0.9996, falseEasting = 500000, falseNorthing = 10000000;
+                const zoneCentralMeridian = 123 * (Math.PI / 180); 
+                let x = easting - falseEasting, y = northing - falseNorthing;
+                let M = y / k0, mu = M / (a * (1 - e * e / 4 - 3 * e * e * e * e / 64 - 5 * e * e * e * e * e * e / 256));
+                let phi1Rad = mu + (3 * e1sq / 2 - 27 * e1sq * e1sq * e1sq / 32) * Math.sin(2 * mu) + (21 * e1sq * e1sq / 16 - 55 * e1sq * e1sq * e1sq / 32) * Math.sin(4 * mu) + (151 * e1sq * e1sq / 96) * Math.sin(6 * mu);
+                let N1 = a / Math.sqrt(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad)), T1 = Math.tan(phi1Rad) * Math.tan(phi1Rad), C1 = e1sq * Math.cos(phi1Rad) * Math.cos(phi1Rad), R1 = a * (1 - e * e) / Math.pow(1 - e * e * Math.sin(phi1Rad) * Math.sin(phi1Rad), 1.5);
+                let D = x / (N1 * k0);
+                let lat = phi1Rad - (N1 * Math.tan(phi1Rad) / R1) * (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e1sq) * D * D * D * D / 24 + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e1sq - 3 * C1 * C1) * D * D * D * D * D * D / 720);
+                let lon = zoneCentralMeridian + (D - (1 + 2 * T1 + C1) * D * D * D / 6 + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * e1sq + 24 * T1 * T1) * D * D * D * D * D / 120) / Math.cos(phi1Rad);
+                return [lat * (180 / Math.PI), lon * (180 / Math.PI)];
+            },
+
             drawPolyline: function() {
-                if (this.polyLine && this.map) this.map.removeLayer(this.polyLine);
-                if (this.points.length > 0 && this.map) {
-                    this.polyLine = L.polyline(this.points, { color: '#2563eb', weight: 4 }).addTo(this.map);
-                    if (this.points.length > 1) {
+                if (this.polyLine && this.map) {
+                    this.map.removeLayer(this.polyLine);
+                }
+                this.polyLine = null;
+
+                if (this.marker && this.map) {
+                    this.map.removeLayer(this.marker);
+                }
+                this.marker = null;
+
+                if (this.points.length === 0) return;
+
+                if (this.points.length === 1) {
+                    if (this.map) {
+                        this.marker = L.marker(this.points[0], { draggable: true }).addTo(this.map);
+                        this.marker.on('dragend', (e) => {
+                            const pos = e.target.getLatLng();
+                            this.points[0] = [pos.lat, pos.lng];
+                            this.updateWKT();
+                        });
+                        this.map.setView(this.points[0], 16);
+                    }
+                } else if (this.points.length > 1) {
+                    if (this.map) {
+                        this.polyLine = L.polyline(this.points, { color: '#2563eb', weight: 4 }).addTo(this.map);
                         this.map.fitBounds(this.polyLine.getBounds(), { padding: [20, 20], maxZoom: 18 });
                     }
                 }
@@ -190,6 +227,7 @@
 
             updateWKT: function() {
                 const el = document.getElementById('inp_psu_wkt');
+                if (!el) return;
                 if (this.points.length === 0) {
                     el.value = '';
                 } else if (this.points.length === 1) {
@@ -204,22 +242,59 @@
                 this.points = [];
                 if (this.polyLine && this.map) this.map.removeLayer(this.polyLine);
                 this.polyLine = null;
-                document.getElementById('inp_psu_wkt').value = '';
+                if (this.marker && this.map) this.map.removeLayer(this.marker);
+                this.marker = null;
+                const el = document.getElementById('inp_psu_wkt');
+                if (el) el.value = '';
             },
 
             loadWKT: function(wktString) {
                 this.clearMap();
-                if (!wktString || typeof wellknown === 'undefined') return;
+                if (!wktString || typeof wellknown === 'undefined') {
+                    if (this.map) {
+                        this.map.setView([-5.1245, 120.2536], 13);
+                    }
+                    return;
+                }
                 try {
                     const geo = wellknown.parse(wktString);
-                    if (geo && geo.type === 'LineString') {
-                        this.points = geo.coordinates.map(c => [c[1], c[0]]);
-                    } else if (geo && geo.type === 'Point') {
-                        this.points = [[geo.coordinates[1], geo.coordinates[0]]];
+                    if (!geo) {
+                        if (this.map) {
+                            this.map.setView([-5.1245, 120.2536], 13);
+                        }
+                        return;
                     }
-                    this.drawPolyline();
-                    this.updateWKT();
-                } catch(e) { console.error('Error parsing WKT:', e); }
+
+                    const parseCoord = (c) => {
+                        let lng = c[0];
+                        let lat = c[1];
+                        if (Math.abs(lng) > 500) {
+                            const converted = this.utmToLatLng(lng, lat);
+                            return [converted[0], converted[1]];
+                        }
+                        return [lat, lng];
+                    };
+
+                    if (geo.type === 'LineString') {
+                        this.points = geo.coordinates.map(c => parseCoord(c));
+                    } else if (geo.type === 'Point') {
+                        this.points = [parseCoord(geo.coordinates)];
+                    }
+
+                    if (this.points.length > 0) {
+                        this.drawPolyline();
+                        this.updateWKT();
+                    } else {
+                        if (this.map) {
+                            this.map.setView([-5.1245, 120.2536], 13);
+                        }
+                    }
+                } catch(e) { 
+                    console.error('Error parsing WKT:', e); 
+                    if (this.map) {
+                        this.map.setView([-5.1245, 120.2536], 13);
+                    }
+                }
             },
 
             openAdd: function() {
@@ -239,6 +314,9 @@
                 });
 
                 this.clearMap();
+                if (this.map) {
+                    this.map.setView([-5.1245, 120.2536], 13);
+                }
                 if (window.UI) UI.openModal('modal-psu');
             },
 
