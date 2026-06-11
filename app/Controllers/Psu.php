@@ -294,7 +294,7 @@ class Psu extends BaseController
         $diff = $this->generateDiff($oldData, $newData);
         $this->logActivity('Ubah', 'PSU Jalan', 'Memperbarui data jalan: ' . $oldData['nama_jalan'], $diff);
 
-        return redirect()->to('/psu')->with('success', 'Data berhasil diperbarui.');
+        return redirect()->to('/psu/detail/' . $id)->with('success', 'Data berhasil diperbarui.');
     }
 
     public function delete($id)
