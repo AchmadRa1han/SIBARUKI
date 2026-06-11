@@ -155,15 +155,19 @@
         const ok = await customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} referensi yang dipilih?`, 'danger');
         
         if (ok) {
+            const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrf_cookie_name='))?.split('=')[1] || '<?= csrf_hash() ?>';
             const formData = new FormData();
             ids.forEach(id => formData.append('ids[]', id));
-            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+            formData.append('<?= csrf_token() ?>', csrfToken);
 
             try {
                 const response = await fetch('<?= base_url('ref-master/bulk-delete') ?>', {
                     method: 'POST',
                     body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    headers: { 
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
                 });
                 const result = await response.json();
                 

@@ -456,9 +456,17 @@
     async function handleBulkDelete() {
         const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
         if (await window.customConfirm('Hapus Massal?', `Hapus ${ids.length} data?`, 'danger')) {
+            const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrf_cookie_name='))?.split('=')[1] || '<?= csrf_hash() ?>';
             const fd = new FormData(); ids.forEach(id => fd.append('ids[]', id));
-            fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
-            const r = await (await fetch('<?= base_url('aset-tanah/bulk-delete') ?>', { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })).json();
+            fd.append('<?= csrf_token() ?>', csrfToken);
+            const r = await (await fetch('<?= base_url('aset-tanah/bulk-delete') ?>', { 
+                method: 'POST', 
+                body: fd, 
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
+                } 
+            })).json();
             if (r.status === 'success') { showToast(r.message, 'success'); setTimeout(() => location.reload(), 1000); }
         }
     }

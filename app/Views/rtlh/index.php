@@ -358,9 +358,10 @@
                 f.method = 'POST'; f.action = `<?= base_url('rtlh/delete') ?>/${id}`;
                 
                 const csrfInput = document.createElement('input');
+                const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrf_cookie_name='))?.split('=')[1] || '<?= csrf_hash() ?>';
                 csrfInput.type = 'hidden';
                 csrfInput.name = '<?= csrf_token() ?>';
-                csrfInput.value = '<?= csrf_hash() ?>';
+                csrfInput.value = csrfToken;
                 f.appendChild(csrfInput);
                 
                 document.body.appendChild(f); f.submit();
@@ -371,10 +372,15 @@
             const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(r => r.value);
             const ok = await window.customConfirm('Hapus Massal?', `Hapus ${ids.length} data ke Recycle Bin?`, 'danger');
             if (ok) {
+                const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrf_cookie_name='))?.split('=')[1] || '<?= csrf_hash() ?>';
                 try {
                     const res = await fetch('<?= base_url('rtlh/bulk-delete') ?>', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+                        headers: { 
+                            'Content-Type': 'application/x-www-form-urlencoded', 
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
                         body: `ids[]=${ids.join('&ids[]=')}`
                     });
                     const data = await res.json();

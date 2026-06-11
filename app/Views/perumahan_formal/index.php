@@ -333,11 +333,19 @@
         const ids = Array.from(checked).map(cb => cb.value);
         const ok = await window.customConfirm('Hapus Massal?', `Apakah Anda yakin ingin menghapus ${ids.length} data perumahan yang dipilih?`, 'danger');
         if (ok) {
+            const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrf_cookie_name='))?.split('=')[1] || '<?= csrf_hash() ?>';
             const formData = new FormData();
             ids.forEach(id => formData.append('ids[]', id));
-            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+            formData.append('<?= csrf_token() ?>', csrfToken);
             try {
-                const response = await fetch('<?= base_url('perumahan-formal/bulk-delete') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const response = await fetch('<?= base_url('perumahan-formal/bulk-delete') ?>', { 
+                    method: 'POST', 
+                    body: formData, 
+                    headers: { 
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken
+                    } 
+                });
                 const result = await response.json();
                 if (result.status === 'success') { showToast(result.message, 'success'); setTimeout(() => window.location.reload(), 1000); }
                 else { showToast(result.message, 'error'); }
