@@ -128,16 +128,17 @@
     <!-- Table Section -->
     <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
         <!-- Floating Bulk Action Bar -->
-        <div id="bulk-action-bar" class="absolute top-0 left-0 right-0 z-50 bg-blue-950 text-white p-4 transform -translate-y-full transition-transform duration-500 flex items-center justify-between px-8">
-            <div class="flex items-center gap-4">
-                <span id="selected-count" class="bg-blue-600 px-3 py-1 rounded-lg text-[9px] font-bold tracking-widest shadow-lg shadow-blue-600/20">0 TERPILIH</span>
-                <p class="text-[9px] font-bold uppercase tracking-widest opacity-70 hidden md:block">Aksi massal tersedia</p>
+        <!-- Floating Bulk Action Bar -->
+        <div id="bulk-action-bar" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[5000] bg-blue-950 text-white px-8 py-4 rounded-3xl shadow-2xl flex items-center gap-6 border border-white/10 backdrop-blur-xl animate-bounce-subtle">
+            <div class="flex items-center gap-3 pr-6 border-r border-white/10">
+                <span id="selected-count" class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-black">0</span>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Data Terpilih</span>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="handleBulkDelete()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus
+                <button onclick="handleBulkDelete()" class="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus Massal
                 </button>
-                <button onclick="clearSelection()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all active:scale-95">Batal</button>
+                <button onclick="clearSelection()" class="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Batal</button>
             </div>
         </div>
 
@@ -355,9 +356,10 @@
     const selectedCount = document.getElementById('selected-count');
 
     function updateBulkBar() {
-        const checked = document.querySelectorAll('.row-checkbox:checked');
-        if (checked.length > 0) { bulkBar.classList.remove('-translate-y-full'); selectedCount.innerText = `${checked.length} TERPILIH`; }
-        else { bulkBar.classList.add('-translate-y-full'); }
+        const checked = document.querySelectorAll('.row-checkbox:checked').length;
+        selectedCount.innerText = checked;
+        bulkBar.classList.toggle('hidden', checked === 0);
+        if (checked > 0 && window.lucide) lucide.createIcons();
     }
 
     if (selectAll) {

@@ -179,8 +179,8 @@
             },
 
             drawPolyline: function() {
-                if (this.polyLine) this.map.removeLayer(this.polyLine);
-                if (this.points.length > 0) {
+                if (this.polyLine && this.map) this.map.removeLayer(this.polyLine);
+                if (this.points.length > 0 && this.map) {
                     this.polyLine = L.polyline(this.points, { color: '#2563eb', weight: 4 }).addTo(this.map);
                     if (this.points.length > 1) {
                         this.map.fitBounds(this.polyLine.getBounds(), { padding: [20, 20], maxZoom: 18 });
@@ -202,7 +202,7 @@
 
             clearMap: function() {
                 this.points = [];
-                if (this.polyLine) this.map.removeLayer(this.polyLine);
+                if (this.polyLine && this.map) this.map.removeLayer(this.polyLine);
                 this.polyLine = null;
                 document.getElementById('inp_psu_wkt').value = '';
             },
@@ -253,11 +253,18 @@
                 const title = document.getElementById('modal-psu-title');
                 if (title) title.innerText = "Edit Data PSU Jalan";
                 
-                const fields = ['nama_jalan', 'tahun', 'panjang_luas', 'jalan'];
-                fields.forEach(f => {
-                    const el = document.getElementById('inp_psu_' + (f === 'panjang_luas' ? 'panjang' : f));
-                    if (el) el.value = data[f] || '';
-                });
+                const fields = {
+                    'inp_psu_nama': data.nama_jalan,
+                    'inp_psu_tahun': data.tahun,
+                    'inp_psu_panjang': data.panjang_luas,
+                    'inp_psu_jalan': data.jalan,
+                    'inp_psu_wkt': data.wkt
+                };
+
+                for (const id in fields) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = fields[id] || '';
+                }
 
                 ['before', 'after'].forEach(p => {
                     const img = document.getElementById('img_psu_' + p);

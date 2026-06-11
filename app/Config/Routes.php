@@ -144,6 +144,7 @@ $routes->group('bansos-rtlh', function($routes) {
     $routes->get('edit/(:num)', 'BansosRtlh::edit/$1');
     $routes->post('update/(:num)', 'BansosRtlh::update/$1');
     $routes->post('delete/(:num)', 'BansosRtlh::delete/$1');
+    $routes->post('bulk-delete', 'BansosRtlh::bulkDelete');
 });
 
 // SISTEM & PENGATURAN

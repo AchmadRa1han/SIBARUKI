@@ -114,7 +114,9 @@
             <table class="w-full text-left border-collapse table-fixed">
                 <thead>
                     <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                        <th class="px-6 py-4 w-16 text-center">No</th>
+                        <th class="px-6 py-4 w-16 text-center">
+                            <input type="checkbox" id="check-all" class="w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
+                        </th>
                         <th class="px-4 py-4 w-64">Nama Jaringan Jalan</th>
                         <th class="px-4 py-4 w-28 text-center">Tahun</th>
                         <th class="px-4 py-4 w-40">Panjang / Luas</th>
@@ -124,7 +126,9 @@
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-[10px]">
                     <?php if(!empty($jalan)): $no = 1 + (($pager->getCurrentPage() - 1) * $perPage); foreach($jalan as $item): ?>
                     <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-all duration-200">
-                        <td class="px-6 py-3 text-center font-bold text-slate-400"><?= $no++ ?></td>
+                        <td class="px-6 py-3 text-center">
+                            <input type="checkbox" value="<?= $item['id'] ?>" class="row-checkbox w-4.5 h-4.5 rounded-lg border-2 border-slate-200 text-blue-600 focus:ring-blue-600/20 cursor-pointer transition-all">
+                        </td>
                         <td class="px-4 py-3">
                             <span class="font-bold text-blue-950 dark:text-white uppercase truncate block text-xs mb-0.5"><?= $item['nama_jalan'] ?></span>
                             <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest"><?= $item['jalan'] ?></span>
@@ -140,7 +144,7 @@
                                 <a href="<?= base_url('psu/detail/' . $item['id']) ?>" class="p-2 bg-blue-950 dark:bg-blue-600 text-white rounded-lg shadow-md hover:scale-110 transition-all active:scale-95" title="Detail">
                                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                                 </a>
-                                <?php if (has_permission('edit_psu')): ?>
+                                <?php if (has_permission('delete_psu')): ?>
                                 <button onclick="confirmDelete(<?= $item['id'] ?>)" class="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-600 hover:text-white transition-all active:scale-95" title="Hapus">
                                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                 </button>
@@ -160,6 +164,20 @@
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Multi-select Action Bar -->
+        <div id="bulk-action-bar" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[5000] bg-blue-950 text-white px-8 py-4 rounded-3xl shadow-2xl flex items-center gap-6 border border-white/10 backdrop-blur-xl animate-bounce-subtle">
+            <div class="flex items-center gap-3 pr-6 border-r border-white/10">
+                <span id="selected-count" class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-black">0</span>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Data Terpilih</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="bulkDelete()" class="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus Massal
+                </button>
+                <button onclick="clearSelection()" class="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Batal</button>
+            </div>
         </div>
         
         <?php if ($pager) : ?>
@@ -301,6 +319,41 @@
         lucide.createIcons();
         initMap();
     });
+
+    // Selection Logic
+    const checkAll = document.getElementById('check-all');
+    const rows = document.querySelectorAll('.row-checkbox');
+    const bar = document.getElementById('bulk-action-bar');
+    const countDisplay = document.getElementById('selected-count');
+
+    const updateBar = () => {
+        const checked = document.querySelectorAll('.row-checkbox:checked').length;
+        countDisplay.innerText = checked;
+        bar.classList.toggle('hidden', checked === 0);
+        if (checked > 0) lucide.createIcons();
+    };
+
+    checkAll?.addEventListener('change', () => { rows.forEach(r => r.checked = checkAll.checked); updateBar(); });
+    rows.forEach(r => r.addEventListener('change', updateBar));
+
+    window.clearSelection = () => { rows.forEach(r => r.checked = false); if(checkAll) checkAll.checked = false; updateBar(); };
+
+    window.bulkDelete = async () => {
+        const ids = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(r => r.value);
+        const ok = await window.customConfirm('Hapus Massal?', `Hapus ${ids.length} data ke Recycle Bin?`, 'danger');
+        if (ok) {
+            try {
+                const res = await fetch('<?= base_url('psu/bulk-delete') ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: `ids[]=${ids.join('&ids[]=')}`
+                });
+                const data = await res.json();
+                if (data.status === 'success') { window.showToast(data.message); setTimeout(() => location.reload(), 1000); }
+                else window.showToast(data.message, 'error');
+            } catch(e) { window.showToast('Gagal menghapus data', 'error'); }
+        }
+    };
 </script>
 
 <style>

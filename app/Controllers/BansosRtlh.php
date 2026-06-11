@@ -211,6 +211,25 @@ class BansosRtlh extends BaseController
         return redirect()->to('/bansos-rtlh')->with('success', 'Data bansos berhasil dihapus.');
     }
 
+    public function bulkDelete()
+    {
+        $ids = $this->request->getPost('ids');
+        if (empty($ids)) return $this->response->setJSON(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+        try {
+            $this->bansosModel->whereIn('id', $ids)->delete();
+            $db->transComplete();
+            if ($db->transStatus() === FALSE) throw new \Exception('Gagal menghapus data massal.');
+            $this->logActivity('Hapus Massal', 'Bansos', "Menghapus " . count($ids) . " data realisasi bansos");
+            return $this->response->setJSON(['status' => 'success', 'message' => count($ids) . ' data berhasil dihapus.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
     public function edit($id)
     {
         return redirect()->to('/bansos-rtlh')->with('error', 'Halaman tidak tersedia. Gunakan tombol Edit pada halaman detail.');
