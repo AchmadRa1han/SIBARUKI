@@ -126,12 +126,48 @@
                 <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
                     <div class="md:col-span-2"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Alamat Lengkap</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase leading-relaxed"><?= $rumah['alamat_detail'] ?? '-' ?></p></div>
                     <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desa / Kelurahan</p><p class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase"><?= !empty($rumah['desa']) ? $rumah['desa'] : '-' ?></p></div>
-                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kepemilikan Rumah</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['kepemilikan_rumah'] ?? ''] ?? '-' ?></p></div>
-                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kepemilikan Tanah</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['kepemilikan_tanah'] ?? ''] ?? '-' ?></p></div>
-                    <div class="bg-blue-600 p-6 rounded-[2rem] text-white shadow-xl shadow-blue-600/20">
-                        <p class="text-[8px] font-bold text-blue-100 uppercase mb-1 tracking-[0.2em]">Luas Rumah</p>
-                        <p class="text-3xl font-black italic"><?= $rumah['luas_rumah_m2'] ?? '0' ?><span class="text-xs font-bold ml-1 opacity-60">m²</span></p>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kepemilikan Rumah</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['kepemilikan_rumah'] ?? ''] ?? $rumah['kepemilikan_rumah'] ?? '-' ?></p></div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kepemilikan Tanah</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['kepemilikan_tanah'] ?? ''] ?? $rumah['kepemilikan_tanah'] ?? '-' ?></p></div>
+                    
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jenis Kawasan</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['jenis_kawasan'] ?? ''] ?? $rumah['jenis_kawasan'] ?? '-' ?></p></div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Fungsi Ruang</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['fungsi_ruang'] ?? '-' ?></p></div>
+                    
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status Backlog</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['status_backlog'] ?? '-' ?></p></div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Desil Nasional (P3KE)</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['desil_nasional'] ?? '-' ?></p></div>
+                    
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Aset Rumah di Lokasi Lain</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['aset_rumah_di_lokasi_lain'] ?? '-' ?></p></div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Riwayat Bantuan Perumahan</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['bantuan_perumahan'] ?? '-' ?></p></div>
+                    
+                    <div class="md:col-span-2 grid grid-cols-2 gap-4">
+                        <div class="bg-blue-600 p-6 rounded-[2rem] text-white shadow-xl shadow-blue-600/20">
+                            <p class="text-[8px] font-bold text-blue-100 uppercase mb-1 tracking-[0.2em]">Luas Rumah</p>
+                            <p class="text-3xl font-black italic"><?= $rumah['luas_rumah_m2'] ?? '0' ?><span class="text-xs font-bold ml-1 opacity-60">m²</span></p>
+                        </div>
+                        <div class="bg-emerald-600 p-6 rounded-[2rem] text-white shadow-xl shadow-emerald-600/20">
+                            <p class="text-[8px] font-bold text-emerald-100 uppercase mb-1 tracking-[0.2em]">Luas Lahan</p>
+                            <p class="text-3xl font-black italic"><?= $rumah['luas_lahan_m2'] ?? '0' ?><span class="text-xs font-bold ml-1 opacity-60">m²</span></p>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Fasilitas & Sanitasi -->
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="p-6 border-b dark:border-slate-800 flex items-center gap-3">
+                    <div class="w-9 h-9 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center text-emerald-600"><i data-lucide="droplet" class="w-4.5 h-4.5"></i></div>
+                    <div><h3 class="text-[11px] font-bold text-blue-950 dark:text-white uppercase tracking-[0.2em]">Fasilitas & Sanitasi</h3><p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Utilitas, Air Bersih, dan Jamban</p></div>
+                </div>
+                <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Sumber Penerangan</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['sumber_penerangan'] ?? ''] ?? $rumah['sumber_penerangan'] ?? '-' ?></p></div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">ID Pelanggan / Detail Listrik</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['sumber_penerangan_detail'] ?? '-' ?></p></div>
+                    
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Sumber Air Minum</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['sumber_air_minum'] ?? ''] ?? $rumah['sumber_air_minum'] ?? '-' ?></p></div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jarak SAM ke TPA Tinja</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['jarak_sam_ke_tpa_tinja'] ?? '-' ?></p></div>
+                    
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kamar Mandi dan Jamban</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['kamar_mandi_dan_jamban'] ?? '-' ?></p></div>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jenis Jamban/Kloset</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $ref[$rumah['jenis_jamban_kloset'] ?? ''] ?? $rumah['jenis_jamban_kloset'] ?? '-' ?></p></div>
+                    
+                    <div class="md:col-span-2"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tempat Pembuangan Akhir Tinja</p><p class="text-sm font-bold text-slate-700 dark:text-white uppercase"><?= $rumah['jenis_tpa_tinja'] ?? '-' ?></p></div>
                 </div>
             </div>
         </div>

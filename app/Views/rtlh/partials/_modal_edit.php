@@ -160,6 +160,13 @@
                                 </select>
                             </div>
                             <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Aset di Lokasi Lain</label>
+                                <select name="aset_rumah_di_lokasi_lain" id="inp_aset_lain" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                    <option value="TIDAK ADA">TIDAK ADA</option>
+                                    <option value="ADA">ADA</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Jenis Kawasan</label>
                                 <select name="jenis_kawasan" id="inp_kawasan" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
                                     <option value="">Pilih</option>
@@ -169,6 +176,10 @@
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Fungsi Ruang</label>
                                 <input type="text" name="fungsi_ruang" id="inp_fungsi_ruang" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none" placeholder="Misal: Rumah Tinggal">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Riwayat Bantuan Perumahan</label>
+                                <input type="text" name="bantuan_perumahan" id="inp_bantuan_perumahan" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none" placeholder="Misal: BSPS 2022, Bedah Rumah BAZNAS, dll">
                             </div>
                         </div>
                         <div class="space-y-6">
@@ -181,6 +192,10 @@
                                     <option value="">Pilih</option>
                                     <?php foreach(($master['SUMBER_PENERANGAN'] ?? []) as $sp): ?><option value="<?= $sp['id'] ?>"><?= $sp['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">ID Pelanggan Listrik</label>
+                                <input type="text" name="sumber_penerangan_detail" id="inp_listric_detail" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs outline-none" placeholder="Nomor Meter / ID Pelanggan">
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Sumber Air Minum</label>
@@ -215,6 +230,13 @@
                                     <option value="SENDIRI">SENDIRI</option>
                                     <option value="BERSAMA">BERSAMA / UMUM</option>
                                     <option value="TIDAK ADA">TIDAK ADA</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Sanitasi (Jenis Jamban)</label>
+                                <select name="jenis_jamban_kloset" id="inp_jamban_kloset" class="w-full mt-1.5 p-4 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl font-bold text-xs">
+                                    <option value="">Pilih Sanitasi</option>
+                                    <?php foreach(($master['JENIS_JAMBAN'] ?? []) as $jj): ?><option value="<?= $jj['id'] ?>"><?= $jj['nama_pilihan'] ?></option><?php endforeach; ?>
                                 </select>
                             </div>
                             <div>
@@ -446,14 +468,18 @@
                     'inp_coords': r.wkt || '',
                     'inp_milik_rumah': r.kepemilikan_rumah || '',
                     'inp_milik_tanah': r.kepemilikan_tanah || '',
+                    'inp_aset_lain': r.aset_rumah_di_lokasi_lain || 'TIDAK ADA',
                     'inp_kawasan': r.jenis_kawasan || '',
                     'inp_fungsi_ruang': r.fungsi_ruang || '',
+                    'inp_bantuan_perumahan': r.bantuan_perumahan || '',
                     'inp_listric': r.sumber_penerangan || '',
+                    'inp_listric_detail': r.sumber_penerangan_detail || '',
                     'inp_air': r.sumber_air_minum || '',
                     'inp_jarak_sam': r.jarak_sam_ke_tpa_tinja || '',
                     'inp_desil': r.desil_nasional || '',
                     'inp_status_backlog': r.status_backlog || 'TIDAK BACKLOG',
                     'inp_bab': r.kamar_mandi_dan_jamban || 'SENDIRI',
+                    'inp_jamban_kloset': r.jenis_jamban_kloset || '',
                     'inp_tpa': r.jenis_tpa_tinja || '',
                     'inp_status_bantuan': (r.status_bantuan === 'Belum Menerima' ? 'Rtlh' : (r.status_bantuan === 'Sudah Menerima' ? 'Rlh' : (r.status_bantuan || 'Unknown')))
                 };
