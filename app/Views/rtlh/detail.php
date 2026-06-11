@@ -181,7 +181,7 @@
                 </div>
                 <div class="p-6 grid grid-cols-2 gap-4">
                     <?php 
-                        $fotos = ['foto_depan' => 'Tampak Depan', 'foto_samping' => 'Samping', 'foto_belakang' => 'Belakang', 'foto_dalam' => 'Interior'];
+                        $fotos = ['foto_depan' => 'Tampak Depan', 'foto_dalam' => 'Tampak Kanan', 'foto_samping' => 'Tampak Kiri', 'foto_belakang' => 'Tampak Belakang'];
                         foreach($fotos as $f => $lbl):
                             $path = !empty($rumah[$f]) ? base_url('uploads/rtlh/' . $rumah[$f]) : null;
                     ?>

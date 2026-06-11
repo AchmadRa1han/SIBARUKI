@@ -106,7 +106,7 @@
     <div class="section-title">Dokumentasi Kondisi Awal (Before)</div>
     <div class="photo-grid">
         <?php if ($rumah): ?>
-            <?php foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $f): ?>
+            <?php foreach(['foto_depan', 'foto_dalam', 'foto_samping', 'foto_belakang'] as $f): ?>
                 <div class="photo-item">
                     <?php if (!empty($rumah[$f])): ?>
                         <img src="<?= base_url('uploads/rtlh/'.$rumah[$f]) ?>">

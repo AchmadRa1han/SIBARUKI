@@ -268,7 +268,7 @@
                                 <h4 class="text-xs font-black text-rose-600 uppercase border-l-4 border-rose-600 pl-4">IV. Dokumentasi Visual</h4>
                             </div>
                             <?php 
-                                $fotos = [['foto_depan', 'Tampak Depan'], ['foto_samping', 'Samping'], ['foto_belakang', 'Belakang'], ['foto_dalam', 'Interior']];
+                                $fotos = [['foto_depan', 'Tampak Depan'], ['foto_dalam', 'Tampak Kanan'], ['foto_samping', 'Tampak Kiri'], ['foto_belakang', 'Tampak Belakang']];
                                 foreach($fotos as $f):
                             ?>
                             <div class="space-y-3">

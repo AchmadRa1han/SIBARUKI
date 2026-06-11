@@ -157,16 +157,16 @@
             <div class="photo-label">Tampak Depan</div>
         </div>
         <div class="photo-box">
+            <?php if(!empty($rumah['foto_dalam'])): ?><img src="<?= base_url('uploads/rtlh/'.$rumah['foto_dalam']) ?>"><?php else: ?><div style="height:200px; background:#eee;">NO PHOTO</div><?php endif; ?>
+            <div class="photo-label">Tampak Kanan</div>
+        </div>
+        <div class="photo-box">
             <?php if(!empty($rumah['foto_samping'])): ?><img src="<?= base_url('uploads/rtlh/'.$rumah['foto_samping']) ?>"><?php else: ?><div style="height:200px; background:#eee;">NO PHOTO</div><?php endif; ?>
-            <div class="photo-label">Tampak Samping Kiri</div>
+            <div class="photo-label">Tampak Kiri</div>
         </div>
         <div class="photo-box">
             <?php if(!empty($rumah['foto_belakang'])): ?><img src="<?= base_url('uploads/rtlh/'.$rumah['foto_belakang']) ?>"><?php else: ?><div style="height:200px; background:#eee;">NO PHOTO</div><?php endif; ?>
             <div class="photo-label">Tampak Belakang</div>
-        </div>
-        <div class="photo-box">
-            <?php if(!empty($rumah['foto_dalam'])): ?><img src="<?= base_url('uploads/rtlh/'.$rumah['foto_dalam']) ?>"><?php else: ?><div style="height:200px; background:#eee;">NO PHOTO</div><?php endif; ?>
-            <div class="photo-label">Tampak Samping Kanan</div>
         </div>
     </div>
 

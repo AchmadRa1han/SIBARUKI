@@ -87,7 +87,7 @@
                         
                         <?php if ($rumah): ?>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <?php foreach(['foto_depan', 'foto_samping', 'foto_belakang', 'foto_dalam'] as $f): ?>
+                                <?php foreach(['foto_depan', 'foto_dalam', 'foto_samping', 'foto_belakang'] as $f): ?>
                                     <div class="aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 group relative">
                                         <?php if (!empty($rumah[$f])): ?>
                                             <img src="<?= base_url('uploads/rtlh/'.$rumah[$f]) ?>" class="w-full h-full object-cover transition-transform group-hover:scale-110">
