@@ -175,6 +175,8 @@ $routes->group('trash', function($routes) {
     $routes->get('restore/(:num)', 'Trash::restore/$1');
     $routes->get('delete-perm/(:num)', 'Trash::deletePermanently/$1');
     $routes->get('empty', 'Trash::emptyTrash');
+    $routes->post('bulk-restore', 'Trash::bulkRestore');
+    $routes->post('bulk-delete-perm', 'Trash::bulkDeletePermanently');
 });
 
 $routes->group('ref-master', function($routes) {

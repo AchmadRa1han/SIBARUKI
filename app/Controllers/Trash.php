@@ -94,6 +94,82 @@ class Trash extends BaseController
         return redirect()->to('/trash')->with('message', 'Recycle Bin telah dikosongkan.');
     }
 
+    public function bulkRestore()
+    {
+        if (!has_permission('manage_roles')) return redirect()->to('/dashboard');
+
+        $ids = $this->request->getPost('ids');
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->to('/trash')->with('error', 'Pilih setidaknya satu data untuk dipulihkan.');
+        }
+
+        $db = \Config\Database::connect();
+        $restoredCount = 0;
+
+        $db->transStart();
+        foreach ($ids as $id) {
+            $item = $db->table('sys_trash')->where('id', $id)->get()->getRowArray();
+            if (!$item) continue;
+
+            $data = json_decode($item['data_json'], true);
+
+            if ($item['entity_type'] === 'RTLH') {
+                if (!empty($data['penerima'])) {
+                    $db->table('perumahan_rtlh_penerima')->ignore(true)->insert($data['penerima']);
+                }
+                $db->table('perumahan_rtlh_rumah')->insert($data['rumah']);
+                $db->table('perumahan_rtlh_kondisi')->insert($data['kondisi']);
+            } elseif ($item['entity_type'] === 'USER') {
+                $db->table('sys_users')->insert($data['user']);
+                if (!empty($data['assignments'])) {
+                    $db->table('sys_user_desa')->insertBatch($data['assignments']);
+                }
+            } elseif ($item['entity_type'] === 'KUMUH') {
+                $db->table('permukiman_wilayah_kumuh')->insert($data);
+            } elseif ($item['entity_type'] === 'PISEW') {
+                $db->table('permukiman_pisew')->insert($data);
+            } elseif ($item['entity_type'] === 'ARSINUM') {
+                $db->table('permukiman_arsinum')->insert($data);
+            } elseif ($item['entity_type'] === 'PSU_JALAN') {
+                $db->table('permukiman_psu_jalan')->insert($data);
+            }
+
+            $db->table('sys_trash')->where('id', $id)->delete();
+            $this->logActivity('Restore', $item['entity_type'], "Memulihkan data ID: {$item['entity_id']} dari Recycle Bin");
+            $restoredCount++;
+        }
+        $db->transComplete();
+
+        return redirect()->to('/trash')->with('message', "{$restoredCount} data berhasil dipulihkan.");
+    }
+
+    public function bulkDeletePermanently()
+    {
+        if (!has_permission('manage_roles')) return redirect()->to('/dashboard');
+
+        $ids = $this->request->getPost('ids');
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->to('/trash')->with('error', 'Pilih setidaknya satu data untuk dihapus secara permanen.');
+        }
+
+        $db = \Config\Database::connect();
+        $deletedCount = 0;
+
+        $db->transStart();
+        foreach ($ids as $id) {
+            $item = $db->table('sys_trash')->where('id', $id)->get()->getRowArray();
+            if (!$item) continue;
+
+            $data = json_decode($item['data_json'], true);
+            $this->cleanupPhysicalFiles($item['entity_type'], $data);
+            $db->table('sys_trash')->where('id', $id)->delete();
+            $deletedCount++;
+        }
+        $db->transComplete();
+
+        return redirect()->to('/trash')->with('message', "{$deletedCount} data berhasil dihapus secara permanen.");
+    }
+
     private function cleanupPhysicalFiles($type, $data)
     {
         $paths = [
