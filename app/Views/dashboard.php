@@ -152,21 +152,53 @@
         </div>
         <?php endif; ?>
 
-        <!-- DATA INTEGRITY (ADMIN ONLY) -->
+        <!-- DATA INTEGRITY & VISITOR STATS (ADMIN ONLY) -->
         <?php if ($role === 'admin'): ?>
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 w-32 h-32 bg-rose-50 dark:bg-rose-900/10 rounded-full blur-3xl"></div>
-            <h3 class="text-[9px] font-bold text-rose-600 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
-                <span class="w-6 h-[2px] bg-rose-600"></span> Integritas & Kualitas Data
-            </h3>
-            <div class="grid grid-cols-1 relative z-10">
-                <div class="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 max-w-xl">
-                    <div class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-rose-500 shadow-lg">
-                        <i data-lucide="map-pin-off" class="w-7 h-7"></i>
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-32 h-32 bg-blue-50 dark:bg-blue-950/10 rounded-full blur-3xl"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                <!-- Left Column: Data Integrity -->
+                <div>
+                    <h3 class="text-[9px] font-bold text-rose-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                        <span class="w-6 h-[2px] bg-rose-600"></span> Integritas & Kualitas Data
+                    </h3>
+                    <div class="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                        <div class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-rose-500 shadow-lg shrink-0">
+                            <i data-lucide="map-pin-off" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-black text-blue-950 dark:text-white leading-tight"><?= number_format($health['coords'] ?? 0) ?></p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Koordinat Kosong / Titik Nol</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-2xl font-black text-blue-950 dark:text-white leading-tight"><?= number_format($health['coords'] ?? 0) ?></p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Koordinat Kosong / Titik Nol</p>
+                </div>
+
+                <!-- Right Column: Visitor Statistics -->
+                <div>
+                    <h3 class="text-[9px] font-bold text-blue-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                        <span class="w-6 h-[2px] bg-blue-600"></span> Statistik Pengunjung
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50/50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Hari Ini</p>
+                            <h4 class="text-xl font-black text-blue-950 dark:text-white"><?= number_format($visitors['today'] ?? 0) ?></h4>
+                            <p class="text-[7px] text-slate-400 font-bold uppercase mt-0.5">Unique IP</p>
+                        </div>
+                        <div class="p-4 bg-slate-50/50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Bulan Ini</p>
+                            <h4 class="text-xl font-black text-blue-950 dark:text-white"><?= number_format($visitors['month'] ?? 0) ?></h4>
+                            <p class="text-[7px] text-slate-400 font-bold uppercase mt-0.5">Unique IP</p>
+                        </div>
+                        <div class="col-span-2 p-4 bg-blue-50/50 dark:bg-blue-950/20 rounded-2xl border border-blue-100/50 dark:border-blue-800/50 flex items-center justify-between">
+                            <div>
+                                <p class="text-[8px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Total Pengunjung</p>
+                                <h4 class="text-2xl font-black text-blue-950 dark:text-white leading-none"><?= number_format($visitors['total'] ?? 0) ?></h4>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/20">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -84,7 +84,7 @@ abstract class BaseController extends Controller
         ]);
 
         $this->db->table('sys_logs')->insert([
-            'user'        => session()->get('username') ?? 'System',
+            'user'        => session()->get('username') ?? ($action === 'Kunjungan' ? 'Guest' : 'System'),
             'action'      => $action,
             'severity'    => $severity,
             'table_name'  => $table,

@@ -11,6 +11,15 @@ class Home extends BaseController
      */
     public function index()
     {
+        // Visitor Tracking: Log once per session for non-admins
+        if (!session()->get('visitor_logged')) {
+            $roleName = session()->get('role_name');
+            if ($roleName !== 'admin') {
+                $this->logActivity('Kunjungan', 'Landing Page', 'Mengakses halaman depan publik');
+                session()->set('visitor_logged', true);
+            }
+        }
+
         $db = \Config\Database::connect();
         $settingsModel = new SettingsModel();
         $roleScope = session()->get('role_scope');
@@ -349,6 +358,15 @@ class Home extends BaseController
             }
         }
 
+        // Visitor Statistics (Admin Only)
+        $visitorStats = ['today' => 0, 'month' => 0, 'total' => 0];
+        $roleName = session()->get('role_name');
+        if ($roleName === 'admin') {
+            $visitorStats['total'] = $db->query("SELECT COUNT(DISTINCT ip_address) as total FROM sys_logs WHERE action = 'Kunjungan'")->getRowArray()['total'] ?? 0;
+            $visitorStats['today'] = $db->query("SELECT COUNT(DISTINCT ip_address) as total FROM sys_logs WHERE action = 'Kunjungan' AND DATE(created_at) = ?", [date('Y-m-d')])->getRowArray()['total'] ?? 0;
+            $visitorStats['month'] = $db->query("SELECT COUNT(DISTINCT ip_address) as total FROM sys_logs WHERE action = 'Kunjungan' AND DATE_FORMAT(created_at, '%Y-%m') = ?", [date('Y-m')])->getRowArray()['total'] ?? 0;
+        }
+
         $data = [
             'title'         => 'Dashboard',
             'rekap'         => [
@@ -368,6 +386,7 @@ class Home extends BaseController
             'statusAset'    => $statusAset,
             'topKumuh'      => $topKumuh,
             'health'        => ['coords' => $missingCoords, 'kk' => $missingKK],
+            'visitors'      => $visitorStats,
             'spasial'       => [
                 'kecamatan' => $desaPolygons,
                 'rtlh'      => $mapRtlh,
